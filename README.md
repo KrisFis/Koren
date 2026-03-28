@@ -14,7 +14,7 @@ All library types live under the `kor::` namespace. The name comes from *Koren* 
 
 ```cpp
 #include "Kor/Kor.h"
-~~~~
+
 kor::TArray<int> myArray;
 kor::FString myStr = KOR_TEXT("Hello World!");
 ```
