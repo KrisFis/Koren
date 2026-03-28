@@ -1,4 +1,5 @@
-// Copyright Alternity Arts. All Rights Reserved
+// Copyright Jan Kristian Fisera. All Rights Reserved.
+// Licensed under the MIT License. See LICENSE in the repository root.
 
 #pragma once
 
