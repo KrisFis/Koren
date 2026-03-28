@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
+#include "KorMinimal.h"
 
-#include "ASTD/Archive.h"
-#include "ASTD/Array.h"
+#include "Kor/Archive.h"
+#include "Kor/Array.h"
 
 // TODO(krisfis): we might want to in-place memory, meaning that it will write to memory block provided
 // Also setting read/write mode is annoying, maybe make it optional
@@ -15,13 +15,13 @@ struct TArrayArchive : public SArchive
 	typedef TArray<ElementT, AllocatorT> ArrayType;
 	static constexpr SizeType ELEMENT_SIZE = sizeof(ElementT);
 
-	FORCEINLINE TArrayArchive(EArchiveType type, EArchiveMode mode)
+	KOR_FORCEINLINE TArrayArchive(EArchiveType type, EArchiveMode mode)
 		: SArchive(type, mode)
 	{
 		SetData({});
 	}
 
-	FORCEINLINE TArrayArchive(EArchiveType type, EArchiveMode mode, ArrayType&& data)
+	KOR_FORCEINLINE TArrayArchive(EArchiveType type, EArchiveMode mode, ArrayType&& data)
 		: SArchive(type, mode)
 	{
 		SetData(Forward(data));
@@ -30,16 +30,16 @@ struct TArrayArchive : public SArchive
 	// Data set/get
 	/////////////////////////////////
 
-	FORCEINLINE void SetData(ArrayType&& data) { _data = data; _offset = _data.GetNum(); }
-	FORCEINLINE const ArrayType& GetData() const { return _data; }
+	KOR_FORCEINLINE void SetData(ArrayType&& data) { _data = data; _offset = _data.GetNum(); }
+	KOR_FORCEINLINE const ArrayType& GetData() const { return _data; }
 
 	// SArchive overrides
 	/////////////////////////////////
 
-	FORCEINLINE virtual bool IsValid() const override { return true; }
-	FORCEINLINE virtual void Flush() override { SetData(ArrayType()); }
-	FORCEINLINE virtual SizeType GetTotalBytes() const override { return _data.GetNum() * ELEMENT_SIZE; }
-	FORCEINLINE virtual SizeType GetBytesOffset() const override { return _offset * ELEMENT_SIZE; }
+	KOR_FORCEINLINE virtual bool IsValid() const override { return true; }
+	KOR_FORCEINLINE virtual void Flush() override { SetData(ArrayType()); }
+	KOR_FORCEINLINE virtual SizeType GetTotalBytes() const override { return _data.GetNum() * ELEMENT_SIZE; }
+	KOR_FORCEINLINE virtual SizeType GetBytesOffset() const override { return _offset * ELEMENT_SIZE; }
 	virtual bool SetBytesOffset(SizeType offset) override
 	{
 		const SizeType offsetInElements = offset >= ELEMENT_SIZE ? SMath::Floor(offset / ELEMENT_SIZE) : 0;

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "ASTD/Build.h"
-#include "ASTD/Check.h"
+#include "Kor/Build.h"
+#include "Kor/Check.h"
 
 // TODO(jkfisera): REIMPLEMENT Invoke
 #include <type_traits>
@@ -20,43 +20,43 @@ namespace _NShared
 		// Getters
 		/////////////////////////////////
 
-		FORCEINLINE bool HasAnyReference() const { return _sharedNum + _weakCount > 0; }
-		FORCEINLINE uint16 GetSharedNum() const { return _sharedNum; }
-		FORCEINLINE uint16 GetWeakCount() const { return _weakCount; }
+		KOR_FORCEINLINE bool HasAnyReference() const { return _sharedNum + _weakCount > 0; }
+		KOR_FORCEINLINE uint16 GetSharedNum() const { return _sharedNum; }
+		KOR_FORCEINLINE uint16 GetWeakCount() const { return _weakCount; }
 
 		template<typename T>
-		FORCEINLINE T* GetObject() const { return reinterpret_cast<T*>(GetObjectImpl()); }
+		KOR_FORCEINLINE T* GetObject() const { return reinterpret_cast<T*>(GetObjectImpl()); }
 
-		FORCEINLINE bool HasObject() const { return GetObjectImpl() != nullptr; }
+		KOR_FORCEINLINE bool HasObject() const { return GetObjectImpl() != nullptr; }
 
 		// Setters [Add]
 		/////////////////////////////////
 
-		FORCEINLINE void AddShared()
+		KOR_FORCEINLINE void AddShared()
 		{
-			CHECK_RET(_sharedNum < UINT16_MAX);
+			KOR_CHECK_RET(_sharedNum < UINT16_MAX);
 			++_sharedNum;
 		}
 
-		FORCEINLINE void AddWeak()
+		KOR_FORCEINLINE void AddWeak()
 		{
-			CHECK_RET(_weakCount < UINT16_MAX); // overflow
+			KOR_CHECK_RET(_weakCount < UINT16_MAX); // overflow
 			++_weakCount;
 		}
 
 		// Setters [REMOVE]
 		/////////////////////////////////
 
-		FORCEINLINE void RemoveShared()
+		KOR_FORCEINLINE void RemoveShared()
 		{
-			CHECK_RET(_sharedNum > 0); // underflow
+			KOR_CHECK_RET(_sharedNum > 0); // underflow
 			if(_sharedNum == 1) DeconstructObjectImpl();
 			--_sharedNum;
 		}
 
-		FORCEINLINE void RemoveWeak()
+		KOR_FORCEINLINE void RemoveWeak()
 		{
-			CHECK_RET(_weakCount > 0); // underflow
+			KOR_CHECK_RET(_weakCount > 0); // underflow
 			--_weakCount;
 		}
 
@@ -85,7 +85,7 @@ namespace _NShared
 		TCustomReferencer() = delete;
 
 		template<typename OtherDeleterT>
-		FORCEINLINE TCustomReferencer(ObjectType* object, OtherDeleterT&& deleter)
+		KOR_FORCEINLINE TCustomReferencer(ObjectType* object, OtherDeleterT&& deleter)
 			: CReferencerBase()
 			, _object(object)
 			, _deleter(MoveIfPossible(deleter))
@@ -96,8 +96,8 @@ namespace _NShared
 	protected:
 
 		// ~BEGIN CReferencerBase interface
-		FORCEINLINE virtual void* GetObjectImpl() const override { return _object; }
-		FORCEINLINE virtual void DeconstructObjectImpl() override { DestructObjectImpl(); }
+		KOR_FORCEINLINE virtual void* GetObjectImpl() const override { return _object; }
+		KOR_FORCEINLINE virtual void DeconstructObjectImpl() override { DestructObjectImpl(); }
 		// ~END CReferencerBase interface
 
 	private: // Fields
@@ -121,18 +121,18 @@ namespace _NShared
 	}
 
 	template<typename ObjectType, typename DeleterType>
-	FORCEINLINE static CReferencerBase* NewCustomReferencerWithDeleter(ObjectType* obj, DeleterType&& deleter)
+	KOR_FORCEINLINE static CReferencerBase* NewCustomReferencerWithDeleter(ObjectType* obj, DeleterType&& deleter)
 	{
 		return new TCustomReferencer<ObjectType, DeleterType>(obj, MoveIfPossible(deleter));
 	}
 
 	template<typename ObjectType>
-	FORCEINLINE_DEBUGGABLE static CReferencerBase* NewCustomReferencer(ObjectType* obj)
+	KOR_FORCEINLINE_DEBUGGABLE static CReferencerBase* NewCustomReferencer(ObjectType* obj)
 	{
 		return NewCustomReferencerWithDeleter(obj, &DefaultDeleteObjectFunc<ObjectType>);
 	}
 
-	FORCEINLINE static void DeleteReferencer(CReferencerBase* referencer)
+	KOR_FORCEINLINE static void DeleteReferencer(CReferencerBase* referencer)
 	{
 		delete referencer;
 	}
@@ -145,53 +145,53 @@ namespace _NShared
 		// Constructors
 		/////////////////////////////////
 
-		FORCEINLINE SReferencerProxy(CReferencerBase* InReferencer)
+		KOR_FORCEINLINE SReferencerProxy(CReferencerBase* InReferencer)
 			: _inner(InReferencer)
 		{}
 
 		// Compare operators
 		/////////////////////////////////
 
-		FORCEINLINE bool operator==(const SReferencerProxy& other) const { return _inner == other._inner; }
-		FORCEINLINE bool operator!=(const SReferencerProxy& other) const { return !operator==(other); }
+		KOR_FORCEINLINE bool operator==(const SReferencerProxy& other) const { return _inner == other._inner; }
+		KOR_FORCEINLINE bool operator!=(const SReferencerProxy& other) const { return !operator==(other); }
 
 		// Pointer operators
 		/////////////////////////////////
 
-		FORCEINLINE CReferencerBase* operator->() { return Get(); }
-		FORCEINLINE const CReferencerBase* operator->() const { return Get(); }
+		KOR_FORCEINLINE CReferencerBase* operator->() { return Get(); }
+		KOR_FORCEINLINE const CReferencerBase* operator->() const { return Get(); }
 
-		FORCEINLINE CReferencerBase& operator*() { return *Get(); }
-		FORCEINLINE const CReferencerBase& operator*() const { return *Get(); }
+		KOR_FORCEINLINE CReferencerBase& operator*() { return *Get(); }
+		KOR_FORCEINLINE const CReferencerBase& operator*() const { return *Get(); }
 
 		// Checkers
 		/////////////////////////////////
 
-		FORCEINLINE bool IsValid() const { return _inner != nullptr; }
-		FORCEINLINE bool IsUnique() const { return _inner != nullptr && _inner->GetSharedNum() == 1; }
-		FORCEINLINE bool IsSafeToDereference() const { return _inner != nullptr && _inner->GetSharedNum() > 0; }
+		KOR_FORCEINLINE bool IsValid() const { return _inner != nullptr; }
+		KOR_FORCEINLINE bool IsUnique() const { return _inner != nullptr && _inner->GetSharedNum() == 1; }
+		KOR_FORCEINLINE bool IsSafeToDereference() const { return _inner != nullptr && _inner->GetSharedNum() > 0; }
 
 		// Getters
 		/////////////////////////////////
 
-		FORCEINLINE CReferencerBase* Get() const { return _inner; }
+		KOR_FORCEINLINE CReferencerBase* Get() const { return _inner; }
 
 		// Setters
 		/////////////////////////////////
 
-		FORCEINLINE void Set(CReferencerBase* referencer) { _inner = referencer; }
+		KOR_FORCEINLINE void Set(CReferencerBase* referencer) { _inner = referencer; }
 
 		// Helper methods [Add]
 		/////////////////////////////////
 
-		FORCEINLINE void AddShared()
+		KOR_FORCEINLINE void AddShared()
 		{
 			if(!IsValid()) return;
 
 			_inner->AddShared();
 		}
 
-		FORCEINLINE void AddWeak()
+		KOR_FORCEINLINE void AddWeak()
 		{
 			if(!IsValid()) return;
 
@@ -201,7 +201,7 @@ namespace _NShared
 		// Helper methods [Remove]
 		/////////////////////////////////
 
-		FORCEINLINE void RemoveShared()
+		KOR_FORCEINLINE void RemoveShared()
 		{
 			if(!IsValid()) return;
 
@@ -213,7 +213,7 @@ namespace _NShared
 			}
 		}
 
-		FORCEINLINE void RemoveWeak()
+		KOR_FORCEINLINE void RemoveWeak()
 		{
 			if(!IsValid()) return;
 

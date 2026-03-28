@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
-#include "ASTD/Math.h"
-#include "ASTD/Memory.h"
+#include "KorMinimal.h"
+#include "Kor/Math.h"
+#include "Kor/Memory.h"
 
-#include PLATFORM_HEADER(CString)
+#include KOR_PLATFORM_HEADER(CString)
 
-typedef PLATFORM_PREFIXED_TYPE(S, PlatformCString) SPlatformCString;
+typedef KOR_PLATFORM_PREFIXED_TYPE(S, PlatformCString) SPlatformCString;
 struct SCString : public SPlatformCString
 {
 	static constexpr uint16 SMALL_BUFFER_SIZE = 1024;
@@ -22,7 +22,7 @@ struct SCString : public SPlatformCString
 	static uint32 GetLength(const CharType* str)
 	{
 		const CharType* current = str;
-		while(*current != CHAR_TERM)
+		while(*current != KOR_CHAR_TERM)
 			++current;
 
 		return static_cast<uint32>(current - str);
@@ -32,7 +32,7 @@ struct SCString : public SPlatformCString
 	static CharType* ToUpper(CharType* str, uint32 maxLen = TLimits<uint32>::Max)
 	{
 		CharType* current = str;
-		while(*current != CHAR_TERM && maxLen > 0)
+		while(*current != KOR_CHAR_TERM && maxLen > 0)
 		{
 			*current = SCString::ToUpperChar(*current);
 			++current;
@@ -46,7 +46,7 @@ struct SCString : public SPlatformCString
 	static CharType* ToLower(CharType* str, uint32 maxLen = TLimits<uint32>::Max)
 	{
 		CharType* current = str;
-		while(*current != CHAR_TERM && maxLen > 0)
+		while(*current != KOR_CHAR_TERM && maxLen > 0)
 		{
 			*current = SCString::ToLowerChar(*current);
 			++current;
@@ -87,15 +87,15 @@ struct SCString : public SPlatformCString
 	template<typename CharType, typename TEnableIf<TIsCharacter<CharType>::Value>::Type* = nullptr>
 	static int32 CompareLength(const CharType* lhs, const CharType* rhs)
 	{
-		while(*lhs != CHAR_TERM && *rhs != CHAR_TERM)
+		while(*lhs != KOR_CHAR_TERM && *rhs != KOR_CHAR_TERM)
 		{
 			++lhs;
 			++rhs;
 		}
 
-		return (*lhs == CHAR_TERM && *rhs == CHAR_TERM)
+		return (*lhs == KOR_CHAR_TERM && *rhs == KOR_CHAR_TERM)
 			? 0
-			: (*lhs == CHAR_TERM ? 1 : -1);
+			: (*lhs == KOR_CHAR_TERM ? 1 : -1);
 	}
 
 	// When:
@@ -105,15 +105,15 @@ struct SCString : public SPlatformCString
 	template<typename CharType, typename TEnableIf<TIsCharacter<CharType>::Value>::Type* = nullptr>
 	static int32 CompareLength(const CharType* val, uint32 testLen)
 	{
-		while (*val != CHAR_TERM && testLen > 0)
+		while (*val != KOR_CHAR_TERM && testLen > 0)
 		{
 			++val;
 			--testLen;
 		}
 
-		return (*val == CHAR_TERM && testLen == 0)
+		return (*val == KOR_CHAR_TERM && testLen == 0)
 			? 0
-			: (*val == CHAR_TERM ? 1 : -1);
+			: (*val == KOR_CHAR_TERM ? 1 : -1);
 	}
 
 	// Compares contents of two strings
@@ -133,7 +133,7 @@ struct SCString : public SPlatformCString
 			// iterate only up to shortest of the strings to not go under the allocation
 			maxLen = SMath::Min(maxLen, SMath::Min(lhsLen, rhsLen));
 
-			// move in character before CHAR_TERM
+			// move in character before KOR_CHAR_TERM
 			lhs += lhsLen - 1;
 			rhs += rhsLen - 1;
 		}
@@ -158,7 +158,7 @@ struct SCString : public SPlatformCString
 
 		if (!fromStart)
 		{
-			// move in character before CHAR_TERM
+			// move in character before KOR_CHAR_TERM
 			str += strLen - 1;
 		}
 
@@ -192,7 +192,7 @@ struct SCString : public SPlatformCString
 		uint32 maxLen = TLimits<uint32>::Max)
 	{
 		const CharType* foundStr = Find(str, test, caseSensitive, fromStart, maxLen);
-		return foundStr ? PTR_DIFF_TYPED(int32, foundStr, str) : INDEX_NONE;
+		return foundStr ? KOR_PTR_DIFF_TYPED(int32, foundStr, str) : KOR_INDEX_NONE;
 	}
 
 private:
@@ -215,7 +215,7 @@ private:
 			if (lhsChar != rhsChar)
 				break;
 
-			if (lhsChar == CHAR_TERM)
+			if (lhsChar == KOR_CHAR_TERM)
 				return 0;
 
 			if (reverse)

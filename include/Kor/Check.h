@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include "ASTD/Build.h"
+#include "Kor/Build.h"
 
-#include "ASTD/_internal/ChecksInternals.h"
-#include "ASTD/IsValid.h"
+#include "Kor/_internal/AssertInternals.h"
+#include "Kor/IsValid.h"
 
-#define CHECK(expression) CHECK_IMPL(expression)
-#define CHECKF(expression) CHECKF_IMPL(expression)
+#define KOR_CHECK(expression) KOR_CHECK_IMPL(expression)
+#define KOR_CHECKF(expression) KOR_CHECKF_IMPL(expression)
 
-#define CHECK_VALID(object) CHECK_IMPL(::IsValid(object))
-#define CHECKF_VALID(object) CHECKF_IMPL(::IsValid(object))
+#define KOR_CHECK_VALID(object) KOR_CHECK_IMPL(::IsValid(object))
+#define KOR_CHECKF_VALID(object) KOR_CHECKF_IMPL(::IsValid(object))
 
-#define CHECK_RET(expression, ...) if(!CHECK_IMPL(expression)) { return __VA_ARGS__; }
-#define CHECK_VALID_RET(object, ...) if(!CHECK_IMPL(::IsValid()) { return __VA_ARGS__; }
+#define KOR_CHECK_RET(expression, ...) if(!KOR_CHECK_IMPL(expression)) { return __VA_ARGS__; }
+#define KOR_CHECK_VALID_RET(object, ...) if(!KOR_CHECK_IMPL(::IsValid()) { return __VA_ARGS__; }

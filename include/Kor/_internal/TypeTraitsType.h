@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ASTD/_internal/TypeTraitsForward.h"
+#include "Kor/_internal/TypeTraitsForward.h"
 
 // [Is abstract type]
 // * Checks whether specific type is abstract

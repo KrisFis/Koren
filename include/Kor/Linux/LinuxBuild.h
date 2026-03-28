@@ -5,53 +5,53 @@
 #include <cstdarg>
 #include <stdint.h>
 
-// COMPILATION & BUILD
+// COMKOR_MATH_PILATION & BUILD
 ////////////////////////////////////////////////////////////////////////
 
-#define DO_PRAGMA(command) _Pragma(#command)
+#define KOR_DO_PRAGMA(command) _Pragma(#command)
 
-#define ASSEMBLY(code) __asm__(code)
+#define KOR_ASSEMBLY(code) __asm__(code)
 
-#define HAS_INCLUDE(file) __has_include(file)
+#define KOR_HAS_INCLUDE(file) __has_include(file)
 
-#define DEPRECATED __attribute__ ((__deprecated__))
-#define DEPRECATED_MSG(msg) __attribute__ ((__deprecated__(msg)))
-#define NODISCARD [[__nodiscard__]]
+#define KOR_DEPRECATED __attribute__ ((__deprecated__))
+#define KOR_DEPRECATED_MSG(msg) __attribute__ ((__deprecated__(msg)))
+#define KOR_NODISCARD [[__nodiscard__]]
 
-#define FORCEINLINE inline __attribute__((always_inline))
+#define KOR_FORCEINLINE inline __attribute__((always_inline))
 
-#define FORCENOINLINE __attribute__((noinline))
+#define KOR_FORCENOINLINE __attribute__((noinline))
 
-#if BUILD_DEBUG
-	#define FORCEINLINE_DEBUGGABLE inline
+#if KOR_BUILD_DEBUG
+	#define KOR_FORCEINLINE_DEBUGGABLE inline
 #else
-	#define FORCEINLINE_DEBUGGABLE FORCEINLINE
+	#define KOR_FORCEINLINE_DEBUGGABLE KOR_FORCEINLINE
 #endif
 
-#if COMPILER_CLANG
-	#define DEBUG_BREAK() __builtin_debugtrap()
+#if KOR_COMKOR_MATH_PILER_CLANG
+	#define KOR_DEBUG_BREAK() __builtin_debugtrap()
 #else
-	#define DEBUG_BREAK() __asm__ volatile("int3")
+	#define KOR_DEBUG_BREAK() __asm__ volatile("int3")
 #endif
 
-#define DLL_EXPORT
-#define DLL_IMPORT
+#define KOR_DLL_EXPORT
+#define KOR_DLL_IMPORT
 
 // DIAGNOSTICS
 ////////////////////////////////////////////////////////////////////////
 
-#define DIAG_WARNINGS_PUSH() DO_PRAGMA(GCC diagnostic push)
-#define DIAG_WARNINGS_POP() DO_PRAGMA(GCC diagnostic pop)
-#define DIAG_WARNINGS_SUPPRESS(value) DO_PRAGMA(GCC diagnostic ignored value)
+#define KOR_DIAG_WARNINGS_PUSH() KOR_DO_PRAGMA(GCC diagnostic push)
+#define KOR_DIAG_WARNINGS_POP() KOR_DO_PRAGMA(GCC diagnostic pop)
+#define KOR_DIAG_WARNINGS_SUPPRESS(value) KOR_DO_PRAGMA(GCC diagnostic ignored value)
 
-#define DIAG_WARNING_UNUSED_VALUE "-Wunused-value"
-#define DIAG_WARNING_NULL_DEREFERENCE "-Wnull-dereference"
-#define DIAG_WARNING_IMPLICIT_NARROWING "-Wconversion"
-#define DIAG_WARNING_SHIFT_OVERFLOW "-Wno-shift-overflow"
-#define DIAG_WARNING_SHIFT_NEGATIVE_VALUE "-Wno-shift-negative-value"
+#define KOR_DIAG_WARNING_UNUSED_VALUE "-Wunused-value"
+#define KOR_DIAG_WARNING_NULL_DEREFERENCE "-Wnull-dereference"
+#define KOR_DIAG_WARNING_IMPLICIT_NARROWING "-Wconversion"
+#define KOR_DIAG_WARNING_SHIFT_OVERFLOW "-Wno-shift-overflow"
+#define KOR_DIAG_WARNING_SHIFT_NEGATIVE_VALUE "-Wno-shift-negative-value"
 
-#if ASTD_DEFAULT_WARNING_SUPPRESS
-	DIAG_WARNINGS_SUPPRESS(DIAG_WARNING_IMPLICIT_NARROWING)
+#if KOR_DEFAULT_WARNING_SUPPRESS
+	KOR_DIAG_WARNINGS_SUPPRESS(KOR_DIAG_WARNING_IMPLICIT_NARROWING)
 #endif
 
 // OPTIMIZATIONS
@@ -59,14 +59,14 @@
 // * Otherwise update macros
 ////////////////////////////////////////////////////////////////////////
 
-#define OPTIMIZATIONS_DISABLE() DO_PRAGMA(GCC push_options) DO_PRAGMA(GCC optimize("O0")) 
-#define OPTIMIZATIONS_RESET() DO_PRAGMA(GCC pop_options)
+#define KOR_OPTIMIZATIONS_DISABLE() KOR_DO_PRAGMA(GCC push_options) KOR_DO_PRAGMA(GCC optimize("O0"))
+#define KOR_OPTIMIZATIONS_RESET() KOR_DO_PRAGMA(GCC pop_options)
 
 // Prediction
 ////////////////////////////////////////////////////////////////////////
 
-#define LIKELY(x) __builtin_expect(!!(x), 1)
-#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+#define KOR_LIKELY(x) __builtin_expect(!!(x), 1)
+#define KOR_UNLIKELY(x) __builtin_expect(!!(x), 0)
 
 // Integers
 ////////////////////////////////////////////////

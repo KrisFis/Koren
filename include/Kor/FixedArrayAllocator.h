@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
+#include "KorMinimal.h"
 
-#include "ASTD/ArrayAllocator.h"
+#include "Kor/ArrayAllocator.h"
 
 // Default array allocator but with fixed num of elements
 template<typename ElementT, uint32 InNumLimit>
@@ -20,21 +20,21 @@ public:
 	// Getters
 	/////////////////////////////////
 
-	FORCEINLINE ElementType* GetData() const { return _allocator.GetData(); }
-	FORCEINLINE void SetData(ElementType* data) { _allocator.SetData(data); }
-	FORCEINLINE SizeType GetCount() const { return _allocator.GetSize(); }
-	FORCEINLINE void GetCount(SizeType count) { _allocator.SetCount(count); }
+	KOR_FORCEINLINE ElementType* GetData() const { return _allocator.GetData(); }
+	KOR_FORCEINLINE void SetData(ElementType* data) { _allocator.SetData(data); }
+	KOR_FORCEINLINE SizeType GetCount() const { return _allocator.GetSize(); }
+	KOR_FORCEINLINE void GetCount(SizeType count) { _allocator.SetCount(count); }
 
 	// Manipulation
 	/////////////////////////////////
 
-	FORCEINLINE ElementType* Allocate(SizeType num)
+	KOR_FORCEINLINE ElementType* Allocate(SizeType num)
 	{
-		CHECK_RET(GetCount() + num <= InNumLimit, nullptr);
+		KOR_CHECK_RET(GetCount() + num <= InNumLimit, nullptr);
 		return _allocator.Allocate(num);
 	}
 
-	FORCEINLINE void Release() { _allocator.Release(); }
+	KOR_FORCEINLINE void Release() { _allocator.Release(); }
 
 private:
 

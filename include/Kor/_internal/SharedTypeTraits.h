@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ASTD/TypeTraits.h"
+#include "Kor/TypeTraits.h"
 
 namespace _NShared
 {

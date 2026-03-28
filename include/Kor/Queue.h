@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
+#include "KorMinimal.h"
 
-#include "ASTD/Memory.h"
-#include "ASTD/QueueAllocator.h"
+#include "Kor/Memory.h"
+#include "Kor/QueueAllocator.h"
 
 // TODO: Introduce iterator
 // TODO: Consider returning memory and allow changing values!
@@ -23,54 +23,54 @@ public:
 	// Constructors
 	/////////////////////////////////
 
-	FORCEINLINE TQueue() = default;
-	FORCEINLINE TQueue(const TQueue& other) { CopyFrom(other); }
-	FORCEINLINE TQueue(TQueue&& other) { MoveFrom(Move(other)); }
+	KOR_FORCEINLINE TQueue() = default;
+	KOR_FORCEINLINE TQueue(const TQueue& other) { CopyFrom(other); }
+	KOR_FORCEINLINE TQueue(TQueue&& other) { MoveFrom(Move(other)); }
 
 	// Destructor
 	/////////////////////////////////
 
-	FORCEINLINE ~TQueue() { EmptyImpl(); }
+	KOR_FORCEINLINE ~TQueue() { EmptyImpl(); }
 
 	// Operators
 	/////////////////////////////////
-	FORCEINLINE bool operator==(const TQueue& other) const { return _allocator == other._allocator; }
+	KOR_FORCEINLINE bool operator==(const TQueue& other) const { return _allocator == other._allocator; }
 
-	FORCEINLINE bool operator!=(const TQueue& other) const { return _allocator != other._allocator; }
+	KOR_FORCEINLINE bool operator!=(const TQueue& other) const { return _allocator != other._allocator; }
 
-	FORCEINLINE TQueue& operator=(const TQueue& other) { CopyFrom(other); return *this; }
-	FORCEINLINE TQueue& operator=(TQueue&& other) { MoveFrom(Move(other)); return *this; }
+	KOR_FORCEINLINE TQueue& operator=(const TQueue& other) { CopyFrom(other); return *this; }
+	KOR_FORCEINLINE TQueue& operator=(TQueue&& other) { MoveFrom(Move(other)); return *this; }
 
 	// Getters
 	/////////////////////////////////
 
-	FORCEINLINE bool IsEmpty() const { return !_allocator.GetHead(); }
-	FORCEINLINE SizeType GetNum() const { return _allocator.GetSize(); }
+	KOR_FORCEINLINE bool IsEmpty() const { return !_allocator.GetHead(); }
+	KOR_FORCEINLINE SizeType GetNum() const { return _allocator.GetSize(); }
 
 	// Peek
 	/////////////////////////////////
 
-	FORCEINLINE bool Peek(ElementT& outVal) const { return PeekImpl(outVal); }
-	FORCEINLINE ElementT Peek_GetCopy() const { ElementT result = ElementT(); PeekImpl(result); return result; }
+	KOR_FORCEINLINE bool Peek(ElementT& outVal) const { return PeekImpl(outVal); }
+	KOR_FORCEINLINE ElementT Peek_GetCopy() const { ElementT result = ElementT(); PeekImpl(result); return result; }
 
 	// Enqueue
 	/////////////////////////////////
 
-	FORCEINLINE void Enqueue(const ElementT& val) { AddImpl(val); }
-	FORCEINLINE void Enqueue(ElementT&& val) { AddImpl(Move(val)); }
+	KOR_FORCEINLINE void Enqueue(const ElementT& val) { AddImpl(val); }
+	KOR_FORCEINLINE void Enqueue(ElementT&& val) { AddImpl(Move(val)); }
 
 	// Dequeue
 	/////////////////////////////////
 
-	FORCEINLINE bool Dequeue() { return RemoveFromHeadImpl(); }
-	FORCEINLINE bool Dequeue(ElementT& outVal) { return RemoveFromHeadImpl(outVal); }
-	FORCEINLINE ElementT Dequeue_GetCopy() { ElementT result = ElementT(); Dequeue(result); return result; }
+	KOR_FORCEINLINE bool Dequeue() { return RemoveFromHeadImpl(); }
+	KOR_FORCEINLINE bool Dequeue(ElementT& outVal) { return RemoveFromHeadImpl(outVal); }
+	KOR_FORCEINLINE ElementT Dequeue_GetCopy() { ElementT result = ElementT(); Dequeue(result); return result; }
 
 	// Empty
 	/////////////////////////////////
 
-	FORCEINLINE void Empty() { EmptyImpl(); }
-	FORCEINLINE void Reset() { EmptyImpl(); }
+	KOR_FORCEINLINE void Empty() { EmptyImpl(); }
+	KOR_FORCEINLINE void Reset() { EmptyImpl(); }
 
 private:
 

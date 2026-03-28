@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "ASTD/Build.h"
+#include "Kor/Build.h"
 
-#include "ASTD/_internal/TypeTraitsCore.h"
+#include "Kor/_internal/TypeTraitsCore.h"
 
 ////////////////////////////////////////////////////////
 // VARIADIC ITERATOR TRAIT
@@ -25,15 +25,15 @@
 // **
 ////////////////////////////////////////////////////////
 
-#define EXECUTE_VARIADIC_ITERATOR_TRAIT(DeclareName, VarTypesName) DeclareName<sizeof...(VarTypesName)-1, VarTypesName...>::Execute()
+#define KOR_EXECUTE_VARIADIC_ITERATOR_TRAIT(DeclareName, VarTypesName) DeclareName<sizeof...(VarTypesName)-1, VarTypesName...>::Execute()
 
-#define DECLARE_VARIADIC_ITERATOR_RET_TRAIT(DeclareName, RetType, Operator, InMethodName)										\
+#define KOR_DECLARE_VARIADIC_ITERATOR_RET_TRAIT(DeclareName, RetType, Operator, InMethodName)										\
 	template<uint32 N, typename T, typename... A>																				\
 	struct DeclareName 																											\
 	{																															\
 	public:																														\
 																																\
-		FORCEINLINE static RetType Execute() { return InMethodName<T>() Operator DeclareName<N-1, A...>::Execute(); }			\
+		KOR_FORCEINLINE static RetType Execute() { return InMethodName<T>() Operator DeclareName<N-1, A...>::Execute(); }			\
 																																\
 	};																															\
 																																\
@@ -42,11 +42,11 @@
 	{																															\
 	public:																														\
 																																\
-		FORCEINLINE static RetType Execute() { return InMethodName<T>(); }														\
+		KOR_FORCEINLINE static RetType Execute() { return InMethodName<T>(); }														\
 																																\
 	};
 
-#define DECLARE_VARIADIC_ITERATOR_TRAIT(DeclareName, InMethodName) DECLARE_VARIADIC_ITERATOR_RET_TRAIT(DeclareName, void, ;, InMethodName)
+#define KOR_DECLARE_VARIADIC_ITERATOR_TRAIT(DeclareName, InMethodName) DECLARE_VARIADIC_ITERATOR_RET_TRAIT(DeclareName, void, ;, InMethodName)
 
 ////////////////////////////////////////////////////////
 // GENERATES METHOD/FIELD CHECK TRAIT
@@ -54,7 +54,7 @@
 ////////////////////////////////////////////////////////
 
 // In "MethodCall" parameter "TestType" can be used
-#define GENERATE_HAS_GLOBAL_METHOD_TRAIT(DeclareName, MethodCall)																\
+#define KOR_GENERATE_HAS_GLOBAL_METHOD_TRAIT(DeclareName, MethodCall)																\
 	template <typename CheckType>																								\
 	struct DeclareName																											\
 	{																															\
@@ -74,7 +74,7 @@
 	};
 
 // In "MethodCall" parameter "TestType" can be used
-#define GENERATE_HAS_METHOD_TRAIT(DeclareName, MethodCall)																		\
+#define KOR_GENERATE_HAS_METHOD_TRAIT(DeclareName, MethodCall)																		\
 	template <typename CheckType>																								\
 	struct DeclareName																											\
 	{																															\
@@ -93,7 +93,7 @@
 		static constexpr bool Value = FGetTestValue<PureType>::Value;															\
 	};
 
-#define GENERATE_HAS_FIELD_TRAIT(DeclareName, FieldName)																		\
+#define KOR_GENERATE_HAS_FIELD_TRAIT(DeclareName, FieldName)																		\
 	template <typename CheckType>																								\
 	struct DeclareName																											\
 	{																															\

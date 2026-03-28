@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
+#include "KorMinimal.h"
 
 #include <new>
-#include PLATFORM_HEADER(Memory)
+#include KOR_PLATFORM_HEADER(Memory)
 
-typedef PLATFORM_PREFIXED_TYPE(S, PlatformMemory) SPlatformMemory;
+typedef KOR_PLATFORM_PREFIXED_TYPE(S, PlatformMemory) SPlatformMemory;
 struct SMemory : public SPlatformMemory
 {
 	static constexpr long double BITS_PER_BYTE = 8; // bits
@@ -25,19 +25,19 @@ struct SMemory : public SPlatformMemory
 	static constexpr long double TB_PER_BYTE = 1.e-12; // terabytes
 
 	template<typename T>
-	FORCEINLINE static T* MallocTyped(int64 num = 1)
+	KOR_FORCEINLINE static T* MallocTyped(int64 num = 1)
 	{
 		return (T*)SPlatformMemory::Malloc(num * sizeof(T));
 	}
 
 	template<typename T>
-	FORCEINLINE static T* ReallocTyped(T* ptr, int64 num = 1)
+	KOR_FORCEINLINE static T* ReallocTyped(T* ptr, int64 num = 1)
 	{
 		return (T*)SPlatformMemory::Realloc(ptr, num * sizeof(T));
 	}
 
 	template<typename T>
-	FORCEINLINE static T* CallocTyped(int64 num = 1)
+	KOR_FORCEINLINE static T* CallocTyped(int64 num = 1)
 	{
 		return (T*)SPlatformMemory::Calloc(num * sizeof(T));
 	}
@@ -66,7 +66,7 @@ struct SMemory : public SPlatformMemory
 	}
 
 	template<typename T>
-	FORCEINLINE static void MoveTyped(T* to, T* from)
+	KOR_FORCEINLINE static void MoveTyped(T* to, T* from)
 	{
 		if constexpr (!TTypeTraits<T>::IsBitwiseMovable)
 		{
@@ -83,7 +83,7 @@ struct SMemory : public SPlatformMemory
 	}
 
 	template<typename T>
-	FORCEINLINE static void FillTyped(const T* dst, T val, int64 num = 1)
+	KOR_FORCEINLINE static void FillTyped(const T* dst, T val, int64 num = 1)
 	{
 		if constexpr (!TTypeTraits<T>::IsBitwiseCopyable)
 		{
@@ -104,7 +104,7 @@ struct SMemory : public SPlatformMemory
 	}
 
 	template<typename T>
-	FORCEINLINE static void ZeroTyped(const T* dst, int64 num = 1)
+	KOR_FORCEINLINE static void ZeroTyped(const T* dst, int64 num = 1)
 	{
 		if constexpr (!TTypeTraits<T>::IsBitwiseCopyable)
 		{
@@ -124,7 +124,7 @@ struct SMemory : public SPlatformMemory
 	}
 
 	template<typename T>
-	FORCEINLINE static bool IsEqual(const T* lhs, const T* rhs, int64 num = 1)
+	KOR_FORCEINLINE static bool IsEqual(const T* lhs, const T* rhs, int64 num = 1)
 	{
 		if constexpr (!TTypeTraits<T>::IsBitwiseComparable)
 		{
@@ -149,7 +149,7 @@ struct SMemory : public SPlatformMemory
 	}
 
 	template<typename T, typename... ArgTypes>
-	FORCEINLINE static void Construct(T* ptr, ArgTypes&&... Args)
+	KOR_FORCEINLINE static void Construct(T* ptr, ArgTypes&&... Args)
 	{
 		if constexpr (!TIsTriviallyConstructible<T, ArgTypes...>::Value)
 		{
@@ -163,7 +163,7 @@ struct SMemory : public SPlatformMemory
 
 	// Destruct element
 	template<typename T>
-	FORCEINLINE static void Destruct(T* ptr)
+	KOR_FORCEINLINE static void Destruct(T* ptr)
 	{
 		if constexpr(!TIsTriviallyDestructible<T>::Value)
 		{
@@ -172,7 +172,7 @@ struct SMemory : public SPlatformMemory
 	}
 };
 
-#if ASTD_NEW_DELETE
+#if KOR_NEW_DELETE
 void* operator new(TSize size)
 {
 	return SMemory::MallocTyped<uint8>((uint32)size);

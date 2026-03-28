@@ -5,7 +5,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "ASTD/Linux/LinuxBuild.h"
+#include "Kor/Linux/LinuxBuild.h"
 
 struct SLinuxPlatformMisc
 {
@@ -18,8 +18,8 @@ struct SLinuxPlatformMisc
 	}
 
 	// Reads from standard file by fileno. example: STDIN_FILENO
-	FORCEINLINE static int64 ReadStd(int32 fileNo, void* buffer, uint64 size) { return read(fileNo, buffer, size); }
+	KOR_FORCEINLINE static int64 ReadStd(int32 fileNo, void* buffer, uint64 size) { return read(fileNo, buffer, size); }
 
 	// Writes to standard file by fileno. example: STDOUT_FILENO
-	FORCEINLINE static int64 WriteStd(int32 fileNo, const void* buffer, uint64 size) { return write(fileNo, buffer, size); }
+	KOR_FORCEINLINE static int64 WriteStd(int32 fileNo, const void* buffer, uint64 size) { return write(fileNo, buffer, size); }
 };

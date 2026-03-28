@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
+#include "KorMinimal.h"
 
-#include "ASTD/CString.h"
+#include "Kor/CString.h"
 
 enum class EArchiveType : uint8
 {
@@ -29,27 +29,27 @@ struct SArchive
 	// Constructors
 	/////////////////////////
 
-	FORCEINLINE SArchive() = delete;
-	FORCEINLINE SArchive(EArchiveType type, EArchiveMode mode)
+	KOR_FORCEINLINE SArchive() = delete;
+	KOR_FORCEINLINE SArchive(EArchiveType type, EArchiveMode mode)
 		: _type(type)
 		, _mode(mode)
 	{}
 
-	FORCEINLINE SArchive(const SArchive& other) = delete;
-	FORCEINLINE SArchive(SArchive&& other) = delete;
+	KOR_FORCEINLINE SArchive(const SArchive& other) = delete;
+	KOR_FORCEINLINE SArchive(SArchive&& other) = delete;
 
-	FORCEINLINE virtual ~SArchive() = default;
+	KOR_FORCEINLINE virtual ~SArchive() = default;
 
 	// Type & Mode
 	/////////////////////////
 
-	FORCEINLINE EArchiveType GetType() const { return _type; }
-	FORCEINLINE bool IsBinary() const { return _type == EArchiveType::Binary; }
-	FORCEINLINE bool IsString() const { return _type == EArchiveType::String; }
+	KOR_FORCEINLINE EArchiveType GetType() const { return _type; }
+	KOR_FORCEINLINE bool IsBinary() const { return _type == EArchiveType::Binary; }
+	KOR_FORCEINLINE bool IsString() const { return _type == EArchiveType::String; }
 
-	FORCEINLINE EArchiveMode GetMode() const { return _mode; }
-	FORCEINLINE bool AllowsRead() const { return _mode == EArchiveMode::Read || _mode == EArchiveMode::ReadWrite; }
-	FORCEINLINE bool AllowsWrite() const { return _mode == EArchiveMode::Write || _mode == EArchiveMode::ReadWrite; }
+	KOR_FORCEINLINE EArchiveMode GetMode() const { return _mode; }
+	KOR_FORCEINLINE bool AllowsRead() const { return _mode == EArchiveMode::Read || _mode == EArchiveMode::ReadWrite; }
+	KOR_FORCEINLINE bool AllowsWrite() const { return _mode == EArchiveMode::Write || _mode == EArchiveMode::ReadWrite; }
 
 	// Essentials
 	/////////////////////////
@@ -60,14 +60,14 @@ struct SArchive
 	// Position
 	/////////////////////////
 
-	FORCEINLINE bool GetIsBegin() const { return GetBytesOffset() <= 0; }
-	FORCEINLINE bool GetIsEnd() const { return GetBytesOffset() >= GetTotalBytes(); }
+	KOR_FORCEINLINE bool GetIsBegin() const { return GetBytesOffset() <= 0; }
+	KOR_FORCEINLINE bool GetIsEnd() const { return GetBytesOffset() >= GetTotalBytes(); }
 
 	// Gets number of bytes
-	FORCEINLINE bool IsEmpty() const { return GetTotalBytes() <= 0; }
+	KOR_FORCEINLINE bool IsEmpty() const { return GetTotalBytes() <= 0; }
 
 	template<typename T = uint8>
-	FORCEINLINE_DEBUGGABLE SizeType GetTotal() const
+	KOR_FORCEINLINE_DEBUGGABLE SizeType GetTotal() const
 	{
 		if constexpr (sizeof(T) == sizeof(uint8))
 		{
@@ -82,7 +82,7 @@ struct SArchive
 
 	// Gets remaining offset in T size (aka. how many Ts till the end of the archive)
 	template<typename T = uint8>
-	FORCEINLINE_DEBUGGABLE SizeType GetRemainingOffset() const
+	KOR_FORCEINLINE_DEBUGGABLE SizeType GetRemainingOffset() const
 	{
 		if constexpr (sizeof(T) == sizeof(uint8))
 		{
@@ -98,7 +98,7 @@ struct SArchive
 	}
 
 	template<typename T = uint8>
-	FORCEINLINE_DEBUGGABLE SizeType GetOffset() const
+	KOR_FORCEINLINE_DEBUGGABLE SizeType GetOffset() const
 	{
 		if constexpr (sizeof(T) == sizeof(uint8))
 		{
@@ -113,22 +113,22 @@ struct SArchive
 
 	// Sets offset for T size
 	template<typename T = uint8>
-	FORCEINLINE_DEBUGGABLE void SetOffset(SizeType num)
+	KOR_FORCEINLINE_DEBUGGABLE void SetOffset(SizeType num)
 	{
 		SetBytesOffset(num * sizeof(T));
 	}
 
 	// Gets end position
 	virtual SizeType GetTotalBytes() const = 0;
-	FORCEINLINE SizeType GCount() const { return GetTotalBytes(); }
+	KOR_FORCEINLINE SizeType GCount() const { return GetTotalBytes(); }
 
 	// Gets current position (tell)
 	virtual SizeType GetBytesOffset() const = 0;
-	FORCEINLINE SizeType Tell() const { return GetBytesOffset(); }
+	KOR_FORCEINLINE SizeType Tell() const { return GetBytesOffset(); }
 
 	// Moves to position (seek)
 	virtual bool SetBytesOffset(SizeType offset) = 0;
-	FORCEINLINE bool Seek(SizeType offset) { return SetBytesOffset(offset); }
+	KOR_FORCEINLINE bool Seek(SizeType offset) { return SetBytesOffset(offset); }
 
 	// Read / Write
 	/////////////////////////
@@ -137,7 +137,7 @@ struct SArchive
 	virtual SizeType ReadBytes(void* ptr, SizeType size) = 0;
 
 	template<typename T>
-	FORCEINLINE_DEBUGGABLE SizeType Read(T* ptr, SizeType num)
+	KOR_FORCEINLINE_DEBUGGABLE SizeType Read(T* ptr, SizeType num)
 	{
 		const SizeType bytesRead = ReadBytes(ptr, sizeof(T) * num);
 		return bytesRead >= sizeof(T) ? bytesRead / sizeof(T) : 0;
@@ -147,7 +147,7 @@ struct SArchive
 	virtual SizeType WriteBytes(const void* ptr, SizeType size) = 0;
 
 	template<typename T>
-	FORCEINLINE_DEBUGGABLE SizeType Write(const T* ptr, SizeType num)
+	KOR_FORCEINLINE_DEBUGGABLE SizeType Write(const T* ptr, SizeType num)
 	{
 		const SizeType bytesWritten = WriteBytes(ptr, sizeof(T) * num);
 		return bytesWritten >= sizeof(T) ? bytesWritten / sizeof(T) : 0;
@@ -181,7 +181,7 @@ struct SArchive
 
 	// Func: (const void* packet, SizeType numOfBytes) -> bool
 	template<SizeType MaxPacketSize, typename FuncType>
-	FORCEINLINE_DEBUGGABLE bool ReadPacketsUntil(SizeType startOffset, FuncType&& func)
+	KOR_FORCEINLINE_DEBUGGABLE bool ReadPacketsUntil(SizeType startOffset, FuncType&& func)
 	{
 		if (!SetBytesOffset(startOffset)) return false;
 		return ReadPacketsUntil<MaxPacketSize>(Forward(func));
@@ -239,7 +239,7 @@ struct SArchive
 
 		ar.template SetOffset<tchar>(oldOffset + usedNum);
 
-		buffer[usedNum] = CHAR_TERM;
+		buffer[usedNum] = KOR_CHAR_TERM;
 		return buffer;
 	}
 
@@ -270,7 +270,7 @@ static SArchive& operator<<(SArchive& ar, SArchive& otherAr)
 	return ar;
 }
 
-FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, SArchive& otherAr)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, SArchive& otherAr)
 {
 	otherAr << ar; // just switch streaming
 	return ar;
@@ -344,7 +344,7 @@ static SArchive& operator>>(SArchive& ar, int32& val)
 			ar,
 			[](const tchar& character) -> bool
 			{
-				return (character >= TEXT('0') && character <= TEXT('9')) || character == TEXT('-');
+				return (character >= KTEXT('0') && character <= KTEXT('9')) || character == KTEXT('-');
 			}
 		);
 
@@ -384,7 +384,7 @@ static SArchive& operator>>(SArchive& ar, int64& val)
 			ar,
 			[](const tchar& character) -> bool
 			{
-				return (character >= TEXT('0') && character <= TEXT('9')) || character == TEXT('-');
+				return (character >= KTEXT('0') && character <= KTEXT('9')) || character == KTEXT('-');
 			}
 		);
 
@@ -424,7 +424,7 @@ static SArchive& operator>>(SArchive& ar, double& val)
 			ar,
 			[](const tchar& character) -> bool
 			{
-				return (character >= TEXT('0') && character <= TEXT('9')) || character == TEXT('.') || character == TEXT('-');
+				return (character >= KTEXT('0') && character <= KTEXT('9')) || character == KTEXT('.') || character == KTEXT('-');
 			}
 		);
 
@@ -434,25 +434,25 @@ static SArchive& operator>>(SArchive& ar, double& val)
 	return ar;
 }
 
-FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, tchar val)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, tchar val)
 {
 	ar.Read(&val, 1);
 	return ar;
 }
 
-FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, tchar& val)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, tchar& val)
 {
 	ar.Write(&val, 1);
 	return ar;
 }
 
-FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const tchar* val)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const tchar* val)
 {
 	ar.Write(val, SCString::GetLength(val));
 	return ar;
 }
 
-FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, tchar* val)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, tchar* val)
 {
 	ar.Read(val, SCString::GetLength(val));
 	return ar;

@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
+#include "KorMinimal.h"
 
-#include "ASTD/Archive.h"
+#include "Kor/Archive.h"
 
-#include "ASTD/Array.h"
-#include "ASTD/CString.h"
+#include "Kor/Array.h"
+#include "Kor/CString.h"
 
 struct SString
 {
@@ -24,19 +24,19 @@ struct SString
 	// Constructors
 	/////////////////////////////////
 
-	FORCEINLINE SString() { InitToEmpty(); }
+	KOR_FORCEINLINE SString() { InitToEmpty(); }
 
-	FORCEINLINE SString(const SString& other) { AppendStringImpl(other); }
-	FORCEINLINE SString(SString&& other) noexcept { AppendStringImpl(Move(other)); }
+	KOR_FORCEINLINE SString(const SString& other) { AppendStringImpl(other); }
+	KOR_FORCEINLINE SString(SString&& other) noexcept { AppendStringImpl(Move(other)); }
 
-	FORCEINLINE SString(const CharType* text) { AppendCharsImpl(text); }
-	FORCEINLINE SString(const CharType* text, SizeType length) { AppendCharsImpl(text, length); }
+	KOR_FORCEINLINE SString(const CharType* text) { AppendCharsImpl(text); }
+	KOR_FORCEINLINE SString(const CharType* text, SizeType length) { AppendCharsImpl(text, length); }
 
 	// fill constructor
-	FORCEINLINE SString(SizeType length, CharType val = CHAR_TERM) { InitToFill(length, val); }
+	KOR_FORCEINLINE SString(SizeType length, CharType val = KOR_CHAR_TERM) { InitToFill(length, val); }
 
-	FORCEINLINE explicit SString(const DataType& data) { AppendDataImpl(data); }
-	FORCEINLINE explicit SString(DataType&& data) noexcept { AppendDataImpl(Move(data)); }
+	KOR_FORCEINLINE explicit SString(const DataType& data) { AppendDataImpl(data); }
+	KOR_FORCEINLINE explicit SString(DataType&& data) noexcept { AppendDataImpl(Move(data)); }
 
 	// Gets the empty string as a non-mutable reference
 	static const SString& GetEmpty()
@@ -48,54 +48,54 @@ struct SString
 	// Compare operators
 	/////////////////////////////////
 
-	FORCEINLINE bool operator==(const SString& other) const { return _data == other._data; }
-	FORCEINLINE bool operator!=(const SString& other) const { return !operator==(other); }
+	KOR_FORCEINLINE bool operator==(const SString& other) const { return _data == other._data; }
+	KOR_FORCEINLINE bool operator!=(const SString& other) const { return !operator==(other); }
 
 	// Assign operators
 	/////////////////////////////////
 
-	FORCEINLINE SString& operator=(const SString& other) { InitToEmpty(); AppendStringImpl(other); return *this; }
-	FORCEINLINE SString& operator=(SString&& other) noexcept { InitToEmpty(); AppendStringImpl(Move(other)); return *this; }
+	KOR_FORCEINLINE SString& operator=(const SString& other) { InitToEmpty(); AppendStringImpl(other); return *this; }
+	KOR_FORCEINLINE SString& operator=(SString&& other) noexcept { InitToEmpty(); AppendStringImpl(Move(other)); return *this; }
 
 	// Arithmetic operators
 	/////////////////////////////////
 
-	FORCEINLINE SString operator+(const SString& other) const { SString tmpStr(*this); tmpStr.AppendStringImpl(other); return *this; }
-	FORCEINLINE SString operator+(SString&& other) const { SString tmpStr(*this); tmpStr.AppendStringImpl(Move(other)); return *this; }
+	KOR_FORCEINLINE SString operator+(const SString& other) const { SString tmpStr(*this); tmpStr.AppendStringImpl(other); return *this; }
+	KOR_FORCEINLINE SString operator+(SString&& other) const { SString tmpStr(*this); tmpStr.AppendStringImpl(Move(other)); return *this; }
 
-	FORCEINLINE SString& operator+=(const SString& other) { AppendStringImpl(other); return *this; }
-	FORCEINLINE SString& operator+=(SString&& other) { AppendStringImpl(Move(other)); return *this; }
+	KOR_FORCEINLINE SString& operator+=(const SString& other) { AppendStringImpl(other); return *this; }
+	KOR_FORCEINLINE SString& operator+=(SString&& other) { AppendStringImpl(Move(other)); return *this; }
 
 	// Get operators
 	/////////////////////////////////
 
-	FORCEINLINE const CharType* operator*() const { return _data.GetData(); }
-	FORCEINLINE CharType* operator*() { return _data.GetData(); }
+	KOR_FORCEINLINE const CharType* operator*() const { return _data.GetData(); }
+	KOR_FORCEINLINE CharType* operator*() { return _data.GetData(); }
 
-	FORCEINLINE CharType operator[](SizeType idx) const { return _data[idx]; }
+	KOR_FORCEINLINE CharType operator[](SizeType idx) const { return _data[idx]; }
 
 	// Path operators
 	/////////////////////////////////
 
-	FORCEINLINE SString operator/(const SString& other) const { SString tmpStr(*this); tmpStr.operator/=(other); return tmpStr; }
-	FORCEINLINE SString operator/=(const SString& other) { AppendCharsImpl(TEXT("/")); AppendStringImpl(other); return *this; }
+	KOR_FORCEINLINE SString operator/(const SString& other) const { SString tmpStr(*this); tmpStr.operator/=(other); return tmpStr; }
+	KOR_FORCEINLINE SString operator/=(const SString& other) { AppendCharsImpl(KTEXT("/")); AppendStringImpl(other); return *this; }
 
 	// Property getters
 	/////////////////////////////////
 
-	FORCEINLINE const DataType& GetData() const { return _data; }
+	KOR_FORCEINLINE const DataType& GetData() const { return _data; }
 
-	FORCEINLINE const CharType* GetChars() const { return _data.GetData(); }
-	FORCEINLINE CharType* GetChars() { return _data.GetData(); }
+	KOR_FORCEINLINE const CharType* GetChars() const { return _data.GetData(); }
+	KOR_FORCEINLINE CharType* GetChars() { return _data.GetData(); }
 
 	// Gets length of the string WITHOUT terminating character
-	FORCEINLINE SizeType GetLength() const { return _data.GetNum() > 1 ? _data.GetNum() - 1 : 0; }
+	KOR_FORCEINLINE SizeType GetLength() const { return _data.GetNum() > 1 ? _data.GetNum() - 1 : 0; }
 
 	// Checks whether specific index within the string can be safely dereferenced 
-	FORCEINLINE bool IsValidIndex(SizeType idx) const { return idx >= 0 && idx < GetLastCharIndex(); }
+	KOR_FORCEINLINE bool IsValidIndex(SizeType idx) const { return idx >= 0 && idx < GetLastCharIndex(); }
 
 	// Checks whether string is empty
-	FORCEINLINE bool IsEmpty() const { return GetLength() == 0; }
+	KOR_FORCEINLINE bool IsEmpty() const { return GetLength() == 0; }
 
 	// Construction
 	/////////////////////////////////
@@ -127,15 +127,15 @@ struct SString
 
 	// Converts string to int32 equivalent
 	// * "10" => 10
-	FORCEINLINE int32 ToInt32() const { return SCString::ToInt32(_data.GetData()); }
+	KOR_FORCEINLINE int32 ToInt32() const { return SCString::ToInt32(_data.GetData()); }
 
 	// Converts string to int64 equivalent
 	// * "10" => 10
-	FORCEINLINE int64 ToInt64() const { return SCString::ToInt64(_data.GetData()); }
+	KOR_FORCEINLINE int64 ToInt64() const { return SCString::ToInt64(_data.GetData()); }
 
 	// Converts string to int64 equivalent
 	// * "10.1" => 10.1
-	FORCEINLINE double ToDouble() const { return SCString::ToDouble(_data.GetData()); }
+	KOR_FORCEINLINE double ToDouble() const { return SCString::ToDouble(_data.GetData()); }
 
 	// Constructs new string from int32
 	// * 10 => "10"
@@ -164,33 +164,33 @@ struct SString
 	// Iterations
 	/////////////////////////////////
 
-	FORCEINLINE StringIteratorType begin() { return _data.GetNum() > 1 ? &_data[0] : nullptr; }
-	FORCEINLINE ConstStringIteratorType begin() const { return _data.GetNum() > 1 ? &_data[0] : nullptr; }
+	KOR_FORCEINLINE StringIteratorType begin() { return _data.GetNum() > 1 ? &_data[0] : nullptr; }
+	KOR_FORCEINLINE ConstStringIteratorType begin() const { return _data.GetNum() > 1 ? &_data[0] : nullptr; }
 
-	FORCEINLINE StringIteratorType end() { return _data.GetNum() > 1 ? &_data[GetLastCharIndex()] : nullptr; }
-	FORCEINLINE ConstStringIteratorType end() const { return _data.GetNum() > 1 ? &_data[GetLastCharIndex()] : nullptr; }
+	KOR_FORCEINLINE StringIteratorType end() { return _data.GetNum() > 1 ? &_data[GetLastCharIndex()] : nullptr; }
+	KOR_FORCEINLINE ConstStringIteratorType end() const { return _data.GetNum() > 1 ? &_data[GetLastCharIndex()] : nullptr; }
 
 	// Compares
 	/////////////////////////////////
 
 	// Compares this string against the provided one
 	// * returns 0 if equal, -1 if this string is "bigger" and 1 if provided string is "bigger"
-	FORCEINLINE int32 Compare(const SString& other, bool caseSensitive = true) const { return SCString::Compare(GetChars(), other.GetChars(), caseSensitive); }
+	KOR_FORCEINLINE int32 Compare(const SString& other, bool caseSensitive = true) const { return SCString::Compare(GetChars(), other.GetChars(), caseSensitive); }
 
 	// Checks whether this string is same as the provided one
 	// * Is same as Compare == 0
-	FORCEINLINE bool Equals(const SString& other, bool caseSensitive = true) const { return Compare(other, caseSensitive) == 0; }
+	KOR_FORCEINLINE bool Equals(const SString& other, bool caseSensitive = true) const { return Compare(other, caseSensitive) == 0; }
 
 	// Checks
 	/////////////////////////////////
 
 	// Checks whether this string contains ONLY whitespaces
-	FORCEINLINE bool IsWhitespace() const
+	KOR_FORCEINLINE bool IsWhitespace() const
 	{
 		if(GetLength() > 0)
 		{
 			const CharType* data = _data.GetData();
-			while(*data != CHAR_TERM)
+			while(*data != KOR_CHAR_TERM)
 			{
 				if(!SCString::IsWhitespaceChar(*data))
 					return false;
@@ -203,31 +203,31 @@ struct SString
 	}
 
 	// Checks whether this string contains provided string from the beginning
-	FORCEINLINE bool StartsWith(const SString& val, bool caseSensitive = true) const
+	KOR_FORCEINLINE bool StartsWith(const SString& val, bool caseSensitive = true) const
 	{
 		return ContainsAtIndexImpl(*this, val, 0, caseSensitive);
 	}
 
 	// Checks whether this string contains provided string from the end
-	FORCEINLINE bool EndsWith(const SString& val, bool caseSensitive = true) const
+	KOR_FORCEINLINE bool EndsWith(const SString& val, bool caseSensitive = true) const
 	{
 		return ContainsAtIndexImpl(*this, val, GetLastCharIndex() - val.GetLastCharIndex(), caseSensitive);
 	}
 
 	// Checks whether this string contains provided string in any place
-	FORCEINLINE bool Contains(const SString& val, bool caseSensitive = true, bool fromStart = true) const
+	KOR_FORCEINLINE bool Contains(const SString& val, bool caseSensitive = true, bool fromStart = true) const
 	{
 		return !!SCString::Find(GetChars(), val.GetChars(), caseSensitive, fromStart);
 	}
 
 	// Checks whether this string contains provided string in provided index
-	FORCEINLINE bool ContainsAt(const SString& val, SizeType index, bool caseSensitive = true)
+	KOR_FORCEINLINE bool ContainsAt(const SString& val, SizeType index, bool caseSensitive = true)
 	{
 		return ContainsAtIndexImpl(*this, val, index, caseSensitive);
 	}
 
 	// Gets index from which this string contains provided string
-	FORCEINLINE SizeType Find(const SString& val, bool caseSensitive = true, bool fromStart = true) const
+	KOR_FORCEINLINE SizeType Find(const SString& val, bool caseSensitive = true, bool fromStart = true) const
 	{
 		return SCString::FindIndex(GetChars(), val.GetChars(), caseSensitive, fromStart);
 	}
@@ -236,13 +236,13 @@ struct SString
 	/////////////////////////////////
 
 	// Appends this string with other string
-	FORCEINLINE void Append(const SString& other) { AppendStringImpl(other); }
-	FORCEINLINE void Append(SString&& other) { AppendStringImpl(Move(other)); }
-	FORCEINLINE void Append(const CharType* other, SizeType num = INDEX_NONE) { AppendCharsImpl(other, num); }
+	KOR_FORCEINLINE void Append(const SString& other) { AppendStringImpl(other); }
+	KOR_FORCEINLINE void Append(SString&& other) { AppendStringImpl(Move(other)); }
+	KOR_FORCEINLINE void Append(const CharType* other, SizeType num = KOR_INDEX_NONE) { AppendCharsImpl(other, num); }
 
 	// Appends this string via "printf"
 	template<typename StringT, typename... ArgTypes>
-	FORCEINLINE void AppendPrintf(StringT&& fmt, ArgTypes&&... args)
+	KOR_FORCEINLINE void AppendPrintf(StringT&& fmt, ArgTypes&&... args)
 	{
 		AppendStringImpl(
 			Move(
@@ -260,13 +260,13 @@ struct SString
 	bool Split(const SString& val, SString* outLeft, SString* outRight, bool caseSensitive = true, bool fromStart = true) const
 	{
 		const SizeType foundIdx = SCString::FindIndex(GetChars(), val.GetChars(), caseSensitive, fromStart);
-		if (foundIdx == INDEX_NONE)
+		if (foundIdx == KOR_INDEX_NONE)
 			return false;
 
 		if(outLeft)
 		{
 			outLeft->_data = DataType(_data.GetData(), foundIdx + 1);
-			outLeft->_data[foundIdx] = CHAR_TERM;
+			outLeft->_data[foundIdx] = KOR_CHAR_TERM;
 		}
 
 		if(outRight)
@@ -277,7 +277,7 @@ struct SString
 		return true;
 	}
 
-	TArray<SString> SplitToArray(const SString& delimiter, bool discardEmpty = true, SizeType num = INDEX_NONE, bool caseSensitive = true) const
+	TArray<SString> SplitToArray(const SString& delimiter, bool discardEmpty = true, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true) const
 	{
 		TArray<SString> result;
 
@@ -286,7 +286,7 @@ struct SString
 			{
 				SString& newStr = result.AddUninitialized_GetRef();
 				newStr._data = DataType(ptr, count);
-				newStr._data.Add(CHAR_TERM);
+				newStr._data.Add(KOR_CHAR_TERM);
 				return (--num == 0);
 			}
 		);
@@ -297,7 +297,7 @@ struct SString
 	// Manipulation
 	/////////////////////////////////
 
-	SString Replace(const SString& from, const SString& to, SizeType num = INDEX_NONE, bool caseSensitive = true) const
+	SString Replace(const SString& from, const SString& to, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true) const
 	{
 		SString newString(*this);
 		newString.ReplaceInline(from, to, num, caseSensitive);
@@ -305,13 +305,13 @@ struct SString
 	}
 
 	// -1 = All
-	void ReplaceInline(const SString& from, const SString& to, SizeType num = INDEX_NONE, bool caseSensitive = true)
+	void ReplaceInline(const SString& from, const SString& to, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true)
 	{
 		DataType newData(_data.GetNum(), true);
 		SplitBySubstringPrivate(*this, from, false, caseSensitive, (num == -1) ? _data.GetNum() : num,
 			[&newData, &to, &num](const CharType* ptr, SizeType count) -> bool
 			{
-				const bool isLast = (*(ptr + count + 1) == CHAR_TERM);
+				const bool isLast = (*(ptr + count + 1) == KOR_CHAR_TERM);
 
 				if(count > 0)
 				{
@@ -328,7 +328,7 @@ struct SString
 
 				if(isLast)
 				{
-					newData.Add(CHAR_TERM);
+					newData.Add(KOR_CHAR_TERM);
 
 					// is redundant, but if implementation changes this might save a day
 					return true;
@@ -351,7 +351,7 @@ struct SString
 		return newString;
 	}
 
-	FORCEINLINE void ToUpperInline() { SCString::ToUpper(_data.GetData()); }
+	KOR_FORCEINLINE void ToUpperInline() { SCString::ToUpper(_data.GetData()); }
 
 	SString ToLower() const
 	{
@@ -360,7 +360,7 @@ struct SString
 		return newString;
 	}
 
-	FORCEINLINE void ToLowerInline() { SCString::ToLower(_data.GetData()); }
+	KOR_FORCEINLINE void ToLowerInline() { SCString::ToLower(_data.GetData()); }
 
 	// Removes all characters from the index position to the end of the string
 	// * Does NOT modify the source string
@@ -383,7 +383,7 @@ struct SString
 		}
 
 		_data.Resize(idx + 1);
-		_data[idx] = CHAR_TERM;
+		_data[idx] = KOR_CHAR_TERM;
 	}
 
 	// Removes all characters from the start of the string to the index position
@@ -448,24 +448,24 @@ struct SString
 	// Reset
 	/////////////////////////////////
 
-	FORCEINLINE void Reset() { EmptyImpl(true); }
-	FORCEINLINE void Empty(bool releaseResources = true) { EmptyImpl(releaseResources); }
+	KOR_FORCEINLINE void Reset() { EmptyImpl(true); }
+	KOR_FORCEINLINE void Empty(bool releaseResources = true) { EmptyImpl(releaseResources); }
 
 	// Other
 	/////////////////////////////////
 
-	FORCEINLINE void Fill(SizeType length, CharType val = CHAR_TERM) { InitToFill(length, val); }
-	FORCEINLINE void Reserve(SizeType num) { _data.Reserve(num + 1); } // termination character
-	FORCEINLINE void ShrinkToFit() { _data.ShrinkToFit(); }
+	KOR_FORCEINLINE void Fill(SizeType length, CharType val = KOR_CHAR_TERM) { InitToFill(length, val); }
+	KOR_FORCEINLINE void Reserve(SizeType num) { _data.Reserve(num + 1); } // termination character
+	KOR_FORCEINLINE void ShrinkToFit() { _data.ShrinkToFit(); }
 
 private:
-	FORCEINLINE void InitToEmpty()
+	KOR_FORCEINLINE void InitToEmpty()
 	{
 		_data.Empty(1);
 		AddTermChecked(_data);
 	}
 
-	FORCEINLINE void InitToFill(SizeType length, CharType val)
+	KOR_FORCEINLINE void InitToFill(SizeType length, CharType val)
 	{
 		_data.Resize(length);
 		SMemory::FillTyped(_data.GetData(), val, length);
@@ -491,7 +491,7 @@ private:
 		AddTerm(_data);
 	}
 
-	void AppendCharsImpl(const CharType* text, SizeType textLen = INDEX_NONE)
+	void AppendCharsImpl(const CharType* text, SizeType textLen = KOR_INDEX_NONE)
 	{
 		RemoveTerm(_data);
 		if (text)
@@ -501,14 +501,14 @@ private:
 		AddTerm(_data);
 	}
 
-	FORCEINLINE void EmptyImpl(bool keepResources) { _data.Empty(keepResources); }
-	FORCEINLINE SizeType GetLastCharIndex() const { return _data.GetNum() - 2; }
+	KOR_FORCEINLINE void EmptyImpl(bool keepResources) { _data.Empty(keepResources); }
+	KOR_FORCEINLINE SizeType GetLastCharIndex() const { return _data.GetNum() - 2; }
 
-	FORCEINLINE_DEBUGGABLE static bool HasTerm(const DataType& data) { return !data.IsEmpty() && *data.GetLast() == CHAR_TERM; }
-	FORCEINLINE static void AddTermChecked(DataType& data) { data.Add(CHAR_TERM); }
-	FORCEINLINE static void AddTerm(DataType& data) { if (!HasTerm(data)) { AddTermChecked(data); }}
-	FORCEINLINE static void RemoveTermChecked(DataType& data) { data.RemoveAt(data.GetNum() - 1); }
-	FORCEINLINE static void RemoveTerm(DataType& data) { if (HasTerm(data)) { RemoveTermChecked(data); }}
+	KOR_FORCEINLINE_DEBUGGABLE static bool HasTerm(const DataType& data) { return !data.IsEmpty() && *data.GetLast() == KOR_CHAR_TERM; }
+	KOR_FORCEINLINE static void AddTermChecked(DataType& data) { data.Add(KOR_CHAR_TERM); }
+	KOR_FORCEINLINE static void AddTerm(DataType& data) { if (!HasTerm(data)) { AddTermChecked(data); }}
+	KOR_FORCEINLINE static void RemoveTermChecked(DataType& data) { data.RemoveAt(data.GetNum() - 1); }
+	KOR_FORCEINLINE static void RemoveTerm(DataType& data) { if (HasTerm(data)) { RemoveTermChecked(data); }}
 
 	static bool ContainsAtIndexImpl(const SString& str, const SString& val, SizeType idx, bool caseSensitive)
 	{
@@ -557,8 +557,8 @@ private:
 			{
 				if (!ignoreEmpty || current-init)
 				{
-					const SizeType currIdx = PTR_DIFF_TYPED(SizeType, init, mainStr.GetData());
-					const SizeType count = PTR_DIFF_TYPED(SizeType, current, init);
+					const SizeType currIdx = KOR_PTR_DIFF_TYPED(SizeType, init, mainStr.GetData());
+					const SizeType count = KOR_PTR_DIFF_TYPED(SizeType, current, init);
 
 					if(functor(mainStr.GetData() + currIdx, count))
 						return;
@@ -572,9 +572,9 @@ private:
 				}
 			}
 
-			if (!ignoreEmpty || *init != CHAR_TERM)
+			if (!ignoreEmpty || *init != KOR_CHAR_TERM)
 			{
-				const SizeType currIdx = PTR_DIFF_TYPED(SizeType, init, mainStr.GetData());
+				const SizeType currIdx = KOR_PTR_DIFF_TYPED(SizeType, init, mainStr.GetData());
 				const SizeType count = mainStr.GetNum() - currIdx;
 
 				functor(mainStr.GetData() + currIdx, count);
@@ -602,13 +602,13 @@ struct TContainerTypeTraits<SString> : public TContainerTypeTraits<void>
 // Archive operator<< && operator>>
 ////////////////////////////////////////////
 
-FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const SString& str)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const SString& str)
 {
 	ar.Write(str.GetChars(), str.GetLength());
 	return ar;
 }
 
-FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, SString& str)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, SString& str)
 {
 	SString::DataType newData;
 	ar >> newData;

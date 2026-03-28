@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
+#include "KorMinimal.h"
 
-#include "ASTD/_internal/SharedReferencer.h"
-#include "ASTD/_internal/SharedTypeTraits.h"
+#include "Kor/_internal/SharedReferencer.h"
+#include "Kor/_internal/SharedTypeTraits.h"
 
 // Equivalent of std's shared_ptr
 template<typename T>
@@ -24,70 +24,70 @@ public:
 	// Constructor
 	/////////////////////////////////
 
-	FORCEINLINE TSharedPtr(_NShared::SNullType* = nullptr) {}
-	FORCEINLINE TSharedPtr(_NShared::CReferencerBase& ref) : _referencerProxy(&ref) { _referencerProxy.AddShared(); }
+	KOR_FORCEINLINE TSharedPtr(_NShared::SNullType* = nullptr) {}
+	KOR_FORCEINLINE TSharedPtr(_NShared::CReferencerBase& ref) : _referencerProxy(&ref) { _referencerProxy.AddShared(); }
 
 	// Copy/Move constructors [SharedPtr]
 	/////////////////////////////////
 
-	FORCEINLINE TSharedPtr(const TSharedPtr& other) { ReplaceBy(other); }
-	FORCEINLINE TSharedPtr(TSharedPtr&& other) { ReplaceBy(Forward<TSharedPtr>(other)); }
+	KOR_FORCEINLINE TSharedPtr(const TSharedPtr& other) { ReplaceBy(other); }
+	KOR_FORCEINLINE TSharedPtr(TSharedPtr&& other) { ReplaceBy(Forward<TSharedPtr>(other)); }
 
 	// Destructor
 	/////////////////////////////////
 
-	FORCEINLINE ~TSharedPtr() { Reset(); }
+	KOR_FORCEINLINE ~TSharedPtr() { Reset(); }
 
 	// Conversion operators
 	/////////////////////////////////
 
-	FORCEINLINE operator bool() const { return IsValid(); }
+	KOR_FORCEINLINE operator bool() const { return IsValid(); }
 
 	template<typename OtherT, typename TEnableIf<TIsBaseOf<OtherT, T>::Value>::Type* = nullptr>
-	FORCEINLINE explicit operator TSharedPtr<OtherT>() const { return _referencerProxy.IsValid() ? TSharedPtr<OtherT>(*_referencerProxy) : nullptr; }
+	KOR_FORCEINLINE explicit operator TSharedPtr<OtherT>() const { return _referencerProxy.IsValid() ? TSharedPtr<OtherT>(*_referencerProxy) : nullptr; }
 
 	// Comparison operators
 	/////////////////////////////////
 
-	FORCEINLINE bool operator==(const TSharedPtr& other) const { return _referencerProxy == other._referencerProxy; }
-	FORCEINLINE bool operator!=(const TSharedPtr& other) const { return !operator==(other); }
+	KOR_FORCEINLINE bool operator==(const TSharedPtr& other) const { return _referencerProxy == other._referencerProxy; }
+	KOR_FORCEINLINE bool operator!=(const TSharedPtr& other) const { return !operator==(other); }
 
 	// Assignment operators
 	/////////////////////////////////
 
-	FORCEINLINE TSharedPtr& operator=(_NShared::SNullType*) { Reset(); return *this; }
+	KOR_FORCEINLINE TSharedPtr& operator=(_NShared::SNullType*) { Reset(); return *this; }
 
-	FORCEINLINE TSharedPtr& operator=(const TSharedPtr& Other) { if(&Other != this) ReplaceBy(Other); return *this; }
-	FORCEINLINE TSharedPtr& operator=(TSharedPtr&& Other) { if(&Other != this) ReplaceBy(Forward<TSharedPtr>(Other)); return *this; }
+	KOR_FORCEINLINE TSharedPtr& operator=(const TSharedPtr& Other) { if(&Other != this) ReplaceBy(Other); return *this; }
+	KOR_FORCEINLINE TSharedPtr& operator=(TSharedPtr&& Other) { if(&Other != this) ReplaceBy(Forward<TSharedPtr>(Other)); return *this; }
 
 	// Pointer operators
 	/////////////////////////////////
 
-	FORCEINLINE ObjectType* operator->() const { return Get(); }
-	FORCEINLINE ObjectType& operator*() const { return *Get(); }
+	KOR_FORCEINLINE ObjectType* operator->() const { return Get(); }
+	KOR_FORCEINLINE ObjectType& operator*() const { return *Get(); }
 
 	// Validation
 	/////////////////////////////////
 
-	FORCEINLINE bool IsValid() const { return _referencerProxy.IsSafeToDereference(); }
-	FORCEINLINE bool IsUnique() const { return _referencerProxy.IsUnique(); }
+	KOR_FORCEINLINE bool IsValid() const { return _referencerProxy.IsSafeToDereference(); }
+	KOR_FORCEINLINE bool IsUnique() const { return _referencerProxy.IsUnique(); }
 
 	// Getters
 	/////////////////////////////////
 
-	FORCEINLINE ObjectType* Get() const { return _referencerProxy.IsValid() ? _referencerProxy->GetObject<ObjectType>() : nullptr; }
-	FORCEINLINE ObjectType& GetRef() { return *Get(); }
+	KOR_FORCEINLINE ObjectType* Get() const { return _referencerProxy.IsValid() ? _referencerProxy->GetObject<ObjectType>() : nullptr; }
+	KOR_FORCEINLINE ObjectType& GetRef() { return *Get(); }
 
 	// Other
 	/////////////////////////////////
 
-	FORCEINLINE void Reset() { _referencerProxy.RemoveShared(); _referencerProxy.Set(nullptr); }
+	KOR_FORCEINLINE void Reset() { _referencerProxy.RemoveShared(); _referencerProxy.Set(nullptr); }
 
 private:
 
 	// const PtrType&
 	// * Copy
-	FORCEINLINE_DEBUGGABLE void ReplaceBy(const TSharedPtr& other)
+	KOR_FORCEINLINE_DEBUGGABLE void ReplaceBy(const TSharedPtr& other)
 	{
 		// How it should work ? (Copy implementation)
 
@@ -103,7 +103,7 @@ private:
 
 	// PtrType&&
 	// * Move
-	FORCEINLINE_DEBUGGABLE void ReplaceBy(TSharedPtr&& other)
+	KOR_FORCEINLINE_DEBUGGABLE void ReplaceBy(TSharedPtr&& other)
 	{
 		// How it should work ? (move implementation)
 
@@ -125,7 +125,7 @@ private:
 ////////////////////////////////////////////
 
 template<typename T>
-FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TSharedPtr<T>& sharedPtr)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TSharedPtr<T>& sharedPtr)
 {
 	if (sharedPtr.IsValid())
 	{
@@ -136,7 +136,7 @@ FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TSharedPt
 }
 
 template<typename T>
-FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TSharedPtr<T>& sharedPtr)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TSharedPtr<T>& sharedPtr)
 {
 	if (sharedPtr.IsValid())
 	{
@@ -163,94 +163,94 @@ public:
 	// Constructors
 	/////////////////////////////////
 
-	FORCEINLINE TWeakPtr(_NShared::SNullType* = nullptr) {}
-	FORCEINLINE TWeakPtr(_NShared::CReferencerBase& ref) : _referencerProxy(&ref) { _referencerProxy.AddWeak();}
+	KOR_FORCEINLINE TWeakPtr(_NShared::SNullType* = nullptr) {}
+	KOR_FORCEINLINE TWeakPtr(_NShared::CReferencerBase& ref) : _referencerProxy(&ref) { _referencerProxy.AddWeak();}
 
 	// Copy/Move constructors
 	/////////////////////////////////
 
-	FORCEINLINE TWeakPtr(const TWeakPtr& other) { ReplaceBy(other); }
-	FORCEINLINE TWeakPtr(TWeakPtr&& other) noexcept { ReplaceBy(Forward<TWeakPtr>(other)); }
+	KOR_FORCEINLINE TWeakPtr(const TWeakPtr& other) { ReplaceBy(other); }
+	KOR_FORCEINLINE TWeakPtr(TWeakPtr&& other) noexcept { ReplaceBy(Forward<TWeakPtr>(other)); }
 
-	FORCEINLINE explicit TWeakPtr(const TSharedPtr<T>& other) { ReplaceBy(other); }
-	FORCEINLINE explicit TWeakPtr(TSharedPtr<T>&& other) noexcept { ReplaceBy(Forward<TSharedPtr<T>>(other)); }
+	KOR_FORCEINLINE explicit TWeakPtr(const TSharedPtr<T>& other) { ReplaceBy(other); }
+	KOR_FORCEINLINE explicit TWeakPtr(TSharedPtr<T>&& other) noexcept { ReplaceBy(Forward<TSharedPtr<T>>(other)); }
 
 	// Destructor
 	/////////////////////////////////
 
-	FORCEINLINE ~TWeakPtr() { Reset(); }
+	KOR_FORCEINLINE ~TWeakPtr() { Reset(); }
 
 	// Conversion operators
 	/////////////////////////////////
 
-	FORCEINLINE operator bool() const { return IsValid(); }
+	KOR_FORCEINLINE operator bool() const { return IsValid(); }
 
 	template<typename OtherT, typename TEnableIf<TIsDerivedFrom<OtherT, T>::Value>::Type* = nullptr>
-	FORCEINLINE operator TWeakPtr<OtherT>() const { return _referencerProxy.IsValid() ? TWeakPtr<OtherT>(*_referencerProxy) : nullptr; }
+	KOR_FORCEINLINE operator TWeakPtr<OtherT>() const { return _referencerProxy.IsValid() ? TWeakPtr<OtherT>(*_referencerProxy) : nullptr; }
 
 	template<typename OtherT, typename TEnableIf<TIsBaseOf<OtherT, T>::Value>::Type* = nullptr>
-	FORCEINLINE explicit operator TWeakPtr<OtherT>() const { return _referencerProxy.IsValid() ? TWeakPtr<OtherT>(*_referencerProxy) : nullptr; }
+	KOR_FORCEINLINE explicit operator TWeakPtr<OtherT>() const { return _referencerProxy.IsValid() ? TWeakPtr<OtherT>(*_referencerProxy) : nullptr; }
 
 	// Comparison operators [WeakPtr]
 	/////////////////////////////////
 
-	FORCEINLINE bool operator==(const TWeakPtr& other) const	{ return _referencerProxy == other._referencerProxy; }
-	FORCEINLINE bool operator!=(const TWeakPtr& other) const	{ return !operator==(other); }
+	KOR_FORCEINLINE bool operator==(const TWeakPtr& other) const	{ return _referencerProxy == other._referencerProxy; }
+	KOR_FORCEINLINE bool operator!=(const TWeakPtr& other) const	{ return !operator==(other); }
 
 	// Comparison operators [SharedPtr]
 	/////////////////////////////////
 
-	FORCEINLINE bool operator==(const TSharedPtr<T>& other) const	{ return _referencerProxy == other._referencerProxy; }
-	FORCEINLINE bool operator!=(const TSharedPtr<T>& other) const	{ return !operator==(other); }
+	KOR_FORCEINLINE bool operator==(const TSharedPtr<T>& other) const	{ return _referencerProxy == other._referencerProxy; }
+	KOR_FORCEINLINE bool operator!=(const TSharedPtr<T>& other) const	{ return !operator==(other); }
 
 	// Assignment operators
 	/////////////////////////////////
 
-	FORCEINLINE TWeakPtr& operator=(const _NShared::SNullType*) { Reset(); return *this; }
+	KOR_FORCEINLINE TWeakPtr& operator=(const _NShared::SNullType*) { Reset(); return *this; }
 
 	// Assignment operators [WeakPtr]
 	/////////////////////////////////
 
-	FORCEINLINE TWeakPtr& operator=(const TWeakPtr& other) { if (&other != this) ReplaceBy(other); return *this; }
-	FORCEINLINE TWeakPtr& operator=(TWeakPtr&& other) { if (&other != this) ReplaceBy(Forward<TWeakPtr>(other)); return *this; }
+	KOR_FORCEINLINE TWeakPtr& operator=(const TWeakPtr& other) { if (&other != this) ReplaceBy(other); return *this; }
+	KOR_FORCEINLINE TWeakPtr& operator=(TWeakPtr&& other) { if (&other != this) ReplaceBy(Forward<TWeakPtr>(other)); return *this; }
 
 	// Assignment operators [SharedPtr]
 	/////////////////////////////////
 
-	FORCEINLINE TWeakPtr& operator=(const TSharedPtr<T>& other) { ReplaceBy(other); return *this; }
-	FORCEINLINE TWeakPtr& operator=(TSharedPtr<T>&& other) { ReplaceBy(Forward<TSharedPtr<T>>(other)); return *this; }
+	KOR_FORCEINLINE TWeakPtr& operator=(const TSharedPtr<T>& other) { ReplaceBy(other); return *this; }
+	KOR_FORCEINLINE TWeakPtr& operator=(TSharedPtr<T>&& other) { ReplaceBy(Forward<TSharedPtr<T>>(other)); return *this; }
 
 	// Pointer operators
 	/////////////////////////////////
 	// * Our weak pointer supports dereferencing without shared_ptr
 
-	FORCEINLINE ObjectType* operator->() const { return Get(); }
-	FORCEINLINE ObjectType& operator*() const { return *Get(); }
+	KOR_FORCEINLINE ObjectType* operator->() const { return Get(); }
+	KOR_FORCEINLINE ObjectType& operator*() const { return *Get(); }
 
 	// Validity
 	/////////////////////////////////
 
-	FORCEINLINE bool IsValid() const { return _referencerProxy.IsSafeToDereference(); }
+	KOR_FORCEINLINE bool IsValid() const { return _referencerProxy.IsSafeToDereference(); }
 
 	// Getters
 	/////////////////////////////////
 
-	FORCEINLINE ObjectType* Get() const { return _referencerProxy.IsValid() ? _referencerProxy->GetObject<ObjectType>() : nullptr; }
-	FORCEINLINE ObjectType& GetRef() const { return *Get(); }
+	KOR_FORCEINLINE ObjectType* Get() const { return _referencerProxy.IsValid() ? _referencerProxy->GetObject<ObjectType>() : nullptr; }
+	KOR_FORCEINLINE ObjectType& GetRef() const { return *Get(); }
 
 	// Other
 	/////////////////////////////////
 
-	FORCEINLINE void Reset() { _referencerProxy.RemoveWeak(); _referencerProxy.Set(nullptr); }
+	KOR_FORCEINLINE void Reset() { _referencerProxy.RemoveWeak(); _referencerProxy.Set(nullptr); }
 
-	FORCEINLINE TSharedPtr<T> Pin() const { return IsValid() ? TSharedPtr<T>(_referencerProxy) : TSharedPtr<T>(); }
+	KOR_FORCEINLINE TSharedPtr<T> Pin() const { return IsValid() ? TSharedPtr<T>(_referencerProxy) : TSharedPtr<T>(); }
 
 private:
 
 	// const PtrType&
 	// * Copy
 	template<typename PtrType>
-	FORCEINLINE_DEBUGGABLE void ReplaceBy(const PtrType& other)
+	KOR_FORCEINLINE_DEBUGGABLE void ReplaceBy(const PtrType& other)
 	{
 		// How it should work ? (Copy implementation)
 
@@ -272,7 +272,7 @@ private:
 	// PtrType&&
 	// * Move
 	template<typename PtrType>
-	FORCEINLINE_DEBUGGABLE void ReplaceBy(PtrType&& other)
+	KOR_FORCEINLINE_DEBUGGABLE void ReplaceBy(PtrType&& other)
 	{
 		// How it should work ? (move implementation)
 
@@ -309,7 +309,7 @@ private:
 ////////////////////////////////////////////
 
 template<typename T>
-FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TWeakPtr<T>& weakPtr)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TWeakPtr<T>& weakPtr)
 {
 	if (weakPtr.IsValid())
 	{
@@ -320,7 +320,7 @@ FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TWeakPtr<
 }
 
 template<typename T>
-FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TWeakPtr<T>& weakPtr)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TWeakPtr<T>& weakPtr)
 {
 	if (weakPtr.IsValid())
 	{
@@ -342,36 +342,36 @@ public:
 	// Constructors
 	/////////////////////////////////
 
-	FORCEINLINE TSharedClass() : _isSharedInitialized(false) {}
+	KOR_FORCEINLINE TSharedClass() : _isSharedInitialized(false) {}
 
 	// Getters
 	/////////////////////////////////
 
-	FORCEINLINE bool IsSharedInitialized() const { return _isSharedInitialized; }
+	KOR_FORCEINLINE bool IsSharedInitialized() const { return _isSharedInitialized; }
 
 	// External method
 	/////////////////////////////////
 
 	// Gets pointer as shared_ptr
-	FORCEINLINE TSharedPtr<ClassType> AsShared()
+	KOR_FORCEINLINE TSharedPtr<ClassType> AsShared()
 	{
-		CHECK_RET(_weakThis.IsValid(), nullptr);
+		KOR_CHECK_RET(_weakThis.IsValid(), nullptr);
 		return _weakThis.Pin();
 	}
 
 	// Gets pointer as shared_ptr with provided type
 	template<typename ChildType>
-	FORCEINLINE TSharedPtr<ChildType> AsShared()
+	KOR_FORCEINLINE TSharedPtr<ChildType> AsShared()
 	{
-		CHECK_RET(_weakThis.IsValid(), nullptr);
+		KOR_CHECK_RET(_weakThis.IsValid(), nullptr);
 		return _weakThis.Pin();
 	}
 
 private:
 	// Do not call this method DIRECTLY!
-	FORCEINLINE void Init_Private(const TSharedPtr<ClassType>& ptr)
+	KOR_FORCEINLINE void Init_Private(const TSharedPtr<ClassType>& ptr)
 	{
-		CHECK_RET(!_isSharedInitialized);
+		KOR_CHECK_RET(!_isSharedInitialized);
 
 		_weakThis = ptr;
 		_isSharedInitialized = true;
@@ -382,7 +382,7 @@ private:
 };
 
 template<typename T, typename InstanceT = T>
-FORCEINLINE_DEBUGGABLE static TSharedPtr<T> MakeShareable(InstanceT* instance)
+KOR_FORCEINLINE_DEBUGGABLE static TSharedPtr<T> MakeShareable(InstanceT* instance)
 {
 	static_assert(TIsDerivedFrom<InstanceT,T>::Value, "Instance type must be derived from return type");
 
@@ -397,7 +397,7 @@ FORCEINLINE_DEBUGGABLE static TSharedPtr<T> MakeShareable(InstanceT* instance)
 }
 
 template<typename T, typename... ArgTypes>
-FORCEINLINE_DEBUGGABLE static TSharedPtr<T> MakeShared(ArgTypes&&... args)
+KOR_FORCEINLINE_DEBUGGABLE static TSharedPtr<T> MakeShared(ArgTypes&&... args)
 {
 	if constexpr (sizeof...(args) > 0)
 	{

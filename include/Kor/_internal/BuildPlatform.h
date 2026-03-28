@@ -2,28 +2,28 @@
 
 #pragma once
 
-#include "ASTD/_internal/BuildPlatformInternals.h"
+#include "Kor/_internal/BuildPlatformInternals.h"
 
-#if PLATFORM_WINDOWS
-	#define PLATFORM_NAME Windows
-	#define PLATFORM_FOLDER_NAME Win32
-	#include "ASTD/Win32/WindowsBuild.h"
-#elif PLATFORM_LINUX
-	#define PLATFORM_NAME Linux
-	#include "ASTD/Linux/LinuxBuild.h"
-#elif PLATFORM_APPLE
-	#define PLATFORM_NAME Apple
-	#include "ASTD/Apple/AppleBuild.h"
+#if KOR_PLATFORM_WINDOWS
+	#define KOR_PLATFORM_NAME Windows
+	#define KOR_PLATFORM_FOLDER_NAME Win32
+	#include "Kor/Win32/WindowsBuild.h"
+#elif KOR_PLATFORM_LINUX
+	#define KOR_PLATFORM_NAME Linux
+	#include "Kor/Linux/LinuxBuild.h"
+#elif KOR_PLATFORM_APPLE
+	#define KOR_PLATFORM_NAME Apple
+	#include "Kor/Apple/AppleBuild.h"
 #else
 	#error "Unsupported platform"
 #endif
 
-#ifndef PLATFORM_FOLDER_NAME
-	#define PLATFORM_FOLDER_NAME PLATFORM_NAME
+#ifndef KOR_PLATFORM_FOLDER_NAME
+	#define KOR_PLATFORM_FOLDER_NAME KOR_PLATFORM_NAME
 #endif
 
-#define PLATFORM_HEADER_NAME(name) PLATFORM_HEADER_NAME_IMPL(PLATFORM_FOLDER_NAME, PLATFORM_NAME, name).h
-#define PLATFORM_HEADER(name) PLATFORM_HEADER_IMPL(PLATFORM_HEADER_NAME(name))
+#define KOR_PLATFORM_HEADER_NAME(name) KOR_PLATFORM_HEADER_NAME_IMPL(KOR_PLATFORM_FOLDER_NAME, KOR_PLATFORM_NAME, name).h
+#define KOR_PLATFORM_HEADER(name) KOR_PLATFORM_HEADER_IMPL(KOR_PLATFORM_HEADER_NAME(name))
 
-#define PLATFORM_TYPE(name) CONCAT_EXPAND(PLATFORM_NAME, name)
-#define PLATFORM_PREFIXED_TYPE(prefix, name) DOUBLE_CONCAT(prefix, PLATFORM_NAME, name)
+#define KOR_PLATFORM_TYPE(name) KOR_MACRO_CONCAT_EXPAND(KOR_PLATFORM_NAME, name)
+#define KOR_PLATFORM_PREFIXED_TYPE(prefix, name) KOR_MACRO_DOUBLE_CONCAT(prefix, KOR_PLATFORM_NAME, name)

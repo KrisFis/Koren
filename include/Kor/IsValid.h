@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include "ASTD/Build.h"
+#include "Kor/Build.h"
 
-#include "ASTD/TypeTraits.h"
-#include "ASTD/TypeTraitsMacros.h"
+#include "Kor/TypeTraits.h"
+#include "Kor/TypeTraitsMacros.h"
 
-namespace NValidationInternals
+namespace _IsValid
 {
-	GENERATE_HAS_FIELD_TRAIT(THasValidateField, Validate)
-	GENERATE_HAS_GLOBAL_METHOD_TRAIT(THasGlobalIsValid, IsValid(DeclVal<TestType>()))
-	GENERATE_HAS_METHOD_TRAIT(THasIsInstanceValidMethod, IsValid())
+	KOR_GENERATE_HAS_FIELD_TRAIT(THasValidateField, Validate)
+	KOR_GENERATE_HAS_GLOBAL_METHOD_TRAIT(THasGlobalIsValid, IsValid(DeclVal<TestType>()))
+	KOR_GENERATE_HAS_METHOD_TRAIT(THasIsInstanceValidMethod, IsValid())
 
 	// Template definition for SFINAE
 	template<typename T, typename Enable = void>
@@ -21,7 +21,7 @@ namespace NValidationInternals
 	template<typename T>
 	struct TValidProvider<T, typename TEnableIf<TIsPointer<T>::Value && THasIsInstanceValidMethod<T>::Value>::Type>
 	{
-		FORCEINLINE static constexpr bool Validate(T Object)
+		KOR_FORCEINLINE static constexpr bool Validate(T Object)
 		{
 			return Object && Object->IsValid();
 		}
@@ -31,7 +31,7 @@ namespace NValidationInternals
 	template<typename T>
 	struct TValidProvider<T, typename TEnableIf<TIsPointer<T>::Value && !THasIsInstanceValidMethod<T>::Value>::Type>
 	{
-		FORCEINLINE static constexpr bool Validate(T Object)
+		KOR_FORCEINLINE static constexpr bool Validate(T Object)
 		{
 			return Object != nullptr;
 		}
@@ -41,7 +41,7 @@ namespace NValidationInternals
 	template<typename T>
 	struct TValidProvider<T, typename TEnableIf<TIsReference<T>::Value && THasIsInstanceValidMethod<T>::Value>::Type>
 	{
-		FORCEINLINE static constexpr bool Validate(T Object)
+		KOR_FORCEINLINE static constexpr bool Validate(T Object)
 		{
 			return Object.IsValid();
 		}
@@ -72,14 +72,14 @@ namespace NValidationInternals
 	};
 }
 
-template<typename T, typename TEnableIf<NValidationInternals::TValidFinder<T>::HasBaseValid>::Type* = nullptr>
-FORCEINLINE static constexpr bool IsValid(const T& obj)
+template<typename T, typename TEnableIf<_IsValid::TValidFinder<T>::HasBaseValid>::Type* = nullptr>
+KOR_FORCEINLINE static constexpr bool IsValid(const T& obj)
 {
-	return NValidationInternals::TValidProvider<typename NValidationInternals::TValidFinder<T>::DesiredType>::Validate(obj);
+	return _IsValid::TValidProvider<typename _IsValid::TValidFinder<T>::DesiredType>::Validate(obj);
 }
 
-template<typename T, typename TEnableIf<!NValidationInternals::TValidFinder<T>::ValidProvided>::Type* = nullptr>
-FORCEINLINE static constexpr bool IsValid(...)
+template<typename T, typename TEnableIf<!_IsValid::TValidFinder<T>::ValidProvided>::Type* = nullptr>
+KOR_FORCEINLINE static constexpr bool IsValid(...)
 {
 	static_assert(sizeof(T) < 0, "IsValid() function overload for type is not implemented");
 	return false;

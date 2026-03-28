@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
+#include "KorMinimal.h"
 
-#include "ASTD/Memory.h"
-#include "ASTD/TypeTraits.h"
+#include "Kor/Memory.h"
+#include "Kor/TypeTraits.h"
 
 template<typename ElementT>
 class TOptional
@@ -25,60 +25,60 @@ public:
 	// Constructors
 	/////////////////////////////////
 
-	FORCEINLINE TOptional() = default;
-	FORCEINLINE TOptional(const TOptional& other) { FillToEmpty(other); }
-	FORCEINLINE TOptional(TOptional&& other) { FillToEmpty(Move(other)); }
-	FORCEINLINE TOptional(const ElementType& InValue) { FillToEmpty(InValue); }
-	FORCEINLINE TOptional(ElementType&& InValue) { FillToEmpty(Move(InValue)); }
+	KOR_FORCEINLINE TOptional() = default;
+	KOR_FORCEINLINE TOptional(const TOptional& other) { FillToEmpty(other); }
+	KOR_FORCEINLINE TOptional(TOptional&& other) { FillToEmpty(Move(other)); }
+	KOR_FORCEINLINE TOptional(const ElementType& InValue) { FillToEmpty(InValue); }
+	KOR_FORCEINLINE TOptional(ElementType&& InValue) { FillToEmpty(Move(InValue)); }
 
 	// Destructor
 	/////////////////////////////////
 
-	FORCEINLINE ~TOptional() { Reset(); }
+	KOR_FORCEINLINE ~TOptional() { Reset(); }
 
 	// Comparison operators
 	/////////////////////////////////
 
-	FORCEINLINE bool operator==(const TOptional& other) const { return ComparePrivate(*this, other); }
-	FORCEINLINE bool operator!=(const TOptional& other) const { return !ComparePrivate(*this, other); }
+	KOR_FORCEINLINE bool operator==(const TOptional& other) const { return ComparePrivate(*this, other); }
+	KOR_FORCEINLINE bool operator!=(const TOptional& other) const { return !ComparePrivate(*this, other); }
 
 	// Assign operators
 	/////////////////////////////////
 
-	FORCEINLINE TOptional& operator=(const TOptional& other) { Reset(); FillToEmpty(other); return *this; }
-	FORCEINLINE TOptional& operator=(TOptional&& other) noexcept { Reset(); FillToEmpty(Move(other)); return *this; }
+	KOR_FORCEINLINE TOptional& operator=(const TOptional& other) { Reset(); FillToEmpty(other); return *this; }
+	KOR_FORCEINLINE TOptional& operator=(TOptional&& other) noexcept { Reset(); FillToEmpty(Move(other)); return *this; }
 
-	FORCEINLINE TOptional& operator=(const ElementType& InValue) { Reset(); FillToEmpty(InValue); return *this; }
-	FORCEINLINE TOptional& operator=(ElementType&& InValue) { Reset(); FillToEmpty(Move(InValue)); return *this; }
+	KOR_FORCEINLINE TOptional& operator=(const ElementType& InValue) { Reset(); FillToEmpty(InValue); return *this; }
+	KOR_FORCEINLINE TOptional& operator=(ElementType&& InValue) { Reset(); FillToEmpty(Move(InValue)); return *this; }
 
 	// Dereference operators
 	/////////////////////////////////
 
-	FORCEINLINE const ElementType* operator->() const { return _data; }
-	FORCEINLINE ElementType* operator->() { return _data; }
+	KOR_FORCEINLINE const ElementType* operator->() const { return _data; }
+	KOR_FORCEINLINE ElementType* operator->() { return _data; }
 
 	// Checks
 	/////////////////////////////////
 
-	FORCEINLINE bool IsValid() const { return !!_data; }
-	FORCEINLINE bool IsSet() const { return IsValid(); }
+	KOR_FORCEINLINE bool IsValid() const { return !!_data; }
+	KOR_FORCEINLINE bool IsSet() const { return IsValid(); }
 
 	// Getters
 	/////////////////////////////////
 
 	// Gets copy
-	FORCEINLINE ElementType Get(const ElementType& defaultValue) const { return IsSet() ? *_data : defaultValue; }
-	FORCEINLINE ElementType Get() const { return GetDefaultedImpl(); }
+	KOR_FORCEINLINE ElementType Get(const ElementType& defaultValue) const { return IsSet() ? *_data : defaultValue; }
+	KOR_FORCEINLINE ElementType Get() const { return GetDefaultedImpl(); }
 
 	// Gets reference, but can crash
-	FORCEINLINE const ElementType& GetRef() const { return *_data; }
-	FORCEINLINE ElementType& GetRef() { return *_data; }
+	KOR_FORCEINLINE const ElementType& GetRef() const { return *_data; }
+	KOR_FORCEINLINE ElementType& GetRef() { return *_data; }
 
 	// Manipulation
 	/////////////////////////////////
 
-	FORCEINLINE void Set(const ElementType& InValue) { Reset(); FillToEmpty(InValue); }
-	FORCEINLINE void Set(ElementType&& InValue) { Reset(); FillToEmpty(Move(InValue)); }
+	KOR_FORCEINLINE void Set(const ElementType& InValue) { Reset(); FillToEmpty(InValue); }
+	KOR_FORCEINLINE void Set(ElementType&& InValue) { Reset(); FillToEmpty(Move(InValue)); }
 
 	void Reset()
 	{
@@ -104,7 +104,7 @@ private:
 		SMemory::MoveTyped(_data, &InValue);
 	}
 
-	FORCEINLINE void FillToEmpty(const TOptional& other) 
+	KOR_FORCEINLINE void FillToEmpty(const TOptional& other)
 	{
 		if(other.IsSet())
 		{
@@ -112,7 +112,7 @@ private:
 		}
 	}
 
-	FORCEINLINE void FillToEmpty(TOptional&& other)
+	KOR_FORCEINLINE void FillToEmpty(TOptional&& other)
 	{
 		if(other.IsSet())
 		{
@@ -151,7 +151,7 @@ private:
 ////////////////////////////////////////////
 
 template<typename T>
-FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TOptional<T>& optional)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TOptional<T>& optional)
 {
 	if (optional.IsSet())
 	{
@@ -162,7 +162,7 @@ FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TOptional
 }
 
 template<typename T>
-FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TOptional<T>& optional)
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TOptional<T>& optional)
 {
 	if (optional.IsSet())
 	{

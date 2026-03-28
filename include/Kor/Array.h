@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "ASTD/ASTDMinimal.h"
+#include "Kor/KorMinimal.h"
 
-#include "ASTD/Math.h"
-#include "ASTD/Memory.h"
+#include "Kor/Math.h"
+#include "Kor/Memory.h"
 
-#include "ASTD/ArrayAllocator.h"
+#include "Kor/ArrayAllocator.h"
 
 template<typename ElementT, typename AllocatorT>
 class TArray
@@ -34,20 +34,20 @@ public:
 	// Constructors
 	/////////////////////////////////
 
-	FORCEINLINE TArray() : _allocator(), _num(0) {}
-	FORCEINLINE TArray(const TArray& other) : _allocator(), _num(0) { AppendImpl(other); }
-	FORCEINLINE TArray(TArray&& other) noexcept : _allocator(), _num(0) { ReplaceImpl(Move(other)); }
-	FORCEINLINE TArray(SizeType num, bool reserveOnly = false) : _allocator(), _num(0)
+	KOR_FORCEINLINE TArray() : _allocator(), _num(0) {}
+	KOR_FORCEINLINE TArray(const TArray& other) : _allocator(), _num(0) { AppendImpl(other); }
+	KOR_FORCEINLINE TArray(TArray&& other) noexcept : _allocator(), _num(0) { ReplaceImpl(Move(other)); }
+	KOR_FORCEINLINE TArray(SizeType num, bool reserveOnly = false) : _allocator(), _num(0)
 	{
 		if (reserveOnly) ReserveImpl(num);
 		else GrowImpl(num);
 	}
-	FORCEINLINE TArray(const ElementListType& list) : _allocator() , _num(0)
+	KOR_FORCEINLINE TArray(const ElementListType& list) : _allocator() , _num(0)
 	{
 		AppendImpl(list.begin(), list.size());
 	}
 
-	FORCEINLINE TArray(const ElementT* data, SizeType num)
+	KOR_FORCEINLINE TArray(const ElementT* data, SizeType num)
 		: _allocator()
 		, _num(0)
 	{
@@ -57,116 +57,116 @@ public:
 	// Destructor
 	/////////////////////////////////
 
-	FORCEINLINE ~TArray() { EmptyImpl(true); }
+	KOR_FORCEINLINE ~TArray() { EmptyImpl(true); }
 
 	// Compare operators
 	/////////////////////////////////
 
-	FORCEINLINE bool operator==(const TArray& other) const { return CompareAllocatorsPrivate(&_allocator, &other._allocator, _num); }
-	FORCEINLINE bool operator!=(const TArray& other) const { return CompareAllocatorsPrivate(&_allocator, &other._allocator, _num); }
+	KOR_FORCEINLINE bool operator==(const TArray& other) const { return CompareAllocatorsPrivate(&_allocator, &other._allocator, _num); }
+	KOR_FORCEINLINE bool operator!=(const TArray& other) const { return CompareAllocatorsPrivate(&_allocator, &other._allocator, _num); }
 
 	// Assign operators
 	/////////////////////////////////
 
-	FORCEINLINE TArray& operator=(const TArray& other) { EmptyImpl(true); AppendImpl(other); return *this; }
-	FORCEINLINE TArray& operator=(TArray&& other) noexcept { ReplaceImpl(Move(other)); return *this; }
+	KOR_FORCEINLINE TArray& operator=(const TArray& other) { EmptyImpl(true); AppendImpl(other); return *this; }
+	KOR_FORCEINLINE TArray& operator=(TArray&& other) noexcept { ReplaceImpl(Move(other)); return *this; }
 
-	FORCEINLINE TArray& operator=(const ElementListType& list) { EmptyImpl(true); AppendImpl(list.begin(), list.size()); return *this; }
+	KOR_FORCEINLINE TArray& operator=(const ElementListType& list) { EmptyImpl(true); AppendImpl(list.begin(), list.size()); return *this; }
 
 	// Get operators
 	/////////////////////////////////
 
-	FORCEINLINE ElementT& operator[](SizeType idx) { return *GetElementAtImpl(idx); }
-	FORCEINLINE const ElementT& operator[](SizeType idx) const { return *GetElementAtImpl(idx); }
+	KOR_FORCEINLINE ElementT& operator[](SizeType idx) { return *GetElementAtImpl(idx); }
+	KOR_FORCEINLINE const ElementT& operator[](SizeType idx) const { return *GetElementAtImpl(idx); }
 
 	// Property getters
 	/////////////////////////////////
 
-	FORCEINLINE const ElementT* GetData() const { return _allocator.GetData(); }
-	FORCEINLINE ElementT* GetData() { return _allocator.GetData(); }
+	KOR_FORCEINLINE const ElementT* GetData() const { return _allocator.GetData(); }
+	KOR_FORCEINLINE ElementT* GetData() { return _allocator.GetData(); }
 
-	FORCEINLINE SizeType GetNum() const { return _num; }
-	FORCEINLINE SizeType GetReservedNum() const { return _allocator.GetSize(); }
+	KOR_FORCEINLINE SizeType GetNum() const { return _num; }
+	KOR_FORCEINLINE SizeType GetReservedNum() const { return _allocator.GetSize(); }
 
 	// Validations
 	/////////////////////////////////
 
-	FORCEINLINE bool IsEmpty() const { return _num == 0; }
-	FORCEINLINE bool IsValidIndex(SizeType idx) const { return idx >= 0 && idx < _num; }
+	KOR_FORCEINLINE bool IsEmpty() const { return _num == 0; }
+	KOR_FORCEINLINE bool IsValidIndex(SizeType idx) const { return idx >= 0 && idx < _num; }
 
 	// Append
 	/////////////////////////////////
 
-	FORCEINLINE void Append(const TArray& other) { AppendImpl(other); }
-	FORCEINLINE void Append(TArray&& other) { AppendImpl(Move(other)); }
+	KOR_FORCEINLINE void Append(const TArray& other) { AppendImpl(other); }
+	KOR_FORCEINLINE void Append(TArray&& other) { AppendImpl(Move(other)); }
 
-	FORCEINLINE void Append(const ElementT& val, SizeType numToAdd) { AddImpl(val, numToAdd); }
-	FORCEINLINE void Append(const ElementListType& list) { AppendImpl(list.begin(), list.size()); }
-	FORCEINLINE void Append(const ElementT* data, SizeType num) { AppendImpl(data, num); }
+	KOR_FORCEINLINE void Append(const ElementT& val, SizeType numToAdd) { AddImpl(val, numToAdd); }
+	KOR_FORCEINLINE void Append(const ElementListType& list) { AppendImpl(list.begin(), list.size()); }
+	KOR_FORCEINLINE void Append(const ElementT* data, SizeType num) { AppendImpl(data, num); }
 
-	FORCEINLINE void AppendUninitialized(SizeType numToAdd) { GrowImpl(_num + numToAdd); }
+	KOR_FORCEINLINE void AppendUninitialized(SizeType numToAdd) { GrowImpl(_num + numToAdd); }
 
 	// Replace
 	/////////////////////////////////
 
-	FORCEINLINE void Replace(TArray& other) { ReplaceImpl(Move(other)); }
-	FORCEINLINE void Replace(TArray&& other) { ReplaceImpl(Move(other)); }
+	KOR_FORCEINLINE void Replace(TArray& other) { ReplaceImpl(Move(other)); }
+	KOR_FORCEINLINE void Replace(TArray&& other) { ReplaceImpl(Move(other)); }
 
 	// Add
 	/////////////////////////////////
 
-	FORCEINLINE void Add(const ElementT& val)
+	KOR_FORCEINLINE void Add(const ElementT& val)
 	{
 		AppendImpl(&val, 1);
 	}
 
-	FORCEINLINE void Add(ElementT&& val)
+	KOR_FORCEINLINE void Add(ElementT&& val)
 	{
 		AppendImpl(&val, 1, true);
 	}
 
-	FORCEINLINE void AddDefaulted(SizeType num = 1)
+	KOR_FORCEINLINE void AddDefaulted(SizeType num = 1)
 	{
 		AddDefaultedImpl(num);
 	}
 
-	FORCEINLINE void AddUninitialized(SizeType num = 1)
+	KOR_FORCEINLINE void AddUninitialized(SizeType num = 1)
 	{
 		AddUninitializedImpl(num);
 	}
 
-	FORCEINLINE ElementT& Add_GetRef(const ElementT& val)
+	KOR_FORCEINLINE ElementT& Add_GetRef(const ElementT& val)
 	{
 		AppendImpl(&val, 1);
 		return *GetElementAtImpl(_num - 1);
 	}
 
-	FORCEINLINE ElementT& Add_GetRef(ElementT&& val)
+	KOR_FORCEINLINE ElementT& Add_GetRef(ElementT&& val)
 	{
 		AppendImpl(&val, 1, true);
 		return *GetElementAtImpl(_num - 1);
 	}
 
-	FORCEINLINE ElementT& AddDefaulted_GetRef()
+	KOR_FORCEINLINE ElementT& AddDefaulted_GetRef()
 	{
 		AddDefaultedImpl();
 		return *GetElementAtImpl(_num - 1);
 	}
 
-	FORCEINLINE ElementT& AddUninitialized_GetRef()
+	KOR_FORCEINLINE ElementT& AddUninitialized_GetRef()
 	{
 		AddUninitializedImpl();
 		return *GetElementAtImpl(_num - 1);
 	}
 
-	FORCEINLINE void Push(const ElementT& val) { AddImpl(val); }
-	FORCEINLINE void Push(ElementT&& val) { AddImpl(Move(val)); }
+	KOR_FORCEINLINE void Push(const ElementT& val) { AddImpl(val); }
+	KOR_FORCEINLINE void Push(ElementT&& val) { AddImpl(Move(val)); }
 
 	// Add
 	/////////////////////////////////
 
 	template<typename... ArgTypes>
-	FORCEINLINE SizeType Emplace(ArgTypes&&... args)
+	KOR_FORCEINLINE SizeType Emplace(ArgTypes&&... args)
 	{
 		AddUninitializedImpl();
 
@@ -175,7 +175,7 @@ public:
 	}
 
 	template<typename... ArgTypes>
-	FORCEINLINE ElementT& Emplace_GetRef(ArgTypes&&... args)
+	KOR_FORCEINLINE ElementT& Emplace_GetRef(ArgTypes&&... args)
 	{
 		AddUninitializedImpl();
 
@@ -219,35 +219,35 @@ public:
 		return removedNum;
 	}
 
-	// Returns index of removed element or INDEX_NONE if not found
-	FORCEINLINE int32 RemoveFirst(const ElementT& val)
+	// Returns index of removed element or KOR_INDEX_NONE if not found
+	KOR_FORCEINLINE int32 RemoveFirst(const ElementT& val)
 	{
 		const int32 foundIdx = FindIndex(val);
-		if (foundIdx != INDEX_NONE) RemoveImpl(foundIdx);
+		if (foundIdx != KOR_INDEX_NONE) RemoveImpl(foundIdx);
 		return foundIdx;
 	}
 
-	// Returns index of removed element or INDEX_NONE if not found
-	FORCEINLINE int32 RemoveSwapFirst(const ElementT& val)
+	// Returns index of removed element or KOR_INDEX_NONE if not found
+	KOR_FORCEINLINE int32 RemoveSwapFirst(const ElementT& val)
 	{
 		const int32 foundIdx = FindIndex(val);
-		if (foundIdx != INDEX_NONE) RemoveSwapImpl(foundIdx);
+		if (foundIdx != KOR_INDEX_NONE) RemoveSwapImpl(foundIdx);
 		return foundIdx;
 	}
 
-	FORCEINLINE void RemoveAt(SizeType idx)
+	KOR_FORCEINLINE void RemoveAt(SizeType idx)
 	{
 		if(!IsValidIndex(idx)) return;
 		RemoveImpl(idx);
 	}
 
-	FORCEINLINE void RemoveAtSwap(SizeType idx)
+	KOR_FORCEINLINE void RemoveAtSwap(SizeType idx)
 	{
 		if(!IsValidIndex(idx)) return;
 		RemoveSwapImpl(idx);
 	}
 
-	FORCEINLINE ElementT RemoveAt_GetCopy(SizeType idx)
+	KOR_FORCEINLINE ElementT RemoveAt_GetCopy(SizeType idx)
 	{
 		if(!IsValidIndex(idx)) return {};
 
@@ -258,7 +258,7 @@ public:
 		return copy;
 	}
 
-	FORCEINLINE ElementT RemoveAtSwap_GetCopy(SizeType idx)
+	KOR_FORCEINLINE ElementT RemoveAtSwap_GetCopy(SizeType idx)
 	{
 		if(!IsValidIndex(idx)) return {};
 
@@ -269,7 +269,7 @@ public:
 		return copy;
 	}
 
-	FORCEINLINE void Pop()
+	KOR_FORCEINLINE void Pop()
 	{
 		if(_num > 0)
 		{
@@ -280,14 +280,14 @@ public:
 	// Swap
 	/////////////////////////////////
 
-	FORCEINLINE void Swap(SizeType firstIdx, SizeType secondIdx)
+	KOR_FORCEINLINE void Swap(SizeType firstIdx, SizeType secondIdx)
 	{
 		if(!IsValidIndex(firstIdx) || !IsValidIndex(secondIdx)) return;
 
 		SwapImpl(firstIdx, secondIdx, 1);
 	}
 
-	FORCEINLINE void SwapRange(SizeType firstIdx, SizeType secondIdx, SizeType num = 1)
+	KOR_FORCEINLINE void SwapRange(SizeType firstIdx, SizeType secondIdx, SizeType num = 1)
 	{
 		if(!IsValidIndex(firstIdx) || !IsValidIndex(secondIdx)) return;
 		else if(firstIdx + num > _num || secondIdx + num > _num) return;
@@ -298,14 +298,14 @@ public:
 	// Get
 	/////////////////////////////////
 
-	FORCEINLINE const ElementT* GetAt(SizeType idx) const { return IsValidIndex(idx) ? GetElementAtImpl(idx) : nullptr; }
-	FORCEINLINE ElementT* GetAt(SizeType idx) { return IsValidIndex(idx) ? GetElementAtImpl(idx) : nullptr; }
+	KOR_FORCEINLINE const ElementT* GetAt(SizeType idx) const { return IsValidIndex(idx) ? GetElementAtImpl(idx) : nullptr; }
+	KOR_FORCEINLINE ElementT* GetAt(SizeType idx) { return IsValidIndex(idx) ? GetElementAtImpl(idx) : nullptr; }
 
-	FORCEINLINE const ElementT* GetFirst() const { return _num > 0 ? GetElementAtImpl(0) : nullptr; }
-	FORCEINLINE ElementT* GetFirst() { return _num > 0 ? GetElementAtImpl(0) : nullptr; }
+	KOR_FORCEINLINE const ElementT* GetFirst() const { return _num > 0 ? GetElementAtImpl(0) : nullptr; }
+	KOR_FORCEINLINE ElementT* GetFirst() { return _num > 0 ? GetElementAtImpl(0) : nullptr; }
 
-	FORCEINLINE const ElementT* GetLast() const { return _num > 0 ? GetElementAtImpl(_num - 1) : nullptr; }
-	FORCEINLINE ElementT* GetLast() { return _num > 0 ? GetElementAtImpl(_num - 1) : nullptr; }
+	KOR_FORCEINLINE const ElementT* GetLast() const { return _num > 0 ? GetElementAtImpl(_num - 1) : nullptr; }
+	KOR_FORCEINLINE ElementT* GetLast() { return _num > 0 ? GetElementAtImpl(_num - 1) : nullptr; }
 
 	// Find Index
 	/////////////////////////////////
@@ -320,7 +320,7 @@ public:
 			}
 		}
 
-		return INDEX_NONE;
+		return KOR_INDEX_NONE;
 	}
 
 	template<typename Functor>
@@ -334,7 +334,7 @@ public:
 			}
 		}
 
-		return INDEX_NONE;
+		return KOR_INDEX_NONE;
 	}
 
 	template<typename KeyType>
@@ -348,7 +348,7 @@ public:
 			}
 		}
 
-		return INDEX_NONE;
+		return KOR_INDEX_NONE;
 	}
 
 	// Find Element
@@ -358,63 +358,63 @@ public:
 	const ElementT* FindByFunc(Functor&& func) const
 	{
 		const SizeType foundIdx = FindIndexByFunc(Move(func));
-		return foundIdx != INDEX_NONE ? GetElementAtImpl(foundIdx) : nullptr;
+		return foundIdx != KOR_INDEX_NONE ? GetElementAtImpl(foundIdx) : nullptr;
 	}
 
 	template<typename Functor>
 	ElementT* FindByFunc(Functor&& func)
 	{
 		const SizeType foundIdx = FindIndexByFunc(Move(func));
-		return foundIdx != INDEX_NONE ? GetElementAtImpl(foundIdx) : nullptr;
+		return foundIdx != KOR_INDEX_NONE ? GetElementAtImpl(foundIdx) : nullptr;
 	}
 
 	template<typename KeyType>
 	const ElementT* FindByKey(KeyType key) const
 	{
 		const SizeType foundIdx = FindByKey(key);
-		return foundIdx != INDEX_NONE ? GetElementAtImpl(foundIdx) : nullptr;
+		return foundIdx != KOR_INDEX_NONE ? GetElementAtImpl(foundIdx) : nullptr;
 	}
 
 	template<typename KeyType>
 	ElementT* FindByKey(KeyType key)
 	{
 		const SizeType foundIdx = FindByKey(key);
-		return foundIdx != INDEX_NONE ? GetElementAtImpl(foundIdx) : nullptr;
+		return foundIdx != KOR_INDEX_NONE ? GetElementAtImpl(foundIdx) : nullptr;
 	}
 
 	// Contains
 	/////////////////////////////////
 
-	FORCEINLINE bool Contains(const ElementT& val) const { return FindIndex(val) != INDEX_NONE; }
+	KOR_FORCEINLINE bool Contains(const ElementT& val) const { return FindIndex(val) != KOR_INDEX_NONE; }
 
 	template<typename Functor>
-	FORCEINLINE bool ContainsByFunc(Functor&& func) const { return !!FindByFunc(Move(func)); }
+	KOR_FORCEINLINE bool ContainsByFunc(Functor&& func) const { return !!FindByFunc(Move(func)); }
 
 	template<typename KeyType>
-	FORCEINLINE bool ContainsByKey(KeyType key) const { return FindByKey(key) != INDEX_NONE; }
+	KOR_FORCEINLINE bool ContainsByKey(KeyType key) const { return FindByKey(key) != KOR_INDEX_NONE; }
 
 	// Other
 	/////////////////////////////////
 
-	FORCEINLINE void ShrinkToFit() { if(_num < _allocator.GetSize()) ShrinkImpl(_num); }
+	KOR_FORCEINLINE void ShrinkToFit() { if(_num < _allocator.GetSize()) ShrinkImpl(_num); }
 
-	FORCEINLINE void Resize(SizeType num) { ResizeImpl(num); }
-	FORCEINLINE void Reserve(SizeType num) { if (num > _num) { ReserveImpl(num); } else { ShrinkImpl(num); }; }
+	KOR_FORCEINLINE void Resize(SizeType num) { ResizeImpl(num); }
+	KOR_FORCEINLINE void Reserve(SizeType num) { if (num > _num) { ReserveImpl(num); } else { ShrinkImpl(num); }; }
 
-	FORCEINLINE void Reset() { EmptyImpl(_allocator.GetSize()); }
-	FORCEINLINE void Empty(SizeType newNum = 0) { EmptyImpl(newNum); }
+	KOR_FORCEINLINE void Reset() { EmptyImpl(_allocator.GetSize()); }
+	KOR_FORCEINLINE void Empty(SizeType newNum = 0) { EmptyImpl(newNum); }
 
 	// Iterators
 	/////////////////////////////////
 
-	FORCEINLINE ArrayIteratorType begin() { return _num > 0 ? GetElementAtImpl(0) : nullptr; }
-	FORCEINLINE ConstArrayIteratorType begin() const { return _num > 0 ? GetElementAtImpl(0) : nullptr; }
-	FORCEINLINE ArrayIteratorType end() { return _num > 0 ? GetElementAtImpl(_num) : nullptr; }
-	FORCEINLINE ConstArrayIteratorType end() const { return _num > 0 ? GetElementAtImpl(_num) : nullptr; }
+	KOR_FORCEINLINE ArrayIteratorType begin() { return _num > 0 ? GetElementAtImpl(0) : nullptr; }
+	KOR_FORCEINLINE ConstArrayIteratorType begin() const { return _num > 0 ? GetElementAtImpl(0) : nullptr; }
+	KOR_FORCEINLINE ArrayIteratorType end() { return _num > 0 ? GetElementAtImpl(_num) : nullptr; }
+	KOR_FORCEINLINE ConstArrayIteratorType end() const { return _num > 0 ? GetElementAtImpl(_num) : nullptr; }
 
 private:
 
-	FORCEINLINE ElementT* GetElementAtImpl(SizeType idx) const { return _allocator.GetData() + idx; }
+	KOR_FORCEINLINE ElementT* GetElementAtImpl(SizeType idx) const { return _allocator.GetData() + idx; }
 
 	void AddDefaultedImpl(SizeType num = 1)
 	{
@@ -426,7 +426,7 @@ private:
 		SMemory::ZeroTyped(GetElementAtImpl(_num - num), num);
 	}
 
-	FORCEINLINE void AddUninitializedImpl(SizeType num = 1)
+	KOR_FORCEINLINE void AddUninitializedImpl(SizeType num = 1)
 	{
 		if(num <= 0) return;
 
@@ -536,13 +536,13 @@ private:
 		tmp.SetSize(0);
 	}
 
-	FORCEINLINE void GrowImpl(SizeType num)
+	KOR_FORCEINLINE void GrowImpl(SizeType num)
 	{
 		_num = num;
 		GrowIfNeededImpl();
 	}
 
-	FORCEINLINE void ReserveImpl(SizeType num)
+	KOR_FORCEINLINE void ReserveImpl(SizeType num)
 	{
 		_allocator.Allocate(num - _allocator.GetSize());
 	}
@@ -608,7 +608,7 @@ private:
 		other._num = 0;
 	}
 
-	FORCEINLINE void AppendImpl(const TArray& other) { AppendImpl(other.GetData(), other._num); }
+	KOR_FORCEINLINE void AppendImpl(const TArray& other) { AppendImpl(other.GetData(), other._num); }
 
 	void ReplaceImpl(TArray&& other)
 	{
@@ -623,7 +623,7 @@ private:
 		other._num = 0;
 	}
 
-	FORCEINLINE void ResizeImpl(SizeType num)
+	KOR_FORCEINLINE void ResizeImpl(SizeType num)
 	{
 		if(num > _num) GrowImpl(num);
 		else if(num < _num) ShrinkImpl(num);
@@ -648,7 +648,7 @@ private:
 		}
 	}
 
-	FORCEINLINE static void DestructElementsPrivate(ElementT* element, SizeType num = 1)
+	KOR_FORCEINLINE static void DestructElementsPrivate(ElementT* element, SizeType num = 1)
 	{
 		for(SizeType i = 0; i < num; ++i)
 		{
@@ -657,14 +657,14 @@ private:
 		}
 	}
 
-	FORCEINLINE static bool CompareAllocatorsPrivate(const AllocatorT* lhs, const AllocatorT* rhs, SizeType size)
+	KOR_FORCEINLINE static bool CompareAllocatorsPrivate(const AllocatorT* lhs, const AllocatorT* rhs, SizeType size)
 	{
 		return (lhs->GetSize() >= size && rhs->GetSize() >= size) ?
 			SMemory::IsEqual(lhs->GetData(), rhs->GetData(), size) : false;
 	}
 
 	AllocatorT _allocator = {};
-	SizeType _num = INDEX_NONE;
+	SizeType _num = KOR_INDEX_NONE;
 };
 
 template<typename ElementT, typename AllocatorT>

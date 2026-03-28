@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
+#include "KorMinimal.h"
 
-#include "ASTD/Memory.h"
+#include "Kor/Memory.h"
 
 template<typename ElementT>
 class TQueueAllocator
@@ -30,25 +30,25 @@ public:
 	// Constructor
 	/////////////////////////////////
 
-	FORCEINLINE TQueueAllocator() = default;
+	KOR_FORCEINLINE TQueueAllocator() = default;
 
 	// Operators
 	/////////////////////////////////
 
-	FORCEINLINE bool operator==(const TQueueAllocator& other) const { return _head == other._head && _tail == other._tail && _size == other._size; }
-	FORCEINLINE bool operator!=(const TQueueAllocator& other) const { return !operator==(other); }
+	KOR_FORCEINLINE bool operator==(const TQueueAllocator& other) const { return _head == other._head && _tail == other._tail && _size == other._size; }
+	KOR_FORCEINLINE bool operator!=(const TQueueAllocator& other) const { return !operator==(other); }
 
 	// Getters
 	/////////////////////////////////
 
-	FORCEINLINE NodeType* GetHead() const { return _head; }
-	FORCEINLINE void SetHead(NodeType* node) { _head = node; }
+	KOR_FORCEINLINE NodeType* GetHead() const { return _head; }
+	KOR_FORCEINLINE void SetHead(NodeType* node) { _head = node; }
 
-	FORCEINLINE NodeType* GetTail() const { return _tail; }
-	FORCEINLINE void SetTail(NodeType* node) { _tail = node; }
+	KOR_FORCEINLINE NodeType* GetTail() const { return _tail; }
+	KOR_FORCEINLINE void SetTail(NodeType* node) { _tail = node; }
 
-	FORCEINLINE SizeType GetSize() const { return _size; }
-	FORCEINLINE void SetSize(SizeType size) { _size = size; }
+	KOR_FORCEINLINE SizeType GetSize() const { return _size; }
+	KOR_FORCEINLINE void SetSize(SizeType size) { _size = size; }
 
 	// Methods
 	/////////////////////////////////

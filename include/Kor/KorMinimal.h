@@ -9,15 +9,15 @@
 // Look at "Build.h" to see defines that affects features provided
 
 // IMPORTANT CORE
-#include "ASTD/Build.h"
+#include "Kor/Build.h"
 
 // FORWARDS
-#include "ASTD/_internal/TypeFowards.h"
+#include "Kor/_internal/TypeFowards.h"
 
 // TYPE MANIPULATION/GENERATION/SFINAE
-#include "ASTD/TypeTraits.h"
-#include "ASTD/TypeTraitsMacros.h"
+#include "Kor/TypeTraits.h"
+#include "Kor/TypeTraitsMacros.h"
 
 // CHECKS
-#include "ASTD/Check.h"
-#include "ASTD/IsValid.h"
+#include "Kor/Check.h"
+#include "Kor/IsValid.h"

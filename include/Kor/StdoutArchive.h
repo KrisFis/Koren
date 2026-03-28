@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
+#include "KorMinimal.h"
 
-#include "ASTD/Misc.h"
-#include "ASTD/ArrayArchive.h"
+#include "Kor/Misc.h"
+#include "Kor/ArrayArchive.h"
 
 template<int32 FileNo, typename AllocatorT = typename TArray<tchar>::AllocatorType>
 struct TStdoutArchive : public TArrayArchive<tchar, AllocatorT>
@@ -28,10 +28,10 @@ struct TStdoutArchive : public TArrayArchive<tchar, AllocatorT>
 	// Getters / Setters
 	/////////////////////////
 
-	FORCEINLINE int32 GetFileNo() const { return FileNo; }
+	KOR_FORCEINLINE int32 GetFileNo() const { return FileNo; }
 
-	FORCEINLINE bool GetFlushOnNewLine() const { return _flushOnNewLine; }
-	FORCEINLINE void SetFlushOnNewLine(bool val) { _flushOnNewLine = val; }
+	KOR_FORCEINLINE bool GetFlushOnNewLine() const { return _flushOnNewLine; }
+	KOR_FORCEINLINE void SetFlushOnNewLine(bool val) { _flushOnNewLine = val; }
 
 	// SArchive overrides
 	/////////////////////////////////
@@ -66,7 +66,7 @@ struct TStdoutArchive : public TArrayArchive<tchar, AllocatorT>
 		SizeType totalWrittenBytes = 0;
 		for (SizeType i = 0; i < lenght; ++i)
 		{
-			if (buffer[i] == CHAR_NEWLINE)
+			if (buffer[i] == KOR_CHAR_NEWLINE)
 			{
 				totalWrittenBytes += Super::WriteBytes(buffer, i + 1);
 

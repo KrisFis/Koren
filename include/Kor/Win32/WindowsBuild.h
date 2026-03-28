@@ -4,7 +4,7 @@
 
 // Windows setup
 
-#if ASTD_USE_UNICODE && !defined(UNICODE)
+#if KOR_USE_UNICODE && !defined(UNICODE)
 	#define UNICODE
 #endif
 
@@ -31,60 +31,60 @@
 	#undef GetCommandLine
 #endif
 
-// COMPILATION & BUILD
+// COMKOR_MATH_PILATION & BUILD
 ////////////////////////////////////////////////////////////////////////
 
-#define DO_PRAGMA(command) __pragma(command)
+#define KOR_DO_PRAGMA(command) __pragma(command)
 
-#define ASSEMBLY(code) __asm(code)
+#define KOR_ASSEMBLY(code) __asm(code)
 
-#define HAS_INCLUDE(file) __has_include(file)
+#define KOR_HAS_INCLUDE(file) __has_include(file)
 
-#define DEPRECATED __declspec(deprecated)
-#define NODISCARD __declspec(nodiscard)
+#define KOR_DEPRECATED __declspec(deprecated)
+#define KOR_NODISCARD __declspec(nodiscard)
 
-#define FORCEINLINE __forceinline
-#define FORCENOINLINE __declspec(noinline)
+#define KOR_FORCEINLINE __forceinline
+#define KOR_FORCENOINLINE __declspec(noinline)
 
-#if BUILD_DEBUG
-	#define FORCEINLINE_DEBUGGABLE __inline
+#if KOR_BUILD_DEBUG
+	#define KOR_FORCEINLINE_DEBUGGABLE __inline
 #else
-	#define FORCEINLINE_DEBUGGABLE FORCEINLINE
+	#define KOR_FORCEINLINE_DEBUGGABLE KOR_FORCEINLINE
 #endif
 
-#define DEBUG_BREAK() __debugbreak()
+#define KOR_DEBUG_BREAK() __debugbreak()
 
-#define DLL_EXPORT __declspec(dllexport)
-#define DLL_IMPORT __declspec(dllimport)
+#define KOR_DLL_EXPORT __declspec(dllexport)
+#define KOR_DLL_IMPORT __declspec(dllimport)
 
 // DIAGNOSTICS
 ////////////////////////////////////////////////////////////////////////
 
-#define DIAG_WARNINGS_PUSH() DO_PRAGMA( warning( push ) )
-#define DIAG_WARNINGS_POP() DO_PRAGMA( warning( pop ) )
-#define DIAG_WARNINGS_SUPPRESS(value) DO_PRAGMA( warning( disable : value ) )
+#define KOR_DIAG_WARNINGS_PUSH() KOR_DO_PRAGMA( warning( push ) )
+#define KOR_DIAG_WARNINGS_POP() KOR_DO_PRAGMA( warning( pop ) )
+#define KOR_DIAG_WARNINGS_SUPPRESS(value) KOR_DO_PRAGMA( warning( disable : value ) )
 
-#define DIAG_WARNING_UNUSED_VALUE 4101
-#define DIAG_WARNING_NULL_DEREFERENCE 6011
-#define DIAG_WARNING_IMPLICIT_NARROWING 4244
-#define DIAG_WARNING_SHIFT_OVERFLOW 4293
-#define DIAG_WARNING_SHIFT_NEGATIVE_VALUE 4146
+#define KOR_DIAG_WARNING_UNUSED_VALUE 4101
+#define KOR_DIAG_WARNING_NULL_DEREFERENCE 6011
+#define KOR_DIAG_WARNING_IMPLICIT_NARROWING 4244
+#define KOR_DIAG_WARNING_SHIFT_OVERFLOW 4293
+#define KOR_DIAG_WARNING_SHIFT_NEGATIVE_VALUE 4146
 
-#if ASTD_DEFAULT_WARNING_SUPPRESS
-	DIAG_WARNINGS_SUPPRESS(DIAG_WARNING_IMPLICIT_NARROWING)
+#if KOR_DEFAULT_WARNING_SUPPRESS
+	KOR_DIAG_WARNINGS_SUPPRESS(KOR_DIAG_WARNING_IMPLICIT_NARROWING)
 #endif
 
 // Prediction
 ////////////////////////////////////////////////////////////////////////
 
-#define LIKELY(x) (x)
-#define UNLIKELY(x) (x)
+#define KOR_LIKELY(x) (x)
+#define KOR_UNLIKELY(x) (x)
 
 // OPTIMIZATIONS
 ////////////////////////////////////////////////////////////////////////
 
-#define OPTIMIZATIONS_DISABLE() DO_PRAGMA( optimize("", off) )
-#define OPTIMIZATIONS_RESET() DO_PRAGMA( optimize("", on) )
+#define KOR_OPTIMIZATIONS_DISABLE() KOR_DO_PRAGMA( optimize("", off) )
+#define KOR_OPTIMIZATIONS_RESET() KOR_DO_PRAGMA( optimize("", on) )
 
 // Integers
 ////////////////////////////////////////////////

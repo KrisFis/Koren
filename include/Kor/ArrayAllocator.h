@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "ASTDMinimal.h"
+#include "KorMinimal.h"
 
-#include "ASTD/Memory.h"
+#include "Kor/Memory.h"
 
 // Main allocator used by TArray
 // * Has data inlined
@@ -22,23 +22,23 @@ public:
 	// Constructor
 	/////////////////////////////////
 
-	FORCEINLINE TArrayAllocator() = default;
+	KOR_FORCEINLINE TArrayAllocator() = default;
 
 	// Destructor
 	/////////////////////////////////
 
-	FORCEINLINE ~TArrayAllocator() { Release(); }
+	KOR_FORCEINLINE ~TArrayAllocator() { Release(); }
 
 	// Getters
 	/////////////////////////////////
 
 	// Gets/Sets allocated data
-	FORCEINLINE ElementType* GetData() const { return _data; }
-	FORCEINLINE void SetData(ElementType* data) { _data = data; }
+	KOR_FORCEINLINE ElementType* GetData() const { return _data; }
+	KOR_FORCEINLINE void SetData(ElementType* data) { _data = data; }
 
 	// Gets/Sets allocated count
-	FORCEINLINE SizeType GetSize() const { return _size; }
-	FORCEINLINE void SetSize(SizeType count) { _size = count; }
+	KOR_FORCEINLINE SizeType GetSize() const { return _size; }
+	KOR_FORCEINLINE void SetSize(SizeType count) { _size = count; }
 
 	// Manipulation
 	/////////////////////////////////

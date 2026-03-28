@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ASTD/Build.h"
+#include "Kor/Build.h"
 
 // [Size]
 // * Gets size type without need of std (same as std::size_t)

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ASTD/_internal/TypeTraitsCore.h"
+#include "Kor/_internal/TypeTraitsCore.h"
 
 // [Is constructible]
 // * Checks whether specific type is constructible from specific types
@@ -51,9 +51,9 @@ struct TIsTriviallyDestructible
 {
 	enum
 	{
-#if PLATFORM_WINDOWS || PLATFORM_APPLE
+#if KOR_PLATFORM_WINDOWS || KOR_PLATFORM_APPLE
 		Value = __is_trivially_destructible(T)
-#elif PLATFORM_LINUX
+#elif KOR_PLATFORM_LINUX
 		Value = __has_trivial_destructor(T)
 #endif
 	};
