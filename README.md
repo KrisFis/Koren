@@ -13,8 +13,8 @@ Started as a learning exercise in implementing STL-like containers and types. It
 All library types live under the `Kor::` namespace. The name comes from *Koren* — Czech for *root*.
 
 ```cpp
-#include "Kor/Kor.h"~~~~
-~~~~
+#include "Kor/Kor.h"
+
 Kor::TArray<int> myArray;
 Kor::FString myStr = KOR_TEXT("Hello World!");
 ```
@@ -44,15 +44,15 @@ Kor::FString myStr = KOR_TEXT("Hello World!");
 
 ## Features
 
-| **Description**                 | **Example**                                    |
-|:--------------------------------|:-----------------------------------------------|
-| STL-like containers             | `TArray`, `TSharedPtr`                         |
-| Lightweight math library        | `SMath::Abs`, `SMath::Lerp`                    |
-| Human-readable build macros     | `KOR_BUILD_RELEASE`, `PLATFORM_WINDOWS`        |
-| Extra utility types             | `TSharedClass`, `TAsync`                       |
-| Object-oriented string helpers  | `SString::Split`                               |
-| Character encoding via FChar    | `KOR_TEXT("myText")`, `KTEXT("myText")`          |
-| Debug assertions                | `KOR_DEMAND`, `KOR_EXPECT`, `KOR_REQUIRE`        |
+| **Description**                | **Example**                                    |
+|:-------------------------------|:-----------------------------------------------|
+| STL-like containers            | `TArray`, `TSharedPtr`                         |
+| Lightweight math library       | `SMath::Abs`, `SMath::Lerp`                    |
+| Human-readable build macros    | `KOR_BUILD_RELEASE`, `PLATFORM_WINDOWS`        |
+| Extra utility types            | `TSharedClass`, `TAsync`                       |
+| Object-oriented string helpers | `SString::Split`                               |
+| Character encoding             | `KOR_TEXT("myText")`, `KTEXT("myText")`          |
+| Debug assertions               | `KOR_DEMAND`, `KOR_EXPECT`, `KOR_REQUIRE`        |
 
 ---
 
