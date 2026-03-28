@@ -1,0 +1,98 @@
+// Copyright Jan Kristian Fisera. All Rights Reserved.
+// Licensed under the MIT License. See LICENSE in the repository root.
+
+#pragma once
+
+#include "Kor/KorMinimal.h"
+#include "Kor/Archive.h"
+#include "Kor/Array.h"
+
+KOR_NAMESPACE_BEGIN
+
+// TODO(krisfis): we might want to in-place memory, meaning that it will write to memory block provided
+// Also setting read/write mode is annoying, maybe make it optional
+template<typename ElementT, typename AllocatorT = typename TArray<tchar>::AllocatorType>
+struct TArrayArchive : public SArchive
+{
+	typedef TArray<ElementT, AllocatorT> ArrayType;
+	static constexpr SizeType ELEMENT_SIZE = sizeof(ElementT);
+
+	KOR_FORCEINLINE TArrayArchive(EArchiveType type, EArchiveMode mode)
+		: SArchive(type, mode)
+	{
+		SetData({});
+	}
+
+	KOR_FORCEINLINE TArrayArchive(EArchiveType type, EArchiveMode mode, ArrayType&& data)
+		: SArchive(type, mode)
+	{
+		SetData(Forward(data));
+	}
+
+	// Data set/get
+	/////////////////////////////////
+
+	KOR_FORCEINLINE void SetData(ArrayType&& data) { _data = data; _offset = _data.GetNum(); }
+	KOR_FORCEINLINE const ArrayType& GetData() const { return _data; }
+
+	// SArchive overrides
+	/////////////////////////////////
+
+	KOR_FORCEINLINE virtual bool IsValid() const override { return true; }
+	KOR_FORCEINLINE virtual void Flush() override { SetData(ArrayType()); }
+	KOR_FORCEINLINE virtual SizeType GetTotalBytes() const override { return _data.GetNum() * ELEMENT_SIZE; }
+	KOR_FORCEINLINE virtual SizeType GetBytesOffset() const override { return _offset * ELEMENT_SIZE; }
+	virtual bool SetBytesOffset(SizeType offset) override
+	{
+		const SizeType offsetInElements = offset >= ELEMENT_SIZE ? SMath::Floor(offset / ELEMENT_SIZE) : 0;
+		if (_data.IsValidIndex(offsetInElements))
+		{
+			_offset = offsetInElements;
+			return true;
+		}
+
+		return false;
+	}
+
+	virtual SizeType ReadBytes(void* ptr, SizeType size) override
+	{
+		if (!ptr || size < ELEMENT_SIZE) return 0;
+		else if (!AllowsRead()) return 0;
+
+		const SizeType elementsToRead = SMath::Min<SizeType>(
+			SMath::Floor(size / ELEMENT_SIZE),
+			_data.GetNum() - _offset
+		);
+
+		if (elementsToRead > 0)
+		{
+			SMemory::Copy(ptr, _data.GetData() + (_offset * ELEMENT_SIZE), elementsToRead * ELEMENT_SIZE);
+			_offset += elementsToRead;
+		}
+
+		return elementsToRead * ELEMENT_SIZE;
+	}
+
+	virtual SizeType WriteBytes(const void* ptr, SizeType size) override
+	{
+		if (!ptr || size < ELEMENT_SIZE) return 0;
+		else if (!AllowsWrite()) return 0;
+
+		const SizeType elementsToWrite = SMath::Floor(size / ELEMENT_SIZE);
+		if (elementsToWrite + _offset > _data.GetNum())
+		{
+			_data.Resize(elementsToWrite + _offset);
+		}
+
+		SMemory::Copy(_data.GetData() + (_offset * ELEMENT_SIZE), ptr, size);
+		_offset += elementsToWrite;
+
+		return elementsToWrite * ELEMENT_SIZE;
+	}
+
+private:
+	ArrayType _data;
+	SizeType _offset = 0;
+};
+
+KOR_NAMESPACE_END
