@@ -3,18 +3,14 @@
 
 #pragma once
 
-#include "Kor/_internal/TypeTraitsCore.h"
-
-KOR_NAMESPACE_BEGIN
-
-namespace _NTypeInternals
+namespace KOR_NAMESPACE Internals
 {
 	template<typename T>
 	struct TDecayHelper	{ typedef T Type; };
-	
+
 	template <typename T>
 	struct TDecayHelper<T[]> { typedef T* Type; };
-	
+
 	template <typename T, uint32 N>
 	struct TDecayHelper<T[N]> { typedef T* Type; };
 
@@ -41,7 +37,4 @@ namespace _NTypeInternals
 		typedef T* Type;
 		typedef const T* ConstType;
 	};
-
 }
-
-KOR_NAMESPACE_END

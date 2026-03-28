@@ -10,7 +10,7 @@
 
 KOR_NAMESPACE_BEGIN
 
-struct SLinuxPlatformMisc
+struct SLinuxMisc
 {
 	static double GetSecondsSinceEpoch()
 	{

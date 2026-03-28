@@ -4,8 +4,8 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include "Kor/_internal/SharedReferencer.h"
-#include "Kor/_internal/SharedTypeTraits.h"
+#include "Kor/Internal/SharedReferencer.h"
+#include "Kor/Internal/SharedTypeTraits.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -26,8 +26,8 @@ public:
 	// Constructor
 	/////////////////////////////////
 
-	KOR_FORCEINLINE TSharedPtr(_NShared::SNullType* = nullptr) {}
-	KOR_FORCEINLINE TSharedPtr(_NShared::CReferencerBase& ref) : _referencerProxy(&ref) { _referencerProxy.AddShared(); }
+	KOR_FORCEINLINE TSharedPtr(Internal::SNullType* = nullptr) {}
+	KOR_FORCEINLINE TSharedPtr(Internal::CReferencerBase& ref) : _referencerProxy(&ref) { _referencerProxy.AddShared(); }
 
 	// Copy/Move constructors [SharedPtr]
 	/////////////////////////////////
@@ -57,7 +57,7 @@ public:
 	// Assignment operators
 	/////////////////////////////////
 
-	KOR_FORCEINLINE TSharedPtr& operator=(_NShared::SNullType*) { Reset(); return *this; }
+	KOR_FORCEINLINE TSharedPtr& operator=(Internal::SNullType*) { Reset(); return *this; }
 
 	KOR_FORCEINLINE TSharedPtr& operator=(const TSharedPtr& Other) { if(&Other != this) ReplaceBy(Other); return *this; }
 	KOR_FORCEINLINE TSharedPtr& operator=(TSharedPtr&& Other) { if(&Other != this) ReplaceBy(Forward<TSharedPtr>(Other)); return *this; }
@@ -120,7 +120,7 @@ private:
 		other._referencerProxy.Set(nullptr); // 3
 	}
 
-	mutable _NShared::SReferencerProxy _referencerProxy = nullptr;
+	mutable Internal::SReferencerProxy _referencerProxy = nullptr;
 };
 
 // Archive operator<< && operator>>
@@ -165,8 +165,8 @@ public:
 	// Constructors
 	/////////////////////////////////
 
-	KOR_FORCEINLINE TWeakPtr(_NShared::SNullType* = nullptr) {}
-	KOR_FORCEINLINE TWeakPtr(_NShared::CReferencerBase& ref) : _referencerProxy(&ref) { _referencerProxy.AddWeak();}
+	KOR_FORCEINLINE TWeakPtr(Internal::SNullType* = nullptr) {}
+	KOR_FORCEINLINE TWeakPtr(Internal::CReferencerBase& ref) : _referencerProxy(&ref) { _referencerProxy.AddWeak();}
 
 	// Copy/Move constructors
 	/////////////////////////////////
@@ -208,7 +208,7 @@ public:
 	// Assignment operators
 	/////////////////////////////////
 
-	KOR_FORCEINLINE TWeakPtr& operator=(const _NShared::SNullType*) { Reset(); return *this; }
+	KOR_FORCEINLINE TWeakPtr& operator=(const Internal::SNullType*) { Reset(); return *this; }
 
 	// Assignment operators [WeakPtr]
 	/////////////////////////////////
@@ -304,7 +304,7 @@ private:
 		other._referencerProxy.Set(nullptr); // 3
 	}
 
-	mutable _NShared::SReferencerProxy _referencerProxy = nullptr;
+	mutable Internal::SReferencerProxy _referencerProxy = nullptr;
 };
 
 // Archive operator<< && operator>>
@@ -388,9 +388,9 @@ KOR_FORCEINLINE_DEBUGGABLE static TSharedPtr<T> MakeShareable(InstanceT* instanc
 {
 	static_assert(TIsDerivedFrom<InstanceT,T>::Value, "Instance type must be derived from return type");
 
-	_NShared::CReferencerBase* referencer = _NShared::NewCustomReferencer(instance);
+	Internal::CReferencerBase* referencer = Internal::NewCustomReferencer(instance);
 	TSharedPtr<T> newShared = TSharedPtr<T>(*referencer);
-	if constexpr (_NShared::TIsSharedClassType<T>::Value)
+	if constexpr (Internal::TIsSharedClassType<T>::Value)
 	{
 		newShared->Init_Private(TSharedPtr<typename T::ClassType>(referencer));
 	}

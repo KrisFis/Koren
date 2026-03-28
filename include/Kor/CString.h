@@ -6,12 +6,11 @@
 #include "Kor/KorMinimal.h"
 #include "Kor/Math.h"
 #include "Kor/Memory.h"
-
-#include KOR_PLATFORM_HEADER(CString)
+#include KOR_PLATFORM_HEADER_FROM(Kor, CString)
 
 KOR_NAMESPACE_BEGIN
 
-typedef KOR_PLATFORM_PREFIXED_TYPE(S, PlatformCString) SPlatformCString;
+typedef KOR_PLATFORM_STRUCT(CString) SPlatformCString;
 struct SCString : public SPlatformCString
 {
 	static constexpr uint16 SMALL_BUFFER_SIZE = 1024;

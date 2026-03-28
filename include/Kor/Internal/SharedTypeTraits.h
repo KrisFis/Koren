@@ -5,9 +5,7 @@
 
 #include "Kor/TypeTraits.h"
 
-KOR_NAMESPACE_BEGIN
-
-namespace _NShared
+namespace KOR_NAMESPACE Internal
 {
 	// Checks whether WeakThis field exists
 	// * Thats indicator of SharedClass
@@ -45,5 +43,3 @@ namespace _NShared
 
 	};
 }
-
-KOR_NAMESPACE_END

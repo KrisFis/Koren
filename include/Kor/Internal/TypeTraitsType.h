@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/_internal/TypeTraitsForward.h"
+#include "Kor/Internal/TypeTraitsForward.h"
 
 KOR_NAMESPACE_BEGIN
 

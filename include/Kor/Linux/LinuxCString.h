@@ -12,7 +12,7 @@
 
 KOR_NAMESPACE_BEGIN
 
-struct SLinuxPlatformCString
+struct SLinuxCString
 {
 	// Checks whether the passed character is alphabetic
 	KOR_FORCEINLINE static bool IsAlphaChar(char val) { return isalpha(val); }

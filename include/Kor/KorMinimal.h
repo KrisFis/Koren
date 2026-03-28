@@ -13,7 +13,7 @@
 #include "Kor/Build.h"
 
 // FORWARDS
-#include "Kor/_internal/TypeFowards.h"
+#include "Kor/Internal/TypeFowards.h"
 
 // TYPE MANIPULATION/GENERATION/SFINAE
 #include "Kor/TypeTraits.h"

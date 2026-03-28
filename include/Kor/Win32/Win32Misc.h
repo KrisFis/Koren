@@ -9,7 +9,7 @@
 
 KOR_NAMESPACE_BEGIN
 
-struct SWindowsPlatformMisc
+struct SWin32Misc
 {
 	static double GetSecondsSinceEpoch()
 	{

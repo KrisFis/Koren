@@ -12,7 +12,7 @@ KOR_NAMESPACE_BEGIN
 
 // TODO(jan.kristian.fisera): Virtual memory allocations
 // * see: https://linux.die.net/man/2/mmap
-struct SLinuxPlatformMemory
+struct SLinuxMemory
 {
 	// Allocates new memory
 	KOR_FORCEINLINE static void* Malloc(int64 size) { return malloc(size); }

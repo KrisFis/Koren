@@ -5,11 +5,11 @@
 
 #include "Kor/KorMinimal.h"
 #include "Kor/CString.h"
-#include KOR_PLATFORM_HEADER(Misc)
+#include KOR_PLATFORM_HEADER_FROM(Kor, Misc)
 
 KOR_NAMESPACE_BEGIN
 
-typedef KOR_PLATFORM_PREFIXED_TYPE(S, PlatformMisc) SPlatformMisc;
+typedef KOR_PLATFORM_STRUCT(Misc) SPlatformMisc;
 // TODO: Separate to IO (input/output) and STime
 struct SMisc : public SPlatformMisc
 {

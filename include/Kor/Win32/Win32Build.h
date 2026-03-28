@@ -96,7 +96,7 @@
 #define KOR_OPTIMIZATIONS_DISABLE() KOR_DO_PRAGMA( optimize("", off) )
 #define KOR_OPTIMIZATIONS_RESET() KOR_DO_PRAGMA( optimize("", on) )
 
-// Integers
+// Arithmetics
 ////////////////////////////////////////////////
 
 #define KOR_PLATFORM_INT8 __int8
@@ -111,7 +111,4 @@
 #define KOR_PLATFORM_INT64 __int64
 #define KOR_PLATFORM_UINT64 unsigned __int64
 
-// Characters
-////////////////////////////////////////////////
-
-#define KOR_PLATFORM_WCHAR __wchar_t
+#define KOR_PLATFORM_WCHAR wchar_t

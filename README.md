@@ -10,13 +10,13 @@ Started as a learning exercise in implementing STL-like containers and types. It
 
 ## Namespace
 
-All library types live under the `kor::` namespace. The name comes from *Koren* — Czech for *root*.
+All library types live under the `Kor::` namespace. The name comes from *Koren* — Czech for *root*.
 
 ```cpp
-#include "Kor/Kor.h"
+#include "Kor/Kor.h"~~~~
 ~~~~
-kor::TArray<int> myArray;
-kor::FString myStr = KOR_TEXT("Hello World!");
+Kor::TArray<int> myArray;
+Kor::FString myStr = KOR_TEXT("Hello World!");
 ```
 
 ---
@@ -61,8 +61,8 @@ kor::FString myStr = KOR_TEXT("Hello World!");
 Wide character string literals are wrapped via `KOR_TEXT`. A shorter alias `KTEXT` is provided for convenience — both are identical.
 
 ```cpp
-kor::tchar* a = KOR_TEXT("Hello");   // canonical
-kor::tchar* b = KTEXT("Hello");      // shorthand alias — same thing
+Kor::tchar* a = KOR_TEXT("Hello");   // canonical
+Kor::tchar* b = KTEXT("Hello");      // shorthand alias — same thing
 ```
 
 `KTEXT` is just:
@@ -114,16 +114,38 @@ Full include — all features, declarations, and implementations.
 
 ## Platform Code
 
-Each platform has its own folder, accessible via the `KOR_PLATFORM_HEADER` macro. This keeps platform-specific code isolated without scattering `#ifdef` everywhere.
+Each platform has its own folder, accessible via platform macros defined in `KorMinimal.h`. This keeps platform-specific code isolated without scattering `#ifdef` everywhere.
 
-**Example — `Kor/Memory.h`** resolves to `Kor/Linux/LinuxMemory.h` on Linux automatically.
+**Example —** on Linux, `KOR_PLATFORM_HEADER_FROM(Kor, Memory)` resolves to `Kor/Linux/LinuxMemory.h` automatically.
 
 ```cpp
 #include "Kor/KorMinimal.h" // or "Kor/Build.h"
+ 
+// Relative to current include root
 #include KOR_PLATFORM_HEADER(MyHeader)
+ 
+// Relative to explicit root (use when including from a different module)
+#include KOR_PLATFORM_HEADER_FROM(Kor, MyHeader)
 ```
 
-Available platform macros: `KOR_PLATFORM_HEADER`, `KOR_PLATFORM_STRUCT`, `KOR_PLATFORM_CLASS`
+### Header Resolution
+
+| Macro                                  | Expands to                         |
+|----------------------------------------|------------------------------------|
+| `KOR_PLATFORM_HEADER(Name)`            | `<Platform>/<Platform>Name.h`      |
+| `KOR_PLATFORM_HEADER_FROM(Root, Name)` | `Root/<Platform>/<Platform>Name.h`~~~~ |
+
+### Type Name Construction
+
+| Macro                                    | Expands to             | Use when                 |
+|------------------------------------------|------------------------|--------------------------|
+| `KOR_PLATFORM_TYPE(Name)`                | `<Platform>Name`       | No prefix needed         |
+| `KOR_PLATFORM_TYPE_CUSTOM(Prefix, Name)` | `Prefix<Platform>Name` | Custom prefix convention |
+| `KOR_PLATFORM_STRUCT(Name)`              | `S<Platform>Name`      | Structs                  |
+| `KOR_PLATFORM_CLASS(Name)`               | `C<Platform>Name`      | Classes                  |
+| `KOR_PLATFORM_TEMPLATE(Name)`            | `T<Platform>Name`      | Templates                |
+| `KOR_PLATFORM_NAMESPACE(Name)`           | `N<Platform>Name`      | Namespaces               |
+| `KOR_PLATFORM_FUNC(Name)`                | `F<Platform>Name`      | Free functions           |
 
 ---
 

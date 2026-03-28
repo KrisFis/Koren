@@ -10,7 +10,7 @@
 
 KOR_NAMESPACE_BEGIN
 
-struct SApplePlatformMisc
+struct SAppleMisc
 {
 	static double GetSecondsSinceEpoch()
 	{

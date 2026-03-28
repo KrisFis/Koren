@@ -4,13 +4,13 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include KOR_PLATFORM_HEADER(Memory)
+#include KOR_PLATFORM_HEADER_FROM(Kor, Memory)
 
 #include <new>
 
 KOR_NAMESPACE_BEGIN
 
-typedef KOR_PLATFORM_PREFIXED_TYPE(S, PlatformMemory) SPlatformMemory;
+typedef KOR_PLATFORM_STRUCT(Memory) SPlatformMemory;
 struct SMemory : public SPlatformMemory
 {
 	static constexpr long double BITS_PER_BYTE = 8; // bits

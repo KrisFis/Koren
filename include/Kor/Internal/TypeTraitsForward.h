@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Kor/_internal/TypeTraitsCore.h"
+#include "Kor/Internal/TypeTraitsCore.h"
 
 KOR_NAMESPACE_BEGIN
 

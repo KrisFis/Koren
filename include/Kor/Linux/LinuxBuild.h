@@ -76,7 +76,7 @@
 #define KOR_LIKELY(x) __builtin_expect(!!(x), 1)
 #define KOR_UNLIKELY(x) __builtin_expect(!!(x), 0)
 
-// Integers
+// Arithmetics
 ////////////////////////////////////////////////
 
 #define KOR_PLATFORM_INT8 int8_t
@@ -90,8 +90,5 @@
 
 #define KOR_PLATFORM_INT64 int64_t
 #define KOR_PLATFORM_UINT64 uint64_t
-
-// Characters
-////////////////////////////////////////////////
 
 #define KOR_PLATFORM_WCHAR wchar_t

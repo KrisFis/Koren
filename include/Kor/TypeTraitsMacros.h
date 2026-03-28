@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Kor/Build.h"
-#include "Kor/_internal/TypeTraitsCore.h"
+#include "Kor/Internal/TypeTraitsCore.h"
 
 ////////////////////////////////////////////////////////
 // VARIADIC ITERATOR TRAIT

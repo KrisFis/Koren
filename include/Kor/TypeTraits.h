@@ -4,12 +4,12 @@
 #pragma once
 
 #include "Kor/Build.h"
-#include "Kor/_internal/TypeTraitsConstruct.h"
-#include "Kor/_internal/TypeTraitsContainers.h"
-#include "Kor/_internal/TypeTraitsCore.h"
-#include "Kor/_internal/TypeTraitsDecayHelper.h"
-#include "Kor/_internal/TypeTraitsForward.h"
-#include "Kor/_internal/TypeTraitsType.h"
+#include "Kor/Internal/TypeTraitsConstruct.h"
+#include "Kor/Internal/TypeTraitsContainers.h"
+#include "Kor/Internal/TypeTraitsCore.h"
+#include "Kor/Internal/TypeTraitsDecayHelper.h"
+#include "Kor/Internal/TypeTraitsForward.h"
+#include "Kor/Internal/TypeTraitsType.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -97,7 +97,7 @@ struct TIsArithmetic
 template<typename T>
 struct TDecay
 {
-	typedef typename _NTypeInternals::TDecayHelper<
+	typedef typename Internals::TDecayHelper<
 		typename TRemoveConstReference<T>::Type
 	>::Type Type;
 };
@@ -117,7 +117,7 @@ public:
 	typedef typename TChoose<
 		TIsPointer<TestType>::Value, 
 		typename TRemovePointer<TestType>::Type,
-		typename _NTypeInternals::TDecayHelper<TestType>::Type
+		typename Internals::TDecayHelper<TestType>::Type
 	>::Type Type;
 };
 
@@ -147,8 +147,8 @@ private:
 	enum { IsSmallType = ((sizeof(T) <= sizeof(void*)) && TIsPODType<T>::Value ) || TIsArithmetic<T>::Value };
 
 public:
-	typedef typename _NTypeInternals::TCallTraitsHelper<T, IsSmallType>::Type Param;
-	typedef typename _NTypeInternals::TCallTraitsHelper<T, IsSmallType>::ConstType ConstParam;
+	typedef typename Internals::TCallTraitsHelper<T, IsSmallType>::Type Param;
+	typedef typename Internals::TCallTraitsHelper<T, IsSmallType>::ConstType ConstParam;
 };
 
 // [Limits]

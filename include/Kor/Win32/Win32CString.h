@@ -7,7 +7,7 @@
 
 KOR_NAMESPACE_BEGIN
 
-struct SWindowsPlatformCString
+struct SWin32CString
 {
 	// Checks whether the passed character is alphabetic
 	KOR_FORCEINLINE static bool IsAlphaChar(char val) { return IsCharAlphaA(val); }
