@@ -21,36 +21,30 @@
 #endif
 
 // Compiler
-// * Supported: MSVC, GNUC, GNUC_CLANG, GNUC_INTEL, GNUC_GCC
-// * Example: COMKOR_MATH_PILER_GNUC_CLANG
+// * Supported: MSVC, GNUC, GNUC_CLANG, GNUC_GCC
+// * Example: KOR_COMPILER_CLANG
 /////////////////////////////////
 
 #if defined(_MSC_VER)
-	#define KOR_COMKOR_MATH_PILER_MSVC 1
+	#define KOR_COMPILER_MSVC 1
 #elif defined(__llvm__) && defined(__clang__)
-	#define KOR_COMKOR_MATH_PILER_CLANG 1
-#elif defined(__INTEL_COMKOR_MATH_PILER)
-	#define KOR_COMKOR_MATH_PILER_INTEL 1
+	#define KOR_COMPILER_CLANG 1
 #elif defined(__GNUC__)
-	#define KOR_COMKOR_MATH_PILER_GCC 1
+	#define KOR_COMPILER_GCC 1
 #else
 	#error "Unsupported compiler"
 #endif
 
-#ifndef KOR_COMKOR_MATH_PILER_MSVC
-	#define KOR_COMKOR_MATH_PILER_MSVC 0
+#ifndef KOR_COMPILER_MSVC
+	#define KOR_COMPILER_MSVC 0
 #endif
 
-#ifndef KOR_COMKOR_MATH_PILER_CLANG
-	#define KOR_COMKOR_MATH_PILER_CLANG 0
+#ifndef KOR_COMPILER_CLANG
+	#define KOR_COMPILER_CLANG 0
 #endif
 
-#ifndef KOR_COMKOR_MATH_PILER_INTEL
-	#define KOR_COMKOR_MATH_PILER_INTEL 0
-#endif
-
-#ifndef KOR_COMKOR_MATH_PILER_GCC
-	#define KOR_COMKOR_MATH_PILER_GCC 0
+#ifndef KOR_COMPILER_GCC
+	#define KOR_COMPILER_GCC 0
 #endif
 
 // Architecture
@@ -111,8 +105,8 @@
 #endif
 
 // Whether we should allow checks in build. See Check.h
-#ifndef KOR_DO_CHECKS
-	#define KOR_DO_CHECKS KOR_BUILD_DEBUG
+#ifndef KOR_USE_ASSERT
+	#define KOR_USE_ASSERT KOR_BUILD_DEBUG
 #endif
 
 // Whether we want to track SMemory allocations, See Memory.h

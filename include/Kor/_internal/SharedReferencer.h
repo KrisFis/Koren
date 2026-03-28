@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Kor/Build.h"
-#include "Kor/Check.h"
+#include "Kor/Assert.h"
 
 // TODO(jkfisera): REIMPLEMENT Invoke
 #include <type_traits>
@@ -37,13 +37,13 @@ namespace _NShared
 
 		KOR_FORCEINLINE void AddShared()
 		{
-			KOR_CHECK_RET(_sharedNum < UINT16_MAX);
+			KOR_ASSERT(_sharedNum < UINT16_MAX);
 			++_sharedNum;
 		}
 
 		KOR_FORCEINLINE void AddWeak()
 		{
-			KOR_CHECK_RET(_weakCount < UINT16_MAX); // overflow
+			KOR_ASSERT(_weakCount < UINT16_MAX); // overflow
 			++_weakCount;
 		}
 
@@ -52,14 +52,14 @@ namespace _NShared
 
 		KOR_FORCEINLINE void RemoveShared()
 		{
-			KOR_CHECK_RET(_sharedNum > 0); // underflow
+			KOR_ASSERT(_sharedNum > 0); // underflow
 			if(_sharedNum == 1) DeconstructObjectImpl();
 			--_sharedNum;
 		}
 
 		KOR_FORCEINLINE void RemoveWeak()
 		{
-			KOR_CHECK_RET(_weakCount > 0); // underflow
+			KOR_ASSERT(_weakCount > 0); // underflow
 			--_weakCount;
 		}
 

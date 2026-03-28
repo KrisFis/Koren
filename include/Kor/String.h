@@ -8,6 +8,9 @@
 #include "Kor/Array.h"
 #include "Kor/CString.h"
 
+// TODO: fix
+#include <cwchar>
+
 KOR_NAMESPACE_BEGIN
 
 struct SString
@@ -113,11 +116,11 @@ struct SString
 		// TODO: Replace with custom implementation
 		if constexpr (TIsSame<CharType, wchar>::Value)
 		{
-			swprintf(buffer, SCString::LARGE_BUFFER_SIZE, fmt, Forward<VarTypes>(args)...);
+			std::swprintf(buffer, SCString::LARGE_BUFFER_SIZE, fmt, Forward<VarTypes>(args)...);
 		}
 		else
 		{
-			snprintf(buffer, SCString::LARGE_BUFFER_SIZE, fmt, Forward<VarTypes>(args)...);
+			std::snprintf(buffer, SCString::LARGE_BUFFER_SIZE, fmt, Forward<VarTypes>(args)...);
 		}
 
 		return SString(buffer);

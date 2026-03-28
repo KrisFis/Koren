@@ -357,7 +357,7 @@ public:
 	// Gets pointer as shared_ptr
 	KOR_FORCEINLINE TSharedPtr<ClassType> AsShared()
 	{
-		KOR_CHECK_RET(_weakThis.IsValid(), nullptr);
+		KOR_ASSERT(_weakThis.IsValid());
 		return _weakThis.Pin();
 	}
 
@@ -365,7 +365,7 @@ public:
 	template<typename ChildType>
 	KOR_FORCEINLINE TSharedPtr<ChildType> AsShared()
 	{
-		KOR_CHECK_RET(_weakThis.IsValid(), nullptr);
+		KOR_ASSERT(_weakThis.IsValid());
 		return _weakThis.Pin();
 	}
 
@@ -373,7 +373,7 @@ private:
 	// Do not call this method DIRECTLY!
 	KOR_FORCEINLINE void Init_Private(const TSharedPtr<ClassType>& ptr)
 	{
-		KOR_CHECK_RET(!_isSharedInitialized);
+		KOR_ASSERT(!_isSharedInitialized);
 
 		_weakThis = ptr;
 		_isSharedInitialized = true;

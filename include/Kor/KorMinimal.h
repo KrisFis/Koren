@@ -18,7 +18,3 @@
 // TYPE MANIPULATION/GENERATION/SFINAE
 #include "Kor/TypeTraits.h"
 #include "Kor/TypeTraitsMacros.h"
-
-// CHECKS
-#include "Kor/Check.h"
-#include "Kor/IsValid.h"

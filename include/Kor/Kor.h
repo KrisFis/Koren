@@ -34,6 +34,10 @@
 // SHARED
 #include "Kor/Shared.h"
 
+// Assert
+#include "Kor/Assert.h"
+#include "Kor/IsValid.h"
+
 // EXTRAS -> ARCHIVE
 #include "Kor/Archive.h"
 #include "Kor/ArrayArchive.h"

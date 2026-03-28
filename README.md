@@ -75,25 +75,17 @@ kor::tchar* b = KTEXT("Hello");      // shorthand alias — same thing
 
 ## Assertions
 
-| **Macro**      | **Fatal** | **Evaluates in release** | **Use when...**                                 |
-|:---------------|:---------:|:------------------------:|:------------------------------------------------|
-| `KOR_DEMAND`   |    YES    |            NO            | This must be true — crash immediately if not    |
-| `KOR_EXPECT`   |    NO     |            NO            | This should be true — warn and recover if not   |
-| `KOR_REQUIRE`  |    YES    |           YES            | Expression must always run and must be true     |
+| **Macro**      | **Fatal** | **Returns bool** | **Use when...**                               |
+|:---------------|:---------:|:----------------:|:----------------------------------------------|
+| `KOR_ASSERT`   |    YES    |        NO        | This must be true — statement, crash if not   |
+| `KOR_EXPECT`   |    NO     |       YES        | This should be true — warn and recover if not |
 
 ```cpp
-KOR_DEMAND(ptr != nullptr);       // fatal — hard requirement
-KOR_EXPECT(index < size);         // non-fatal — recoverable expectation
-KOR_REQUIRE(init() == true);      // always evaluates — fatal if false
+KOR_ASSERT(ptr != nullptr);         // fatal, hard requirement
 
-if (KOR_EXPECT(index < size))
+if (KOR_EXPECT(index < size))       // non-fatal — recoverable expectation
 {
-    arr[index] = value;              // only runs if condition passed
-}
- 
-if (!KOR_REQUIRE(init() == true))
-{
-    return false;                    // init() always ran, but failed
+    arr[index] = value;
 }
 ```
 

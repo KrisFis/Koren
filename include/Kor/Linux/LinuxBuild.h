@@ -23,10 +23,12 @@
 #define KOR_DEPRECATED __attribute__ ((__deprecated__))
 #define KOR_DEPRECATED_MSG(msg) __attribute__ ((__deprecated__(msg)))
 #define KOR_NODISCARD [[__nodiscard__]]
+#define KOR_NORETURN __attribute__((noreturn))
 
 #define KOR_FORCEINLINE inline __attribute__((always_inline))
-
 #define KOR_FORCENOINLINE __attribute__((noinline))
+
+#define KOR_UNREACHABLE_CODE() __builtin_unreachable()
 
 #if KOR_BUILD_DEBUG
 	#define KOR_FORCEINLINE_DEBUGGABLE inline
@@ -34,7 +36,7 @@
 	#define KOR_FORCEINLINE_DEBUGGABLE KOR_FORCEINLINE
 #endif
 
-#if KOR_COMKOR_MATH_PILER_CLANG
+#if KOR_COMPILER_CLANG
 	#define KOR_DEBUG_BREAK() __builtin_debugtrap()
 #else
 	#define KOR_DEBUG_BREAK() __asm__ volatile("int3")

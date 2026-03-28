@@ -48,10 +48,13 @@
 #define KOR_HAS_INCLUDE(file) __has_include(file)
 
 #define KOR_DEPRECATED __declspec(deprecated)
-#define KOR_NODISCARD __declspec(nodiscard)
+#define KOR_NODISCARD __declspec(noreturn)
+#define KOR_NORETURN __declspec(noreturn)
 
 #define KOR_FORCEINLINE __forceinline
 #define KOR_FORCENOINLINE __declspec(noinline)
+
+#define KOR_UNREACHABLE_CODE() __assume(false)
 
 #if KOR_BUILD_DEBUG
 	#define KOR_FORCEINLINE_DEBUGGABLE __inline
