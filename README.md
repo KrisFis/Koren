@@ -51,7 +51,7 @@ kor::FString myStr = KOR_TEXT("Hello World!");
 | Human-readable build macros     | `KOR_BUILD_RELEASE`, `PLATFORM_WINDOWS`        |
 | Extra utility types             | `TSharedClass`, `TAsync`                       |
 | Object-oriented string helpers  | `SString::Split`                               |
-| Character encoding via FChar    | `KOR_TEXT("myText")`, `KTEXT("myText")`          |
+| Character encoding              | `KOR_TEXT("myText")`, `KTEXT("myText")`          |
 | Debug assertions                | `KOR_DEMAND`, `KOR_EXPECT`, `KOR_REQUIRE`        |
 
 ---
