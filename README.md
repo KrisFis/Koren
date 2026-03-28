@@ -133,7 +133,7 @@ Each platform has its own folder, accessible via platform macros defined in `Kor
 | Macro                                  | Expands to                         |
 |----------------------------------------|------------------------------------|
 | `KOR_PLATFORM_HEADER(Name)`            | `<Platform>/<Platform>Name.h`      |
-| `KOR_PLATFORM_HEADER_FROM(Root, Name)` | `Root/<Platform>/<Platform>Name.h`~~~~ |
+| `KOR_PLATFORM_HEADER_FROM(Root, Name)` | `Root/<Platform>/<Platform>Name.h` |
 
 ### Type Name Construction
 
