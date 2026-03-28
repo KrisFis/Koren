@@ -18,7 +18,7 @@ namespace Private::Assert
 	KOR_DIAG_WARNINGS_SUPPRESS(KOR_DIAG_WARNING_NULL_DEREFERENCE)
 	KOR_OPTIMIZATIONS_DISABLE();
 
-	KOR_NODISCARD KOR_FORCEINLINE static void Crash()
+	KOR_FORCEINLINE static void Crash()
 	{
 		*((uint8*)0) = 0;
 		KOR_UNREACHABLE_CODE();
@@ -29,7 +29,7 @@ namespace Private::Assert
 
 	KOR_FORCEINLINE static void LogFailed(const char* Expression, const char* File, int32 Line)
 	{
-		SMisc::WriteToStderr(*SString::Printf(TEXT("Assert failed '%s' at '%s:%d'"), Expression, File, Line));
+		SMisc::WriteToStderr(*SString::Printf(KTEXT("Assert failed '%s' at '%s:%d'"), Expression, File, Line));
 	}
 }
 KOR_NAMESPACE_END

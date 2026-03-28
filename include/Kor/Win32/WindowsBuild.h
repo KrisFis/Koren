@@ -99,19 +99,19 @@
 // Integers
 ////////////////////////////////////////////////
 
-#define KOR_PLATFORM_INT8 __int8;
-#define KOR_PLATFORM_UINT8 unsigned __int8;
+#define KOR_PLATFORM_INT8 __int8
+#define KOR_PLATFORM_UINT8 unsigned __int8
 
-#define KOR_PLATFORM_INT16 __int16;
-#define KOR_PLATFORM_UINT16 unsigned __int16;
+#define KOR_PLATFORM_INT16 __int16
+#define KOR_PLATFORM_UINT16 unsigned __int16
 
-#define KOR_PLATFORM_INT32 __int32;
-#define KOR_PLATFORM_UINT32 unsigned __int32;
+#define KOR_PLATFORM_INT32 __int32
+#define KOR_PLATFORM_UINT32 unsigned __int32
 
-#define KOR_PLATFORM_INT64 __int64;
-#define KOR_PLATFORM_UINT64 unsigned __int64;
+#define KOR_PLATFORM_INT64 __int64
+#define KOR_PLATFORM_UINT64 unsigned __int64
 
 // Characters
 ////////////////////////////////////////////////
 
-#define KOR_PLATFORM_WCHAR __wchar_t;
+#define KOR_PLATFORM_WCHAR __wchar_t

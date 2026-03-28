@@ -21,22 +21,29 @@
 #endif
 
 // Compiler
-// * Supported: MSVC, GNUC, GNUC_CLANG, GNUC_GCC
+// * Supported: MSVC, GNUC, CLANG, GCC
 // * Example: KOR_COMPILER_CLANG
 /////////////////////////////////
 
 #if defined(_MSC_VER)
 	#define KOR_COMPILER_MSVC 1
-#elif defined(__llvm__) && defined(__clang__)
-	#define KOR_COMPILER_CLANG 1
 #elif defined(__GNUC__)
-	#define KOR_COMPILER_GCC 1
+	#define KOR_COMPILER_GNUC 1
+	#if defined(__clang__)
+		#define KOR_COMPILER_CLANG 1
+	#else
+		#define KOR_COMPILER_GCC 1
+	#endif
 #else
 	#error "Unsupported compiler"
 #endif
 
 #ifndef KOR_COMPILER_MSVC
 	#define KOR_COMPILER_MSVC 0
+#endif
+
+#ifndef KOR_COMPILER_GNUC
+	#define KOR_COMPILER_GNUC 0
 #endif
 
 #ifndef KOR_COMPILER_CLANG
@@ -159,7 +166,7 @@
 #if KOR_USE_UNICODE
 	#define KOR_TEXT(text) KOR_WIDETEXT(text)
 #else
-	#define KTEXT(text) KOR_ANSITEXT(text)
+	#define KOR_TEXT(text) KOR_ANSITEXT(text)
 #endif
 
 #define KTEXT(text) KOR_TEXT(text)
@@ -194,7 +201,7 @@ using wchar = KOR_PLATFORM_WCHAR;
 #if KOR_USE_UNICODE
 using tchar = wchar;
 #else
-using wchar = char;
+using tchar = char;
 #endif
 
 KOR_NAMESPACE_END

@@ -37,9 +37,8 @@ kor::FString myStr = KOR_TEXT("Hello World!");
 | **Compiler**  | **Tested** | **Macro**                              |
 |:--------------|:----------:|:---------------------------------------|
 | MSVC          |    YES     | `KOR_COMPILER_MSVC`                    |
-| Clang         |    YES     | `KOR_COMPILER_GNUC && KOR_COMPILER_GNUC_CLANG` |
-| GCC           |    YES     | `KOR_COMPILER_GNUC && KOR_COMPILER_GNUC_GCC`   |
-| Intel         |     NO     | `KOR_COMPILER_GNUC && KOR_COMPILER_GNUC_INTEL` |
+| Clang         |    YES     | `KOR_COMPILER_GNUC && KOR_COMPILER_CLANG` |
+| GCC           |    YES     | `KOR_COMPILER_GNUC && KOR_COMPILER_GCC`   |
 
 ---
 

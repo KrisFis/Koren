@@ -54,10 +54,10 @@ struct TIsTriviallyDestructible
 {
 	enum
 	{
-#if KOR_PLATFORM_WINDOWS || KOR_PLATFORM_APPLE
-		Value = __is_trivially_destructible(T)
-#elif KOR_PLATFORM_LINUX
+#if KOR_COMPILER_GCC
 		Value = __has_trivial_destructor(T)
+#else
+		Value = __is_trivially_destructible(T)
 #endif
 	};
 };

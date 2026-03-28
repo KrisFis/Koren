@@ -7,7 +7,7 @@
 #include "Kor/Assert.h"
 
 // TODO(jkfisera): REIMPLEMENT Invoke
-#include <type_traits>
+#include <functional>
 
 KOR_NAMESPACE_BEGIN
 
