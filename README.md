@@ -104,7 +104,7 @@ if (KOR_EXPECT(index < size))       // non-fatal — recoverable expectation
 ---
 
 ## Includes
-~~~~
+
 ### `Kor/KorMinimal.h`
 Minimal include — macros, templates, forward declarations, and core platform code. Use this when you only need the foundations.
 
