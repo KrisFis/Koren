@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "KorMinimal.h"
-
+#include "Kor/KorMinimal.h"
 #include "Kor/Memory.h"
+
+KOR_NAMESPACE_BEGIN
 
 // Main allocator used by TArray
 // * Has data inlined
@@ -80,3 +81,5 @@ private:
 	ElementType* _data = nullptr;
 	SizeType _size = 0;
 };
+
+KOR_NAMESPACE_END

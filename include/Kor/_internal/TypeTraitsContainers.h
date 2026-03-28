@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include "Kor/Build.h"
+
+KOR_NAMESPACE_BEGIN
+
 template<typename T>
 struct TContainerTypeTraits
 {
@@ -51,3 +55,5 @@ private:
 public:
 	enum { Value = ContainerT::IsContainer && !ContainerT::IsDynamic };
 };
+
+KOR_NAMESPACE_END

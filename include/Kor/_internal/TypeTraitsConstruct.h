@@ -4,6 +4,8 @@
 
 #include "Kor/_internal/TypeTraitsCore.h"
 
+KOR_NAMESPACE_BEGIN
+
 // [Is constructible]
 // * Checks whether specific type is constructible from specific types
 
@@ -87,3 +89,5 @@ struct TIsTriviallyCopyable { enum { Value = __is_trivially_copyable(T) };};
 
 template<typename T>
 struct TIsTriviallyMovable { enum { Value = TIsTriviallyMoveConstructible<T>::Value && TIsTriviallyMoveAssignable<T>::Value };};
+
+KOR_NAMESPACE_END

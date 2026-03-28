@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "KorMinimal.h"
+#include "Kor/KorMinimal.h"
 
 #include <cmath>
 
@@ -17,6 +17,8 @@
 
 // Types
 ///////////////////////////////////////////////////////////
+
+KOR_NAMESPACE_BEGIN
 
 struct SMath
 {
@@ -98,3 +100,5 @@ struct SMath
 		return (Value == 0) ? 0 : pos;
 	}
 };
+
+KOR_NAMESPACE_END

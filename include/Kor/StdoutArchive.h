@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "KorMinimal.h"
-
+#include "Kor/KorMinimal.h"
 #include "Kor/Misc.h"
 #include "Kor/ArrayArchive.h"
+
+KOR_NAMESPACE_BEGIN
 
 template<int32 FileNo, typename AllocatorT = typename TArray<tchar>::AllocatorType>
 struct TStdoutArchive : public TArrayArchive<tchar, AllocatorT>
@@ -91,5 +92,7 @@ private:
 	bool _flushOnNewLine = true;
 };
 
-typedef TStdoutArchive<SMisc::STDOUT_FILE_NO> SStdoutArchive;
-typedef TStdoutArchive<SMisc::STDERR_FILE_NO> SStderrArchive;
+using SStdoutArchive = TStdoutArchive<SMisc::STDOUT_FILE_NO>;
+using SStderrArchive = TStdoutArchive<SMisc::STDERR_FILE_NO>;
+
+KOR_NAMESPACE_END

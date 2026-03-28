@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include "Kor/Build.h"
+
 #include <cstdio>
 #include <ctype.h>
 #include <cwchar>
 #include <wctype.h>
 
-#include "Kor/Linux/LinuxBuild.h"
+KOR_NAMESPACE_BEGIN
 
 struct SLinuxPlatformCString
 {
@@ -71,3 +73,5 @@ struct SLinuxPlatformCString
 	KOR_FORCEINLINE static char* FromDouble(double val, int32 Digits, char* buf, uint32 maxLen) { snprintf(buf, maxLen, "%.*f", Digits, val); return buf; }
 	KOR_FORCEINLINE static wchar* FromDouble(double val, int32 Digits, wchar* buf, uint32 maxLen) { swprintf(buf, maxLen, L"%.*f", Digits, val); return buf; }
 };
+
+KOR_NAMESPACE_END

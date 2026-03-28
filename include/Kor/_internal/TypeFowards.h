@@ -2,7 +2,11 @@
 
 #pragma once
 
+#include "Kor/Build.h"
+
 #include <initializer_list>
+
+KOR_NAMESPACE_BEGIN
 
 // SIMPLE TYPES
 /////////////////////////////////
@@ -36,3 +40,5 @@ class TSharedPtr;
 
 template<typename T>
 class TWeakPtr;
+
+KOR_NAMESPACE_END

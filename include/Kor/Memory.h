@@ -2,10 +2,12 @@
 
 #pragma once
 
-#include "KorMinimal.h"
+#include "Kor/KorMinimal.h"
+#include KOR_PLATFORM_HEADER(Memory)
 
 #include <new>
-#include KOR_PLATFORM_HEADER(Memory)
+
+KOR_NAMESPACE_BEGIN
 
 typedef KOR_PLATFORM_PREFIXED_TYPE(S, PlatformMemory) SPlatformMemory;
 struct SMemory : public SPlatformMemory
@@ -171,15 +173,16 @@ struct SMemory : public SPlatformMemory
 		}
 	}
 };
+KOR_NAMESPACE_END
 
 #if KOR_NEW_DELETE
 void* operator new(TSize size)
 {
-	return SMemory::MallocTyped<uint8>((uint32)size);
+	return KOR_NAMESPACE SMemory::MallocTyped<uint8>((uint32)size);
 }
 
 void operator delete(void* ptr, TSize) noexcept
 {
-	return SMemory::Free(ptr);
+	return KOR_NAMESPACE SMemory::Free(ptr);
 }
 #endif

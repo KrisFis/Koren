@@ -4,6 +4,8 @@
 
 #include "Kor/_internal/TypeTraitsForward.h"
 
+KOR_NAMESPACE_BEGIN
+
 // [Is abstract type]
 // * Checks whether specific type is abstract
 
@@ -54,3 +56,5 @@ struct THasVirtualDestructor { enum { Value = __has_virtual_destructor(T) }; };
 
 template<typename T, typename = void> struct THasEqualOperator { enum { Value = false };};
 template<typename T> struct THasEqualOperator<T, decltype(DeclVal<T>() == DeclVal<T>(), void())> { enum { Value = true };};
+
+KOR_NAMESPACE_END

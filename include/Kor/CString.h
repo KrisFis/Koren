@@ -2,11 +2,13 @@
 
 #pragma once
 
-#include "KorMinimal.h"
+#include "Kor/KorMinimal.h"
 #include "Kor/Math.h"
 #include "Kor/Memory.h"
 
 #include KOR_PLATFORM_HEADER(CString)
+
+KOR_NAMESPACE_BEGIN
 
 typedef KOR_PLATFORM_PREFIXED_TYPE(S, PlatformCString) SPlatformCString;
 struct SCString : public SPlatformCString
@@ -234,3 +236,5 @@ private:
 		return (maxLen > 0) ? (*lhs - *rhs) : 0;
 	}
 };
+
+KOR_NAMESPACE_END

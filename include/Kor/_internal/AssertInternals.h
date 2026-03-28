@@ -4,9 +4,11 @@
 
 #include "Kor/Build.h"
 
-#if KOR_DO_CHECKS
+#include <iostream>
 
-	#include <iostream>
+KOR_NAMESPACE_BEGIN
+
+#if KOR_DO_CHECKS
 
 	namespace _NAssert
 	{
@@ -53,3 +55,5 @@
 	#define KOR_CHECKF_IMPL(expression) (!!(expression))
 
 #endif
+
+KOR_NAMESPACE_END

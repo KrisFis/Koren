@@ -3,11 +3,12 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-
 #include "Kor/Math.h"
 #include "Kor/Memory.h"
 
 #include "Kor/ArrayAllocator.h"
+
+KOR_NAMESPACE_BEGIN
 
 template<typename ElementT, typename AllocatorT>
 class TArray
@@ -680,3 +681,5 @@ struct TContainerTypeTraits<TArray<ElementT, AllocatorT>> : public TContainerTyp
 		InlineMemory = TIsSame<AllocatorT, TArrayAllocator<ElementT>>::Value
 	};
 };
+
+KOR_NAMESPACE_END

@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "KorMinimal.h"
-
+#include "Kor/KorMinimal.h"
 #include "Kor/Archive.h"
 #include "Kor/Array.h"
+
+KOR_NAMESPACE_BEGIN
 
 // TODO(krisfis): we might want to in-place memory, meaning that it will write to memory block provided
 // Also setting read/write mode is annoying, maybe make it optional
@@ -92,3 +93,5 @@ private:
 	ArrayType _data;
 	SizeType _offset = 0;
 };
+
+KOR_NAMESPACE_END

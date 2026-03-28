@@ -4,7 +4,12 @@
 
 #include <cstdint>
 
-// COMKOR_MATH_PILATION & BUILD
+// This file shouldn't have any kor dependencies
+// * Can include platform types and macros
+// * Can define macros
+// * Can NOT define kor types (restriction is only for this Build.h, not other platform files)
+
+// BUILD
 ////////////////////////////////////////////////////////////////////////
 
 #define KOR_DO_PRAGMA(command) _Pragma(#command)
@@ -71,19 +76,19 @@
 // Integers
 ////////////////////////////////////////////////
 
-typedef int8_t int8;
-typedef uint8_t uint8;
+#define KOR_PLATFORM_INT8 int8_t;
+#define KOR_PLATFORM_UINT8 unsigned uint8_t;
 
-typedef int16_t int16;
-typedef uint16_t uint16;
+#define KOR_PLATFORM_INT16 int16_t;
+#define KOR_PLATFORM_UINT16 unsigned uint16_t;
 
-typedef int32_t int32;
-typedef uint32_t uint32;
+#define KOR_PLATFORM_INT32 int32_t;
+#define KOR_PLATFORM_UINT32 unsigned uint32_t;
 
-typedef int64_t int64;
-typedef uint64_t uint64;
+#define KOR_PLATFORM_INT64 int64_t;
+#define KOR_PLATFORM_UINT64 unsigned uint64_t;
 
 // Characters
 ////////////////////////////////////////////////
 
-typedef wchar_t wchar;
+#define KOR_PLATFORM_WCHAR wchar_t;

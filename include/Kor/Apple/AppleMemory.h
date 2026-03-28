@@ -2,10 +2,12 @@
 
 #pragma once
 
+#include "Kor/Build.h"
+
 #include <cstdlib>
 #include <memory.h>
 
-#include "Kor/Apple/AppleBuild.h"
+KOR_NAMESPACE_BEGIN
 
 // TODO(jan.kristian.fisera): Virtual memory allocations
 // * see: https://linux.die.net/man/2/mmap
@@ -38,3 +40,5 @@ struct SApplePlatformMemory
 	// Compares two blocks of memory
 	KOR_FORCEINLINE static int32 Compare(const void* lhs, const void* rhs, int64 num) { return memcmp(lhs, rhs, num); }
 };
+
+KOR_NAMESPACE_END

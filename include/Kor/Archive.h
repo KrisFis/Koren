@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "KorMinimal.h"
-
+#include "Kor/KorMinimal.h"
 #include "Kor/CString.h"
+
+KOR_NAMESPACE_BEGIN
 
 enum class EArchiveType : uint8
 {
@@ -457,3 +458,5 @@ KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, tchar* val)
 	ar.Read(val, SCString::GetLength(val));
 	return ar;
 }
+
+KOR_NAMESPACE_END

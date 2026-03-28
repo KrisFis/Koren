@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "KorMinimal.h"
-
+#include "Kor/KorMinimal.h"
 #include "Kor/Memory.h"
+
+KOR_NAMESPACE_BEGIN
 
 template<typename ElementT>
 class TQueueAllocator
@@ -127,3 +128,5 @@ private:
 	NodeType* _tail = nullptr;
 	SizeType _size = 0;
 };
+
+KOR_NAMESPACE_END

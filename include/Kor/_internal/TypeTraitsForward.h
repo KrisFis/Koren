@@ -4,6 +4,8 @@
 
 #include "Kor/_internal/TypeTraitsCore.h"
 
+KOR_NAMESPACE_BEGIN
+
 // [Move]
 // * Indicates that a specific object should be "moved"
 
@@ -36,3 +38,4 @@ KOR_FORCEINLINE constexpr T&& Forward(typename TRemoveReference<T>::Type&& obj) 
 template<typename T>
 T&& DeclVal();
 
+KOR_NAMESPACE_END

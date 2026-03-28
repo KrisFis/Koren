@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "KorMinimal.h"
-
+#include "Kor/KorMinimal.h"
 #include "Kor/ArrayAllocator.h"
+
+KOR_NAMESPACE_BEGIN
 
 // Default array allocator but with fixed num of elements
 template<typename ElementT, uint32 InNumLimit>
@@ -40,3 +41,5 @@ private:
 
 	TArrayAllocator<ElementType> _allocator = {};
 };
+
+KOR_NAMESPACE_END

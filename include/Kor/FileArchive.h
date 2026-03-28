@@ -2,10 +2,12 @@
 
 #pragma once
 
-#include "KorMinimal.h"
+#include "Kor/KorMinimal.h"
+#include "Kor/Archive.h"
 
-#include "Archive.h"
 #include <cstdio>
+
+KOR_NAMESPACE_BEGIN
 
 struct SCFileArchive : public SArchive
 {
@@ -103,3 +105,5 @@ private:
 	const tchar* _filename = nullptr;
 	bool _overwrite = false;
 };
+
+KOR_NAMESPACE_END

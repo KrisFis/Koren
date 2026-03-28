@@ -2,10 +2,12 @@
 
 #pragma once
 
-#include "KorMinimal.h"
+#include "Kor/KorMinimal.h"
 
 #include "Kor/Memory.h"
 #include "Kor/QueueAllocator.h"
+
+KOR_NAMESPACE_BEGIN
 
 // TODO: Introduce iterator
 // TODO: Consider returning memory and allow changing values!
@@ -180,3 +182,5 @@ struct TContainerTypeTraits<TQueue<ElementT, AllocatorT>> : public TContainerTyp
 		IsDynamic = true
 	};
 };
+
+KOR_NAMESPACE_END

@@ -2,7 +2,13 @@
 
 #pragma once
 
+// This file shouldn't have any kor dependencies
+// * Can include platform types and macros
+// * Can define macros
+// * Can NOT define kor types (restriction is only for this Build.h, not other platform files)
+
 // Windows setup
+////////////////////////////////////////////////////////////////////////
 
 #if KOR_USE_UNICODE && !defined(UNICODE)
 	#define UNICODE
@@ -31,7 +37,7 @@
 	#undef GetCommandLine
 #endif
 
-// COMKOR_MATH_PILATION & BUILD
+// BUILD
 ////////////////////////////////////////////////////////////////////////
 
 #define KOR_DO_PRAGMA(command) __pragma(command)
@@ -89,19 +95,19 @@
 // Integers
 ////////////////////////////////////////////////
 
-typedef __int8 int8;
-typedef unsigned __int8 uint8;
+#define KOR_PLATFORM_INT8 __int8;
+#define KOR_PLATFORM_UINT8 unsigned __int8;
 
-typedef __int16 int16;
-typedef unsigned __int16 uint16;
+#define KOR_PLATFORM_INT16 __int16;
+#define KOR_PLATFORM_UINT16 unsigned __int16;
 
-typedef __int32 int32;
-typedef unsigned __int32 uint32;
+#define KOR_PLATFORM_INT32 __int32;
+#define KOR_PLATFORM_UINT32 unsigned __int32;
 
-typedef __int64 int64;
-typedef unsigned __int64 uint64;
+#define KOR_PLATFORM_INT64 __int64;
+#define KOR_PLATFORM_UINT64 unsigned __int64;
 
 // Characters
 ////////////////////////////////////////////////
 
-typedef __wchar_t wchar;
+#define KOR_PLATFORM_WCHAR __wchar_t;

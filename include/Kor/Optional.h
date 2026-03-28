@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "KorMinimal.h"
-
+#include "Kor/KorMinimal.h"
 #include "Kor/Memory.h"
 #include "Kor/TypeTraits.h"
+
+KOR_NAMESPACE_BEGIN
 
 template<typename ElementT>
 class TOptional
@@ -171,3 +172,5 @@ KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TOptional<T
 
 	return ar;
 }
+
+KOR_NAMESPACE_END

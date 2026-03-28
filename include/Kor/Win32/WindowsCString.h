@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include "Kor/Win32/WindowsBuild.h"
+#include "Kor/Build.h"
+
+KOR_NAMESPACE_BEGIN
 
 struct SWindowsPlatformCString
 {
@@ -79,3 +81,5 @@ struct SWindowsPlatformCString
 		return buf;
 	}
 };
+
+KOR_NAMESPACE_END

@@ -4,6 +4,8 @@
 
 #include "Kor/_internal/TypeTraitsCore.h"
 
+KOR_NAMESPACE_BEGIN
+
 namespace _NTypeInternals
 {
 	template<typename T>
@@ -40,3 +42,5 @@ namespace _NTypeInternals
 	};
 
 }
+
+KOR_NAMESPACE_END

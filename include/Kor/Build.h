@@ -129,13 +129,30 @@
 	#define KOR_NEW_DELETE 0
 #endif
 
+// Whether library should be encapsulated in "kor" namespace
+#ifndef KOR_USE_NAMESPACE
+	#define KOR_USE_NAMESPACE 1
+#endif
+
+// Library
+///////////////////////////////////////////////////////
+
+#if KOR_USE_NAMESPACE
+#define KOR_NAMESPACE_BEGIN namespace kor {
+#define KOR_NAMESPACE_END }
+#define KOR_NAMESPACE kor::
+#else
+#define KOR_NAMESPACE_BEGIN
+#define KOR_NAMESPACE_END
+#define KOR_NAMESPACE
+#endif
+
 // Platform
 /////////////////////////////////
 
 #include "Kor/_internal/BuildPlatform.h"
 
-// Other
-// * Post platform types/forwards and helpers
+// Platform Extras
 /////////////////////////////////
 
 #define KOR_PTR_DIFF(Ptr1, Ptr2) static_cast<int64>(Ptr1 - Ptr2)
@@ -146,10 +163,8 @@
 
 #if KOR_USE_UNICODE
 	#define KOR_TEXT(text) KOR_WIDETEXT(text)
-	typedef wchar tchar;
 #else
 	#define KTEXT(text) KOR_ANSITEXT(text)
-	typedef char tchar;
 #endif
 
 #define KTEXT(text) KOR_TEXT(text)
@@ -165,3 +180,26 @@
 #define KOR_MACRO_CONCAT_EXPAND(x, y) KOR_MACRO_CONCAT(x,y)
 
 #define KOR_MACRO_DOUBLE_CONCAT(x, y, z) KOR_MACRO_CONCAT_EXPAND(KOR_MACRO_CONCAT_EXPAND(x, y), z)
+
+// Platform | Arithmetic Types
+/////////////////////////////////
+
+KOR_NAMESPACE_BEGIN
+
+using int8 = KOR_PLATFORM_INT8;
+using uint8 = KOR_PLATFORM_UINT8;
+using int16 = KOR_PLATFORM_INT16;
+using uint16 = KOR_PLATFORM_UINT16;
+using int32 = KOR_PLATFORM_INT32;
+using uint32 = KOR_PLATFORM_UINT32;
+using int64 = KOR_PLATFORM_INT64;
+using uint64 = KOR_PLATFORM_UINT64;
+using wchar = KOR_PLATFORM_WCHAR;
+
+#if KOR_USE_UNICODE
+using tchar = wchar;
+#else
+using wchar = char;
+#endif
+
+KOR_NAMESPACE_END

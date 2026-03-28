@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "KorMinimal.h"
-
+#include "Kor/KorMinimal.h"
 #include "Kor/_internal/SharedReferencer.h"
 #include "Kor/_internal/SharedTypeTraits.h"
+
+KOR_NAMESPACE_BEGIN
 
 // Equivalent of std's shared_ptr
 template<typename T>
@@ -408,3 +409,5 @@ KOR_FORCEINLINE_DEBUGGABLE static TSharedPtr<T> MakeShared(ArgTypes&&... args)
 		return MakeShareable<T>(new T());
 	}
 }
+
+KOR_NAMESPACE_END

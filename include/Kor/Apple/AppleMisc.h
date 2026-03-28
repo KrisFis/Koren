@@ -2,10 +2,12 @@
 
 #pragma once
 
+#include "Kor/Build.h"
+
 #include <ctime>
 #include <unistd.h>
 
-#include "Kor/Apple/AppleBuild.h"
+KOR_NAMESPACE_BEGIN
 
 struct SApplePlatformMisc
 {
@@ -23,3 +25,5 @@ struct SApplePlatformMisc
 	// Writes to standard file by fileno. example: STDOUT_FILENO
 	KOR_FORCEINLINE static int64 WriteStd(int32 fileNo, const void* buffer, uint64 size) { return write(fileNo, buffer, size); }
 };
+
+KOR_NAMESPACE_END

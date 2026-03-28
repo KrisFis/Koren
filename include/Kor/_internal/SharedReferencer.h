@@ -8,6 +8,8 @@
 // TODO(jkfisera): REIMPLEMENT Invoke
 #include <type_traits>
 
+KOR_NAMESPACE_BEGIN
+
 namespace _NShared
 {
 	struct SNullType {};
@@ -230,3 +232,5 @@ namespace _NShared
 		CReferencerBase* _inner = nullptr;
 	};
 }
+
+KOR_NAMESPACE_END

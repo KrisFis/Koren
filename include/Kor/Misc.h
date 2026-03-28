@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "KorMinimal.h"
-
+#include "Kor/KorMinimal.h"
 #include "Kor/CString.h"
 #include KOR_PLATFORM_HEADER(Misc)
+
+KOR_NAMESPACE_BEGIN
 
 typedef KOR_PLATFORM_PREFIXED_TYPE(S, PlatformMisc) SPlatformMisc;
 // TODO: Separate to IO (input/output) and STime
@@ -50,3 +51,5 @@ struct SMisc : public SPlatformMisc
 		return writtenBytes >= sizeof(tchar) ? writtenBytes / sizeof(tchar) : 0;
 	}
 };
+
+KOR_NAMESPACE_END

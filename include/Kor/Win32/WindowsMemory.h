@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include "Kor/Win32/WindowsBuild.h"
+#include "Kor/Build.h"
+
+KOR_NAMESPACE_BEGIN
 
 // TODO(jan.kristian.fisera): Virtual memory allocations
 // * see: https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc
@@ -35,3 +37,5 @@ struct SWindowsPlatformMemory
 	// Compares two blocks of memory
 	KOR_FORCEINLINE static int32 Compare(const void* lhs, const void* rhs, int64 num) { return RtlEqualMemory(lhs, rhs, num); }
 };
+
+KOR_NAMESPACE_END

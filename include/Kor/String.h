@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "KorMinimal.h"
-
+#include "Kor/KorMinimal.h"
 #include "Kor/Archive.h"
-
 #include "Kor/Array.h"
 #include "Kor/CString.h"
+
+KOR_NAMESPACE_BEGIN
 
 struct SString
 {
@@ -615,3 +615,5 @@ KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, SString& st
 	str = SString(Move(newData));
 	return ar;
 }
+
+KOR_NAMESPACE_END

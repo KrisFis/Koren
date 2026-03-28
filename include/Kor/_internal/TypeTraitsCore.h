@@ -4,6 +4,8 @@
 
 #include "Kor/Build.h"
 
+KOR_NAMESPACE_BEGIN
+
 // [Size]
 // * Gets size type without need of std (same as std::size_t)
 
@@ -185,3 +187,5 @@ template<> struct TMakeUnsigned<int8> { typedef uint8 Type; };
 template<> struct TMakeUnsigned<int16> { typedef uint16 Type; };
 template<> struct TMakeUnsigned<int32> { typedef uint32 Type; };
 template<> struct TMakeUnsigned<int64> { typedef uint64 Type; };
+
+KOR_NAMESPACE_END

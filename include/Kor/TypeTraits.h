@@ -3,14 +3,14 @@
 #pragma once
 
 #include "Kor/Build.h"
-
-// INCLUDES ALL INTERNALS
 #include "Kor/_internal/TypeTraitsConstruct.h"
 #include "Kor/_internal/TypeTraitsContainers.h"
 #include "Kor/_internal/TypeTraitsCore.h"
 #include "Kor/_internal/TypeTraitsDecayHelper.h"
 #include "Kor/_internal/TypeTraitsForward.h"
 #include "Kor/_internal/TypeTraitsType.h"
+
+KOR_NAMESPACE_BEGIN
 
 // [Choose]
 // * Chooses between two different types based on a value
@@ -190,3 +190,5 @@ struct TTypeTraits
 		IsBitwiseComparable = IsFundamental || IsEnum || !THasEqualOperator<T>::Value
 	};
 };
+
+KOR_NAMESPACE_END

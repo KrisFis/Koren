@@ -3,9 +3,10 @@
 #pragma once
 
 #include "Kor/Build.h"
-
 #include "Kor/TypeTraits.h"
 #include "Kor/TypeTraitsMacros.h"
+
+KOR_NAMESPACE_BEGIN
 
 namespace _IsValid
 {
@@ -84,3 +85,5 @@ KOR_FORCEINLINE static constexpr bool IsValid(...)
 	static_assert(sizeof(T) < 0, "IsValid() function overload for type is not implemented");
 	return false;
 }
+
+KOR_NAMESPACE_END

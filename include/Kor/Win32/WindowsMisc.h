@@ -2,8 +2,11 @@
 
 #pragma once
 
-#include "Kor/Win32/WindowsBuild.h"
+#include "Kor/Build.h"
+
 #include <io.h>
+
+KOR_NAMESPACE_BEGIN
 
 struct SWindowsPlatformMisc
 {
@@ -21,3 +24,5 @@ struct SWindowsPlatformMisc
 	// Writes to standard file by fileno. example: STDOUT_FILENO
 	static int64 WriteToFile(int32 fileNo, const void* buffer, uint64 size) { return _write(fileNo, buffer, size); }
 };
+
+KOR_NAMESPACE_END

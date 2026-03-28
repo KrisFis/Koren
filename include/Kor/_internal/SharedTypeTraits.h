@@ -4,6 +4,8 @@
 
 #include "Kor/TypeTraits.h"
 
+KOR_NAMESPACE_BEGIN
+
 namespace _NShared
 {
 	// Checks whether WeakThis field exists
@@ -42,3 +44,5 @@ namespace _NShared
 
 	};
 }
+
+KOR_NAMESPACE_END
