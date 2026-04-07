@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/Build.h"
+#include "Kor/Core/Build.h"
 
 KOR_NAMESPACE_BEGIN
 

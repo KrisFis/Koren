@@ -6,7 +6,7 @@
 #include "Kor/KorMinimal.h"
 #include "Kor/Math.h"
 #include "Kor/Memory.h"
-#include KOR_PLATFORM_HEADER_FROM(Kor, CString)
+#include KOR_PLATFORM_HEADER_FROM(Kor/Core, CString)
 
 KOR_NAMESPACE_BEGIN
 

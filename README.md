@@ -28,6 +28,7 @@ Kor::FString myStr = KOR_TEXT("Hello World!");
 | Windows      |    YES     | `KOR_PLATFORM_WINDOWS` |
 | Linux        |    YES     | `KOR_PLATFORM_LINUX`   |
 | Apple        |    YES     | `KOR_PLATFORM_APPLE`   |
+| Unix         |    YES     | `KOR_PLATFORM_UNIX`    |
 
 | **Architecture** | **Tested** | **Macro**             |
 |:-----------------|:----------:|:----------------------|
@@ -116,16 +117,16 @@ Full include - all features, declarations, and implementations.
 
 Each platform has its own folder, accessible via platform macros defined in `KorMinimal.h`. This keeps platform-specific code isolated without scattering `#ifdef` everywhere.
 
-**Example -** on Linux, `KOR_PLATFORM_HEADER_FROM(Kor, Memory)` resolves to `Kor/Linux/LinuxMemory.h` automatically.
+**Example -** on Linux, `KOR_PLATFORM_HEADER_FROM(Kor/Core, Memory)` resolves to `Kor/Linux/LinuxMemory.h` automatically.
 
 ```cpp
-#include "Kor/KorMinimal.h" // or "Kor/Build.h"
+#include "Kor/KorMinimal.h"
  
 // Relative to current include root
 #include KOR_PLATFORM_HEADER(MyHeader)
  
 // Relative to explicit root (use when including from a different module)
-#include KOR_PLATFORM_HEADER_FROM(Kor, MyHeader)
+#include KOR_PLATFORM_HEADER_FROM(Kor/Core, MyHeader)
 ```
 
 ### Header Resolution

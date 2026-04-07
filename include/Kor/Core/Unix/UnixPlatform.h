@@ -3,15 +3,10 @@
 
 #pragma once
 
-#include "Kor/Build.h"
+#include "Kor/Core/Build.h"
 
 #include <cstdarg>
 #include <stdint.h>
-
-// This file shouldn't have any kor dependencies
-// * Can include platform types and macros
-// * Can define macros
-// * Can NOT define kor types (restriction is only for this Build.h, not other platform files)
 
 // BUILD
 ////////////////////////////////////////////////////////////////////////
@@ -83,15 +78,12 @@
 
 #define KOR_WCHAR_BYTES 4
 
-#define KOR_CHAR_NEWLINE_WIDE L"\n"
-#define KOR_CHAR_NEWLINE_ANSI "\n"
-
 // Types
 ////////////////////////////////////////////////
 
 KOR_NAMESPACE_BEGIN
 
-struct SLinuxTypes
+struct SUnixTypes
 {
 	typedef int8_t Int8;
 	typedef uint8_t Uint8;

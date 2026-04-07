@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/Build.h"
+#include "Core/Build.h"
 #include "Kor/Misc.h"
 #include "Kor/String.h"
 

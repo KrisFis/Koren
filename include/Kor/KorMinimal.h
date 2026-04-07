@@ -10,8 +10,8 @@
 // Look at "Build.h" to see defines that affects features provided
 
 // IMPORTANT CORE
-#include "Kor/Build.h"
-#include "Kor/Platform.h"
+#include "Kor/Core/Build.h"
+#include "Kor/Core/Platform.h"
 
 // FORWARDS
 #include "Kor/Internal/TypeFowards.h"

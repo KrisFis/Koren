@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include KOR_PLATFORM_HEADER_FROM(Kor, Memory)
+#include KOR_PLATFORM_HEADER_FROM(Kor/Core, Memory)
 
 #include <new>
 

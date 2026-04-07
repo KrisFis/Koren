@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/Build.h"
+#include "Kor/Core/Build.h"
 
 #include <cstdlib>
 #include <memory.h>
@@ -12,7 +12,7 @@ KOR_NAMESPACE_BEGIN
 
 // TODO(jan.kristian.fisera): Virtual memory allocations
 // * see: https://linux.die.net/man/2/mmap
-struct SLinuxMemory
+struct SUnixMemory
 {
 	// Allocates new memory
 	KOR_FORCEINLINE static void* Malloc(int64 size) { return malloc(size); }

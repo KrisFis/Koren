@@ -3,16 +3,16 @@
 
 #pragma once
 
-#include "Kor/Build.h"
+#include "Kor/Core/Build.h"
 
 #include <cstdio>
-#include <cctype>
+#include <ctype.h>
 #include <cwchar>
-#include <cwctype>
+#include <wctype.h>
 
 KOR_NAMESPACE_BEGIN
 
-struct SAppleCString
+struct SUnixCString
 {
 	// Checks whether the passed character is alphabetic
 	KOR_FORCEINLINE static bool IsAlphaChar(char val) { return isalpha(val); }
@@ -63,8 +63,8 @@ struct SAppleCString
 	KOR_FORCEINLINE static int64 ToInt64(const wchar* val) { return wcstol(val, nullptr, 10); }
 
 	// Converts integer value to string in specified base, string is saved to provided buffer
-	KOR_FORCEINLINE static char* FromInt64(int64 val, char* buf, uint32 maxLen) { snprintf(buf, maxLen, "%lld", val); return buf; }
-	KOR_FORCEINLINE static wchar* FromInt64(int64 val, wchar* buf, uint32 maxLen) { swprintf(buf, maxLen, L"%lld", val); return buf; }
+	KOR_FORCEINLINE static char* FromInt64(int64 val, char* buf, uint32 maxLen) { snprintf(buf, maxLen, "%ld", val); return buf; }
+	KOR_FORCEINLINE static wchar* FromInt64(int64 val, wchar* buf, uint32 maxLen) { swprintf(buf, maxLen, L"%ld", val); return buf; }
 
 	// Converts the string pointed to, by the argument str to a floating-point number
 	KOR_FORCEINLINE static double ToDouble(const char* val) { return atof(val); }

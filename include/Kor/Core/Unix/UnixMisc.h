@@ -3,18 +3,18 @@
 
 #pragma once
 
-#include "Kor/Build.h"
+#include "Kor/Core/Build.h"
 
-#include <ctime>
+#include <time.h>
 #include <unistd.h>
 
 KOR_NAMESPACE_BEGIN
 
-struct SAppleMisc
+struct SUnixMisc
 {
 	static double GetSecondsSinceEpoch()
 	{
-		timespec ts = {};
+		timespec ts;
 		clock_gettime(CLOCK_MONOTONIC, &ts);
 
 		return (double)ts.tv_sec + (double)ts.tv_nsec / 1.e9;

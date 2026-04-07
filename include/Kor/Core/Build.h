@@ -87,11 +87,25 @@
 	#define KOR_ARCHITECTURE_64 0
 #endif
 
+// CPP Version
+///////////////////////////////////////////////////////////////
+
+// cpp11 - Published 2011-03
+#define KOR_CPP_11 (__cplusplus >= 201103L)
+// cpp14 - Published 2014-02
+#define KOR_CPP_14 (__cplusplus >= 201402L)
+// cpp17 - Published 2017-03
+#define KOR_CPP_17 (__cplusplus >= 201703L)
+// cpp20 - Published 2020-02
+#define KOR_CPP_20 (__cplusplus >= 202002L)
+// cpp23 - Published 2023-02
+#define KOR_CPP_23 (__cplusplus >= 202302L)
+
 // Platform
 ///////////////////////////////////////////////////////////////
-// Detected automatically. Exactly one will be set to 1.
+// Detected automatically
 //
-// Supported: Windows, Linux, Apple
+// Supported: Windows, Linux, Apple, Unix
 // Example:   KOR_PLATFORM_WINDOWS
 ///////////////////////////////////////////////////////////////
 
@@ -99,8 +113,12 @@
 	#define KOR_PLATFORM_WINDOWS 1
 #elif defined(__linux__)
 	#define KOR_PLATFORM_LINUX 1
+	#define KOR_PLATFORM_UNIX 1
 #elif defined(__APPLE__)
 	#define KOR_PLATFORM_APPLE 1
+	#define KOR_PLATFORM_UNIX 1
+#elif defined(__unix__) || defined(__unix)
+	#define KOR_PLATFORM_UNIX 1
 #else
 	#error "Unsupported platform"
 #endif
@@ -117,6 +135,10 @@
 	#define KOR_PLATFORM_APPLE 0
 #endif
 
+#ifndef KOR_PLATFORM_UNIX
+	#define KOR_PLATFORM_UNIX 0
+#endif
+
 // Configuration
 ///////////////////////////////////////////////////////////////
 // Optional overrides.
@@ -125,7 +147,7 @@
 ///////////////////////////////////////////////////////////////
 
 // Whether to use wide characters (wchar) as the default char type (tchar).
-// Defaults to 1 on Windows, 0 elsewhere. See: Types section below.
+// Defaults to 1 on Windows, 0 elsewhere. See: Platform.h
 #ifndef KOR_USE_UNICODE
 	#define KOR_USE_UNICODE KOR_PLATFORM_WINDOWS
 #endif
@@ -189,45 +211,3 @@
 
 #define KOR_MACRO_DOUBLE_CONCAT(x, y, z) KOR_MACRO_CONCAT_EXPAND(KOR_MACRO_CONCAT_EXPAND(x, y), z)
 #define KOR_MACRO_DOUBLE_CONCAT_EXPAND(x, y, z) KOR_MACRO_DOUBLE_CONCAT(x, y, z)
-
-// Platform Primitives
-///////////////////////////////////////////////////////////////
-// Helpers for resolving platform-specific headers and type names.
-// KOR_PLATFORM_NAME expands to the active platform identifier (e.g. Win32).
-//
-// Header resolution:
-//   KOR_PLATFORM_HEADER(name)            - relative to current include root
-//   KOR_PLATFORM_HEADER_FROM(root, name) - relative to explicit root
-//
-// Type name construction:
-//   KOR_PLATFORM_TYPE(Name)                - e.g. Win32Name           (no prefix)
-//   KOR_PLATFORM_TYPE_CUSTOM(Prefix, Name) - e.g. PrefixWin32Name     (custom prefix)
-//   KOR_PLATFORM_STRUCT(Name)              - e.g. SWin32Name          (structs)
-//   KOR_PLATFORM_CLASS(Name)               - e.g. CWin32Name          (classes)
-//   KOR_PLATFORM_TEMPLATE(Name)            - e.g. TWin32Name          (templates)
-//   KOR_PLATFORM_NAMESPACE(Name)           - e.g. NWin32Name          (namespaces)
-//   KOR_PLATFORM_FUNC(Name)                - e.g. FWin32Name          (free functions)
-///////////////////////////////////////////////////////////////
-
-#if KOR_PLATFORM_WINDOWS
-	#define KOR_PLATFORM_NAME Win32
-#elif KOR_PLATFORM_LINUX
-	#define KOR_PLATFORM_NAME Linux
-#elif KOR_PLATFORM_APPLE
-	#define KOR_PLATFORM_NAME Apple
-#else
-	#error "Unsupported platform"
-#endif
-
-#define KOR_PLATFORM_HEADER(name) KOR_MACRO_STRINGIFY_EXPAND(KOR_PLATFORM_NAME/KOR_MACRO_CONCAT_EXPAND(KOR_PLATFORM_NAME, name.h))
-#define KOR_PLATFORM_HEADER_FROM(root, name) KOR_MACRO_STRINGIFY_EXPAND(root/KOR_PLATFORM_NAME/KOR_MACRO_CONCAT_EXPAND(KOR_PLATFORM_NAME, name.h))
-
-#define KOR_PLATFORM_TYPE(name) KOR_MACRO_CONCAT(KOR_PLATFORM_NAME, name)
-#define KOR_PLATFORM_TYPE_CUSTOM(prefix, name) KOR_MACRO_DOUBLE_CONCAT(prefix, KOR_PLATFORM_NAME, name)
-
-#define KOR_PLATFORM_STRUCT(name) KOR_PLATFORM_TYPE_CUSTOM(S, name)
-#define KOR_PLATFORM_CLASS(name) KOR_PLATFORM_TYPE_CUSTOM(C, name)
-#define KOR_PLATFORM_ENUM(name) KOR_PLATFORM_TYPE_CUSTOM(E, name)
-#define KOR_PLATFORM_TEMPLATE(name) KOR_PLATFORM_TYPE_CUSTOM(T, name)
-#define KOR_PLATFORM_NAMESPACE(name) KOR_PLATFORM_TYPE_CUSTOM(N, name)
-#define KOR_PLATFORM_FUNC(name) KOR_PLATFORM_TYPE_CUSTOM(F, name)
