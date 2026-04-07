@@ -241,7 +241,7 @@ struct SArchive
 
 		ar.template SetOffset<tchar>(oldOffset + usedNum);
 
-		buffer[usedNum] = KOR_CHAR_TERM;
+		buffer[usedNum] = KTEXT('\0');
 		return buffer;
 	}
 

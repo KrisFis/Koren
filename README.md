@@ -1,16 +1,16 @@
 # Koren
 
-**A header-only foundational C++ library** — my personal alternative to the STL, inspired by Unreal Engine's architecture but written in pure C++ from scratch.
+**A header-only foundational C++ library** - my personal alternative to the STL, inspired by Unreal Engine's architecture but written in pure C++ from scratch.
 
 Started as a learning exercise in implementing STL-like containers and types. It has since grown into a generic foundation library I use across my own projects under the **Alternity Arts** umbrella.
 
-> **Note:** Still a work in progress. Some types currently typedef from `std::` as placeholders — these are intended to be replaced with custom implementations over time.
+> **Note:** Still a work in progress. Some types currently typedef from `std::` as placeholders - these are intended to be replaced with custom implementations over time.
 
 ---
 
 ## Namespace
 
-All library types live under the `Kor::` namespace. The name comes from *Koren* — Czech for *root*.
+All library types live under the `Kor::` namespace. The name comes from *Koren* - Czech for *root*.
 
 ```cpp
 #include "Kor/Kor.h"
@@ -58,11 +58,11 @@ Kor::FString myStr = KOR_TEXT("Hello World!");
 
 ## Text Literals
 
-Wide character string literals are wrapped via `KOR_TEXT`. A shorter alias `KTEXT` is provided for convenience — both are identical.
+Wide character string literals are wrapped via `KOR_TEXT`. A shorter alias `KTEXT` is provided for convenience - both are identical.
 
 ```cpp
 Kor::tchar* a = KOR_TEXT("Hello");   // canonical
-Kor::tchar* b = KTEXT("Hello");      // shorthand alias — same thing
+Kor::tchar* b = KTEXT("Hello");      // shorthand alias - same thing
 ```
 
 `KTEXT` is just:
@@ -76,13 +76,13 @@ Kor::tchar* b = KTEXT("Hello");      // shorthand alias — same thing
 
 | **Macro**      | **Fatal** | **Returns bool** | **Use when...**                               |
 |:---------------|:---------:|:----------------:|:----------------------------------------------|
-| `KOR_ASSERT`   |    YES    |        NO        | This must be true — statement, crash if not   |
-| `KOR_EXPECT`   |    NO     |       YES        | This should be true — warn and recover if not |
+| `KOR_ASSERT`   |    YES    |        NO        | This must be true - statement, crash if not   |
+| `KOR_EXPECT`   |    NO     |       YES        | This should be true - warn and recover if not |
 
 ```cpp
 KOR_ASSERT(ptr != nullptr);         // fatal, hard requirement
 
-if (KOR_EXPECT(index < size))       // non-fatal — recoverable expectation
+if (KOR_EXPECT(index < size))       // non-fatal - recoverable expectation
 {
     arr[index] = value;
 }
@@ -105,10 +105,10 @@ if (KOR_EXPECT(index < size))       // non-fatal — recoverable expectation
 ## Includes
 
 ### `Kor/KorMinimal.h`
-Minimal include — macros, templates, forward declarations, and core platform code. Use this when you only need the foundations.
+Minimal include - macros, templates, forward declarations, and core platform code. Use this when you only need the foundations.
 
 ### `Kor/Kor.h`
-Full include — all features, declarations, and implementations.
+Full include - all features, declarations, and implementations.
 
 ---
 
@@ -116,7 +116,7 @@ Full include — all features, declarations, and implementations.
 
 Each platform has its own folder, accessible via platform macros defined in `KorMinimal.h`. This keeps platform-specific code isolated without scattering `#ifdef` everywhere.
 
-**Example —** on Linux, `KOR_PLATFORM_HEADER_FROM(Kor, Memory)` resolves to `Kor/Linux/LinuxMemory.h` automatically.
+**Example -** on Linux, `KOR_PLATFORM_HEADER_FROM(Kor, Memory)` resolves to `Kor/Linux/LinuxMemory.h` automatically.
 
 ```cpp
 #include "Kor/KorMinimal.h" // or "Kor/Build.h"
@@ -152,7 +152,7 @@ Each platform has its own folder, accessible via platform macros defined in `Kor
 ## FAQ
 
 ### Why not just use the STL?
-Personal reasons mostly — I wanted to understand how these things work at the implementation level, and I prefer UE-style naming and architecture. This library reflects my own taste and needs.
+Personal reasons mostly - I wanted to understand how these things work at the implementation level, and I prefer UE-style naming and architecture. This library reflects my own taste and needs.
 
 ### Can I use it in my own project?
 Yes, feel free. Keep in mind it's opinionated and shaped around my workflows.

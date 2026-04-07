@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include <cstdarg>
-#include <stdint.h>
+#include "Kor/Build.h"
+
+#include <cstdint>
 
 // This file shouldn't have any kor dependencies
 // * Can include platform types and macros
@@ -22,7 +23,7 @@
 
 #define KOR_DEPRECATED __attribute__ ((__deprecated__))
 #define KOR_DEPRECATED_MSG(msg) __attribute__ ((__deprecated__(msg)))
-#define KOR_NODISCARD [[__nodiscard__]]
+#define KOR_NODISCARD [[nodiscard]]
 #define KOR_NORETURN __attribute__((noreturn))
 
 #define KOR_FORCEINLINE inline __attribute__((always_inline))
@@ -31,9 +32,9 @@
 #define KOR_UNREACHABLE_CODE() __builtin_unreachable()
 
 #if KOR_BUILD_DEBUG
-	#define KOR_FORCEINLINE_DEBUGGABLE inline
+#define KOR_FORCEINLINE_DEBUGGABLE inline
 #else
-	#define KOR_FORCEINLINE_DEBUGGABLE KOR_FORCEINLINE
+#define KOR_FORCEINLINE_DEBUGGABLE KOR_FORCEINLINE
 #endif
 
 #if KOR_COMPILER_CLANG
@@ -42,7 +43,7 @@
 	#define KOR_DEBUG_BREAK() __asm__ volatile("int3")
 #endif
 
-#define KOR_DLL_EXPORT
+#define KOR_DLL_EXPORT __attribute__((visibility("default")))
 #define KOR_DLL_IMPORT
 
 // DIAGNOSTICS
@@ -62,8 +63,9 @@
 	KOR_DIAG_WARNINGS_SUPPRESS(KOR_DIAG_WARNING_IMPLICIT_NARROWING)
 #endif
 
+
 // OPTIMIZATIONS
-// * Uses options, make sure it does not colide with anything
+// * Uses options, make sure it does not collide with anything
 // * Otherwise update macros
 ////////////////////////////////////////////////////////////////////////
 
@@ -76,19 +78,39 @@
 #define KOR_LIKELY(x) __builtin_expect(!!(x), 1)
 #define KOR_UNLIKELY(x) __builtin_expect(!!(x), 0)
 
-// Arithmetics
+// Strings
 ////////////////////////////////////////////////
 
-#define KOR_PLATFORM_INT8 int8_t
-#define KOR_PLATFORM_UINT8 uint8_t
+#define KOR_WCHAR_BYTES 4
 
-#define KOR_PLATFORM_INT16 int16_t
-#define KOR_PLATFORM_UINT16 uint16_t
+#define KOR_CHAR_NEWLINE_WIDE L"\n"
+#define KOR_CHAR_NEWLINE_ANSI "\n"
 
-#define KOR_PLATFORM_INT32 int32_t
-#define KOR_PLATFORM_UINT32 uint32_t
+// Types
+////////////////////////////////////////////////
 
-#define KOR_PLATFORM_INT64 int64_t
-#define KOR_PLATFORM_UINT64 uint64_t
+KOR_NAMESPACE_BEGIN
 
-#define KOR_PLATFORM_WCHAR wchar_t
+struct SAppleTypes
+{
+	typedef int8_t Int8;
+	typedef uint8_t Uint8;
+
+	typedef int16_t Int16;
+	typedef uint16_t Uint16;
+
+	typedef int32_t Int32;
+	typedef uint32_t Uint32;
+
+	typedef int64_t Int64;
+	typedef uint64_t Uint64;
+
+	typedef char Achar;
+	typedef wchar_t Wchar;
+
+	typedef char8_t Char8;
+	typedef char16_t Char16;
+	typedef char32_t Char32;
+};
+
+KOR_NAMESPACE_END

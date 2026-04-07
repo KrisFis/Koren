@@ -63,26 +63,26 @@ struct TStdoutArchive : public TArrayArchive<tchar, AllocatorT>
 		else if (!Super::AllowsWrite()) return 0;
 
 		const tchar* buffer = (tchar*)ptr;
-		SizeType lenght = size;
+		SizeType length = size;
 
 		SizeType totalWrittenBytes = 0;
-		for (SizeType i = 0; i < lenght; ++i)
+		for (SizeType i = 0; i < length; ++i)
 		{
-			if (buffer[i] == KOR_CHAR_NEWLINE)
+			if (buffer[i] == KTEXT('\n') || buffer[i] == KTEXT('\r'))
 			{
 				totalWrittenBytes += Super::WriteBytes(buffer, i + 1);
 
 				buffer += i + 1;
-				lenght -= i + 1;
+				length -= i + 1;
 				i = 0;
 
 				Flush();
 			}
 		}
 
-		if (lenght > 0)
+		if (length > 0)
 		{
-			totalWrittenBytes += Super::WriteBytes(buffer, lenght);
+			totalWrittenBytes += Super::WriteBytes(buffer, length);
 		}
 
 		return totalWrittenBytes;

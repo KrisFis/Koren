@@ -178,28 +178,7 @@
 // General-purpose utility macros. No platform or config dependencies.
 ///////////////////////////////////////////////////////////////
 
-// Pointer arithmetic helpers — result is signed to allow negative offsets.
-#define KOR_PTR_DIFF(Ptr1, Ptr2) static_cast<int64>(Ptr1 - Ptr2)
-#define KOR_PTR_DIFF_TYPED(RetType, Ptr1, Ptr2) static_cast<RetType>(Ptr1 -Ptr2)
-
-// String literal helpers. Prefer KTEXT() shorthand in user code.
-#define KOR_ANSITEXT(text) text
-#define KOR_WIDETEXT(text) L ## text
-
-#if KOR_USE_UNICODE
-	#define KOR_TEXT(text) KOR_WIDETEXT(text)
-#else
-	#define KOR_TEXT(text) KOR_ANSITEXT(text)
-#endif
-
-#define KTEXT(text) KOR_TEXT(text)
-
-// Sentinel and character constants.
-#define KOR_INDEX_NONE -1
-#define KOR_CHAR_TERM '\0'
-#define KOR_CHAR_NEWLINE '\n'
-
-// Macro utilities — expand, stringify, and concatenate with proper expansion order.
+// Macro utilities - expand, stringify, and concatenate with proper expansion order.
 #define KOR_MACRO_EXPAND(x) x
 
 #define KOR_MACRO_STRINGIFY(x) #x
@@ -252,36 +231,3 @@
 #define KOR_PLATFORM_TEMPLATE(name) KOR_PLATFORM_TYPE_CUSTOM(T, name)
 #define KOR_PLATFORM_NAMESPACE(name) KOR_PLATFORM_TYPE_CUSTOM(N, name)
 #define KOR_PLATFORM_FUNC(name) KOR_PLATFORM_TYPE_CUSTOM(F, name)
-
-#include KOR_PLATFORM_HEADER_FROM(Kor, Build)
-
-// Types
-///////////////////////////////////////////////////////////////
-// Fixed-width integer types and character types sourced from
-// the active platform's Build header (e.g. Kor/Win32/Win32Build.h).
-// tchar resolves to wchar when KOR_USE_UNICODE=1, char otherwise.
-///////////////////////////////////////////////////////////////
-
-KOR_NAMESPACE_BEGIN
-
-using int8 = KOR_PLATFORM_INT8;
-using uint8 = KOR_PLATFORM_UINT8;
-
-using int16 = KOR_PLATFORM_INT16;
-using uint16 = KOR_PLATFORM_UINT16;
-
-using int32 = KOR_PLATFORM_INT32;
-using uint32 = KOR_PLATFORM_UINT32;
-
-using int64 = KOR_PLATFORM_INT64;
-using uint64 = KOR_PLATFORM_UINT64;
-
-using wchar = KOR_PLATFORM_WCHAR;
-
-#if KOR_USE_UNICODE
-using tchar = wchar;
-#else
-using tchar = char;
-#endif
-
-KOR_NAMESPACE_END

@@ -37,7 +37,7 @@ struct SString
 	KOR_FORCEINLINE SString(const CharType* text, SizeType length) { AppendCharsImpl(text, length); }
 
 	// fill constructor
-	KOR_FORCEINLINE SString(SizeType length, CharType val = KOR_CHAR_TERM) { InitToFill(length, val); }
+	KOR_FORCEINLINE SString(SizeType length, CharType val = KTEXT('\0')) { InitToFill(length, val); }
 
 	KOR_FORCEINLINE explicit SString(const DataType& data) { AppendDataImpl(data); }
 	KOR_FORCEINLINE explicit SString(DataType&& data) noexcept { AppendDataImpl(Move(data)); }
@@ -194,7 +194,7 @@ struct SString
 		if(GetLength() > 0)
 		{
 			const CharType* data = _data.GetData();
-			while(*data != KOR_CHAR_TERM)
+			while(*data != KTEXT('\0'))
 			{
 				if(!SCString::IsWhitespaceChar(*data))
 					return false;
@@ -270,7 +270,7 @@ struct SString
 		if(outLeft)
 		{
 			outLeft->_data = DataType(_data.GetData(), foundIdx + 1);
-			outLeft->_data[foundIdx] = KOR_CHAR_TERM;
+			outLeft->_data[foundIdx] = KTEXT('\0');
 		}
 
 		if(outRight)
@@ -290,7 +290,7 @@ struct SString
 			{
 				SString& newStr = result.AddUninitialized_GetRef();
 				newStr._data = DataType(ptr, count);
-				newStr._data.Add(KOR_CHAR_TERM);
+				newStr._data.Add(KTEXT('\0'));
 				return (--num == 0);
 			}
 		);
@@ -315,7 +315,7 @@ struct SString
 		SplitBySubstringPrivate(*this, from, false, caseSensitive, (num == -1) ? _data.GetNum() : num,
 			[&newData, &to, &num](const CharType* ptr, SizeType count) -> bool
 			{
-				const bool isLast = (*(ptr + count + 1) == KOR_CHAR_TERM);
+				const bool isLast = (*(ptr + count + 1) == KTEXT('\0'));
 
 				if(count > 0)
 				{
@@ -332,7 +332,7 @@ struct SString
 
 				if(isLast)
 				{
-					newData.Add(KOR_CHAR_TERM);
+					newData.Add(KTEXT('\0'));
 
 					// is redundant, but if implementation changes this might save a day
 					return true;
@@ -387,7 +387,7 @@ struct SString
 		}
 
 		_data.Resize(idx + 1);
-		_data[idx] = KOR_CHAR_TERM;
+		_data[idx] = KTEXT('\0');
 	}
 
 	// Removes all characters from the start of the string to the index position
@@ -458,7 +458,7 @@ struct SString
 	// Other
 	/////////////////////////////////
 
-	KOR_FORCEINLINE void Fill(SizeType length, CharType val = KOR_CHAR_TERM) { InitToFill(length, val); }
+	KOR_FORCEINLINE void Fill(SizeType length, CharType val = KTEXT('\0')) { InitToFill(length, val); }
 	KOR_FORCEINLINE void Reserve(SizeType num) { _data.Reserve(num + 1); } // termination character
 	KOR_FORCEINLINE void ShrinkToFit() { _data.ShrinkToFit(); }
 
@@ -508,8 +508,8 @@ private:
 	KOR_FORCEINLINE void EmptyImpl(bool keepResources) { _data.Empty(keepResources); }
 	KOR_FORCEINLINE SizeType GetLastCharIndex() const { return _data.GetNum() - 2; }
 
-	KOR_FORCEINLINE_DEBUGGABLE static bool HasTerm(const DataType& data) { return !data.IsEmpty() && *data.GetLast() == KOR_CHAR_TERM; }
-	KOR_FORCEINLINE static void AddTermChecked(DataType& data) { data.Add(KOR_CHAR_TERM); }
+	KOR_FORCEINLINE_DEBUGGABLE static bool HasTerm(const DataType& data) { return !data.IsEmpty() && *data.GetLast() == KTEXT('\0'); }
+	KOR_FORCEINLINE static void AddTermChecked(DataType& data) { data.Add(KTEXT('\0')); }
 	KOR_FORCEINLINE static void AddTerm(DataType& data) { if (!HasTerm(data)) { AddTermChecked(data); }}
 	KOR_FORCEINLINE static void RemoveTermChecked(DataType& data) { data.RemoveAt(data.GetNum() - 1); }
 	KOR_FORCEINLINE static void RemoveTerm(DataType& data) { if (HasTerm(data)) { RemoveTermChecked(data); }}
@@ -561,8 +561,8 @@ private:
 			{
 				if (!ignoreEmpty || current-init)
 				{
-					const SizeType currIdx = KOR_PTR_DIFF_TYPED(SizeType, init, mainStr.GetData());
-					const SizeType count = KOR_PTR_DIFF_TYPED(SizeType, current, init);
+					const SizeType currIdx = KOR_PTR_DIFF(SizeType, init, mainStr.GetData());
+					const SizeType count = KOR_PTR_DIFF(SizeType, current, init);
 
 					if(functor(mainStr.GetData() + currIdx, count))
 						return;
@@ -576,9 +576,9 @@ private:
 				}
 			}
 
-			if (!ignoreEmpty || *init != KOR_CHAR_TERM)
+			if (!ignoreEmpty || *init != KTEXT('\0'))
 			{
-				const SizeType currIdx = KOR_PTR_DIFF_TYPED(SizeType, init, mainStr.GetData());
+				const SizeType currIdx = KOR_PTR_DIFF(SizeType, init, mainStr.GetData());
 				const SizeType count = mainStr.GetNum() - currIdx;
 
 				functor(mainStr.GetData() + currIdx, count);

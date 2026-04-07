@@ -3,10 +3,7 @@
 
 #pragma once
 
-// This file shouldn't have any kor dependencies
-// * Can include platform types and macros
-// * Can define macros
-// * Can NOT define kor types (restriction is only for this Build.h, not other platform files)
+#include "Kor/Build.h"
 
 // Windows setup
 ////////////////////////////////////////////////////////////////////////
@@ -96,19 +93,39 @@
 #define KOR_OPTIMIZATIONS_DISABLE() KOR_DO_PRAGMA( optimize("", off) )
 #define KOR_OPTIMIZATIONS_RESET() KOR_DO_PRAGMA( optimize("", on) )
 
-// Arithmetics
+// Strings
 ////////////////////////////////////////////////
 
-#define KOR_PLATFORM_INT8 __int8
-#define KOR_PLATFORM_UINT8 unsigned __int8
+#define KOR_WCHAR_BYTES 2
 
-#define KOR_PLATFORM_INT16 __int16
-#define KOR_PLATFORM_UINT16 unsigned __int16
+#define KOR_CHAR_NEWLINE_WIDE L"\r\n"
+#define KOR_CHAR_NEWLINE_ANSI "\r\n"
 
-#define KOR_PLATFORM_INT32 __int32
-#define KOR_PLATFORM_UINT32 unsigned __int32
+// Types
+////////////////////////////////////////////////
 
-#define KOR_PLATFORM_INT64 __int64
-#define KOR_PLATFORM_UINT64 unsigned __int64
+KOR_NAMESPACE_BEGIN
 
-#define KOR_PLATFORM_WCHAR wchar_t
+struct SWin32Types
+{
+	typedef __int8 Int8;
+	typedef unsigned __int8 Uint8;
+
+	typedef __int16 Int16;
+	typedef unsigned __int16 Uint16;
+
+	typedef __int32 Int32;
+	typedef unsigned __int32 Uint32;
+
+	typedef __int64 Int64;
+	typedef unsigned __int64 Uint64;
+
+	typedef char Achar;
+	typedef wchar_t Wchar;
+
+	typedef char8_t Char8;
+	typedef char16_t Char16;
+	typedef char32_t Char32;
+};
+
+KOR_NAMESPACE_END
