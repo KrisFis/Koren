@@ -28,31 +28,23 @@
 // Compiler
 ///////////////////////////////////////////////////////////////
 // Detected automatically from predefined compiler macros.
-// GNUC is set alongside CLANG or GCC (they are not mutually exclusive).
 //
-// Supported: MSVC, GNUC, CLANG, GCC
+// Supported: MSVC, CLANG, GCC
 // Example:   KOR_COMPILER_CLANG
 ///////////////////////////////////////////////////////////////
 
 #if defined(_MSC_VER)
 	#define KOR_COMPILER_MSVC 1
+#elif defined(__clang__)
+	#define KOR_COMPILER_CLANG 1
 #elif defined(__GNUC__)
-	#define KOR_COMPILER_GNUC 1
-	#if defined(__clang__)
-		#define KOR_COMPILER_CLANG 1
-	#else
-		#define KOR_COMPILER_GCC 1
-	#endif
+	#define KOR_COMPILER_GCC 1
 #else
 	#error "Unsupported compiler"
 #endif
 
 #ifndef KOR_COMPILER_MSVC
 	#define KOR_COMPILER_MSVC 0
-#endif
-
-#ifndef KOR_COMPILER_GNUC
-	#define KOR_COMPILER_GNUC 0
 #endif
 
 #ifndef KOR_COMPILER_CLANG

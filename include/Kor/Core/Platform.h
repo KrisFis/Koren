@@ -49,7 +49,7 @@
 #define KOR_PLATFORM_NAMESPACE(name) KOR_PLATFORM_TYPE_CUSTOM(N, name)
 #define KOR_PLATFORM_FUNC(name) KOR_PLATFORM_TYPE_CUSTOM(F, name)
 
-// Main Platform include
+// Main platform include
 ///////////////////////////////////////////////////////////////
 
 #include KOR_PLATFORM_HEADER_FROM(Kor/Core, Platform)

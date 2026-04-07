@@ -11,6 +11,7 @@
 
 // IMPORTANT CORE
 #include "Kor/Core/Build.h"
+#include "Kor/Core/Compiler.h"
 #include "Kor/Core/Platform.h"
 
 // FORWARDS

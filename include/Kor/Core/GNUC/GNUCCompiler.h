@@ -1,0 +1,65 @@
+// Copyright Jan Kristian Fisera. All Rights Reserved.
+// Licensed under the MIT License. See LICENSE in the repository root.
+
+#pragma once
+
+#include "Kor/Core/Build.h"
+
+// BUILD
+////////////////////////////////////////////////////////////////////////
+
+#define KOR_DO_PRAGMA(command) _Pragma(#command)
+
+#define KOR_ASSEMBLY(code) __asm__(code)
+
+#define KOR_HAS_INCLUDE(file) __has_include(file)
+
+#define KOR_DEPRECATED __attribute__ ((__deprecated__))
+#define KOR_DEPRECATED_MSG(msg) __attribute__ ((__deprecated__(msg)))
+#define KOR_NODISCARD [[nodiscard]]
+#define KOR_NORETURN __attribute__((noreturn))
+
+#define KOR_FORCEINLINE inline __attribute__((always_inline))
+#define KOR_FORCENOINLINE __attribute__((noinline))
+
+#define KOR_UNREACHABLE_CODE() __builtin_unreachable()
+
+#if KOR_BUILD_DEBUG
+	#define KOR_FORCEINLINE_DEBUGGABLE inline
+#else
+	#define KOR_FORCEINLINE_DEBUGGABLE KOR_FORCEINLINE
+#endif
+
+#define KOR_DLL_EXPORT
+#define KOR_DLL_IMPORT
+
+// DIAGNOSTICS
+////////////////////////////////////////////////////////////////////////
+
+#define KOR_DIAG_WARNINGS_PUSH() KOR_DO_PRAGMA(GCC diagnostic push)
+#define KOR_DIAG_WARNINGS_POP() KOR_DO_PRAGMA(GCC diagnostic pop)
+#define KOR_DIAG_WARNINGS_SUPPRESS(value) KOR_DO_PRAGMA(GCC diagnostic ignored value)
+
+#define KOR_DIAG_WARNING_UNUSED_VALUE "-Wunused-value"
+#define KOR_DIAG_WARNING_NULL_DEREFERENCE "-Wnull-dereference"
+#define KOR_DIAG_WARNING_IMPLICIT_NARROWING "-Wconversion"
+#define KOR_DIAG_WARNING_SHIFT_OVERFLOW "-Wno-shift-overflow"
+#define KOR_DIAG_WARNING_SHIFT_NEGATIVE_VALUE "-Wno-shift-negative-value"
+
+#if KOR_DEFAULT_WARNING_SUPPRESS
+	KOR_DIAG_WARNINGS_SUPPRESS(KOR_DIAG_WARNING_IMPLICIT_NARROWING)
+#endif
+
+// OPTIMIZATIONS
+// * Uses options, make sure it does not collide with anything
+// * Otherwise update macros
+////////////////////////////////////////////////////////////////////////
+
+#define KOR_OPTIMIZATIONS_DISABLE() KOR_DO_PRAGMA(GCC push_options) KOR_DO_PRAGMA(GCC optimize("O0"))
+#define KOR_OPTIMIZATIONS_RESET() KOR_DO_PRAGMA(GCC pop_options)
+
+// Prediction
+////////////////////////////////////////////////////////////////////////
+
+#define KOR_LIKELY(x) __builtin_expect(!!(x), 1)
+#define KOR_UNLIKELY(x) __builtin_expect(!!(x), 0)
