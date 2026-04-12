@@ -127,7 +127,12 @@ template<> struct TIsFloating<long double> { enum { Value = true }; };
 
 template<typename T> struct TIsCharacter { enum { Value = false }; };
 template<> struct TIsCharacter<char> { enum { Value = true }; };
+#if KOR_CHAR8_NATIVE
+template<> struct TIsCharacter<char8> { enum { Value = true }; };
+#endif
 template<> struct TIsCharacter<wchar> { enum { Value = true }; };
+template<> struct TIsCharacter<char16> { enum { Value = true }; };
+template<> struct TIsCharacter<char32> { enum { Value = true }; };
 
 // [Is Integer Type]
 // * Checks whether specific type is integer type
@@ -169,24 +174,26 @@ template<> struct TIsSigned<uint16> { enum { Value = false }; };
 template<> struct TIsSigned<uint32> { enum { Value = false }; };
 template<> struct TIsSigned<uint64> { enum { Value = false }; };
 
-// [Make Signed]
-// * Gets signed type from unsigned
-// * if T is already signed, it remains unchanged
+// [TInt]
+// * Maps a byte size to its corresponding signed and unsigned integer types
+// * Primary source of truth for integer type resolution by size
+// * Unsupported sizes will result in a compile error (incomplete type)
+template<TSize Size> struct TInt { static_assert(Size == 0, "TInt: unsupported size, must be 1, 2, 4 or 8"); };
+template <> struct TInt<1> { typedef int8  Signed; typedef uint8  Unsigned; };
+template <> struct TInt<2> { typedef int16 Signed; typedef uint16 Unsigned; };
+template <> struct TInt<4> { typedef int32 Signed; typedef uint32 Unsigned; };
+template <> struct TInt<8> { typedef int64 Signed; typedef uint64 Unsigned; };
 
-template<typename T> struct TMakeSigned { typedef T Type; };
-template<> struct TMakeSigned<uint8> { typedef int8 Type; };
-template<> struct TMakeSigned<uint16> { typedef int16 Type; };
-template<> struct TMakeSigned<uint32> { typedef int32 Type; };
-template<> struct TMakeSigned<uint64> { typedef int64 Type; };
+// [TMakeUnsigned]
+// * Convenience wrapper around TInt - resolves to unsigned integer of given size
+// * Example: TMakeUnsigned<4>::Type → uint32
+template <typename T>
+struct TMakeUnsigned { typedef typename TInt<sizeof(T)>::Unsigned Type; };
 
-// [Make Unsigned]
-// * Gets unsigned type from signed
-// * if T is already unsigned, it remains unchanged
-
-template<typename T> struct TMakeUnsigned { typedef T Type; };
-template<> struct TMakeUnsigned<int8> { typedef uint8 Type; };
-template<> struct TMakeUnsigned<int16> { typedef uint16 Type; };
-template<> struct TMakeUnsigned<int32> { typedef uint32 Type; };
-template<> struct TMakeUnsigned<int64> { typedef uint64 Type; };
+// [TMakeSigned]
+// * Convenience wrapper around TInt - resolves to signed integer of given size
+// * Example: TMakeSigned<4>::Type → int32
+template <typename T>
+struct TMakeSigned { typedef typename TInt<sizeof(T)>::Signed Type; };
 
 KOR_NAMESPACE_END

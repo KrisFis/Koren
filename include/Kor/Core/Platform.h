@@ -62,12 +62,12 @@
 #endif
 
 #ifdef __cpp_char8_t
-	#define KOR_CHAR8_IS_UTF8 1
+	#define KOR_CHAR8_NATIVE 1
 #else
 	#define KOR_CHAR8_IS_UTF8 0
 #endif
 
-#ifdef KOR_CHAR8_IS_UTF8
+#ifdef KOR_CHAR8_NATIVE
 	#define KOR_TEXT_UTF8(text) u8 ## text
 #else
 	#define KOR_TEXT_UTF8(text) text
@@ -134,7 +134,7 @@ typedef SPlatformTypes::Char16	char16;
 // A 32-bit character containing a UTF32 (fixed-width) code unit.
 typedef SPlatformTypes::Char32	char32;
 
-// Either achar/char8 or wchar
+// Either achar or wchar
 #if KOR_USE_UNICODE
 typedef wchar tchar;
 #else
