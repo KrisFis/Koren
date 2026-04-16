@@ -148,6 +148,20 @@ template<> struct TIsIntegral<uint16> { enum { Value = true }; };
 template<> struct TIsIntegral<uint32> { enum { Value = true }; };
 template<> struct TIsIntegral<uint64> { enum { Value = true }; };
 
+// [Is arithmetic]
+// * Checks whether specific type is arithmetic
+
+template <typename T>
+struct TIsArithmetic
+{
+	enum { Value =
+			TIsIntegral<T>::Value ||
+			TIsFloating<T>::Value ||
+			TIsCharacter<T>::Value ||
+			TIsBool<T>::Value
+	};
+};
+
 // [Is Fundamental]
 // * Checks whether specific type is a fundamental type
 // * Fundamental types is any type that is fundamental to cpp (not user-defined)
@@ -166,13 +180,21 @@ struct TIsFundamental
 
 // [Is signed type]
 // * Checks whether specific type is signed type
-// * Signed types are types that is missing "unsigned" qualifier
 
-template<typename T> struct TIsSigned { enum { Value = true }; };
-template<> struct TIsSigned<uint8> { enum { Value = false }; };
-template<> struct TIsSigned<uint16> { enum { Value = false }; };
-template<> struct TIsSigned<uint32> { enum { Value = false }; };
-template<> struct TIsSigned<uint64> { enum { Value = false }; };
+template<typename T> struct TIsSigned
+{
+	static_assert(TIsArithmetic<T>::Value, "TIsSigned is only valid for arithmetic types");
+	enum { Value = T(-1) < T(0) };
+};
+
+// [Is unsigned type]
+// * Checks whether specific type is unsigned type
+
+template<typename T> struct TIsUnsigned
+{
+	static_assert(TIsArithmetic<T>::Value, "TIsUnsigned is only valid for arithmetic types");
+	enum { Value = !TIsSigned<T>::Value };
+};
 
 // [TInt]
 // * Maps a byte size to its corresponding signed and unsigned integer types

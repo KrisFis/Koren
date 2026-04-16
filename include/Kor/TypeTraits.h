@@ -75,21 +75,6 @@ struct TIsCastable { enum { Value = TIsDerivedFrom<T, R>::Value || TIsBaseOf<T, 
 template<uint32 N, typename T, typename... ArgTypes> struct TGetNthType { typedef typename TGetNthType<N - 1, ArgTypes...>::Type Type; };
 template<typename T, typename... ArgTypes> struct TGetNthType<0, T, ArgTypes...> { typedef T Type; };
 
-
-// [Is arithmetic]
-// * Checks whether specific type is arithmetic
-
-template <typename T>
-struct TIsArithmetic
-{
-	enum { Value =
-			TIsIntegral<T>::Value ||
-			TIsFloating<T>::Value ||
-			TIsCharacter<T>::Value ||
-			TIsBool<T>::Value
-	};
-};
-
 // [Decay]
 // * Returns the decayed type
 // * ie. applies array-to-pointer and function-to-pointer conversions
