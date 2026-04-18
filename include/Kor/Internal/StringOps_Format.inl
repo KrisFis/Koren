@@ -9,15 +9,17 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Format(CharType* str, const CharType
 {
 	if constexpr (sizeof(CharType) > 1)
 	{
-		return 0;
-
+#if !KOR_COMPILER_MSVC
+		return swprintf(
+			reinterpret_cast<wchar_t*>(str),
+			SCString::LARGE_BUFFER_SIZE,
+			reinterpret_cast<const wchar_t*>(fmt),
+			args...
+		);
+#else
 		// TODO: Add support for wide printf
-		// return swprintf(
-		// 	reinterpret_cast<wchar_t*>(str),
-		// 	SCString::LARGE_BUFFER_SIZE,
-		// 	reinterpret_cast<const wchar_t*>(fmt),
-		// 	args...
-		// );
+		return 0;
+#endif
 	}
 	else
 	{
@@ -35,14 +37,17 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Format(CharType* str, const CharType
 {
 	if constexpr (sizeof(CharType) > 1)
 	{
-		return 0;
+#if !KOR_COMPILER_MSVC
+		return swprintf(
+			reinterpret_cast<wchar_t*>(str),
+			len,
+			reinterpret_cast<const wchar_t*>(fmt),
+			args...
+		);
+#else
 		// TODO: Add support for wide printf
-		// return swprintf(
-		// 	reinterpret_cast<wchar_t*>(str),
-		// 	len,
-		// 	reinterpret_cast<const wchar_t*>(fmt),
-		// 	args...
-		// );
+		return 0;
+#endif
 	}
 	else
 	{
