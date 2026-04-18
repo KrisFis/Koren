@@ -11,7 +11,7 @@ namespace KOR_NAMESPACE Internals
 	template <typename T>
 	struct TDecayHelper<T[]> { typedef T* Type; };
 
-	template <typename T, uint32 N>
+	template <typename T, TSize N>
 	struct TDecayHelper<T[N]> { typedef T* Type; };
 
 	template <typename T, typename... Params>

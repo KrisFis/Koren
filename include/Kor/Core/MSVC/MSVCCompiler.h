@@ -15,6 +15,8 @@
 #define KOR_HAS_INCLUDE(file) __has_include(file)
 
 #define KOR_DEPRECATED __declspec(deprecated)
+#define KOR_DEPRECATED_MSG(msg) __declspec(deprecated(msg))
+
 #define KOR_NODISCARD __declspec(noreturn)
 #define KOR_NORETURN __declspec(noreturn)
 

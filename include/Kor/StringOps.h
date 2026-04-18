@@ -341,16 +341,16 @@ struct TStringOps
 	// - fmt: null-terminated format string, must not be null
 	// Warning: unbounded - str must be large enough to hold the result
 	template<typename... ArgT>
-	static int32 Format(CharType* str, const CharType* fmt, ArgT&&... args) noexcept;
+	static int32 Format(CharType* str, const CharType* fmt, const ArgT&... args) noexcept;
 
 	// Bounded variant - writes at most len characters including null terminator.
 	// Returns the number of characters that would have been written (may exceed len on truncation).
 	// - len: size of str buffer in characters, must be > 0
 	template<typename... ArgT>
-	static int32 Format(CharType* str, const CharType* fmt, int32 len, ArgT&&... args) noexcept;
+	static int32 Format(CharType* str, const CharType* fmt, int32 len, const ArgT&... args) noexcept;
 
 	template<int32 N, typename... ArgT>
-	static int32 Format(CharType (&str)[N], const CharType* fmt, ArgT&&... args) noexcept;
+	static int32 Format(CharType (&str)[N], const CharType* fmt, const ArgT&... args) noexcept;
 
 	// ToInt32 | ToInt64 | ToUInt32 | ToUInt64
 	////////////////////////////////////////////////

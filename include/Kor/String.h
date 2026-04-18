@@ -4,71 +4,125 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
+#include "Kor/StringOps.h"
 #include "Kor/Archive.h"
 #include "Kor/Array.h"
-#include "Kor/CString.h"
 
-// TODO: fix
-#include <cwchar>
+// Remove dependency
+#include "Kor/CString.h"
 
 KOR_NAMESPACE_BEGIN
 
-struct SString
+// [ Is String ]
+// Checks if type is string type
+
+template<typename T> struct TIsTString : public TFalseValue {};
+template<typename CharT> struct TIsTString<TString<CharT>> : public TTrueValue {};
+
+// [ TString Format Traits ]
+// * Checks if specific format is valid for CharT
+
+template<typename CharT, typename FmtT>
+struct TTStringFormatTraits
 {
+	static_assert(TIsCharacter<CharT>::Value, "CharT must be character type");
+
+private:
+	using RawFmtT = typename TRemoveConstReference<FmtT>::Type;
+	using PureFmt = typename TPure<FmtT>::Type;
+
+public:
+	enum
+	{
+		IsCString = (TIsPointer<RawFmtT>::Value && TIsSame<PureFmt, CharT>::Value),
+		IsCArray = (TIsArray<RawFmtT>::Value && TIsSame<PureFmt, CharT>::Value),
+
+		IsTString = TIsSame<PureFmt, TString<CharT>>::Value,
+
+		IsValid = IsCArray || IsCString || IsTString
+	};
+};
+
+// [ TString Traits ]
+// General TString traits
+// * Helps to navigate to underlying ops and constants for underlying character type
+
+template<typename CharT>
+struct TTStringTraits
+{
+	static_assert(TIsCharacter<CharT>::Value, "CharT must be character type");
+
+	using CharType = CharT;
+	using Constant = TCharConstant<CharT>;
+
+	using COps = TCharOps<CharT>;
+	using SOps = TStringOps<CharT>;
+};
+
+template<typename CharT>
+struct TString
+{
+private:
+	static_assert(TIsCharacter<CharT>::Value, "CharT must be character type");
+	using TT = TTStringTraits<CharT>;
+
+public:
+
 	// Types
 	/////////////////////////////////
 
-	typedef tchar CharType;
+	using CharType = CharT;
+
 	typedef TArray<CharType> DataType;
 	typedef typename DataType::SizeType SizeType;
 
-	typedef CharType* StringIteratorType;
-	typedef const CharType* ConstStringIteratorType;
+	typedef CharType* IteratorType;
+	typedef const CharType* ConstIteratorType;
 
 	// Constructors
 	/////////////////////////////////
 
-	KOR_FORCEINLINE SString() { InitToEmpty(); }
+	KOR_FORCEINLINE TString() { InitToEmpty(); }
 
-	KOR_FORCEINLINE SString(const SString& other) { AppendStringImpl(other); }
-	KOR_FORCEINLINE SString(SString&& other) noexcept { AppendStringImpl(Move(other)); }
+	KOR_FORCEINLINE TString(const TString& other) { AppendStringImpl(other); }
+	KOR_FORCEINLINE TString(TString&& other) noexcept { AppendStringImpl(Move(other)); }
 
-	KOR_FORCEINLINE SString(const CharType* text) { AppendCharsImpl(text); }
-	KOR_FORCEINLINE SString(const CharType* text, SizeType length) { AppendCharsImpl(text, length); }
+	KOR_FORCEINLINE TString(const CharType* text) { AppendCharsImpl(text); }
+	KOR_FORCEINLINE TString(const CharType* text, SizeType length) { AppendCharsImpl(text, length); }
 
 	// fill constructor
-	KOR_FORCEINLINE SString(SizeType length, CharType val = KTEXT('\0')) { InitToFill(length, val); }
+	KOR_FORCEINLINE TString(SizeType length, CharType val = TT::Constant::Null) { InitToFill(length, val); }
 
-	KOR_FORCEINLINE explicit SString(const DataType& data) { AppendDataImpl(data); }
-	KOR_FORCEINLINE explicit SString(DataType&& data) noexcept { AppendDataImpl(Move(data)); }
+	KOR_FORCEINLINE explicit TString(const DataType& data) { AppendDataImpl(data); }
+	KOR_FORCEINLINE explicit TString(DataType&& data) noexcept { AppendDataImpl(Move(data)); }
 
 	// Gets the empty string as a non-mutable reference
-	static const SString& GetEmpty()
+	static const TString& GetEmpty()
 	{
-		static SString emptyString = SString();
+		static TString emptyString = TString();
 		return emptyString;
 	}
 
 	// Compare operators
 	/////////////////////////////////
 
-	KOR_FORCEINLINE bool operator==(const SString& other) const { return _data == other._data; }
-	KOR_FORCEINLINE bool operator!=(const SString& other) const { return !operator==(other); }
+	KOR_FORCEINLINE bool operator==(const TString& other) const { return _data == other._data; }
+	KOR_FORCEINLINE bool operator!=(const TString& other) const { return !operator==(other); }
 
 	// Assign operators
 	/////////////////////////////////
 
-	KOR_FORCEINLINE SString& operator=(const SString& other) { InitToEmpty(); AppendStringImpl(other); return *this; }
-	KOR_FORCEINLINE SString& operator=(SString&& other) noexcept { InitToEmpty(); AppendStringImpl(Move(other)); return *this; }
+	KOR_FORCEINLINE TString& operator=(const TString& other) { InitToEmpty(); AppendStringImpl(other); return *this; }
+	KOR_FORCEINLINE TString& operator=(TString&& other) noexcept { InitToEmpty(); AppendStringImpl(Move(other)); return *this; }
 
 	// Arithmetic operators
 	/////////////////////////////////
 
-	KOR_FORCEINLINE SString operator+(const SString& other) const { SString tmpStr(*this); tmpStr.AppendStringImpl(other); return *this; }
-	KOR_FORCEINLINE SString operator+(SString&& other) const { SString tmpStr(*this); tmpStr.AppendStringImpl(Move(other)); return *this; }
+	KOR_FORCEINLINE TString operator+(const TString& other) const { TString tmpStr(*this); tmpStr.AppendStringImpl(other); return *this; }
+	KOR_FORCEINLINE TString operator+(TString&& other) const { TString tmpStr(*this); tmpStr.AppendStringImpl(Move(other)); return *this; }
 
-	KOR_FORCEINLINE SString& operator+=(const SString& other) { AppendStringImpl(other); return *this; }
-	KOR_FORCEINLINE SString& operator+=(SString&& other) { AppendStringImpl(Move(other)); return *this; }
+	KOR_FORCEINLINE TString& operator+=(const TString& other) { AppendStringImpl(other); return *this; }
+	KOR_FORCEINLINE TString& operator+=(TString&& other) { AppendStringImpl(Move(other)); return *this; }
 
 	// Get operators
 	/////////////////////////////////
@@ -81,8 +135,8 @@ struct SString
 	// Path operators
 	/////////////////////////////////
 
-	KOR_FORCEINLINE SString operator/(const SString& other) const { SString tmpStr(*this); tmpStr.operator/=(other); return tmpStr; }
-	KOR_FORCEINLINE SString operator/=(const SString& other) { AppendCharsImpl(KTEXT("/")); AppendStringImpl(other); return *this; }
+	KOR_FORCEINLINE TString operator/(const TString& other) const { TString tmpStr(*this); tmpStr.operator/=(other); return tmpStr; }
+	KOR_FORCEINLINE TString operator/=(const TString& other) { AppendCharsImpl(TT::Constant::Slash); AppendStringImpl(other); return *this; }
 
 	// Property getters
 	/////////////////////////////////
@@ -104,26 +158,35 @@ struct SString
 	// Construction
 	/////////////////////////////////
 
-	template<
-		typename StringT,
-		typename... VarTypes>
-	static SString Printf(StringT&& fmt, VarTypes&&... args)
+	template<typename FmtT, typename... VarTypes>
+	static TString Format(const FmtT& fmt, const VarTypes&... args)
 	{
+		using StringTraits = TTStringFormatTraits<CharT, FmtT>;
+
 		static_assert(sizeof...(VarTypes) > 0, "No arguments provided. Use construction from fmt directly instead");
-		static_assert(TIsSame<typename TPure<StringT>::Type, CharType*>::Value || TIsSame<typename TPure<StringT>::Type, SString>::Value, "Format variable has to be string type");
-		thread_local CharType buffer[SCString::LARGE_BUFFER_SIZE];
+		static_assert(StringTraits::IsValid, "Format variable is not valid");
 
-		// TODO: Replace with custom implementation
-		if constexpr (TIsSame<CharType, wchar>::Value)
-		{
-			std::swprintf(buffer, SCString::LARGE_BUFFER_SIZE, fmt, Forward<VarTypes>(args)...);
-		}
-		else
-		{
-			std::snprintf(buffer, SCString::LARGE_BUFFER_SIZE, fmt, Forward<VarTypes>(args)...);
-		}
+		const CharType* format = nullptr;
 
-		return SString(buffer);
+		if constexpr (StringTraits::IsTString) { format = fmt.GetChars(); }
+		else if constexpr (StringTraits::IsCArray || StringTraits::IsCString) { format = fmt; }
+		else { static_assert(sizeof(FmtT) > 0, "Unimplemented format type"); }
+
+		const int32 size = TT::SOps::Format(nullptr, format, 0, args...);
+		if (size <= 0) return TString();
+
+		TString result;
+		result._data.Resize(size + 1); // with '\0'
+		TT::SOps::Format(result._data.GetData(), format, size + 1, args...);
+
+		return result;
+	}
+
+	template<typename FmtT, typename... VarTypes>
+	KOR_DEPRECATED_MSG("Use Format() instead")
+	KOR_FORCEINLINE static TString Printf(FmtT&& fmt, const VarTypes&... args)
+	{
+		return Format(Move(fmt), args...);
 	}
 
 	// Conversions
@@ -143,47 +206,47 @@ struct SString
 
 	// Constructs new string from int32
 	// * 10 => "10"
-	static SString FromInt32(int32 val)
+	static TString FromInt32(int32 val)
 	{
 		thread_local CharType buffer[SCString::MAX_BUFFER_SIZE_INT32];
-		return SString(SCString::FromInt32(val, buffer, SCString::MAX_BUFFER_SIZE_INT32));
+		return TString(SCString::FromInt32(val, buffer, SCString::MAX_BUFFER_SIZE_INT32));
 	}
 
 	// Constructs new string from int64
 	// * 10 => "10"
-	static SString FromInt64(int64 val)
+	static TString FromInt64(int64 val)
 	{
 		thread_local CharType buffer[SCString::MAX_BUFFER_SIZE_INT64];
-		return SString(SCString::FromInt64(val, buffer, SCString::MAX_BUFFER_SIZE_INT64));
+		return TString(SCString::FromInt64(val, buffer, SCString::MAX_BUFFER_SIZE_INT64));
 	}
 
 	// Constructs new string from double, providing number of digits to expect
 	// * 10.1 => "10.1"
-	static SString FromDouble(double val, uint8 digits)
+	static TString FromDouble(double val, uint8 digits)
 	{
 		thread_local CharType buffer[SCString::MAX_BUFFER_SIZE_DOUBLE];
-		return SString(SCString::FromDouble(val, digits, buffer, SCString::MAX_BUFFER_SIZE_DOUBLE));
+		return TString(SCString::FromDouble(val, digits, buffer, SCString::MAX_BUFFER_SIZE_DOUBLE));
 	}
 
 	// Iterations
 	/////////////////////////////////
 
-	KOR_FORCEINLINE StringIteratorType begin() { return _data.GetNum() > 1 ? &_data[0] : nullptr; }
-	KOR_FORCEINLINE ConstStringIteratorType begin() const { return _data.GetNum() > 1 ? &_data[0] : nullptr; }
+	KOR_FORCEINLINE IteratorType begin() { return _data.GetNum() > 1 ? &_data[0] : nullptr; }
+	KOR_FORCEINLINE ConstIteratorType begin() const { return _data.GetNum() > 1 ? &_data[0] : nullptr; }
 
-	KOR_FORCEINLINE StringIteratorType end() { return _data.GetNum() > 1 ? &_data[GetLastCharIndex()] : nullptr; }
-	KOR_FORCEINLINE ConstStringIteratorType end() const { return _data.GetNum() > 1 ? &_data[GetLastCharIndex()] : nullptr; }
+	KOR_FORCEINLINE IteratorType end() { return _data.GetNum() > 1 ? &_data[GetLastCharIndex()] : nullptr; }
+	KOR_FORCEINLINE ConstIteratorType end() const { return _data.GetNum() > 1 ? &_data[GetLastCharIndex()] : nullptr; }
 
 	// Compares
 	/////////////////////////////////
 
 	// Compares this string against the provided one
 	// * returns 0 if equal, -1 if this string is "bigger" and 1 if provided string is "bigger"
-	KOR_FORCEINLINE int32 Compare(const SString& other, bool caseSensitive = true) const { return SCString::Compare(GetChars(), other.GetChars(), caseSensitive); }
+	KOR_FORCEINLINE int32 Compare(const TString& other, bool caseSensitive = true) const { return SCString::Compare(GetChars(), other.GetChars(), caseSensitive); }
 
 	// Checks whether this string is same as the provided one
 	// * Is same as Compare == 0
-	KOR_FORCEINLINE bool Equals(const SString& other, bool caseSensitive = true) const { return Compare(other, caseSensitive) == 0; }
+	KOR_FORCEINLINE bool Equals(const TString& other, bool caseSensitive = true) const { return Compare(other, caseSensitive) == 0; }
 
 	// Checks
 	/////////////////////////////////
@@ -194,7 +257,7 @@ struct SString
 		if(GetLength() > 0)
 		{
 			const CharType* data = _data.GetData();
-			while(*data != KTEXT('\0'))
+			while(*data != TT::Constant::Null)
 			{
 				if(!SCString::IsWhitespaceChar(*data))
 					return false;
@@ -207,31 +270,31 @@ struct SString
 	}
 
 	// Checks whether this string contains provided string from the beginning
-	KOR_FORCEINLINE bool StartsWith(const SString& val, bool caseSensitive = true) const
+	KOR_FORCEINLINE bool StartsWith(const TString& val, bool caseSensitive = true) const
 	{
 		return ContainsAtIndexImpl(*this, val, 0, caseSensitive);
 	}
 
 	// Checks whether this string contains provided string from the end
-	KOR_FORCEINLINE bool EndsWith(const SString& val, bool caseSensitive = true) const
+	KOR_FORCEINLINE bool EndsWith(const TString& val, bool caseSensitive = true) const
 	{
 		return ContainsAtIndexImpl(*this, val, GetLastCharIndex() - val.GetLastCharIndex(), caseSensitive);
 	}
 
 	// Checks whether this string contains provided string in any place
-	KOR_FORCEINLINE bool Contains(const SString& val, bool caseSensitive = true, bool fromStart = true) const
+	KOR_FORCEINLINE bool Contains(const TString& val, bool caseSensitive = true, bool fromStart = true) const
 	{
 		return !!SCString::Find(GetChars(), val.GetChars(), caseSensitive, fromStart);
 	}
 
 	// Checks whether this string contains provided string in provided index
-	KOR_FORCEINLINE bool ContainsAt(const SString& val, SizeType index, bool caseSensitive = true)
+	KOR_FORCEINLINE bool ContainsAt(const TString& val, SizeType index, bool caseSensitive = true)
 	{
 		return ContainsAtIndexImpl(*this, val, index, caseSensitive);
 	}
 
 	// Gets index from which this string contains provided string
-	KOR_FORCEINLINE SizeType Find(const SString& val, bool caseSensitive = true, bool fromStart = true) const
+	KOR_FORCEINLINE SizeType Find(const TString& val, bool caseSensitive = true, bool fromStart = true) const
 	{
 		return SCString::FindIndex(GetChars(), val.GetChars(), caseSensitive, fromStart);
 	}
@@ -240,8 +303,8 @@ struct SString
 	/////////////////////////////////
 
 	// Appends this string with other string
-	KOR_FORCEINLINE void Append(const SString& other) { AppendStringImpl(other); }
-	KOR_FORCEINLINE void Append(SString&& other) { AppendStringImpl(Move(other)); }
+	KOR_FORCEINLINE void Append(const TString& other) { AppendStringImpl(other); }
+	KOR_FORCEINLINE void Append(TString&& other) { AppendStringImpl(Move(other)); }
 	KOR_FORCEINLINE void Append(const CharType* other, SizeType num = KOR_INDEX_NONE) { AppendCharsImpl(other, num); }
 
 	// Appends this string via "printf"
@@ -250,7 +313,7 @@ struct SString
 	{
 		AppendStringImpl(
 			Move(
-				SString::Printf(
+				TString::Printf(
 					Forward<StringT>(fmt),
 					Forward<ArgTypes>(args)...
 				)
@@ -261,7 +324,7 @@ struct SString
 	// Const manipulation
 	/////////////////////////////////
 
-	bool Split(const SString& val, SString* outLeft, SString* outRight, bool caseSensitive = true, bool fromStart = true) const
+	bool Split(const TString& val, TString* outLeft, TString* outRight, bool caseSensitive = true, bool fromStart = true) const
 	{
 		const SizeType foundIdx = SCString::FindIndex(GetChars(), val.GetChars(), caseSensitive, fromStart);
 		if (foundIdx == KOR_INDEX_NONE)
@@ -270,7 +333,7 @@ struct SString
 		if(outLeft)
 		{
 			outLeft->_data = DataType(_data.GetData(), foundIdx + 1);
-			outLeft->_data[foundIdx] = KTEXT('\0');
+			outLeft->_data[foundIdx] = TT::Constant::Null;
 		}
 
 		if(outRight)
@@ -281,16 +344,16 @@ struct SString
 		return true;
 	}
 
-	TArray<SString> SplitToArray(const SString& delimiter, bool discardEmpty = true, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true) const
+	TArray<TString> SplitToArray(const TString& delimiter, bool discardEmpty = true, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true) const
 	{
-		TArray<SString> result;
+		TArray<TString> result;
 
 		SplitBySubstringPrivate(*this, delimiter, discardEmpty, caseSensitive, _data.GetNum(),
 			[&result, &num](const CharType* ptr, SizeType count) -> bool
 			{
-				SString& newStr = result.AddUninitialized_GetRef();
+				TString& newStr = result.AddUninitialized_GetRef();
 				newStr._data = DataType(ptr, count);
-				newStr._data.Add(KTEXT('\0'));
+				newStr._data.Add(TT::Constant::Null);
 				return (--num == 0);
 			}
 		);
@@ -301,21 +364,21 @@ struct SString
 	// Manipulation
 	/////////////////////////////////
 
-	SString Replace(const SString& from, const SString& to, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true) const
+	TString Replace(const TString& from, const TString& to, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true) const
 	{
-		SString newString(*this);
+		TString newString(*this);
 		newString.ReplaceInline(from, to, num, caseSensitive);
 		return newString;
 	}
 
 	// -1 = All
-	void ReplaceInline(const SString& from, const SString& to, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true)
+	void ReplaceInline(const TString& from, const TString& to, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true)
 	{
 		DataType newData(_data.GetNum(), true);
 		SplitBySubstringPrivate(*this, from, false, caseSensitive, (num == -1) ? _data.GetNum() : num,
 			[&newData, &to, &num](const CharType* ptr, SizeType count) -> bool
 			{
-				const bool isLast = (*(ptr + count + 1) == KTEXT('\0'));
+				const bool isLast = (*(ptr + count + 1) == TT::Constant::Null);
 
 				if(count > 0)
 				{
@@ -332,7 +395,7 @@ struct SString
 
 				if(isLast)
 				{
-					newData.Add(KTEXT('\0'));
+					newData.Add(TT::Constant::Null);
 
 					// is redundant, but if implementation changes this might save a day
 					return true;
@@ -348,18 +411,18 @@ struct SString
 		}
 	}
 
-	SString ToUpper() const
+	TString ToUpper() const
 	{
-		SString newString(*this);
+		TString newString(*this);
 		newString.ToUpperInline();
 		return newString;
 	}
 
 	KOR_FORCEINLINE void ToUpperInline() { SCString::ToUpper(_data.GetData()); }
 
-	SString ToLower() const
+	TString ToLower() const
 	{
-		SString newString(*this);
+		TString newString(*this);
 		newString.ToLowerInline();
 		return newString;
 	}
@@ -369,9 +432,9 @@ struct SString
 	// Removes all characters from the index position to the end of the string
 	// * Does NOT modify the source string
 	// * ChopRight at index 1 for "ABC" returns "A"
-	SString ChopRight(SizeType idx) const
+	TString ChopRight(SizeType idx) const
 	{
-		SString newString(*this);
+		TString newString(*this);
 		newString.ChopRightInline(idx);
 		return newString;
 	}
@@ -387,15 +450,15 @@ struct SString
 		}
 
 		_data.Resize(idx + 1);
-		_data[idx] = KTEXT('\0');
+		_data[idx] = TT::Constant::Null;
 	}
 
 	// Removes all characters from the start of the string to the index position
 	// * Does NOT modify the source string
 	// * ChopLeft at index 1 for "ABC" returns "C"
-	SString ChopLeft(SizeType idx) const
+	TString ChopLeft(SizeType idx) const
 	{
-		SString newString(*this);
+		TString newString(*this);
 		newString.ChopLeftInline(idx);
 		return newString;
 	}
@@ -419,9 +482,9 @@ struct SString
 		_data = Move(newData);
 	}
 
-	SString ChopRange(SizeType firstIdx, SizeType secondIdx) const
+	TString ChopRange(SizeType firstIdx, SizeType secondIdx) const
 	{
-		SString newString(*this);
+		TString newString(*this);
 		newString.ChopRangeInline(firstIdx, secondIdx);
 		return newString;
 	}
@@ -458,7 +521,7 @@ struct SString
 	// Other
 	/////////////////////////////////
 
-	KOR_FORCEINLINE void Fill(SizeType length, CharType val = KTEXT('\0')) { InitToFill(length, val); }
+	KOR_FORCEINLINE void Fill(SizeType length, CharType val = TT::Constant::Null) { InitToFill(length, val); }
 	KOR_FORCEINLINE void Reserve(SizeType num) { _data.Reserve(num + 1); } // termination character
 	KOR_FORCEINLINE void ShrinkToFit() { _data.ShrinkToFit(); }
 
@@ -487,7 +550,7 @@ private:
 
 	template<
 		typename StringT,
-		typename TEnableIf<TIsSame<typename TDecay<StringT>::Type, SString>::Value>::Type* = nullptr>
+		typename TEnableIf<TIsSame<typename TDecay<StringT>::Type, TString>::Value>::Type* = nullptr>
 	void AppendStringImpl(StringT&& str)
 	{
 		RemoveTerm(_data);
@@ -508,13 +571,13 @@ private:
 	KOR_FORCEINLINE void EmptyImpl(bool keepResources) { _data.Empty(keepResources); }
 	KOR_FORCEINLINE SizeType GetLastCharIndex() const { return _data.GetNum() - 2; }
 
-	KOR_FORCEINLINE_DEBUGGABLE static bool HasTerm(const DataType& data) { return !data.IsEmpty() && *data.GetLast() == KTEXT('\0'); }
-	KOR_FORCEINLINE static void AddTermChecked(DataType& data) { data.Add(KTEXT('\0')); }
+	KOR_FORCEINLINE_DEBUGGABLE static bool HasTerm(const DataType& data) { return !data.IsEmpty() && *data.GetLast() == TT::Constant::Null; }
+	KOR_FORCEINLINE static void AddTermChecked(DataType& data) { data.Add(TT::Constant::Null); }
 	KOR_FORCEINLINE static void AddTerm(DataType& data) { if (!HasTerm(data)) { AddTermChecked(data); }}
 	KOR_FORCEINLINE static void RemoveTermChecked(DataType& data) { data.RemoveAt(data.GetNum() - 1); }
 	KOR_FORCEINLINE static void RemoveTerm(DataType& data) { if (HasTerm(data)) { RemoveTermChecked(data); }}
 
-	static bool ContainsAtIndexImpl(const SString& str, const SString& val, SizeType idx, bool caseSensitive)
+	static bool ContainsAtIndexImpl(const TString& str, const TString& val, SizeType idx, bool caseSensitive)
 	{
 		if(idx < 0 || str.GetLength() < idx + val.GetLength())
 			return false;
@@ -541,7 +604,7 @@ private:
 
 	template<typename FuncType>
 	static void SplitBySubstringPrivate(
-		const SString& str, const SString& substr,
+		const TString& str, const TString& substr,
 		bool ignoreEmpty, bool caseSensitive,
 		SizeType maxSplits,
 		FuncType&& functor)
@@ -576,7 +639,7 @@ private:
 				}
 			}
 
-			if (!ignoreEmpty || *init != KTEXT('\0'))
+			if (!ignoreEmpty || *init != TT::Constant::Null)
 			{
 				const SizeType currIdx = KOR_PTR_DIFF(SizeType, init, mainStr.GetData());
 				const SizeType count = mainStr.GetNum() - currIdx;
@@ -589,11 +652,13 @@ private:
 	DataType _data = {};
 };
 
-template<>
-struct TContainerTypeTraits<SString> : public TContainerTypeTraits<void>
+template<typename T>
+struct TContainerTypeTraits<TString<T>> : public TContainerTypeTraits<void>
 {
-	using ElementType = SString::CharType;
-	using AllocatorType = SString::DataType::AllocatorType;
+	using Type = TString<T>; // optional
+
+	using ElementType = typename Type::CharType;
+	using AllocatorType = typename Type::DataType::AllocatorType;
 
 	enum
 	{
@@ -606,18 +671,23 @@ struct TContainerTypeTraits<SString> : public TContainerTypeTraits<void>
 // Archive operator<< && operator>>
 ////////////////////////////////////////////
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const SString& str)
+template<typename CharType>
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TString<CharType>& str)
 {
 	ar.Write(str.GetChars(), str.GetLength());
 	return ar;
 }
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, SString& str)
+template<typename CharType>
+KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TString<CharType>& str)
 {
-	SString::DataType newData;
+	typename TString<CharType>::DataType newData;
 	ar >> newData;
-	str = SString(Move(newData));
+	str = TString<CharType>(Move(newData));
 	return ar;
 }
+
+// Convenience typedef for platform char
+using SString = TString<tchar>;
 
 KOR_NAMESPACE_END

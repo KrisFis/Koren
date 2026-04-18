@@ -94,17 +94,25 @@ template<typename T>
 struct TPure
 {
 private:
-
-	typedef typename TRemoveConstReference<T>::Type TestType;
+	using TestType = typename TRemoveConstReference<T>::Type;
 
 public:
-
 	typedef typename TChoose<
-		TIsPointer<TestType>::Value, 
-		typename TRemovePointer<TestType>::Type,
-		typename Internals::TDecayHelper<TestType>::Type
+		TIsArray<TestType>::Value,
+		typename TRemoveExtent<TestType>::Type,
+		typename TChoose<
+			TIsPointer<TestType>::Value,
+			typename TRemovePointer<TestType>::Type,
+			TestType
+		>::Type
 	>::Type Type;
 };
+
+// [Is Pure]
+// * Checks if type is pure type (no qualifiers)
+
+template<typename T>
+struct TIsPure { enum { Value = TIsSame<typename TPure<T>::Value, T>::Value }; };
 
 // [Get type]
 // * Gets type variations

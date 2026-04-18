@@ -16,6 +16,7 @@
 
 #define KOR_DEPRECATED __attribute__ ((__deprecated__))
 #define KOR_DEPRECATED_MSG(msg) __attribute__ ((__deprecated__(msg)))
+
 #define KOR_NODISCARD [[nodiscard]]
 #define KOR_NORETURN __attribute__((noreturn))
 

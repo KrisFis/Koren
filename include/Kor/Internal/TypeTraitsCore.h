@@ -79,6 +79,13 @@ struct TRemoveConstReference
 	typedef typename TRemoveConst<typename TRemoveReference<T>::Type>::Type Type;
 };
 
+// [Remove Extent]
+// * Removes extent '[]' from the type
+
+template<typename T> struct TRemoveExtent { typedef T Type; };
+template<typename T, TSize N> struct TRemoveExtent<T[N]> { typedef T Type; };
+template<typename T> struct TRemoveExtent<T[]> { typedef T Type; };
+
 // [Is Pointer]
 // * Checks whether provided type is pointer
 

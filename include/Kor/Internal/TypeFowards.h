@@ -13,10 +13,12 @@ KOR_NAMESPACE_BEGIN
 /////////////////////////////////
 
 struct SArchive;
-struct SString;
 
 // TEMPLATED TYPES
 /////////////////////////////////
+
+template<typename T>
+struct TString;
 
 template<typename ElementT>
 class TArrayAllocator;
