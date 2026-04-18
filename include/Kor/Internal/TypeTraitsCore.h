@@ -106,13 +106,13 @@ template<typename T, uint32 N> struct TIsArray<T[N]> { enum { Value = true }; };
 template<typename T> struct TIsFunction { enum { Value = false }; };
 template <typename RetType, typename... Params> struct TIsFunction<RetType(Params...)> { enum { Value = true }; };
 
-// [Is Bool Type]
+// [Is Bool]
 // * Checks whether specific type is bool type
 
 template<typename T> struct TIsBool { enum { Value = false }; };
 template<> struct TIsBool<bool> { enum { Value = true }; };
 
-// [Is Floating Type]
+// [Is Floating]
 // * Checks whether specific type is floating type
 // * Floating types are: float, double
 
@@ -121,7 +121,7 @@ template<> struct TIsFloating<float> { enum { Value = true }; };
 template<> struct TIsFloating<double> { enum { Value = true }; };
 template<> struct TIsFloating<long double> { enum { Value = true }; };
 
-// [Is Character Type]
+// [Is Character]
 // * Checks whether specific type is character type
 // * Character types are: char, wchar
 
@@ -134,7 +134,20 @@ template<> struct TIsCharacter<wchar> { enum { Value = true }; };
 template<> struct TIsCharacter<char16> { enum { Value = true }; };
 template<> struct TIsCharacter<char32> { enum { Value = true }; };
 
-// [Is Integer Type]
+// [Is Unicode]
+// * Checks whether specific type is unicode character type
+// * Unicode types are: char8, char16, char32 and wchar
+
+template<typename T>
+struct TIsUnicode { enum { Value = false };};
+#if KOR_CHAR8_NATIVE
+template<> struct TIsUnicode<char8> { enum { Value = true };};
+#endif
+template<> struct TIsUnicode<char16> { enum { Value = true };};
+template<> struct TIsUnicode<char32> { enum { Value = true };};
+template<> struct TIsUnicode<wchar> { enum { Value = true };};
+
+// [Is Integer]
 // * Checks whether specific type is integer type
 // * Integer types are: int8, int16, int32, int64, uint8, uint16, uint32, uint64
 
@@ -148,7 +161,7 @@ template<> struct TIsIntegral<uint16> { enum { Value = true }; };
 template<> struct TIsIntegral<uint32> { enum { Value = true }; };
 template<> struct TIsIntegral<uint64> { enum { Value = true }; };
 
-// [Is arithmetic]
+// [Is Arithmetic]
 // * Checks whether specific type is arithmetic
 
 template <typename T>
