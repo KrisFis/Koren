@@ -36,6 +36,10 @@
 #define KOR_DLL_EXPORT __declspec(dllexport)
 #define KOR_DLL_IMPORT __declspec(dllimport)
 
+#define KOR_VARARGS __cdecl
+#define KOR_CDECL __cdecl
+#define KOR_STDCALL __stdcall
+
 // DIAGNOSTICS
 ////////////////////////////////////////////////////////////////////////
 

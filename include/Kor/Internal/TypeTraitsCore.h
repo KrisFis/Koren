@@ -133,7 +133,7 @@ template<> struct TIsFloating<long double> { enum { Value = true }; };
 // * Character types are: char, wchar
 
 template<typename T> struct TIsCharacter { enum { Value = false }; };
-template<> struct TIsCharacter<char> { enum { Value = true }; };
+template<> struct TIsCharacter<achar> { enum { Value = true }; };
 #if KOR_CHAR8_NATIVE
 template<> struct TIsCharacter<char8> { enum { Value = true }; };
 #endif

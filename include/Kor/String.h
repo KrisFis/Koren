@@ -9,6 +9,7 @@
 #include "Kor/Array.h"
 
 // Remove dependency
+#include "Kor/Assert.h"
 #include "Kor/CString.h"
 
 KOR_NAMESPACE_BEGIN
@@ -172,12 +173,24 @@ public:
 		else if constexpr (StringTraits::IsCArray || StringTraits::IsCString) { format = fmt; }
 		else { static_assert(sizeof(FmtT) > 0, "Unimplemented format type"); }
 
-		const int32 size = TT::SOps::Format(nullptr, format, 0, args...);
-		if (size <= 0) return TString();
-
 		TString result;
-		result._data.Resize(size + 1); // with '\0'
-		TT::SOps::Format(result._data.GetData(), format, size + 1, args...);
+		result._data.Resize(512);
+
+		int32 writtenBytes = TT::SOps::Format(result._data.GetData(), format, result._data.GetNum(), args...);
+		if (writtenBytes < 0) return TString();
+
+		if (writtenBytes >= result._data.GetNum())
+		{
+			result._data.Resize(writtenBytes + 1);
+			KOR_ASSERT(TT::SOps::Format(result._data.GetData(), format, result._data.GetNum(), args...) == writtenBytes);
+		}
+		else
+		{
+			result._data.Resize(writtenBytes + 1);
+		}
+
+		// MSVC wide does not null terminate on truncation, ensure null term explicitly
+		result._data[writtenBytes] = TT::Constant::Null;
 
 		return result;
 	}

@@ -4,7 +4,8 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include "Kor/CString.h"
+#include "Kor/StringOps.h"
+
 #include KOR_PLATFORM_HEADER_FROM(Kor/Core, Misc)
 
 KOR_NAMESPACE_BEGIN
@@ -36,20 +37,6 @@ struct SMisc : public SPlatformMisc
 	KOR_FORCEINLINE_DEBUGGABLE static int64 WriteToStderr(const void* buffer, int64 size)
 	{
 		return SPlatformMisc::WriteToFile(STDERR_FILE_NO, buffer, size);
-	}
-
-	template<typename CharType, typename TEnableIf<TIsCharacter<CharType>::Value>::Type* = nullptr>
-	KOR_FORCEINLINE_DEBUGGABLE static uint64 WriteToStdout(const CharType* str)
-	{
-		const uint64 writtenBytes = SPlatformMisc::WriteToFile(STDOUT_FILE_NO, str, SCString::GetLength(str) * sizeof(CharType));
-		return writtenBytes >= sizeof(tchar) ? writtenBytes / sizeof(tchar) : 0;
-	}
-
-	template<typename CharType, typename TEnableIf<TIsCharacter<CharType>::Value>::Type* = nullptr>
-	KOR_FORCEINLINE_DEBUGGABLE static uint64 WriteToStderr(const CharType* str)
-	{
-		const uint64 writtenBytes = SPlatformMisc::WriteToFile(STDERR_FILE_NO, str, SCString::GetLength(str) * sizeof(CharType));
-		return writtenBytes >= sizeof(tchar) ? writtenBytes / sizeof(tchar) : 0;
 	}
 };
 

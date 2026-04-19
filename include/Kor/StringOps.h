@@ -6,6 +6,10 @@
 #include "Kor/KorMinimal.h"
 #include "Kor/CharOps.h"
 
+// TODO: Remove
+#include "CString.h"
+#include <stdio.h>
+
 KOR_NAMESPACE_BEGIN
 
 // Search direction for Find and Replace operations
@@ -332,20 +336,15 @@ struct TStringOps
 	template<int32 N>
 	static int32 Replace(CharType (&str)[N], CharType from, CharType to, ESearchCase searchCase) noexcept;
 
-	// Format
+	// Format | FormatLength
 	////////////////////////////////////////////////
 
 	// Writes a formatted string into str using printf-style fmt.
-	// Returns the number of characters written, or negative on error.
+	// Returns the number of CharType units written, excluding null terminator. Returns negative on error. (may exceed len on truncation).
 	// - str: output buffer, must not be null
 	// - fmt: null-terminated format string, must not be null
-	// Warning: unbounded - str must be large enough to hold the result
-	template<typename... ArgT>
-	static int32 Format(CharType* str, const CharType* fmt, const ArgT&... args) noexcept;
-
-	// Bounded variant - writes at most len characters including null terminator.
-	// Returns the number of characters that would have been written (may exceed len on truncation).
 	// - len: size of str buffer in characters, must be > 0
+	// Warning: does not guarantee null termination - caller is responsible.
 	template<typename... ArgT>
 	static int32 Format(CharType* str, const CharType* fmt, int32 len, const ArgT&... args) noexcept;
 

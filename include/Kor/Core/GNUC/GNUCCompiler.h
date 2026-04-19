@@ -34,6 +34,10 @@
 #define KOR_DLL_EXPORT
 #define KOR_DLL_IMPORT
 
+#define KOR_VARARGS
+#define KOR_CDECL
+#define KOR_STDCALL
+
 // DIAGNOSTICS
 ////////////////////////////////////////////////////////////////////////
 

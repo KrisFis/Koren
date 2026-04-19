@@ -128,12 +128,33 @@ namespace Internal
 		str[result] = TCharConstant<CharT>::Null;
 		return result;
 	}
+
+	template<typename... ArgT>
+	KOR_FORCEINLINE int32 Format(achar* str, const achar* fmt, int32 len, const ArgT&... args)
+	{
+#if KOR_COMPILER_MSVC
+		return _snprintf(str, static_cast<TSize>(len), fmt, args...);
+#else
+		return snprintf(str, static_cast<TSize>(len), fmt, args...);
+#endif
+	}
+
+	// TODO: MOVE TO PLATFORM STRING
+	template<typename... ArgT>
+	KOR_FORCEINLINE int32 Format(wchar* str, const wchar* fmt, int32 len, const ArgT&... args)
+	{
+#if KOR_COMPILER_MSVC
+		return _snwprintf(str, len, fmt, args...);
+#else
+		return swprintf(str, static_cast<TSize>(len), fmt, args...);
+#endif
+	}
 }
 
 template<typename CharType>
 int32 TStringOps<CharType>::Length(const CharType* str) noexcept
 {
-	int32 len = 0; while (*str) ++len; return len;
+	int32 len = 0; while (*str++) ++len; return len;
 }
 
 template<typename CharType>

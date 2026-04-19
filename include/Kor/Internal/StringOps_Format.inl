@@ -5,64 +5,30 @@
 
 template<typename CharType>
 template<typename... ArgT>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Format(CharType* str, const CharType* fmt, const ArgT&... args) noexcept
-{
-	if constexpr (sizeof(CharType) > 1)
-	{
-#if !KOR_COMPILER_MSVC
-		return swprintf(
-			reinterpret_cast<wchar_t*>(str),
-			SCString::LARGE_BUFFER_SIZE,
-			reinterpret_cast<const wchar_t*>(fmt),
-			args...
-		);
-#else
-		// TODO: Add support for wide printf
-		return 0;
-#endif
-	}
-	else
-	{
-		return sprintf(
-			reinterpret_cast<achar*>(str),
-			reinterpret_cast<const achar*>(fmt),
-			args...
-		);
-	}
-}
-
-template<typename CharType>
-template<typename... ArgT>
 KOR_FORCEINLINE int32 TStringOps<CharType>::Format(CharType* str, const CharType* fmt, int32 len, const ArgT&... args) noexcept
 {
-	if constexpr (sizeof(CharType) > 1)
+	if constexpr (TIsSame<CharType, achar>::Value)
 	{
-#if !KOR_COMPILER_MSVC
-		return swprintf(
-			reinterpret_cast<wchar_t*>(str),
-			len,
-			reinterpret_cast<const wchar_t*>(fmt),
-			args...
-		);
-#else
-		// TODO: Add support for wide printf
-		return 0;
-#endif
+		return Internal::Format(str, fmt, len, args...);
+	}
+	else if constexpr (TIsSame<CharType, wchar>::Value)
+	{
+		return Internal::Format(str, fmt, len, args...);
+	}
+	else if constexpr (TIsSame<CharType, char8>::Value)
+	{
+		return Internal::Format(reinterpret_cast<achar*>(str), reinterpret_cast<const achar*>(fmt), len, args...);
 	}
 	else
 	{
-		return snprintf(
-			reinterpret_cast<achar*>(str),
-			len,
-			reinterpret_cast<const achar*>(fmt),
-			args...
-		);
+		static_assert(sizeof(CharType) == 0, "Format not supported for this character type");
+		return KOR_INDEX_NONE;
 	}
 }
 
 template<typename CharType>
 template<int32 N, typename ... ArgT>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Format(CharType(& str)[N], const CharType* fmt, const ArgT&... args) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::Format(CharType(&str)[N], const CharType* fmt, const ArgT&... args) noexcept
 {
-	return Format(str, N, fmt, args... );
+	return Format(static_cast<CharType*>(str), fmt, N, args... );
 }

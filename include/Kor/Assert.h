@@ -5,7 +5,6 @@
 
 #include "Core/Build.h"
 #include "Kor/Misc.h"
-#include "Kor/String.h"
 
 // KOR_ASSERT(statement)
 // - Fatal
@@ -43,7 +42,7 @@
 		KOR_DIAG_WARNINGS_SUPPRESS(KOR_DIAG_WARNING_NULL_DEREFERENCE)
 		KOR_OPTIMIZATIONS_DISABLE();
 
-		KOR_FORCEINLINE static void Crash()
+		KOR_FORCEINLINE static void Crash() noexcept
 		{
 			*((uint8*)0) = 0;
 			KOR_UNREACHABLE_CODE();
@@ -52,9 +51,21 @@
 		KOR_OPTIMIZATIONS_RESET();
 		KOR_DIAG_WARNINGS_POP()
 
-		KOR_FORCEINLINE static void LogFailed(const char* Expression, const char* File, int32 Line)
+		static void LogFailed(const achar* Expression, const achar* File, int32 Line) noexcept
 		{
-			SMisc::WriteToStderr(*SString::Printf(KTEXT("Assert failed '%s' at '%s:%d'"), Expression, File, Line));
+			thread_local achar LOG_BUFFER[SCString::LARGE_BUFFER_SIZE];
+			const int32 result = TStringOps<achar>::Format(
+				LOG_BUFFER,
+				KOR_TEXT_ANSI("Assert failed '%s' at '%s:%d'"),
+				Expression,
+				File,
+				Line
+			);
+
+			if (result > 0)
+			{
+				SMisc::WriteToStdout(LOG_BUFFER, sizeof(achar));
+			}
 		}
 	}
 

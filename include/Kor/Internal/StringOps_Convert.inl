@@ -132,13 +132,22 @@ KOR_FORCEINLINE double TStringOps<CharType>::ToFloat(const CharType* str) noexce
 {
 	// IMPLEMENT PlatformStringOps
 
-	if constexpr (sizeof(CharType) > 1)
+	if constexpr (TIsSame<CharType, achar>::Value)
 	{
-		return wcstod(reinterpret_cast<const wchar*>(str), nullptr);
+		return strtod(str, nullptr);
+	}
+	else if constexpr (TIsSame<CharType, wchar>::Value)
+	{
+		return wcstod(str, nullptr);
+	}
+	else if constexpr (TIsSame<CharType, char8>::Value)
+	{
+		return strtod(reinterpret_cast<const achar*>(str), nullptr);
 	}
 	else
 	{
-		return strtod(reinterpret_cast<const achar*>(str), nullptr);
+		static_assert(sizeof(CharType) == 0, "FromFloat not supported for this character type");
+		return KOR_INDEX_NONE;
 	}
 }
 
@@ -147,40 +156,33 @@ KOR_FORCEINLINE double TStringOps<CharType>::ToFloat(const CharType* str, const 
 {
 	// IMPLEMENT PlatformStringOps
 
-	if constexpr (sizeof(CharType) > 1)
+	if constexpr (TIsSame<CharType, achar>::Value)
 	{
-		wchar* end = nullptr;
-		const double result = wcstod(reinterpret_cast<const wchar*>(str), &end);
-		outEnd = reinterpret_cast<const CharType*>(end);
-		return result;
+		return strtod(str, &outEnd);
 	}
-	else
+	else if constexpr (TIsSame<CharType, wchar>::Value)
+	{
+		return wcstod(str, &outEnd);
+	}
+	else if constexpr (TIsSame<CharType, char8>::Value)
 	{
 		achar* end = nullptr;
 		const double result = strtod(reinterpret_cast<const achar*>(str), &end);
 		outEnd = reinterpret_cast<const CharType*>(end);
 		return result;
 	}
+	else
+	{
+		static_assert(sizeof(CharType) == 0, "FromFloat not supported for this character type");
+		return KOR_INDEX_NONE;
+	}
 }
 
 template<typename CharType>
 template<EFloatFormat Format>
-int32 TStringOps<CharType>::FromFloat(CharType* str, double value, int32 precision) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double value, int32 precision) noexcept
 {
-	if constexpr (sizeof(CharType) > 1)
-	{
-		const wchar* fmtStr =
-			Format == EFloatFormat::Fixed		? KOR_TEXT_WIDE("%.*f") :
-			Format == EFloatFormat::Scientific	? KOR_TEXT_WIDE("%.*e") : KOR_TEXT_WIDE("%.*g");
-		return swprintf(reinterpret_cast<wchar_t*>(str), SCString::MAX_BUFFER_SIZE_DOUBLE, fmtStr, precision, value);
-	}
-	else
-	{
-		const achar* fmtStr =
-			Format == EFloatFormat::Fixed		? KOR_TEXT_ANSI("%.*f") :
-			Format == EFloatFormat::Scientific	? KOR_TEXT_ANSI("%.*e") : KOR_TEXT_ANSI("%.*g");
-		return snprintf(reinterpret_cast<char*>(str), SCString::MAX_BUFFER_SIZE_DOUBLE, fmtStr, precision, value);
-	}
+	return FromFloat(str, value, SCString::MAX_BUFFER_SIZE_DOUBLE, precision);
 }
 
 template<typename CharType>
@@ -199,21 +201,33 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double valu
 
 template<typename CharType>
 template<EFloatFormat Format>
-int32 TStringOps<CharType>::FromFloat(CharType* str, double value, int32 len, int32 precision) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double value, int32 len, int32 precision) noexcept
 {
-	if constexpr (sizeof(CharType) > 1)
-	{
-		const wchar* fmtStr =
-			Format == EFloatFormat::Fixed		? KOR_TEXT_WIDE("%.*f") :
-			Format == EFloatFormat::Scientific	? KOR_TEXT_WIDE("%.*e") : KOR_TEXT_WIDE("%.*g");
-		return swprintf(reinterpret_cast<wchar_t*>(str), len, fmtStr, precision, value);
-	}
-	else
+	if constexpr (TIsSame<CharType, achar>::Value)
 	{
 		const achar* fmtStr =
 			Format == EFloatFormat::Fixed		? KOR_TEXT_ANSI("%.*f") :
 			Format == EFloatFormat::Scientific	? KOR_TEXT_ANSI("%.*e") : KOR_TEXT_ANSI("%.*g");
-		return snprintf(reinterpret_cast<char*>(str), len, fmtStr, precision, value);
+		return Internal::Format(str, fmtStr, len, precision, value);
+	}
+	else if constexpr (TIsSame<CharType, wchar>::Value)
+	{
+		const wchar* fmtStr =
+			Format == EFloatFormat::Fixed		? KOR_TEXT_WIDE("%.*f") :
+			Format == EFloatFormat::Scientific	? KOR_TEXT_WIDE("%.*e") : KOR_TEXT_WIDE("%.*g");
+		return Internal::Format(str, fmtStr, len, precision, value);
+	}
+	else if constexpr (TIsSame<CharType, wchar>::Value)
+	{
+		const achar* fmtStr =
+			Format == EFloatFormat::Fixed		? KOR_TEXT_ANSI("%.*f") :
+			Format == EFloatFormat::Scientific	? KOR_TEXT_ANSI("%.*e") : KOR_TEXT_ANSI("%.*g");
+		return Internal::Format(reinterpret_cast<achar*>(str), fmtStr, len, precision, value);
+	}
+	else
+	{
+		static_assert(sizeof(CharType) == 0, "FromFloat not supported for this character type");
+		return KOR_INDEX_NONE;
 	}
 }
 
@@ -240,7 +254,7 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType(& str)[N], double
 
 template<typename CharType>
 template<int32 N>
-int32 TStringOps<CharType>::FromFloat(CharType(& str)[N], double value, int32 precision, EFloatFormat format) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType(& str)[N], double value, int32 precision, EFloatFormat format) noexcept
 {
 	return FromFloat(str, value, N, precision, format);
 }
