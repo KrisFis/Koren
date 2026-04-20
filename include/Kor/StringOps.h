@@ -305,10 +305,10 @@ struct TStringOps
 	///////////////////////////////////////////////////////////////////////////////////
 
 	template<typename ToCharType>
-	int32 ConvertedLength(const CharType* str, int32 len) noexcept;
+	static int32 ConvertedLength(const CharType* str, int32 len) noexcept;
 
 	template<typename ToCharType, TSize N>
-	int32 ConvertedLength(const CharType (&str)[N]) noexcept;
+	static int32 ConvertedLength(const CharType (&str)[N]) noexcept;
 
 	// Convert
 	// Converts src from CharType encoding into ToCharType encoding, writing result into toStr.
@@ -319,10 +319,10 @@ struct TStringOps
 	///////////////////////////////////////////////////////////////////////////////////
 
 	template<typename ToCharType>
-	int32 Convert(const CharType* str, ToCharType* toStr, int32 len) noexcept;
+	static int32 Convert(const CharType* str, ToCharType* toStr, int32 len) noexcept;
 
 	template<typename ToCharType, TSize N>
-	int32 Convert(const CharType (&str)[N], ToCharType* toStr) noexcept;
+	static int32 Convert(const CharType (&str)[N], ToCharType* toStr) noexcept;
 
 	// ToInt32 | ToInt64 | ToUInt32 | ToUInt64
 	// Parses the string as an integer of the corresponding type.
