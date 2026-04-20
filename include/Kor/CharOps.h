@@ -7,6 +7,11 @@
 
 KOR_NAMESPACE_BEGIN
 
+// [ Char Constant ]
+// Per-type character constants for all standard ASCII control, whitespace,
+// linebreak, and operator characters.
+// * All values are cast to CharType at compile time - safe for any character width
+// * Bogus degrades to '?' for narrow types that cannot represent U+FFFD
 template <typename CharType>
 struct TCharConstant
 {
@@ -98,31 +103,27 @@ struct TCharConstant
 	static constexpr CharType Tilde				= (CharType)0x7E;
 };
 
+// [ Char Ops ]
 // Character classification and conversion operations.
-//
-// Supports any character type (char, achar, wchar, char8, char16, char32)
-// via TIsCharacter-constrained CharType.
-//
-// Scope:
-//   ASCII only (0x00-0x7F) — codepoints outside this range always return
-//   false for classification and are returned unchanged by conversion.
-//   No locale, no CRT dependency, no Unicode category tables.
-//
-// Design:
-//   Bitwise operators (& |) are used instead of logical (&& ||) throughout
-//   to avoid short-circuit branching on cheap scalar comparisons.
-//   UCharType cast guards against sign extension on signed char types
+// * ASCII only (0x00-0x7F) — codepoints outside this range always return
+//   false for classification and are returned unchanged by conversion
+// * No locale, no CRT dependency, no Unicode category tables
+// * Bitwise operators (& |) used instead of logical (&& ||) throughout
+//   to avoid short-circuit branching on cheap scalar comparisons
+// * UCharType cast guards against sign extension on signed char types
 //   e.g. '\x80' as signed char would sign-extend to 0xFFFFFF80 before
-//   arithmetic, producing incorrect range check results.
+//   arithmetic, producing incorrect range check results
 template <typename T>
 struct TCharOps
 {
 	static_assert(TIsCharacter<T>::Value, "T must be a character type");
 
-	using CharType  = T;
-	using UCharType = typename TMakeUnsigned<CharType>::Type;
-
+	using CharType      = T;
+	using UCharType     = typename TMakeUnsigned<CharType>::Type;
 	using CharConstant  = TCharConstant<CharType>;
+
+	// Classification
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Returns true if c is within the ASCII range (0x00-0x7F)
 	// Useful as a guard before applying any ASCII-specific classification
@@ -187,8 +188,10 @@ struct TCharOps
 	// Unicode line endings (NEL, LS, PS) are intentionally excluded — ASCII only
 	static constexpr bool IsLinebreak(CharType c) noexcept;
 
+	// Conversion
+	///////////////////////////////////////////////////////////////////////////////////
+
 	// Converts a digit character to its integer value (0-9)
-	// Essentially same as HexToInt with limited range
 	// Returns KOR_INDEX_NONE if c is not a valid digit
 	static constexpr int32 DigitToInt(CharType c) noexcept;
 
@@ -198,7 +201,6 @@ struct TCharOps
 	static constexpr int32 HexToInt(CharType c) noexcept;
 
 	// Converts an integer value (0-9) to its digit character
-	// Essentially same as IntToHex with limited range
 	// Returns Null if n is outside 0-9 range
 	static constexpr int32 IntToDigit(int32 n) noexcept;
 
@@ -206,6 +208,9 @@ struct TCharOps
 	// 0-9 -> '0'-'9', 10-15 -> 'a'-'f' (lowercase) or 'A'-'F' (uppercase)
 	// Returns Null if n is outside 0-15 range
 	static constexpr CharType IntToHex(int32 n, bool bUpper = false) noexcept;
+
+	// Casing
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Converts c to uppercase if it is a lowercase ASCII letter (a-z)
 	// Characters outside a-z are returned unchanged — no locale, no Unicode folding
