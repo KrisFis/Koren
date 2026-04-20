@@ -9,6 +9,7 @@
 #include "Kor/Internal/TypeTraitsCore.h"
 #include "Kor/Internal/TypeTraitsDecayHelper.h"
 #include "Kor/Internal/TypeTraitsForward.h"
+#include "Kor/Internal/TypeTraitsString.h"
 #include "Kor/Internal/TypeTraitsType.h"
 
 KOR_NAMESPACE_BEGIN

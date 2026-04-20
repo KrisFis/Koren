@@ -58,7 +58,7 @@ struct TStringOps
 	using CharConstant  = TCharConstant<CharType>;
 
 	// IsAscii
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Returns true if every character in str falls within the ASCII range (0x00-0x7F).
 	// - str: null-terminated input, must not be null
@@ -75,7 +75,7 @@ struct TStringOps
 	static bool IsAscii(const CharType (&str)[N]) noexcept;
 
 	// IsNumeric
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Returns true if every character in str is a decimal digit (0-9).
 	// - str: null-terminated input, must not be null
@@ -91,7 +91,7 @@ struct TStringOps
 	static bool IsNumeric(const CharType (&str)[N]) noexcept;
 
 	// IsUpper
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Returns true if every character in str is uppercase.
 	// - str: null-terminated input, must not be null
@@ -106,7 +106,7 @@ struct TStringOps
 	static bool IsUpper(const CharType (&str)[N]) noexcept;
 
 	// IsLower
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Returns true if every character in str is lowercase.
 	// - str: null-terminated input, must not be null
@@ -121,7 +121,7 @@ struct TStringOps
 	static bool IsLower(const CharType (&str)[N]) noexcept;
 
 	// Compare
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Compares lhs and rhs lexicographically.
 	// Returns 0 if equal, negative if lhs < rhs, positive if lhs > rhs.
@@ -149,7 +149,7 @@ struct TStringOps
 	static int32 Compare(CharType (&lhs)[N], const CharType* rhs, ESearchCase searchCase) noexcept;
 
 	// Length
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Returns the number of characters before the null terminator.
 	// - str: null-terminated input, must not be null
@@ -160,7 +160,7 @@ struct TStringOps
 	static int32 Length(const CharType (&)[N]) noexcept;
 
 	// ToUpper
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Converts all characters in str to uppercase in-place.
 	// - str: null-terminated input/output, must not be null
@@ -174,7 +174,7 @@ struct TStringOps
 	static void ToUpper(CharType (&str)[N]) noexcept;
 
 	// ToLower
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Converts all characters in str to lowercase in-place.
 	// - str: null-terminated input/output, must not be null
@@ -188,7 +188,7 @@ struct TStringOps
 	static void ToLower(CharType (&str)[N]) noexcept;
 
 	// Fill
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Fills len characters of str with c. Does not write a null terminator.
 	// - str: output buffer, must not be null
@@ -200,7 +200,7 @@ struct TStringOps
 	static void Fill(CharType (&str)[N], CharType c) noexcept;
 
 	// Copy
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Copies src into dest including the null terminator.
 	// - dest: output buffer, must be large enough to hold src
@@ -217,7 +217,7 @@ struct TStringOps
 	static void Copy(CharType (&dest)[N], const CharType* src) noexcept;
 
 	// Concatenate
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Appends src to the end of dest, writing a null terminator after.
 	// - dest: null-terminated buffer with enough remaining capacity for src
@@ -232,7 +232,7 @@ struct TStringOps
 	static void Concatenate(CharType* dest, const CharType (&src)[N]) noexcept;
 
 	// Find
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Searches for substr in str.
 	// Returns the index of the first (Forward) or last (Backward) match, or KOR_INDEX_NONE.
@@ -260,7 +260,7 @@ struct TStringOps
 	static int32 Find(const CharType (&str)[N], const CharType (&subStr)[R], ESearchCase searchCase, ESearchDir searchDir) noexcept;
 
 	// Find (Char)
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Searches for character c in str.
 	// Returns the index of the first (Forward) or last (Backward) occurrence, or KOR_INDEX_NONE.
@@ -284,7 +284,7 @@ struct TStringOps
 	static int32 Find(const CharType (&str)[N], CharType c, ESearchCase searchCase, ESearchDir searchDir) noexcept;
 
 	// Replace
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Replaces all occurrences of from with to in str in-place.
 	// Returns the number of replacements made.
@@ -312,7 +312,7 @@ struct TStringOps
 	static int32 Replace(CharType (&str)[N], const CharType* from, const CharType* to, ESearchCase searchCase) noexcept;
 
 	// Replace (Char)
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Replaces all occurrences of character from with to in str in-place.
 	// Returns the number of replacements made.
@@ -337,7 +337,7 @@ struct TStringOps
 	static int32 Replace(CharType (&str)[N], CharType from, CharType to, ESearchCase searchCase) noexcept;
 
 	// Format | FormatLength
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Writes a formatted string into str using printf-style fmt.
 	// Returns the number of CharType units written, excluding null terminator. Returns negative on error. (may exceed len on truncation).
@@ -351,8 +351,28 @@ struct TStringOps
 	template<int32 N, typename... ArgT>
 	static int32 Format(CharType (&str)[N], const CharType* fmt, const ArgT&... args) noexcept;
 
+	// Convert
+	// * Passing a UTF8 mid-sequence srcLen produces undefined count
+	///////////////////////////////////////////////////////////////////////////////////
+
+	template<typename ToCharType>
+	int32 ConvertedLength(const CharType* str, int32 len) noexcept;
+
+	template<typename ToCharType, TSize N>
+	int32 ConvertedLength(const CharType (&str)[N]) noexcept;
+
+	// Convert
+	// * Passing a UTF8 mid-sequence srcLen produces undefined count
+	///////////////////////////////////////////////////////////////////////////////////
+
+	template<typename ToCharType>
+	int32 Convert(const CharType* str, ToCharType* toStr, int32 len) noexcept;
+
+	template<typename ToCharType, TSize N>
+	int32 Convert(const CharType (&str)[N], ToCharType* toStr) noexcept;
+
 	// ToInt32 | ToInt64 | ToUInt32 | ToUInt64
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Parses a null-terminated string as a signed 32-bit integer.
 	// - str: null-terminated input, must not be null
@@ -375,7 +395,7 @@ struct TStringOps
 	static uint64 ToUInt64(const CharType* str, const CharType*& outEnd, int32 base = 10) noexcept;
 
 	// FromInt32 | FromInt64 | FromUInt32 | FromUInt64
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Writes the integer value as a string into str.
 	// Returns the number of characters written, not including null terminator.
@@ -404,7 +424,7 @@ struct TStringOps
 	template<int32 N> static int32 FromUInt64(CharType (&str)[N], uint64 value, int32 base = 10) noexcept;
 
 	// ToFloat
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Parses a null-terminated string as a double.
 	// - str: null-terminated input, must not be null
@@ -415,7 +435,7 @@ struct TStringOps
 	static double ToFloat(const CharType* str, const CharType*& outEnd) noexcept;
 
 	// FromFloat
-	////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Writes a double value as a formatted string into str.
 	// Returns the number of characters written, not including null terminator.

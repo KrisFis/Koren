@@ -12,8 +12,16 @@ struct TCharConstant
 {
 	static_assert(TIsCharacter<CharType>::Value, "CharType must be a character");
 
+	// Sentinel
+	///////////////////////////////////////////////////////////////////////////////////
+
+	// U+FFFD for wide types, '?' for narrow (ANSI cannot represent U+FFFD)
+	static constexpr CharType Bogus = sizeof(CharType) > 1
+		? (CharType)0xFFFD
+		: (CharType)0x3F;
+
 	// Linebreak
-	//////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// '\n' - Unix/Linux/macOS line ending
 	static constexpr CharType LineFeed			= (CharType)0xa;
@@ -25,7 +33,7 @@ struct TCharConstant
 	static constexpr CharType CarriageReturn	= (CharType)0xd;
 
 	// Whitespace
-	//////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// ' ' - standard space
 	static constexpr CharType Space				= (CharType)0x20;
@@ -33,7 +41,7 @@ struct TCharConstant
 	static constexpr CharType Tab				= (CharType)0x9;
 
 	// Control
-	//////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// '\0' - string terminator in C-style strings
 	static constexpr CharType Null				= (CharType)0x0;
@@ -45,7 +53,7 @@ struct TCharConstant
 	static constexpr CharType Delete			= (CharType)0x7f;
 
 	// Arithmetic operators
-	//////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// '+' - positive sign / addition operator
 	static constexpr CharType Plus				= (CharType)0x2B;

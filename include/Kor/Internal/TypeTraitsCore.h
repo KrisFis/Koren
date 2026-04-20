@@ -141,19 +141,6 @@ template<> struct TIsCharacter<wchar> { enum { Value = true }; };
 template<> struct TIsCharacter<char16> { enum { Value = true }; };
 template<> struct TIsCharacter<char32> { enum { Value = true }; };
 
-// [Is Unicode]
-// * Checks whether specific type is unicode character type
-// * Unicode types are: char8, char16, char32 and wchar
-
-template<typename T>
-struct TIsUnicode { enum { Value = false };};
-#if KOR_CHAR8_NATIVE
-template<> struct TIsUnicode<char8> { enum { Value = true };};
-#endif
-template<> struct TIsUnicode<char16> { enum { Value = true };};
-template<> struct TIsUnicode<char32> { enum { Value = true };};
-template<> struct TIsUnicode<wchar> { enum { Value = true };};
-
 // [Is Integer]
 // * Checks whether specific type is integer type
 // * Integer types are: int8, int16, int32, int64, uint8, uint16, uint32, uint64
