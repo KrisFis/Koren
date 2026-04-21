@@ -56,15 +56,15 @@
 			thread_local achar LOG_BUFFER[SCString::LARGE_BUFFER_SIZE];
 			const int32 result = TStringOps<achar>::Format(
 				LOG_BUFFER,
-				KOR_TEXT_ANSI("Assert failed '%s' at '%s:%d'"),
+				KOR_TEXT_ANSI("ASSERT: '%s' at '%s:%d'\n"),
 				Expression,
 				File,
 				Line
 			);
 
-			if (result > 0)
+			if (result > 1) // > '\0'
 			{
-				SMisc::WriteToStdout(LOG_BUFFER, sizeof(achar));
+				SMisc::WriteToStdout(LOG_BUFFER, sizeof(achar) * result);
 			}
 		}
 	}
