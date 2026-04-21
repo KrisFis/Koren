@@ -84,6 +84,7 @@ int32 TStringOps<CharType>::Convert(const CharType* str, ToCharType* toStr, int3
 	static_assert(TIsCharacter<ToCharType>::Value, "Destination Character Type is not a character type");
 
 	using ToCharConstant = TCharConstant<ToCharType>;
+	using ToCharOps = TCharOps<ToCharType>;
 
 	if (len <= 0) [[ unlikely ]] return KOR_INDEX_NONE;
 
@@ -104,7 +105,7 @@ int32 TStringOps<CharType>::Convert(const CharType* str, ToCharType* toStr, int3
 	{
 		for (int32 i = 0; i < len + 1; ++i)
 		{
-			toStr[i] = (ToCharType)(CharType)str[i];
+			toStr[i] = (ToCharType)(UCharType)str[i];
 		}
 		return len;
 	}
@@ -117,9 +118,9 @@ int32 TStringOps<CharType>::Convert(const CharType* str, ToCharType* toStr, int3
 	{
 		for (int32 i = 0; i < len + 1; ++i)
 		{
-			toStr[i] = str[i] > (CharType)TLimits<ToCharType>::Max
+			toStr[i] = str[i] > (UCharType)ToCharOps::MaxCodePoint()
 				? ToCharConstant::Bogus
-				: (ToCharType)(CharType)str[i];
+				: (ToCharType)(UCharType)str[i];
 		}
 		return len;
 	}
@@ -132,7 +133,7 @@ int32 TStringOps<CharType>::Convert(const CharType* str, ToCharType* toStr, int3
 		int32 written = 0;
 		for (int32 i = 0; i < len + 1; ++i)
 		{
-			const uint32 cp = (uint32)(CharType)str[i];
+			const uint32 cp = (uint32)(UCharType)str[i];
 
 			if (cp == 0) // null terminator
 			{
@@ -225,7 +226,7 @@ int32 TStringOps<CharType>::Convert(const CharType* str, ToCharType* toStr, int3
 			}
 
 			// Now emit codepoint into ToCharType
-			if (cp > (uint32)TLimits<ToCharType>::Max)
+			if (cp > (uint32)ToCharOps::MaxCodePoint())
 			{
 				toStr[written++] = ToCharConstant::Bogus;
 			}

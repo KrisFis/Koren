@@ -21,9 +21,9 @@ struct TCharConstant
 	///////////////////////////////////////////////////////////////////////////////////
 
 	// U+FFFD for wide types, '?' for narrow (ANSI cannot represent U+FFFD)
-	static constexpr CharType Bogus = sizeof(CharType) > 1
-		? (CharType)0xFFFD
-		: (CharType)0x3F;
+	static constexpr CharType Bogus = TIsSame<CharType, achar>::Value
+		? (CharType)0x3F
+		: (CharType)0xFFFD;
 
 	// Linebreak
 	///////////////////////////////////////////////////////////////////////////////////
@@ -121,6 +121,12 @@ struct TCharOps
 	using CharType      = T;
 	using UCharType     = typename TMakeUnsigned<CharType>::Type;
 	using CharConstant  = TCharConstant<CharType>;
+
+	// Constants
+	///////////////////////////////////////////////////////////////////////////////////
+
+	// Returns max valid codepoint supported by the character type
+	static constexpr CharType MaxCodePoint() noexcept;
 
 	// Classification
 	///////////////////////////////////////////////////////////////////////////////////

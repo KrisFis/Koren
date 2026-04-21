@@ -152,8 +152,8 @@ public:
 template<typename T>
 struct TLimits
 {
-	static_assert(TIsIntegral<T>::Value, "TIntLimit accepts only integer types");
-	static_assert(TIsSame<T, typename TPure<T>::Type>::Value, "TIntLimit accepts only pure types");
+	static_assert(TIsArithmetic<T>::Value, "TLimits accepts only arithmetic types");
+	static_assert(TIsSame<T, typename TPure<T>::Type>::Value, "TLimits accepts only pure types");
 
 	static constexpr bool IsSigned = TIsSigned<T>::Value;
 

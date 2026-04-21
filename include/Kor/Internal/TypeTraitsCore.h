@@ -19,7 +19,7 @@ template<bool T> struct TBoolValue { static constexpr bool Value = T; };
 template<typename> struct TValue : TBoolValue<true> {};
 
 typedef TBoolValue<true> TTrueValue;
-typedef TBoolValue<true> TFalseValue;
+typedef TBoolValue<false> TFalseValue;
 
 // [Enable if]
 // * Enables compilation of specific template function/struct when condition met

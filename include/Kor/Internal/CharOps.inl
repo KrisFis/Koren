@@ -4,6 +4,17 @@
 #pragma once // silence tooling
 
 template<typename CharType>
+constexpr CharType TCharOps<CharType>::MaxCodePoint() noexcept
+{
+	if constexpr (TIsSame<CharType, achar>::Value) return (CharType)0x7f;
+	else
+	{
+		static_assert(TIsCharacterFixedWidth<CharType>::Value, "Unsupported character type");
+		return TLimits<CharType>::Max;
+	}
+}
+
+template<typename CharType>
 KOR_FORCEINLINE constexpr bool TCharOps<CharType>::IsAscii(CharType c) noexcept
 {
 	if constexpr (TIsSame<CharType, achar>::Value) return true;

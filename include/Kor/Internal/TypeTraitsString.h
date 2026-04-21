@@ -37,7 +37,7 @@ template<> struct TIsCharacterFixedWidth<char32> : TTrueValue {};
 template<typename T>
 struct TIsCharacterVariableWidth
 {
-	static constexpr bool Value = TIsCharacter<T>::Value && !TIsCharacterFixedWidth<T>::value;
+	static constexpr bool Value = TIsCharacter<T>::Value && !TIsCharacterFixedWidth<T>::Value;
 };
 
 // [ Is Character Compatible ]
