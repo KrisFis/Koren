@@ -247,7 +247,7 @@ struct TStringOps
 	// Replace
 	// Replaces all occurrences of a substring with another in-place.
 	// Returns the number of replacements made.
-	// * Uses a thread-local scratch buffer of SCString::LARGE_BUFFER_SIZE
+	// * Uses a thread-local scratch buffer of SMemory::LARGE_BUFFER_SIZE
 	// * Result must fit within LARGE_BUFFER_SIZE or behavior is undefined
 	// * Prefer the template overload when Case is known at compile time
 	///////////////////////////////////////////////////////////////////////////////////
@@ -386,7 +386,7 @@ struct TStringOps
 	// FromFloat
 	// Writes a double value as a formatted string into the buffer.
 	// Returns the number of characters written, excluding null terminator.
-	// * Buffer must be at least SCString::MAX_BUFFER_SIZE_DOUBLE characters
+	// * Buffer must be at least SMemory::MAX_BUFFER_SIZE_DOUBLE characters
 	// * Prefer the template overload when Format is known at compile time
 	// * Bounded overload returns would-be length on truncation (snprintf semantics)
 	///////////////////////////////////////////////////////////////////////////////////

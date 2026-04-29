@@ -221,8 +221,8 @@ public:
 	// * 10 => "10"
 	static TString FromInt32(int32 val)
 	{
-		thread_local CharType buffer[SCString::MAX_BUFFER_SIZE_INT32];
-		return TString(SCString::FromInt32(val, buffer, SCString::MAX_BUFFER_SIZE_INT32));
+		thread_local CharType buffer[SMemory::MAX_BUFFER_SIZE_DOUBLE];
+		return TString(SCString::FromInt32(val, buffer, SMemory::MAX_BUFFER_SIZE_DOUBLE));
 	}
 
 	// Constructs new string from int64
@@ -237,8 +237,8 @@ public:
 	// * 10.1 => "10.1"
 	static TString FromDouble(double val, uint8 digits)
 	{
-		thread_local CharType buffer[SCString::MAX_BUFFER_SIZE_DOUBLE];
-		return TString(SCString::FromDouble(val, digits, buffer, SCString::MAX_BUFFER_SIZE_DOUBLE));
+		thread_local CharType buffer[SMemory::MAX_BUFFER_SIZE_DOUBLE];
+		return TString(SCString::FromDouble(val, digits, buffer, SMemory::MAX_BUFFER_SIZE_DOUBLE));
 	}
 
 	// Iterations

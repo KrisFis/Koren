@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include "Kor/CString.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -217,10 +216,10 @@ struct SArchive
 		else if (!IsString()) return nullptr;
 
 		// pooled pointer
-		thread_local tchar buffer[SCString::LARGE_BUFFER_SIZE];
+		thread_local tchar buffer[SMemory::LARGE_BUFFER_SIZE];
 
 		const SizeType oldOffset = ar.template GetOffset<tchar>();
-		const SizeType expectedReadNum = SMath::Min<SizeType>(SCString::LARGE_BUFFER_SIZE, GetTotal<tchar>());
+		const SizeType expectedReadNum = SMath::Min<SizeType>(SMemory::LARGE_BUFFER_SIZE, GetTotal<tchar>());
 
 		if (expectedReadNum <= 0) return nullptr;
 
@@ -324,8 +323,8 @@ static SArchive& operator<<(SArchive& ar, const int32 val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SCString::MAX_BUFFER_SIZE_INT32];
-		if (SCString::FromInt32(val, buffer, SCString::MAX_BUFFER_SIZE_INT32))
+		thread_local tchar buffer[SMemory::MAX_BUFFER_SIZE_DOUBLE];
+		if (SStringOps::FromInt32(buffer, val, SMemory::MAX_BUFFER_SIZE_DOUBLE))
 		{
 			ar.Write(buffer, SCString::GetLength(buffer));
 		}
@@ -404,8 +403,8 @@ static SArchive& operator<<(SArchive& ar, const double val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SCString::MAX_BUFFER_SIZE_DOUBLE];
-		if (SCString::FromDouble(val, 4, buffer, SCString::MAX_BUFFER_SIZE_DOUBLE))
+		thread_local tchar buffer[SMemory::MAX_BUFFER_SIZE_DOUBLE];
+		if (SCString::FromDouble(val, 4, buffer, SMemory::MAX_BUFFER_SIZE_DOUBLE))
 		{
 			ar.Write(buffer, SCString::GetLength(buffer));
 		}

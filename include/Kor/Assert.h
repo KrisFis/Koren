@@ -53,7 +53,7 @@
 
 		static void LogFailed(const achar* Expression, const achar* File, int32 Line) noexcept
 		{
-			thread_local achar LOG_BUFFER[SCString::LARGE_BUFFER_SIZE];
+			thread_local achar LOG_BUFFER[SMemory::LARGE_BUFFER_SIZE];
 			const int32 result = TStringOps<achar>::Format(
 				LOG_BUFFER,
 				KOR_TEXT_ANSI("ASSERT: '%s' at '%s:%d'\n"),

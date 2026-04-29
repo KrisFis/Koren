@@ -30,7 +30,6 @@
 // STRINGS
 #include "Kor/CharOps.h"
 #include "Kor/StringOps.h"
-#include "Kor/CString.h"
 #include "Kor/String.h"
 
 // SHARED

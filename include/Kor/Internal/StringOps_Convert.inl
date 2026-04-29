@@ -436,7 +436,7 @@ template<typename CharType>
 template<EFloatFormat Format>
 KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double value, int32 precision) noexcept
 {
-	return FromFloat(str, value, SCString::MAX_BUFFER_SIZE_DOUBLE, precision);
+	return FromFloat(str, value, SMemory::MAX_BUFFER_SIZE_DOUBLE, precision);
 }
 
 template<typename CharType>
@@ -457,26 +457,19 @@ template<typename CharType>
 template<EFloatFormat Format>
 KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double value, int32 len, int32 precision) noexcept
 {
-	if constexpr (TIsSame<CharType, achar>::Value)
+	if constexpr (TIsSame<CharType, achar>::Value || TIsSame<CharType, char8>::Value)
 	{
 		const achar* fmtStr =
 			Format == EFloatFormat::Fixed		? KOR_TEXT_ANSI("%.*f") :
 			Format == EFloatFormat::Scientific	? KOR_TEXT_ANSI("%.*e") : KOR_TEXT_ANSI("%.*g");
-		return Internal::Format(str, fmtStr, len, precision, value);
+		return SPlatformAnsiStringOps::Snprintf(reinterpret_cast<achar*>(str), fmtStr, len, precision, value);
 	}
 	else if constexpr (TIsSame<CharType, wchar>::Value)
 	{
 		const wchar* fmtStr =
 			Format == EFloatFormat::Fixed		? KOR_TEXT_WIDE("%.*f") :
 			Format == EFloatFormat::Scientific	? KOR_TEXT_WIDE("%.*e") : KOR_TEXT_WIDE("%.*g");
-		return Internal::Format(str, fmtStr, len, precision, value);
-	}
-	else if constexpr (TIsSame<CharType, wchar>::Value)
-	{
-		const achar* fmtStr =
-			Format == EFloatFormat::Fixed		? KOR_TEXT_ANSI("%.*f") :
-			Format == EFloatFormat::Scientific	? KOR_TEXT_ANSI("%.*e") : KOR_TEXT_ANSI("%.*g");
-		return Internal::Format(reinterpret_cast<achar*>(str), fmtStr, len, precision, value);
+		return SPlatformWideStringOps::Snprintf(str, fmtStr, len, precision, value);
 	}
 	else
 	{

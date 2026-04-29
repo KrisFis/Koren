@@ -7,7 +7,7 @@ template<typename CharType>
 template<ESearchCase Case>
 int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const CharType* to) noexcept
 {
-	CharType* buffer = Internal::GetBuffer<CharType, SCString::LARGE_BUFFER_SIZE>();
+	CharType* buffer = Internal::GetBuffer<CharType, SMemory::LARGE_BUFFER_SIZE>();
 
 	const int32 fromLen = Length(from);
 	const int32 toLen   = Length(to);
@@ -49,7 +49,7 @@ template<typename CharType>
 template<ESearchCase Case>
 int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const CharType* to, int32 len) noexcept
 {
-	CharType* buffer = Internal::GetBuffer<CharType, SCString::LARGE_BUFFER_SIZE>();
+	CharType* buffer = Internal::GetBuffer<CharType, SMemory::LARGE_BUFFER_SIZE>();
 
 	const int32 fromLen = Length(from);
 	const int32 toLen = Length(to);

@@ -14,7 +14,7 @@ struct TWin32StringOps
 		"Win32 string operations only work on ANSI and WCHAR types.");
 
 	template<typename... ArgT>
-	KOR_FORCEINLINE int32 Snprintf(achar* str, const CharType* fmt, TSize len, const ArgT&... args)
+	KOR_FORCEINLINE int32 static Snprintf(achar* str, const CharType* fmt, TSize len, const ArgT&... args) noexcept
 	{
 		if constexpr (TIsSame<CharType, achar>::Value)
 		{
