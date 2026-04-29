@@ -6,11 +6,17 @@
 #include "Kor/KorMinimal.h"
 #include "Kor/CharOps.h"
 
-// TODO: Remove
-#include "CString.h"
-#include <stdio.h>
+#include KOR_PLATFORM_HEADER_FROM(Kor/Core, StringOps)
 
 KOR_NAMESPACE_BEGIN
+
+// Platform typedefs type
+template<typename CharType>
+using TPlatformStringOps = KOR_PLATFORM_TEMPLATE(StringOps<CharType>);
+
+// Platforms only support ANSI and WIDE character types
+using SPlatformAnsiStringOps = TPlatformStringOps<achar>;
+using SPlatformWideStringOps = TPlatformStringOps<wchar>;
 
 // Search direction for Find and Replace operations
 enum class ESearchDir : uint8

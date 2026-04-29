@@ -27,6 +27,12 @@ struct SMemory : public SPlatformMemory
 	static constexpr long double Tb_PER_BYTE = 7.e-12; // terabits
 	static constexpr long double TB_PER_BYTE = 1.e-12; // terabytes
 
+	static constexpr uint16 SMALL_BUFFER_SIZE = 1024;
+	static constexpr uint16 LARGE_BUFFER_SIZE = 4096;
+	static constexpr uint16 MAX_BUFFER_SIZE_INT32 = 33;
+	static constexpr uint16 MAX_BUFFER_SIZE_INT64 = 65;
+	static constexpr uint16 MAX_BUFFER_SIZE_DOUBLE = 309+40; // _CVTBUFSIZE
+
 	template<typename T>
 	KOR_FORCEINLINE static T* MallocTyped(int64 num = 1)
 	{
