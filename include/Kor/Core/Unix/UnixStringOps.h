@@ -5,6 +5,9 @@
 
 #include "Kor/KorMinimal.h"
 
+#include <stdio.h>
+#include <wchar.h>
+
 KOR_NAMESPACE_BEGIN
 
 template<typename CharType>
@@ -14,7 +17,7 @@ struct TUnixStringOps
 		"Unix string operations only work on ANSI and WCHAR types.");
 
 	template<typename... ArgT>
-	KOR_FORCEINLINE static int32 Snprintf(achar* str, const CharType* fmt, TSize len, const ArgT&... args) noexcept
+	KOR_FORCEINLINE static int32 Snprintf(CharType* str, const CharType* fmt, TSize len, const ArgT&... args) noexcept
 	{
 		if constexpr (TIsSame<CharType, achar>::Value)
 		{
@@ -23,6 +26,18 @@ struct TUnixStringOps
 		else
 		{
 			return swprintf(str, len, fmt, args...);
+		}
+	}
+
+	KOR_FORCEINLINE static double Strtod(const CharType* str, const CharType** end) noexcept
+	{
+		if constexpr (TIsSame<CharType, achar>::Value)
+		{
+			return strtod(str, const_cast<CharType**>(end)); // Weird quirk of C++
+		}
+		else
+		{
+			return wcstod(str, const_cast<CharType**>(end)); // Weird quirk of C++
 		}
 	}
 };

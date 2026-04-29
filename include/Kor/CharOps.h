@@ -57,50 +57,71 @@ struct TCharConstant
 	// DEL - opposite of Null, often used as "invalid" sentinel
 	static constexpr CharType Delete			= (CharType)0x7f;
 
-	// Arithmetic operators
+	// Arithmetic & Punctuation
 	///////////////////////////////////////////////////////////////////////////////////
 
 	// '+' - positive sign / addition operator
 	static constexpr CharType Plus				= (CharType)0x2B;
-
 	// '-' - negative sign / subtraction operator
 	static constexpr CharType Minus				= (CharType)0x2D;
-
 	// '*' - multiplication operator
 	static constexpr CharType Asterisk			= (CharType)0x2A;
-
 	// '/' - division operator / path separator
 	static constexpr CharType Slash				= (CharType)0x2F;
-
 	// '\' - escape character / path separator
 	static constexpr CharType Backslash			= (CharType)0x5C;
-
 	// '%' - modulo operator
 	static constexpr CharType Percent			= (CharType)0x25;
-
 	// '=' - assignment / equality operator
 	static constexpr CharType Equal				= (CharType)0x3D;
-
 	// '<' - less than operator
 	static constexpr CharType Less				= (CharType)0x3C;
-
 	// '>' - greater than operator
 	static constexpr CharType Greater			= (CharType)0x3E;
-
 	// '!' - logical not operator
 	static constexpr CharType Exclamation		= (CharType)0x21;
-
 	// '&' - bitwise and / reference operator
 	static constexpr CharType Ampersand			= (CharType)0x26;
-
 	// '|' - bitwise or operator
 	static constexpr CharType Pipe				= (CharType)0x7C;
-
 	// '^' - bitwise xor operator
 	static constexpr CharType Caret				= (CharType)0x5E;
-
 	// '~' - bitwise not operator
 	static constexpr CharType Tilde				= (CharType)0x7E;
+	// '.' - dot / decimal point / member access operator
+	static constexpr CharType Dot				= (CharType)0x2E;
+	// ',' - comma / separator
+	static constexpr CharType Comma				= (CharType)0x2C;
+	// ';' - semicolon / statement terminator
+	static constexpr CharType Semicolon			= (CharType)0x3B;
+	// ':' - colon / scope resolution
+	static constexpr CharType Colon				= (CharType)0x3A;
+	// '?' - question mark
+	static constexpr CharType Question			= (CharType)0x3F;
+
+	// Numbers
+	///////////////////////////////////////////////////////////////////////////////////
+
+	// '0' - digit zero
+	static constexpr CharType Zero				= (CharType)0x30;
+	// '1' - digit one
+	static constexpr CharType One				= (CharType)0x31;
+	// '2' - digit two
+	static constexpr CharType Two				= (CharType)0x32;
+	// '3' - digit three
+	static constexpr CharType Three				= (CharType)0x33;
+	// '4' - digit four
+	static constexpr CharType Four				= (CharType)0x34;
+	// '5' - digit five
+	static constexpr CharType Five				= (CharType)0x35;
+	// '6' - digit six
+	static constexpr CharType Six				= (CharType)0x36;
+	// '7' - digit seven
+	static constexpr CharType Seven				= (CharType)0x37;
+	// '8' - digit eight
+	static constexpr CharType Eight				= (CharType)0x38;
+	// '9' - digit nine
+	static constexpr CharType Nine				= (CharType)0x39;
 };
 
 // [ Char Ops ]
@@ -194,26 +215,41 @@ struct TCharOps
 	// Unicode line endings (NEL, LS, PS) are intentionally excluded — ASCII only
 	static constexpr bool IsLinebreak(CharType c) noexcept;
 
-	// Conversion
+	// ToInt | FromInt
+	///////////////////////////////////////////////////////////////////////////////////
+
+	// Converts a digit or letter character to its integer value (0-35)
+	// Returns KOR_INDEX_NONE if c is not a valid digit or letter
+	static constexpr int32 ToInt(CharType c) noexcept;
+
+	// Converts an integer value (0-35) to its digit or letter character
+	// Covers bases 2-36: 0-9 map to '0'-'9', 10-35 map to 'a'-'z'
+	// Returns Null if n is outside 0-35 range
+	static constexpr CharType FromInt(int32 n) noexcept;
+
+	// ToDigit | FromDigit
 	///////////////////////////////////////////////////////////////////////////////////
 
 	// Converts a digit character to its integer value (0-9)
 	// Returns KOR_INDEX_NONE if c is not a valid digit
-	static constexpr int32 DigitToInt(CharType c) noexcept;
+	static constexpr int32 ToDigit(CharType c) noexcept;
+
+	// Converts an integer value (0-9) to its digit character
+	// Returns Null if n is outside 0-9 range
+	static constexpr CharType FromDigit(int32 n) noexcept;
+
+	// ToHex | FromHex
+	///////////////////////////////////////////////////////////////////////////////////
 
 	// Converts a hexadecimal digit character to its integer value (0-15)
 	// '0'-'9' -> 0-9, 'a'-'f' -> 10-15, 'A'-'F' -> 10-15
 	// Returns KOR_INDEX_NONE if c is not a valid hex digit
-	static constexpr int32 HexToInt(CharType c) noexcept;
-
-	// Converts an integer value (0-9) to its digit character
-	// Returns Null if n is outside 0-9 range
-	static constexpr int32 IntToDigit(int32 n) noexcept;
+	static constexpr int32 ToHex(CharType c) noexcept;
 
 	// Converts an integer value (0-15) to its hexadecimal digit character
-	// 0-9 -> '0'-'9', 10-15 -> 'a'-'f' (lowercase) or 'A'-'F' (uppercase)
+	// 0-9 -> '0'-'9', 10-15 -> 'a'-'f'
 	// Returns Null if n is outside 0-15 range
-	static constexpr CharType IntToHex(int32 n, bool bUpper = false) noexcept;
+	static constexpr CharType FromHex(int32 n) noexcept;
 
 	// Casing
 	///////////////////////////////////////////////////////////////////////////////////

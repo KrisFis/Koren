@@ -66,9 +66,9 @@ KOR_FORCEINLINE void TStringOps<CharType>::ToLower(CharType(& str)[N]) noexcept
 }
 
 template<typename CharType>
-void TStringOps<CharType>::Fill(CharType* str, CharType c, int32 len) noexcept
+void TStringOps<CharType>::Fill(CharType* str, CharType c, int32 maxLen) noexcept
 {
-	while(len-- > 0) *str = c;
+	while(maxLen-- > 0) *str = c;
 }
 
 template<typename CharType>

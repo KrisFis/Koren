@@ -216,10 +216,10 @@ struct SArchive
 		else if (!IsString()) return nullptr;
 
 		// pooled pointer
-		thread_local tchar buffer[SMemory::LARGE_BUFFER_SIZE];
+		thread_local tchar buffer[SMemory::BUFFER_SIZE_LARGE];
 
 		const SizeType oldOffset = ar.template GetOffset<tchar>();
-		const SizeType expectedReadNum = SMath::Min<SizeType>(SMemory::LARGE_BUFFER_SIZE, GetTotal<tchar>());
+		const SizeType expectedReadNum = SMath::Min<SizeType>(SMemory::BUFFER_SIZE_LARGE, GetTotal<tchar>());
 
 		if (expectedReadNum <= 0) return nullptr;
 
@@ -323,10 +323,10 @@ static SArchive& operator<<(SArchive& ar, const int32 val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SMemory::MAX_BUFFER_SIZE_DOUBLE];
-		if (SStringOps::FromInt32(buffer, val, SMemory::MAX_BUFFER_SIZE_DOUBLE))
+		thread_local tchar buffer[SMemory::BUFFER_SIZE_INT32_MAX];
+		if (SStringOps::FromInt(buffer, val, SMemory::BUFFER_SIZE_INT32_MAX, 10))
 		{
-			ar.Write(buffer, SCString::GetLength(buffer));
+			ar.Write(buffer, SStringOps::Length(buffer));
 		}
 	}
 
@@ -343,13 +343,13 @@ static SArchive& operator>>(SArchive& ar, int32& val)
 	{
 		const tchar* buffer = ar.ReadPooledStringByPred(
 			ar,
-			[](const tchar& character) -> bool
+			[](const tchar& c) -> bool
 			{
-				return (character >= KTEXT('0') && character <= KTEXT('9')) || character == KTEXT('-');
+				return SCharOps::IsSign(c) | SCharOps::IsDigit(c);
 			}
 		);
 
-		val = buffer ? SCString::ToInt32(buffer) : 0;
+		val = buffer ? SStringOps::ToInt(buffer) : 0;
 	}
 
 	return ar;
@@ -363,10 +363,10 @@ static SArchive& operator<<(SArchive& ar, const int64 val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SCString::MAX_BUFFER_SIZE_INT64];
-		if (SCString::FromInt64(val, buffer, SCString::MAX_BUFFER_SIZE_INT64))
+		thread_local tchar buffer[SMemory::BUFFER_SIZE_INT64_MAX];
+		if (SStringOps::FromInt(buffer, val, SMemory::BUFFER_SIZE_INT64_MAX, 10))
 		{
-			ar.Write(buffer, SCString::GetLength(buffer));
+			ar.Write(buffer, SStringOps::Length(buffer));
 		}
 	}
 
@@ -383,13 +383,13 @@ static SArchive& operator>>(SArchive& ar, int64& val)
 	{
 		const tchar* buffer = ar.ReadPooledStringByPred(
 			ar,
-			[](const tchar& character) -> bool
+			[](const tchar& c) -> bool
 			{
-				return (character >= KTEXT('0') && character <= KTEXT('9')) || character == KTEXT('-');
+				return SCharOps::IsSign(c) | SCharOps::IsDigit(c);
 			}
 		);
 
-		val = buffer ? SCString::ToInt64(buffer) : 0;
+		val = buffer ? SStringOps::ToInt(buffer) : 0;
 	}
 
 	return ar;
@@ -403,10 +403,10 @@ static SArchive& operator<<(SArchive& ar, const double val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SMemory::MAX_BUFFER_SIZE_DOUBLE];
-		if (SCString::FromDouble(val, 4, buffer, SMemory::MAX_BUFFER_SIZE_DOUBLE))
+		thread_local tchar buffer[SMemory::BUFFER_SIZE_DOUBLE_MAX];
+		if (SStringOps::FromFloat(buffer, val, SMemory::BUFFER_SIZE_DOUBLE_MAX, 4))
 		{
-			ar.Write(buffer, SCString::GetLength(buffer));
+			ar.Write(buffer, SStringOps::Length(buffer));
 		}
 	}
 
@@ -423,13 +423,13 @@ static SArchive& operator>>(SArchive& ar, double& val)
 	{
 		const tchar* buffer = ar.ReadPooledStringByPred(
 			ar,
-			[](const tchar& character) -> bool
+			[](const tchar& c) -> bool
 			{
-				return (character >= KTEXT('0') && character <= KTEXT('9')) || character == KTEXT('.') || character == KTEXT('-');
+				return SCharOps::IsSign(c) | SCharOps::IsDigit(c) | (c == SCharConstant::Dot);
 			}
 		);
 
-		val = buffer ? SCString::ToDouble(buffer) : 0.0;
+		val = buffer ? SStringOps::ToFloat(buffer) : 0.0;
 	}
 
 	return ar;
@@ -449,13 +449,13 @@ KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, tchar& val)
 
 KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const tchar* val)
 {
-	ar.Write(val, SCString::GetLength(val));
+	ar.Write(val, SStringOps::Length(val));
 	return ar;
 }
 
 KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, tchar* val)
 {
-	ar.Read(val, SCString::GetLength(val));
+	ar.Read(val, SStringOps::Length(val));
 	return ar;
 }
 

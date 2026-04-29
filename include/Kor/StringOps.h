@@ -18,6 +18,9 @@ using TPlatformStringOps = KOR_PLATFORM_TEMPLATE(StringOps<CharType>);
 using SPlatformAnsiStringOps = TPlatformStringOps<achar>;
 using SPlatformWideStringOps = TPlatformStringOps<wchar>;
 
+// We don't want to support tchar, as we can't truly tell if it will always be wchar or achar
+// using SPlatformStringOps = TPlatformStringOps<tchar>;
+
 // Search direction for Find and Replace operations
 enum class ESearchDir : uint8
 {
@@ -89,6 +92,18 @@ struct TStringOps
 
 	template<int32 N>
 	static bool IsNumeric(const CharType (&str)[N]) noexcept;
+
+	// IsWhitespace
+	// Returns true if all characters in the string are whitespace characters.
+	// * Returns true for empty string
+	///////////////////////////////////////////////////////////////////////////////////
+
+	static bool IsWhitespace(const CharType* str) noexcept;
+
+	static bool IsWhitespace(const CharType* str, int32 len) noexcept;
+
+	template<int32 N>
+	static bool IsWhitespace(const CharType (&str)[N]) noexcept;
 
 	// IsUpper
 	// Returns true if all characters in the string are uppercase.
@@ -170,7 +185,7 @@ struct TStringOps
 	// * Does not write a null terminator
 	///////////////////////////////////////////////////////////////////////////////////
 
-	static void Fill(CharType* str, CharType c, int32 len) noexcept;
+	static void Fill(CharType* str, CharType c, int32 maxLen) noexcept;
 
 	template<int32 N>
 	static void Fill(CharType (&str)[N], CharType c) noexcept;
@@ -258,9 +273,9 @@ struct TStringOps
 	static int32 Replace(CharType* str, const CharType* from, const CharType* to, ESearchCase searchCase) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive>
-	static int32 Replace(CharType* str, const CharType* from, const CharType* to, int32 len) noexcept;
+	static int32 Replace(CharType* str, const CharType* from, const CharType* to, int32 maxLen) noexcept;
 
-	static int32 Replace(CharType* str, const CharType* from, const CharType* to, int32 len, ESearchCase searchCase) noexcept;
+	static int32 Replace(CharType* str, const CharType* from, const CharType* to, int32 maxLen, ESearchCase searchCase) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive, int32 N>
 	static int32 Replace(CharType (&str)[N], const CharType* from, const CharType* to) noexcept;
@@ -281,9 +296,9 @@ struct TStringOps
 	static int32 Replace(CharType* str, CharType from, CharType to, ESearchCase searchCase) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive>
-	static int32 Replace(CharType* str, CharType from, CharType to, int32 len) noexcept;
+	static int32 Replace(CharType* str, CharType from, CharType to, int32 maxLen) noexcept;
 
-	static int32 Replace(CharType* str, CharType from, CharType to, int32 len, ESearchCase searchCase) noexcept;
+	static int32 Replace(CharType* str, CharType from, CharType to, int32 maxLen, ESearchCase searchCase) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive, int32 N>
 	static int32 Replace(CharType (&str)[N], CharType from, CharType to) noexcept;
@@ -299,7 +314,7 @@ struct TStringOps
 	///////////////////////////////////////////////////////////////////////////////////
 
 	template<typename... ArgT>
-	static int32 Format(CharType* str, const CharType* fmt, int32 len, const ArgT&... args) noexcept;
+	static int32 Format(CharType* str, const CharType* fmt, int32 maxLen, const ArgT&... args) noexcept;
 
 	template<int32 N, typename... ArgT>
 	static int32 Format(CharType (&str)[N], const CharType* fmt, const ArgT&... args) noexcept;
@@ -330,7 +345,7 @@ struct TStringOps
 	template<typename ToCharType, TSize N>
 	static int32 Convert(const CharType (&str)[N], ToCharType* toStr) noexcept;
 
-	// ToInt32 | ToInt64 | ToUInt32 | ToUInt64
+	// ToInt | ToUInt
 	// Parses the string as an integer of the corresponding type.
 	// Returns the parsed value, or 0 on failure.
 	// * Does not skip leading whitespace - input must start with optional sign then digits
@@ -338,41 +353,28 @@ struct TStringOps
 	// * Use the outEnd overload to detect how many characters were consumed
 	///////////////////////////////////////////////////////////////////////////////////
 
-	static int32 ToInt32(const CharType* str, int32 base = 10) noexcept;
-	static int32 ToInt32(const CharType* str, const CharType*& outEnd, int32 base = 10) noexcept;
+	static int64 ToInt(const CharType* str, int32 base = 10) noexcept;
+	static int64 ToInt(const CharType* str, int32& outLen, int32 base) noexcept;
 
-	static int64 ToInt64(const CharType* str, int32 base = 10) noexcept;
-	static int64 ToInt64(const CharType* str, const CharType*& outEnd, int32 base = 10) noexcept;
+	static uint64 ToUInt(const CharType* str, int32 base = 10) noexcept;
+	static uint64 ToUInt(const CharType* str, int32& outLen, int32 base) noexcept;
 
-	static uint32 ToUInt32(const CharType* str, int32 base = 10) noexcept;
-	static uint32 ToUInt32(const CharType* str, const CharType*& outEnd, int32 base = 10) noexcept;
-
-	static uint64 ToUInt64(const CharType* str, int32 base = 10) noexcept;
-	static uint64 ToUInt64(const CharType* str, const CharType*& outEnd, int32 base = 10) noexcept;
-
-	// FromInt32 | FromInt64 | FromUInt32 | FromUInt64
+	// FromInt | FromUInt
 	// Writes the integer value as a string into the buffer.
-	// Returns the number of characters written, excluding null terminator.
+	// Returns the number of characters written, excluding null terminator
+	// On error, returns KOR_INDEX_NONE (-1)
 	// * Use the bounded overload to guard against buffer overflows - returns KOR_INDEX_NONE if too small
 	// * Prefer the array ref overload when buffer size is known at compile time
 	///////////////////////////////////////////////////////////////////////////////////
 
-	static int32 FromInt32(CharType* str, int32 value, int32 base = 10) noexcept;
-	static int32 FromInt32(CharType* str, int32 value, int32 len, int32 base = 10) noexcept;
+	static int32 FromInt(CharType* str, int64 value, int32 base = 10) noexcept;
+	static int32 FromInt(CharType* str, int64 value, int32 maxLen, int32 base) noexcept;
 
-	static int32 FromInt64(CharType* str, int64 value, int32 base = 10) noexcept;
-	static int32 FromInt64(CharType* str, int64 value, int32 len, int32 base = 10) noexcept;
+	static int32 FromUInt(CharType* str, uint64 value, int32 base = 10) noexcept;
+	static int32 FromUInt(CharType* str, uint64 value, int32 maxLen, int32 base) noexcept;
 
-	static int32 FromUInt32(CharType* str, uint32 value, int32 base = 10) noexcept;
-	static int32 FromUInt32(CharType* str, uint32 value, int32 len, int32 base = 10) noexcept;
-
-	static int32 FromUInt64(CharType* str, uint64 value, int32 base = 10) noexcept;
-	static int32 FromUInt64(CharType* str, uint64 value, int32 len, int32 base = 10) noexcept;
-
-	template<int32 N> static int32 FromInt32(CharType (&str)[N], int32 value, int32 base = 10) noexcept;
-	template<int32 N> static int32 FromInt64(CharType (&str)[N], int64 value, int32 base = 10) noexcept;
-	template<int32 N> static int32 FromUInt32(CharType (&str)[N], uint32 value, int32 base = 10) noexcept;
-	template<int32 N> static int32 FromUInt64(CharType (&str)[N], uint64 value, int32 base = 10) noexcept;
+	template<int32 N> static int32 FromInt(CharType (&str)[N], int64 value, int32 base = 10) noexcept;
+	template<int32 N> static int32 FromUInt(CharType (&str)[N], uint64 value, int32 base = 10) noexcept;
 
 	// ToFloat
 	// Parses the string as a double.
@@ -381,14 +383,14 @@ struct TStringOps
 	///////////////////////////////////////////////////////////////////////////////////
 
 	static double ToFloat(const CharType* str) noexcept;
-	static double ToFloat(const CharType* str, const CharType*& outEnd) noexcept;
+	static double ToFloat(const CharType* str, int32& outLen) noexcept;
 
 	// FromFloat
 	// Writes a double value as a formatted string into the buffer.
 	// Returns the number of characters written, excluding null terminator.
 	// * Buffer must be at least SMemory::MAX_BUFFER_SIZE_DOUBLE characters
 	// * Prefer the template overload when Format is known at compile time
-	// * Bounded overload returns would-be length on truncation (snprintf semantics)
+	// * Bounded overload returns would-be length on truncation (Format/snprintf semantics)
 	///////////////////////////////////////////////////////////////////////////////////
 
 	template<EFloatFormat Format = EFloatFormat::Fixed>
@@ -397,9 +399,9 @@ struct TStringOps
 	static int32 FromFloat(CharType* str, double value, int32 precision, EFloatFormat format) noexcept;
 
 	template<EFloatFormat Format = EFloatFormat::Fixed>
-	static int32 FromFloat(CharType* str, double value, int32 len, int32 precision = 6) noexcept;
+	static int32 FromFloat(CharType* str, double value, int32 maxLen, int32 precision) noexcept;
 
-	static int32 FromFloat(CharType* str, double value, int32 len, int32 precision, EFloatFormat format) noexcept;
+	static int32 FromFloat(CharType* str, double value, int32 maxLen, int32 precision, EFloatFormat format) noexcept;
 
 	template<EFloatFormat Format = EFloatFormat::Fixed, int32 N>
 	static int32 FromFloat(CharType (&str)[N], double value, int32 precision = 6) noexcept;

@@ -10,7 +10,6 @@
 
 // Remove dependency
 #include "Kor/Assert.h"
-#include "Kor/CString.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -60,6 +59,8 @@ struct TTStringTraits
 	using SOps = TStringOps<CharT>;
 };
 
+// TODO: Reimplement to use TStringOps properly
+// Example: FromFloat -> template version and non-templated one
 template<typename CharT>
 struct TString
 {
@@ -205,40 +206,43 @@ public:
 	// Conversions
 	/////////////////////////////////
 
-	// Converts string to int32 equivalent
-	// * "10" => 10
-	KOR_FORCEINLINE int32 ToInt32() const { return SCString::ToInt32(_data.GetData()); }
-
 	// Converts string to int64 equivalent
 	// * "10" => 10
-	KOR_FORCEINLINE int64 ToInt64() const { return SCString::ToInt64(_data.GetData()); }
+	KOR_FORCEINLINE int64 ToInt(int32 base = 10) const { return TT::SOps::ToInt(_data.GetData(), base); }
+
+	// Converts string to uint64 equivalent
+	// * "10" => 10
+	KOR_FORCEINLINE uint64 ToUInt(int32 base = 10) const { return TT::SOps::ToUInt(_data.GetData(), base); }
 
 	// Converts string to int64 equivalent
 	// * "10.1" => 10.1
-	KOR_FORCEINLINE double ToDouble() const { return SCString::ToDouble(_data.GetData()); }
-
-	// Constructs new string from int32
-	// * 10 => "10"
-	static TString FromInt32(int32 val)
-	{
-		thread_local CharType buffer[SMemory::MAX_BUFFER_SIZE_DOUBLE];
-		return TString(SCString::FromInt32(val, buffer, SMemory::MAX_BUFFER_SIZE_DOUBLE));
-	}
+	KOR_FORCEINLINE double ToFloat() const { return TT::SOps::ToFloat(_data.GetData()); }
 
 	// Constructs new string from int64
 	// * 10 => "10"
-	static TString FromInt64(int64 val)
+	static TString FromInt(int64 val)
 	{
-		thread_local CharType buffer[SCString::MAX_BUFFER_SIZE_INT64];
-		return TString(SCString::FromInt64(val, buffer, SCString::MAX_BUFFER_SIZE_INT64));
+		CharType* buffer = Internal::GetScratchBuffer<CharType>();
+		const int32 len = TT::SOps::FromInt(buffer, val);
+		return len > 0 ? TString(buffer, len + 1) : TString();
+	}
+
+	// Constructs new string from uint64
+	// * 10 => "10"
+	static TString FromUInt(uint64 val)
+	{
+		CharType* buffer = Internal::GetScratchBuffer<CharType>();
+		const int32 len = TT::SOps::FromUInt(buffer, val);
+		return len > 0 ? TString(buffer, len + 1) : TString();
 	}
 
 	// Constructs new string from double, providing number of digits to expect
 	// * 10.1 => "10.1"
-	static TString FromDouble(double val, uint8 digits)
+	static TString FromFloat(double val, uint8 precision = 6, EFloatFormat format = EFloatFormat::Auto)
 	{
-		thread_local CharType buffer[SMemory::MAX_BUFFER_SIZE_DOUBLE];
-		return TString(SCString::FromDouble(val, digits, buffer, SMemory::MAX_BUFFER_SIZE_DOUBLE));
+		CharType* buffer = Internal::GetScratchBuffer<CharType>();
+		const int32 len = TT::SOps::FromFloat(buffer, val, precision, format);
+		return len > 0 ? TString(buffer, len + 1) : TString();
 	}
 
 	// Iterations
@@ -255,7 +259,10 @@ public:
 
 	// Compares this string against the provided one
 	// * returns 0 if equal, -1 if this string is "bigger" and 1 if provided string is "bigger"
-	KOR_FORCEINLINE int32 Compare(const TString& other, bool caseSensitive = true) const { return SCString::Compare(GetChars(), other.GetChars(), caseSensitive); }
+	KOR_FORCEINLINE int32 Compare(const TString& other, bool caseSensitive = true) const
+	{
+		return TT::SOps::Compare(GetChars(), other.GetChars(), GetLength(), caseSensitive ? ESearchCase::Sensitive : ESearchCase::Insensitive);
+	}
 
 	// Checks whether this string is same as the provided one
 	// * Is same as Compare == 0
@@ -265,22 +272,7 @@ public:
 	/////////////////////////////////
 
 	// Checks whether this string contains ONLY whitespaces
-	KOR_FORCEINLINE bool IsWhitespace() const
-	{
-		if(GetLength() > 0)
-		{
-			const CharType* data = _data.GetData();
-			while(*data != TT::Constant::Null)
-			{
-				if(!SCString::IsWhitespaceChar(*data))
-					return false;
-
-				++data;
-			}
-		}
-
-		return true;
-	}
+	KOR_FORCEINLINE bool IsWhitespace() const { return TT::SOps::IsWhitespace(_data.GetData(), GetLength()); }
 
 	// Checks whether this string contains provided string from the beginning
 	KOR_FORCEINLINE bool StartsWith(const TString& val, bool caseSensitive = true) const
@@ -297,7 +289,7 @@ public:
 	// Checks whether this string contains provided string in any place
 	KOR_FORCEINLINE bool Contains(const TString& val, bool caseSensitive = true, bool fromStart = true) const
 	{
-		return !!SCString::Find(GetChars(), val.GetChars(), caseSensitive, fromStart);
+		return TT::SOps::Find(GetChars(), val.GetChars(), caseSensitive, fromStart) != KOR_INDEX_NONE;
 	}
 
 	// Checks whether this string contains provided string in provided index
@@ -309,7 +301,16 @@ public:
 	// Gets index from which this string contains provided string
 	KOR_FORCEINLINE SizeType Find(const TString& val, bool caseSensitive = true, bool fromStart = true) const
 	{
-		return SCString::FindIndex(GetChars(), val.GetChars(), caseSensitive, fromStart);
+		return TT::SOps::Find(
+			GetChars(), val.GetChars(),
+			GetLength(), val.GetLength(),
+			caseSensitive
+				? ESearchCase::Sensitive
+				: ESearchCase::Insensitive,
+			fromStart
+				? ESearchDir::Forward
+				: ESearchDir::Backward
+		);
 	}
 
 	// Append
@@ -322,16 +323,9 @@ public:
 
 	// Appends this string via "printf"
 	template<typename StringT, typename... ArgTypes>
-	KOR_FORCEINLINE void AppendPrintf(StringT&& fmt, ArgTypes&&... args)
+	KOR_FORCEINLINE void AppendFormat(StringT&& fmt, const ArgTypes&... args)
 	{
-		AppendStringImpl(
-			Move(
-				TString::Printf(
-					Forward<StringT>(fmt),
-					Forward<ArgTypes>(args)...
-				)
-			)
-		);
+		AppendStringImpl(Move(TString::Format(Forward<StringT>(fmt), args...)));
 	}
 
 	// Const manipulation
@@ -339,7 +333,7 @@ public:
 
 	bool Split(const TString& val, TString* outLeft, TString* outRight, bool caseSensitive = true, bool fromStart = true) const
 	{
-		const SizeType foundIdx = SCString::FindIndex(GetChars(), val.GetChars(), caseSensitive, fromStart);
+		const SizeType foundIdx = Find(val, caseSensitive, fromStart);
 		if (foundIdx == KOR_INDEX_NONE)
 			return false;
 
@@ -431,7 +425,7 @@ public:
 		return newString;
 	}
 
-	KOR_FORCEINLINE void ToUpperInline() { SCString::ToUpper(_data.GetData()); }
+	KOR_FORCEINLINE void ToUpperInline() { TT::SOps::ToUpper(_data.GetData()); }
 
 	TString ToLower() const
 	{
@@ -440,7 +434,7 @@ public:
 		return newString;
 	}
 
-	KOR_FORCEINLINE void ToLowerInline() { SCString::ToLower(_data.GetData()); }
+	KOR_FORCEINLINE void ToLowerInline() { TT::SOps::ToLower(_data.GetData()); }
 
 	// Removes all characters from the index position to the end of the string
 	// * Does NOT modify the source string
@@ -576,7 +570,7 @@ private:
 		RemoveTerm(_data);
 		if (text)
 		{
-			_data.Append(text, textLen > 0 ? textLen : SCString::GetLength(text) + 1);
+			_data.Append(text, textLen > 0 ? textLen : TT::SOps::Length(text) + 1);
 		}
 		AddTerm(_data);
 	}
@@ -584,7 +578,7 @@ private:
 	KOR_FORCEINLINE void EmptyImpl(bool keepResources) { _data.Empty(keepResources); }
 	KOR_FORCEINLINE SizeType GetLastCharIndex() const { return _data.GetNum() - 2; }
 
-	KOR_FORCEINLINE_DEBUGGABLE static bool HasTerm(const DataType& data) { return !data.IsEmpty() && *data.GetLast() == TT::Constant::Null; }
+	KOR_FORCEINLINE static bool HasTerm(const DataType& data) { return !data.IsEmpty() && *data.GetLast() == TT::Constant::Null; }
 	KOR_FORCEINLINE static void AddTermChecked(DataType& data) { data.Add(TT::Constant::Null); }
 	KOR_FORCEINLINE static void AddTerm(DataType& data) { if (!HasTerm(data)) { AddTermChecked(data); }}
 	KOR_FORCEINLINE static void RemoveTermChecked(DataType& data) { data.RemoveAt(data.GetNum() - 1); }
@@ -600,13 +594,13 @@ private:
 			CharType lhs = str._data[i];
 			CharType rhs = val._data[i];
 
-			if(!caseSensitive)
+			if (!caseSensitive)
 			{
-				lhs = SCString::ToLowerChar(lhs);
-				rhs = SCString::ToLowerChar(rhs);
+				lhs = TT::COps::ToLower(lhs);
+				rhs = TT::COps::ToLower(rhs);
 			}
 
-			if(lhs != rhs)
+			if (lhs != rhs)
 			{
 				return false;
 			}
@@ -633,7 +627,7 @@ private:
 			const CharType* init = mainStr.GetData();
 			const CharType* subChars = subStr.GetData();
 
-			while(const CharType* current = SCString::Find(init, subChars, caseSensitive))
+			while(const CharType* current = TT::SOps::Find(init, subChars, caseSensitive))
 			{
 				if (!ignoreEmpty || current-init)
 				{

@@ -68,6 +68,35 @@ KOR_FORCEINLINE bool TStringOps<CharType>::IsNumeric(const CharType(& str)[N]) n
 }
 
 template<typename CharType>
+bool TStringOps<CharType>::IsWhitespace(const CharType* str) noexcept
+{
+	while(*str)
+	{
+		if (!CharOps::IsWhitespace(*(str++))) return false;
+	}
+
+	return true;
+}
+
+template<typename CharType>
+bool TStringOps<CharType>::IsWhitespace(const CharType* str, int32 len) noexcept
+{
+	while(len-- > 0)
+	{
+		if (!CharOps::IsWhitespace(*(str++))) return false;
+	}
+
+	return true;
+}
+
+template<typename CharType>
+template<int32 N>
+KOR_FORCEINLINE bool TStringOps<CharType>::IsWhitespace(const CharType (&str)[N]) noexcept
+{
+	return IsWhitespace(str, N);
+}
+
+template<typename CharType>
 bool TStringOps<CharType>::IsUpper(const CharType* str) noexcept
 {
 	while(*str)

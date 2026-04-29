@@ -3,6 +3,107 @@
 
 #pragma once // silence tooling
 
+namespace Internal
+{
+	template<typename IntT, typename CharT>
+	static IntT Atoi(const CharT* str, const CharT** outEnd, int32 base) noexcept
+	{
+		// CRT version removes leading whitespaces
+		// while (CharOps::IsWhitespace(*str)) ++str;
+
+		IntT result = 0;
+		bool negative = false;
+
+		if (*str == TCharConstant<CharT>::Plus) { ++str; }
+		else if constexpr (TIsSigned<IntT>::Value)
+		{
+			if (*str == TCharConstant<CharT>::Minus) { negative = true; ++str; }
+		}
+
+		while (*str)
+		{
+			const int32 digit = TCharOps<CharT>::ToInt(*str);
+			if (digit < 0 || digit >= base) break;
+
+			result = result * base + digit;
+			++str;
+		}
+
+		if (outEnd) *outEnd = str;
+
+		if constexpr (TIsSigned<IntT>::Value) return negative ? -result : result;
+		else return result;
+	}
+
+	template<typename IntT, typename CharT>
+	KOR_FORCEINLINE static IntT Atoi(const CharT* str, int32 base) noexcept
+	{
+		const CharT* end = nullptr;
+		return Atoi<IntT>(str, &end, base);
+	}
+
+	template<typename IntT, typename CharT>
+	KOR_FORCEINLINE static IntT Atoi(const CharT* str, int32& outLen, int32 base) noexcept
+	{
+		const CharT* end = nullptr;
+		const IntT result = Atoi<IntT>(str, &end, base);
+		outLen = KOR_PTR_DIFF(int32, end, str);
+		return result;
+	}
+
+	template<typename IntT, typename CharT>
+	static int32 Itoa(CharT* str, IntT value, int32 maxLen, int32 base) noexcept
+	{
+		if (maxLen <= 0) return KOR_INDEX_NONE;
+
+		if (value == 0)
+		{
+			if (maxLen < 2) return KOR_INDEX_NONE;
+			str[0] = TCharConstant<CharT>::Zero;
+			str[1] = TCharConstant<CharT>::Null;
+			return 1;
+		}
+
+		bool negative = false;
+		if constexpr (TIsSigned<IntT>::Value)
+		{
+			if (value < 0) { negative = true; value = -value; }
+		}
+
+		CharT* end = str + maxLen - 1;
+		*end = TCharConstant<CharT>::Null;
+
+		CharT* cur = end;
+		while (value > 0)
+		{
+			if (cur <= str) return KOR_INDEX_NONE;
+			*--cur = TCharOps<CharT>::FromInt(value % base);
+			value /= base;
+		}
+
+		if (negative)
+		{
+			if (cur <= str) return KOR_INDEX_NONE;
+			*--cur = TCharConstant<CharT>::Minus;
+		}
+
+		const int32 result = KOR_PTR_DIFF(int32, end, cur);
+		if (cur != str)
+		{
+			SMemory::Copy(str, cur, result);
+		}
+
+		str[result] = TCharConstant<CharT>::Null;
+		return result;
+	}
+
+	template<typename IntT, typename CharT>
+	static int32 Itoa(CharT* str, IntT value, int32 base) noexcept
+	{
+		return Itoa(str, value, SMemory::BUFFER_SIZE_LARGE, base);
+	}
+}
+
 template<typename CharType>
 template<typename ToCharType>
 int32 TStringOps<CharType>::ConvertedLength(const CharType* str, int32 len) noexcept
@@ -258,145 +359,79 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Convert(const CharType (&str)[N], To
 }
 
 template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::ToInt32(const CharType* str, int32 base) noexcept
+KOR_FORCEINLINE int64 TStringOps<CharType>::ToInt(const CharType* str, int32 base) noexcept
 {
-	return Internal::StrToInt<int32>(str, nullptr, base);
+	return Internal::Atoi<int64>(str, base);
 }
 
 template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::ToInt32(const CharType* str, const CharType*& outEnd, int32 base) noexcept
+KOR_FORCEINLINE int64 TStringOps<CharType>::ToInt(const CharType* str, int32& outLen, int32 base) noexcept
 {
-	return Internal::StrToInt<int32>(str, &outEnd, base);
+	return Internal::Atoi<int64>(str, outLen, base);
 }
 
 template<typename CharType>
-KOR_FORCEINLINE int64 TStringOps<CharType>::ToInt64(const CharType* str, int32 base) noexcept
+KOR_FORCEINLINE uint64 TStringOps<CharType>::ToUInt(const CharType* str, int32 base) noexcept
 {
-	return Internal::StrToInt<int64>(str, nullptr, base);
+	return Internal::Atoi<uint64>(str, base);
 }
 
 template<typename CharType>
-KOR_FORCEINLINE int64 TStringOps<CharType>::ToInt64(const CharType* str, const CharType*& outEnd, int32 base) noexcept
+KOR_FORCEINLINE uint64 TStringOps<CharType>::ToUInt(const CharType* str, int32& outLen, int32 base) noexcept
 {
-	return Internal::StrToInt<int64>(str, &outEnd, base);
+	return Internal::Atoi<uint64>(str, outLen, base);
 }
 
 template<typename CharType>
-KOR_FORCEINLINE uint32 TStringOps<CharType>::ToUInt32(const CharType* str, int32 base) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::FromInt(CharType* str, int64 value, int32 base) noexcept
 {
-	return Internal::StrToInt<uint32>(str, nullptr, base);
+	return Internal::Itoa(str, value, base);
 }
 
 template<typename CharType>
-KOR_FORCEINLINE uint32 TStringOps<CharType>::ToUInt32(const CharType* str, const CharType*& outEnd, int32 base) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::FromInt(CharType* str, int64 value, int32 maxLen, int32 base) noexcept
 {
-	return Internal::StrToInt<uint32>(str, &outEnd, base);
+	return Internal::Itoa(str, value, maxLen, base);
 }
 
 template<typename CharType>
-KOR_FORCEINLINE uint64 TStringOps<CharType>::ToUInt64(const CharType* str, int32 base) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::FromUInt(CharType* str, uint64 value, int32 base) noexcept
 {
-	return Internal::StrToInt<uint64>(str, nullptr, base);
+	return Internal::Itoa(str, value, SMemory::BUFFER_SIZE_LARGE, base);
 }
 
 template<typename CharType>
-KOR_FORCEINLINE uint64 TStringOps<CharType>::ToUInt64(const CharType* str, const CharType*& outEnd, int32 base) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::FromUInt(CharType* str, uint64 value, int32 maxLen, int32 base) noexcept
 {
-	return Internal::StrToInt<uint64>(str, &outEnd, base);
-}
-
-template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromInt32(CharType* str, int32 value, int32 base) noexcept
-{
-	return Internal::IntToStr(str, value, base);
-}
-
-template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromInt32(CharType* str, int32 value, int32 len, int32 base) noexcept
-{
-	return Internal::IntToStr(str, value, len, base);
-}
-
-template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromInt64(CharType* str, int64 value, int32 base) noexcept
-{
-	return Internal::IntToStr(str, value, base);
-}
-
-template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromInt64(CharType* str, int64 value, int32 len, int32 base) noexcept
-{
-	return Internal::IntToStr(str, value, len, base);
-}
-
-template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromUInt32(CharType* str, uint32 value, int32 base) noexcept
-{
-	return Internal::IntToStr(str, value, base);
-}
-
-template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromUInt32(CharType* str, uint32 value, int32 len, int32 base) noexcept
-{
-	return Internal::IntToStr(str, value, len, base);
-}
-
-template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromUInt64(CharType* str, uint64 value, int32 base) noexcept
-{
-	return Internal::IntToStr(str, value, base);
-}
-
-template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromUInt64(CharType* str, uint64 value, int32 len, int32 base) noexcept
-{
-	return Internal::IntToStr(str, value, len, base);
+	return Internal::Itoa(str, value, maxLen, base);
 }
 
 template<typename CharType>
 template<int32 N>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromInt32(CharType (&str)[N], int32 value, int32 base) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::FromInt(CharType (&str)[N], int64 value, int32 base) noexcept
 {
-	return FromInt32(str, value, N, base);
+	return FromInt(str, value, N, base);
 }
 
 template<typename CharType>
 template<int32 N>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromInt64(CharType (&str)[N], int64 value, int32 base) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::FromUInt(CharType (&str)[N], uint64 value, int32 base) noexcept
 {
-	return FromInt64(str, value, N, base);
-}
-
-template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromUInt32(CharType (&str)[N], uint32 value, int32 base) noexcept
-{
-	return FromUInt32(str, value, N, base);
-}
-
-template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromUInt64(CharType (&str)[N], uint64 value, int32 base) noexcept
-{
-	return FromUInt64(str, value, N, base);
+	return FromUInt(str, value, N, base);
 }
 
 template<typename CharType>
 KOR_FORCEINLINE double TStringOps<CharType>::ToFloat(const CharType* str) noexcept
 {
-	// IMPLEMENT PlatformStringOps
-
-	if constexpr (TIsSame<CharType, achar>::Value)
+	if constexpr (TIsSame<CharType, achar>::Value || TIsSame<CharType, char8>::Value)
 	{
-		return strtod(str, nullptr);
+		const achar* end = nullptr;
+		return SPlatformAnsiStringOps::Strtod(reinterpret_cast<const achar*>(str), &end);
 	}
 	else if constexpr (TIsSame<CharType, wchar>::Value)
 	{
-		return wcstod(str, nullptr);
-	}
-	else if constexpr (TIsSame<CharType, char8>::Value)
-	{
-		return strtod(reinterpret_cast<const achar*>(str), nullptr);
+		const wchar* end = nullptr;
+		return SPlatformWideStringOps::Strtod(str, &end);
 	}
 	else
 	{
@@ -406,23 +441,22 @@ KOR_FORCEINLINE double TStringOps<CharType>::ToFloat(const CharType* str) noexce
 }
 
 template<typename CharType>
-KOR_FORCEINLINE double TStringOps<CharType>::ToFloat(const CharType* str, const CharType*& outEnd) noexcept
+KOR_FORCEINLINE double TStringOps<CharType>::ToFloat(const CharType* str, int32& outLen) noexcept
 {
 	// IMPLEMENT PlatformStringOps
 
-	if constexpr (TIsSame<CharType, achar>::Value)
+	if constexpr (TIsSame<CharType, achar>::Value || TIsSame<CharType, char8>::Value)
 	{
-		return strtod(str, &outEnd);
+		achar* end = nullptr;
+		const double result = SPlatformAnsiStringOps::Strtod(str, &end);
+		outLen = KOR_PTR_DIFF(int32, end, str);
+		return result;
 	}
 	else if constexpr (TIsSame<CharType, wchar>::Value)
 	{
-		return wcstod(str, &outEnd);
-	}
-	else if constexpr (TIsSame<CharType, char8>::Value)
-	{
-		achar* end = nullptr;
-		const double result = strtod(reinterpret_cast<const achar*>(str), &end);
-		outEnd = reinterpret_cast<const CharType*>(end);
+		wchar* end = nullptr;
+		const double result = SPlatformWideStringOps::Strtod(str, &end);
+		outLen = KOR_PTR_DIFF(int32, end, str);
 		return result;
 	}
 	else
@@ -436,7 +470,7 @@ template<typename CharType>
 template<EFloatFormat Format>
 KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double value, int32 precision) noexcept
 {
-	return FromFloat(str, value, SMemory::MAX_BUFFER_SIZE_DOUBLE, precision);
+	return FromFloat(str, value, SMemory::BUFFER_SIZE_DOUBLE_MAX, precision);
 }
 
 template<typename CharType>
@@ -455,21 +489,21 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double valu
 
 template<typename CharType>
 template<EFloatFormat Format>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double value, int32 len, int32 precision) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double value, int32 maxLen, int32 precision) noexcept
 {
 	if constexpr (TIsSame<CharType, achar>::Value || TIsSame<CharType, char8>::Value)
 	{
 		const achar* fmtStr =
 			Format == EFloatFormat::Fixed		? KOR_TEXT_ANSI("%.*f") :
 			Format == EFloatFormat::Scientific	? KOR_TEXT_ANSI("%.*e") : KOR_TEXT_ANSI("%.*g");
-		return SPlatformAnsiStringOps::Snprintf(reinterpret_cast<achar*>(str), fmtStr, len, precision, value);
+		return SPlatformAnsiStringOps::Snprintf(reinterpret_cast<achar*>(str), fmtStr, maxLen, precision, value);
 	}
 	else if constexpr (TIsSame<CharType, wchar>::Value)
 	{
 		const wchar* fmtStr =
 			Format == EFloatFormat::Fixed		? KOR_TEXT_WIDE("%.*f") :
 			Format == EFloatFormat::Scientific	? KOR_TEXT_WIDE("%.*e") : KOR_TEXT_WIDE("%.*g");
-		return SPlatformWideStringOps::Snprintf(str, fmtStr, len, precision, value);
+		return SPlatformWideStringOps::Snprintf(str, fmtStr, maxLen, precision, value);
 	}
 	else
 	{
@@ -479,16 +513,16 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double valu
 }
 
 template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double value, int32 len, int32 precision, EFloatFormat format) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::FromFloat(CharType* str, double value, int32 maxLen, int32 precision, EFloatFormat format) noexcept
 {
 	switch (format)
 	{
 		case EFloatFormat::Fixed:
-			return FromFloat<EFloatFormat::Fixed>(str, value, len, precision);
+			return FromFloat<EFloatFormat::Fixed>(str, value, maxLen, precision);
 		case EFloatFormat::Scientific:
-			return FromFloat<EFloatFormat::Scientific>(str, value, len, precision);
+			return FromFloat<EFloatFormat::Scientific>(str, value, maxLen, precision);
 		default:
-			return FromFloat<EFloatFormat::Auto>(str, value, len, precision);
+			return FromFloat<EFloatFormat::Auto>(str, value, maxLen, precision);
 	}
 }
 

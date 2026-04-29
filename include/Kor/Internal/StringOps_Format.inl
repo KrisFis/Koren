@@ -5,15 +5,15 @@
 
 template<typename CharType>
 template<typename... ArgT>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Format(CharType* str, const CharType* fmt, int32 len, const ArgT&... args) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::Format(CharType* str, const CharType* fmt, int32 maxLen, const ArgT&... args) noexcept
 {
 	if constexpr (TIsSame<CharType, achar>::Value || TIsSame<CharType, char8>::Value)
 	{
-		return SPlatformAnsiStringOps::Snprintf(reinterpret_cast<achar*>(str), reinterpret_cast<const achar*>(fmt), len, args...);
+		return SPlatformAnsiStringOps::Snprintf(reinterpret_cast<achar*>(str), reinterpret_cast<const achar*>(fmt), maxLen, args...);
 	}
 	else if constexpr (TIsSame<CharType, wchar>::Value)
 	{
-		return SPlatformWideStringOps::Snprintf(str, fmt, len, args...);
+		return SPlatformWideStringOps::Snprintf(str, fmt, maxLen, args...);
 	}
 	else
 	{

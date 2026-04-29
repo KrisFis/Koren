@@ -7,7 +7,7 @@ template<typename CharType>
 template<ESearchCase Case>
 int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const CharType* to) noexcept
 {
-	CharType* buffer = Internal::GetBuffer<CharType, SMemory::LARGE_BUFFER_SIZE>();
+	CharType* buffer = Internal::GetScratchBuffer<CharType>();
 
 	const int32 fromLen = Length(from);
 	const int32 toLen   = Length(to);
@@ -47,9 +47,9 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType* str, const CharTyp
 
 template<typename CharType>
 template<ESearchCase Case>
-int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const CharType* to, int32 len) noexcept
+int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const CharType* to, int32 maxLen) noexcept
 {
-	CharType* buffer = Internal::GetBuffer<CharType, SMemory::LARGE_BUFFER_SIZE>();
+	CharType* buffer = Internal::GetScratchBuffer<CharType>();
 
 	const int32 fromLen = Length(from);
 	const int32 toLen = Length(to);
@@ -57,7 +57,7 @@ int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const C
 	int32 count = 0;
 	CharType* dst = buffer;
 	const CharType* src = str;
-	int32 remaining = len;
+	int32 remaining = maxLen;
 
 	while (remaining > 0)
 	{
@@ -76,16 +76,16 @@ int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const C
 	}
 
 	*dst = CharConstant::Null;
-	Copy(str, buffer, len);
+	Copy(str, buffer, maxLen);
 	return count;
 }
 
 template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const CharType* to, int32 len, ESearchCase searchCase) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const CharType* to, int32 maxLen, ESearchCase searchCase) noexcept
 {
 	return searchCase == ESearchCase::Sensitive
-		? Replace<ESearchCase::Sensitive>(str, from, to, len)
-		: Replace<ESearchCase::Insensitive>(str, from, to, len);
+		? Replace<ESearchCase::Sensitive>(str, from, to, maxLen)
+		: Replace<ESearchCase::Insensitive>(str, from, to, maxLen);
 }
 
 template<typename CharType>
@@ -133,12 +133,12 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType* str, CharType from
 
 template<typename CharType>
 template<ESearchCase Case>
-int32 TStringOps<CharType>::Replace(CharType* str, CharType from, CharType to, int32 len) noexcept
+int32 TStringOps<CharType>::Replace(CharType* str, CharType from, CharType to, int32 maxLen) noexcept
 {
 	int32 result = 0;
 
 	const CharType lf = CharMayLower<Case>(from);
-	while (len-- > 0)
+	while (maxLen-- > 0)
 	{
 		if (CharMayLower<Case>(*str) == lf)
 		{
@@ -153,11 +153,11 @@ int32 TStringOps<CharType>::Replace(CharType* str, CharType from, CharType to, i
 }
 
 template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType* str, CharType from, CharType to, int32 len, ESearchCase searchCase) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType* str, CharType from, CharType to, int32 maxLen, ESearchCase searchCase) noexcept
 {
 	return searchCase == ESearchCase::Sensitive
-		? Replace<ESearchCase::Sensitive>(str, from, to, len)
-		: Replace<ESearchCase::Insensitive>(str, from, to, len);
+		? Replace<ESearchCase::Sensitive>(str, from, to, maxLen)
+		: Replace<ESearchCase::Insensitive>(str, from, to, maxLen);
 }
 
 template<typename CharType>
