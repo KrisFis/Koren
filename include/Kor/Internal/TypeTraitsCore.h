@@ -12,14 +12,19 @@ KOR_NAMESPACE_BEGIN
 
 typedef decltype(sizeof(0)) TSize;
 
+// [[ TVoid ]]
+// * Gets any param and returns void type
+
+template <typename... ArgsT> struct TVoid { using Type = void; };
+
 // [Bool Value]
 // * False and true value
 
 template<bool T> struct TBoolValue { static constexpr bool Value = T; };
 template<typename> struct TValue : TBoolValue<true> {};
 
-typedef TBoolValue<true> TTrueValue;
-typedef TBoolValue<false> TFalseValue;
+typedef TBoolValue<true> TTrueType;
+typedef TBoolValue<false> TFalseType;
 
 // [Enable if]
 // * Enables compilation of specific template function/struct when condition met

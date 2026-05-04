@@ -18,7 +18,7 @@ struct SArchive;
 /////////////////////////////////
 
 template<typename T>
-struct TString;
+class TString;
 
 template<typename ElementT>
 class TArrayAllocator;

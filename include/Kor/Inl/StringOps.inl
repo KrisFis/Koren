@@ -34,10 +34,10 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Length(const CharType(&)[N]) noexcep
 	return N;
 }
 
-#include "Kor/Internal/StringOps_Query.inl"
-#include "Kor/Internal/StringOps_Compare.inl"
-#include "Kor/Internal/StringOps_Transform.inl"
-#include "Kor/Internal/StringOps_Find.inl"
-#include "Kor/Internal/StringOps_Replace.inl"
-#include "Kor/Internal/StringOps_Format.inl"
-#include "Kor/Internal/StringOps_Convert.inl"
+#include "Kor/Inl/StringOps_Query.inl"
+#include "Kor/Inl/StringOps_Compare.inl"
+#include "Kor/Inl/StringOps_Transform.inl"
+#include "Kor/Inl/StringOps_Find.inl"
+#include "Kor/Inl/StringOps_Replace.inl"
+#include "Kor/Inl/StringOps_Format.inl"
+#include "Kor/Inl/StringOps_Convert.inl"

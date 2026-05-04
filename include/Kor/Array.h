@@ -36,20 +36,22 @@ public:
 	// Constructors
 	/////////////////////////////////
 
-	KOR_FORCEINLINE TArray() : _allocator(), _num(0) {}
-	KOR_FORCEINLINE TArray(const TArray& other) : _allocator(), _num(0) { AppendImpl(other); }
+	KOR_FORCEINLINE constexpr TArray() noexcept : _allocator(), _num(0) {}
+	KOR_FORCEINLINE TArray(const TArray& other) noexcept : _allocator(), _num(0) { AppendImpl(other); }
 	KOR_FORCEINLINE TArray(TArray&& other) noexcept : _allocator(), _num(0) { ReplaceImpl(Move(other)); }
-	KOR_FORCEINLINE TArray(SizeType num, bool reserveOnly = false) : _allocator(), _num(0)
+	KOR_FORCEINLINE TArray(SizeType num, bool reserveOnly = false) noexcept : _allocator(), _num(0)
 	{
 		if (reserveOnly) ReserveImpl(num);
 		else GrowImpl(num);
 	}
-	KOR_FORCEINLINE TArray(const ElementListType& list) : _allocator() , _num(0)
+	KOR_FORCEINLINE TArray(const ElementListType& list) noexcept
+		: _allocator()
+		, _num(0)
 	{
 		AppendImpl(list.begin(), list.size());
 	}
 
-	KOR_FORCEINLINE TArray(const ElementT* data, SizeType num)
+	KOR_FORCEINLINE TArray(const ElementT* data, SizeType num) noexcept
 		: _allocator()
 		, _num(0)
 	{

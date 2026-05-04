@@ -410,9 +410,9 @@ struct TStringOps
 	static int32 FromFloat(CharType (&str)[N], double value, int32 precision, EFloatFormat format) noexcept;
 };
 
-#include "Kor/Internal/StringOps.inl"
+#include "Inl/StringOps.inl"
 
-// Convenience typedefs for tchar
+	// Convenience typedefs for tchar
 using SStringOps = TStringOps<tchar>;
 
 KOR_NAMESPACE_END

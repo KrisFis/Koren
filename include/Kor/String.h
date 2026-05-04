@@ -8,693 +8,569 @@
 #include "Kor/Archive.h"
 #include "Kor/Array.h"
 
-// Remove dependency
-#include "Kor/Assert.h"
-
 KOR_NAMESPACE_BEGIN
 
-// [ Is String ]
-// Checks if type is string type
-
-template<typename T> struct TIsTString : public TFalseValue {};
-template<typename CharT> struct TIsTString<TString<CharT>> : public TTrueValue {};
-
-// [ TString Format Traits ]
-// * Checks if specific format is valid for CharT
-
-template<typename CharT, typename FmtT>
-struct TTStringFormatTraits
+template<typename CharT>
+class TStringView
 {
-	static_assert(TIsCharacter<CharT>::Value, "CharT must be character type");
+	static_assert(TIsCharacter<CharT>::Value, "CharType must be character type");
 
-private:
-	using RawFmtT = typename TRemoveConstReference<FmtT>::Type;
-	using PureFmt = typename TPure<FmtT>::Type;
+	using CharConstant = TCharConstant<CharT>;
+	using CharOps = TCharOps<CharT>;
+	using StringOps = TStringOps<CharT>;
 
 public:
-	enum
-	{
-		IsCString = (TIsPointer<RawFmtT>::Value && TIsSame<PureFmt, CharT>::Value),
-		IsCArray = (TIsArray<RawFmtT>::Value && TIsSame<PureFmt, CharT>::Value),
-
-		IsTString = TIsSame<PureFmt, TString<CharT>>::Value,
-
-		IsValid = IsCArray || IsCString || IsTString
-	};
-};
-
-// [ TString Traits ]
-// General TString traits
-// * Helps to navigate to underlying ops and constants for underlying character type
-
-template<typename CharT>
-struct TTStringTraits
-{
-	static_assert(TIsCharacter<CharT>::Value, "CharT must be character type");
-
-	using CharType = CharT;
-	using Constant = TCharConstant<CharT>;
-
-	using COps = TCharOps<CharT>;
-	using SOps = TStringOps<CharT>;
-};
-
-// TODO: Reimplement to use TStringOps properly
-// Example: FromFloat -> template version and non-templated one
-template<typename CharT>
-struct TString
-{
-private:
-	static_assert(TIsCharacter<CharT>::Value, "CharT must be character type");
-	using TT = TTStringTraits<CharT>;
-
-public:
-
-	// Types
-	/////////////////////////////////
-
 	using CharType = CharT;
 
-	typedef TArray<CharType> DataType;
-	typedef typename DataType::SizeType SizeType;
+	// TODO: Replace with TArrayView once implemented
+	using DataType = const CharT*;
+	using SizeType = TArray<CharT, TArrayAllocator<CharT>>::SizeType;
 
-	typedef CharType* IteratorType;
-	typedef const CharType* ConstIteratorType;
+	using IteratorType      = const CharType*;
+	using ConstIteratorType = const CharType*;
 
-	// Constructors
-	/////////////////////////////////
+	// Constructors - Default, Copy, Move
+	// View is trivially copyable, no move needed.
+	// -------------------------------------------------------------------------
 
-	KOR_FORCEINLINE TString() { InitToEmpty(); }
+	constexpr TStringView() noexcept = default;
+	constexpr TStringView(const TStringView& other) noexcept = default;
+	TStringView& operator=(const TStringView& other) noexcept = default;
 
-	KOR_FORCEINLINE TString(const TString& other) { AppendStringImpl(other); }
-	KOR_FORCEINLINE TString(TString&& other) noexcept { AppendStringImpl(Move(other)); }
+	// Constructors - From raw pointer
+	// -------------------------------------------------------------------------
 
-	KOR_FORCEINLINE TString(const CharType* text) { AppendCharsImpl(text); }
-	KOR_FORCEINLINE TString(const CharType* text, SizeType length) { AppendCharsImpl(text, length); }
+	constexpr TStringView(const CharType* text) noexcept;
+	constexpr TStringView(const CharType* text, SizeType length) noexcept;
 
-	// fill constructor
-	KOR_FORCEINLINE TString(SizeType length, CharType val = TT::Constant::Null) { InitToFill(length, val); }
+	template<TSize N>
+	constexpr TStringView(const CharType (&text)[N]) noexcept;
 
-	KOR_FORCEINLINE explicit TString(const DataType& data) { AppendDataImpl(data); }
-	KOR_FORCEINLINE explicit TString(DataType&& data) noexcept { AppendDataImpl(Move(data)); }
+	// Constants
+	// -------------------------------------------------------------------------
 
-	// Gets the empty string as a non-mutable reference
-	static const TString& GetEmpty()
-	{
-		static TString emptyString = TString();
-		return emptyString;
-	}
+	// Returns an empty view. No allocation, points to a static null terminator.
+	static constexpr TStringView GetEmpty() noexcept;
 
-	// Compare operators
-	/////////////////////////////////
+	// Comparison operators
+	// Performs case-sensitive comparison.
+	// Use Equals() for case-insensitive comparison.
+	// -------------------------------------------------------------------------
 
-	KOR_FORCEINLINE bool operator==(const TString& other) const { return _data == other._data; }
-	KOR_FORCEINLINE bool operator!=(const TString& other) const { return !operator==(other); }
+	bool operator==(const TStringView& other) const noexcept;
+	bool operator!=(const TStringView& other) const noexcept;
 
-	// Assign operators
-	/////////////////////////////////
+	// Dereference / subscript
+	// operator* - Returns raw const char pointer, equivalent to GetChars().
+	// operator[] - Returns character at index, no bounds checking.
+	// -------------------------------------------------------------------------
 
-	KOR_FORCEINLINE TString& operator=(const TString& other) { InitToEmpty(); AppendStringImpl(other); return *this; }
-	KOR_FORCEINLINE TString& operator=(TString&& other) noexcept { InitToEmpty(); AppendStringImpl(Move(other)); return *this; }
-
-	// Arithmetic operators
-	/////////////////////////////////
-
-	KOR_FORCEINLINE TString operator+(const TString& other) const { TString tmpStr(*this); tmpStr.AppendStringImpl(other); return *this; }
-	KOR_FORCEINLINE TString operator+(TString&& other) const { TString tmpStr(*this); tmpStr.AppendStringImpl(Move(other)); return *this; }
-
-	KOR_FORCEINLINE TString& operator+=(const TString& other) { AppendStringImpl(other); return *this; }
-	KOR_FORCEINLINE TString& operator+=(TString&& other) { AppendStringImpl(Move(other)); return *this; }
-
-	// Get operators
-	/////////////////////////////////
-
-	KOR_FORCEINLINE const CharType* operator*() const { return _data.GetData(); }
-	KOR_FORCEINLINE CharType* operator*() { return _data.GetData(); }
-
-	KOR_FORCEINLINE CharType operator[](SizeType idx) const { return _data[idx]; }
-
-	// Path operators
-	/////////////////////////////////
-
-	KOR_FORCEINLINE TString operator/(const TString& other) const { TString tmpStr(*this); tmpStr.operator/=(other); return tmpStr; }
-	KOR_FORCEINLINE TString operator/=(const TString& other) { AppendCharsImpl(TT::Constant::Slash); AppendStringImpl(other); return *this; }
+	const CharType* operator*() const noexcept;
+	CharType        operator[](SizeType idx) const noexcept;
 
 	// Property getters
-	/////////////////////////////////
-
-	KOR_FORCEINLINE const DataType& GetData() const { return _data; }
-
-	KOR_FORCEINLINE const CharType* GetChars() const { return _data.GetData(); }
-	KOR_FORCEINLINE CharType* GetChars() { return _data.GetData(); }
-
-	// Gets length of the string WITHOUT terminating character
-	KOR_FORCEINLINE SizeType GetLength() const { return _data.GetNum() > 1 ? _data.GetNum() - 1 : 0; }
-
-	// Checks whether specific index within the string can be safely dereferenced 
-	KOR_FORCEINLINE bool IsValidIndex(SizeType idx) const { return idx >= 0 && idx < GetLastCharIndex(); }
-
-	// Checks whether string is empty
-	KOR_FORCEINLINE bool IsEmpty() const { return GetLength() == 0; }
-
-	// Construction
-	/////////////////////////////////
-
-	template<typename FmtT, typename... VarTypes>
-	static TString Format(const FmtT& fmt, const VarTypes&... args)
-	{
-		using StringTraits = TTStringFormatTraits<CharT, FmtT>;
-
-		static_assert(sizeof...(VarTypes) > 0, "No arguments provided. Use construction from fmt directly instead");
-		static_assert(StringTraits::IsValid, "Format variable is not valid");
-
-		const CharType* format = nullptr;
-
-		if constexpr (StringTraits::IsTString) { format = fmt.GetChars(); }
-		else if constexpr (StringTraits::IsCArray || StringTraits::IsCString) { format = fmt; }
-		else { static_assert(sizeof(FmtT) > 0, "Unimplemented format type"); }
-
-		TString result;
-		result._data.Resize(512);
-
-		int32 writtenBytes = TT::SOps::Format(result._data.GetData(), format, result._data.GetNum(), args...);
-		if (writtenBytes < 0) return TString();
-
-		if (writtenBytes >= result._data.GetNum())
-		{
-			result._data.Resize(writtenBytes + 1);
-			KOR_ASSERT(TT::SOps::Format(result._data.GetData(), format, result._data.GetNum(), args...) == writtenBytes);
-		}
-		else
-		{
-			result._data.Resize(writtenBytes + 1);
-		}
-
-		// MSVC wide does not null terminate on truncation, ensure null term explicitly
-		result._data[writtenBytes] = TT::Constant::Null;
-
-		return result;
-	}
-
-	template<typename FmtT, typename... VarTypes>
-	KOR_DEPRECATED_MSG("Use Format() instead")
-	KOR_FORCEINLINE static TString Printf(FmtT&& fmt, const VarTypes&... args)
-	{
-		return Format(Move(fmt), args...);
-	}
-
-	// Conversions
-	/////////////////////////////////
-
-	// Converts string to int64 equivalent
-	// * "10" => 10
-	KOR_FORCEINLINE int64 ToInt(int32 base = 10) const { return TT::SOps::ToInt(_data.GetData(), base); }
-
-	// Converts string to uint64 equivalent
-	// * "10" => 10
-	KOR_FORCEINLINE uint64 ToUInt(int32 base = 10) const { return TT::SOps::ToUInt(_data.GetData(), base); }
-
-	// Converts string to int64 equivalent
-	// * "10.1" => 10.1
-	KOR_FORCEINLINE double ToFloat() const { return TT::SOps::ToFloat(_data.GetData()); }
-
-	// Constructs new string from int64
-	// * 10 => "10"
-	static TString FromInt(int64 val)
-	{
-		CharType* buffer = Internal::GetScratchBuffer<CharType>();
-		const int32 len = TT::SOps::FromInt(buffer, val);
-		return len > 0 ? TString(buffer, len + 1) : TString();
-	}
-
-	// Constructs new string from uint64
-	// * 10 => "10"
-	static TString FromUInt(uint64 val)
-	{
-		CharType* buffer = Internal::GetScratchBuffer<CharType>();
-		const int32 len = TT::SOps::FromUInt(buffer, val);
-		return len > 0 ? TString(buffer, len + 1) : TString();
-	}
-
-	// Constructs new string from double, providing number of digits to expect
-	// * 10.1 => "10.1"
-	static TString FromFloat(double val, uint8 precision = 6, EFloatFormat format = EFloatFormat::Auto)
-	{
-		CharType* buffer = Internal::GetScratchBuffer<CharType>();
-		const int32 len = TT::SOps::FromFloat(buffer, val, precision, format);
-		return len > 0 ? TString(buffer, len + 1) : TString();
-	}
-
-	// Iterations
-	/////////////////////////////////
-
-	KOR_FORCEINLINE IteratorType begin() { return _data.GetNum() > 1 ? &_data[0] : nullptr; }
-	KOR_FORCEINLINE ConstIteratorType begin() const { return _data.GetNum() > 1 ? &_data[0] : nullptr; }
-
-	KOR_FORCEINLINE IteratorType end() { return _data.GetNum() > 1 ? &_data[GetLastCharIndex()] : nullptr; }
-	KOR_FORCEINLINE ConstIteratorType end() const { return _data.GetNum() > 1 ? &_data[GetLastCharIndex()] : nullptr; }
-
-	// Compares
-	/////////////////////////////////
-
-	// Compares this string against the provided one
-	// * returns 0 if equal, -1 if this string is "bigger" and 1 if provided string is "bigger"
-	KOR_FORCEINLINE int32 Compare(const TString& other, bool caseSensitive = true) const
-	{
-		return TT::SOps::Compare(GetChars(), other.GetChars(), GetLength(), caseSensitive ? ESearchCase::Sensitive : ESearchCase::Insensitive);
-	}
-
-	// Checks whether this string is same as the provided one
-	// * Is same as Compare == 0
-	KOR_FORCEINLINE bool Equals(const TString& other, bool caseSensitive = true) const { return Compare(other, caseSensitive) == 0; }
-
-	// Checks
-	/////////////////////////////////
-
-	// Checks whether this string contains ONLY whitespaces
-	KOR_FORCEINLINE bool IsWhitespace() const { return TT::SOps::IsWhitespace(_data.GetData(), GetLength()); }
-
-	// Checks whether this string contains provided string from the beginning
-	KOR_FORCEINLINE bool StartsWith(const TString& val, bool caseSensitive = true) const
-	{
-		return ContainsAtIndexImpl(*this, val, 0, caseSensitive);
-	}
-
-	// Checks whether this string contains provided string from the end
-	KOR_FORCEINLINE bool EndsWith(const TString& val, bool caseSensitive = true) const
-	{
-		return ContainsAtIndexImpl(*this, val, GetLastCharIndex() - val.GetLastCharIndex(), caseSensitive);
-	}
-
-	// Checks whether this string contains provided string in any place
-	KOR_FORCEINLINE bool Contains(const TString& val, bool caseSensitive = true, bool fromStart = true) const
-	{
-		return TT::SOps::Find(GetChars(), val.GetChars(), caseSensitive, fromStart) != KOR_INDEX_NONE;
-	}
-
-	// Checks whether this string contains provided string in provided index
-	KOR_FORCEINLINE bool ContainsAt(const TString& val, SizeType index, bool caseSensitive = true)
-	{
-		return ContainsAtIndexImpl(*this, val, index, caseSensitive);
-	}
-
-	// Gets index from which this string contains provided string
-	KOR_FORCEINLINE SizeType Find(const TString& val, bool caseSensitive = true, bool fromStart = true) const
-	{
-		return TT::SOps::Find(
-			GetChars(), val.GetChars(),
-			GetLength(), val.GetLength(),
-			caseSensitive
-				? ESearchCase::Sensitive
-				: ESearchCase::Insensitive,
-			fromStart
-				? ESearchDir::Forward
-				: ESearchDir::Backward
-		);
-	}
-
-	// Append
-	/////////////////////////////////
-
-	// Appends this string with other string
-	KOR_FORCEINLINE void Append(const TString& other) { AppendStringImpl(other); }
-	KOR_FORCEINLINE void Append(TString&& other) { AppendStringImpl(Move(other)); }
-	KOR_FORCEINLINE void Append(const CharType* other, SizeType num = KOR_INDEX_NONE) { AppendCharsImpl(other, num); }
-
-	// Appends this string via "printf"
-	template<typename StringT, typename... ArgTypes>
-	KOR_FORCEINLINE void AppendFormat(StringT&& fmt, const ArgTypes&... args)
-	{
-		AppendStringImpl(Move(TString::Format(Forward<StringT>(fmt), args...)));
-	}
-
-	// Const manipulation
-	/////////////////////////////////
-
-	bool Split(const TString& val, TString* outLeft, TString* outRight, bool caseSensitive = true, bool fromStart = true) const
-	{
-		const SizeType foundIdx = Find(val, caseSensitive, fromStart);
-		if (foundIdx == KOR_INDEX_NONE)
-			return false;
-
-		if(outLeft)
-		{
-			outLeft->_data = DataType(_data.GetData(), foundIdx + 1);
-			outLeft->_data[foundIdx] = TT::Constant::Null;
-		}
-
-		if(outRight)
-		{
-			outRight->_data = DataType(GetChars() + foundIdx + 1, _data.GetNum() - foundIdx);
-		}
-
-		return true;
-	}
-
-	TArray<TString> SplitToArray(const TString& delimiter, bool discardEmpty = true, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true) const
-	{
-		TArray<TString> result;
-
-		SplitBySubstringPrivate(*this, delimiter, discardEmpty, caseSensitive, _data.GetNum(),
-			[&result, &num](const CharType* ptr, SizeType count) -> bool
-			{
-				TString& newStr = result.AddUninitialized_GetRef();
-				newStr._data = DataType(ptr, count);
-				newStr._data.Add(TT::Constant::Null);
-				return (--num == 0);
-			}
-		);
-
-		return result;
-	}
-
-	// Manipulation
-	/////////////////////////////////
-
-	TString Replace(const TString& from, const TString& to, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true) const
-	{
-		TString newString(*this);
-		newString.ReplaceInline(from, to, num, caseSensitive);
-		return newString;
-	}
-
-	// -1 = All
-	void ReplaceInline(const TString& from, const TString& to, SizeType num = KOR_INDEX_NONE, bool caseSensitive = true)
-	{
-		DataType newData(_data.GetNum(), true);
-		SplitBySubstringPrivate(*this, from, false, caseSensitive, (num == -1) ? _data.GetNum() : num,
-			[&newData, &to, &num](const CharType* ptr, SizeType count) -> bool
-			{
-				const bool isLast = (*(ptr + count + 1) == TT::Constant::Null);
-
-				if(count > 0)
-				{
-					newData.Append(ptr, count);
-				}
-
-				if(!isLast)
-				{
-					if(to._data.GetNum() > 1)
-					{
-						newData.Append(to._data.GetData(), to._data.GetNum() - 1);
-					}
-				}
-
-				if(isLast)
-				{
-					newData.Add(TT::Constant::Null);
-
-					// is redundant, but if implementation changes this might save a day
-					return true;
-				}
-
-				return false;
-			}
-		);
-
-		if(newData.GetNum() > 0)
-		{
-			_data.Replace(newData);
-		}
-	}
-
-	TString ToUpper() const
-	{
-		TString newString(*this);
-		newString.ToUpperInline();
-		return newString;
-	}
-
-	KOR_FORCEINLINE void ToUpperInline() { TT::SOps::ToUpper(_data.GetData()); }
-
-	TString ToLower() const
-	{
-		TString newString(*this);
-		newString.ToLowerInline();
-		return newString;
-	}
-
-	KOR_FORCEINLINE void ToLowerInline() { TT::SOps::ToLower(_data.GetData()); }
-
-	// Removes all characters from the index position to the end of the string
-	// * Does NOT modify the source string
-	// * ChopRight at index 1 for "ABC" returns "A"
-	TString ChopRight(SizeType idx) const
-	{
-		TString newString(*this);
-		newString.ChopRightInline(idx);
-		return newString;
-	}
-
-	// Removes all characters from the index position to the end of the string
-	// * Modifies the source string
-	// * ChopRightInline at index 1 for "ABC" returns "A"
-	void ChopRightInline(SizeType idx)
-	{
-		if(!IsValidIndex(idx))
-		{
-			return;
-		}
-
-		_data.Resize(idx + 1);
-		_data[idx] = TT::Constant::Null;
-	}
-
-	// Removes all characters from the start of the string to the index position
-	// * Does NOT modify the source string
-	// * ChopLeft at index 1 for "ABC" returns "C"
-	TString ChopLeft(SizeType idx) const
-	{
-		TString newString(*this);
-		newString.ChopLeftInline(idx);
-		return newString;
-	}
-
-	// Removes all characters from the start of the string to the index position
-	// * Modifies the source string
-	// * ChopLeftInline at index 1 for "ABC" returns "C"
-	void ChopLeftInline(SizeType idx)
-	{
-		if(!IsValidIndex(idx))
-		{
-			return;
-		}
-
-		DataType newData(_data.GetNum() - idx);
-		for(SizeType i = 0; i < newData.GetNum(); ++i)
-		{
-			newData[i] = _data[idx + i];
-		}
-
-		_data = Move(newData);
-	}
-
-	TString ChopRange(SizeType firstIdx, SizeType secondIdx) const
-	{
-		TString newString(*this);
-		newString.ChopRangeInline(firstIdx, secondIdx);
-		return newString;
-	}
-
-	void ChopRangeInline(SizeType firstIdx, SizeType secondIdx)
-	{
-		if( !IsValidIndex(firstIdx) || !IsValidIndex(secondIdx))
-		{
-			return;
-		}
-
-		SizeType* biggerVal, *smallerVal;
-		if(firstIdx > secondIdx)
-		{
-			biggerVal = &firstIdx;
-			smallerVal = &secondIdx;
-		}
-		else
-		{
-			biggerVal = &secondIdx;
-			smallerVal = &firstIdx;
-		}
-
-		ChopRightInline(*biggerVal);
-		ChopLeftInline(*smallerVal);
-	}
-
-	// Reset
-	/////////////////////////////////
-
-	KOR_FORCEINLINE void Reset() { EmptyImpl(true); }
-	KOR_FORCEINLINE void Empty(bool releaseResources = true) { EmptyImpl(releaseResources); }
-
-	// Other
-	/////////////////////////////////
-
-	KOR_FORCEINLINE void Fill(SizeType length, CharType val = TT::Constant::Null) { InitToFill(length, val); }
-	KOR_FORCEINLINE void Reserve(SizeType num) { _data.Reserve(num + 1); } // termination character
-	KOR_FORCEINLINE void ShrinkToFit() { _data.ShrinkToFit(); }
+	// -------------------------------------------------------------------------
+
+	// Returns true if `idx` is within [0, GetLength()).
+	bool IsValidIndex(SizeType idx) const noexcept;
+
+	// Returns true if the view has no characters.
+	bool IsEmpty() const noexcept;
+
+	// Returns the number of characters, excluding null terminator.
+	SizeType GetLength() const noexcept;
+
+	// Returns a pointer to the character buffer.
+	// Note: not guaranteed to be null-terminated unless constructed from
+	// a null-terminated source and not sliced.
+	const CharType* GetChars() const noexcept;
+
+	// Sub-views
+	// All return non-owning views. Zero allocation.
+	// Valid as long as the source buffer is alive and unmodified.
+	// -------------------------------------------------------------------------
+
+	// Returns a view of `length` characters starting at `start`.
+	TStringView Sub(SizeType start, SizeType length) const noexcept;
+
+	// Returns a view of the first `count` characters.
+	TStringView Left(SizeType count) const noexcept;
+
+	// Returns a view of the last `count` characters.
+	TStringView Right(SizeType count) const noexcept;
+
+	// Int conversions
+	// -------------------------------------------------------------------------
+
+	// Parses the viewed string as an integer. `base` defaults to 10.
+	int64  ToInt(int32 base = 10) const noexcept;
+	uint64 ToUInt(int32 base = 10) const noexcept;
+
+	// Float conversions
+	// -------------------------------------------------------------------------
+
+	// Parses the viewed string as a double.
+	double ToFloat() const noexcept;
+
+	// Query
+	// -------------------------------------------------------------------------
+
+	// Returns true if all characters are in the ASCII range (0-127).
+	bool IsAscii() const noexcept;
+
+	// Returns true if all characters are numeric digits.
+	bool IsNumeric() const noexcept;
+
+	// Returns true if all characters are whitespace.
+	bool IsWhitespace() const noexcept;
+
+	// Returns true if all characters are uppercase.
+	bool IsUpper() const noexcept;
+
+	// Returns true if all characters are lowercase.
+	bool IsLower() const noexcept;
+
+	// Compares this view with `other`. Returns 0 if equal, <0 if less, >0 if greater.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	int32 Compare(const TStringView& other) const noexcept;
+	int32 Compare(const TStringView& other, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
+
+	// Returns true if this view is equal to `other`.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	bool Equals(const TStringView& other) const noexcept;
+	bool Equals(const TStringView& other, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
+
+	// Returns true if this view begins with `val`.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	bool StartsWith(const TStringView& val) const noexcept;
+	bool StartsWith(const TStringView& val, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
+
+	// Returns true if this view ends with `val`.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	bool EndsWith(const TStringView& val) const noexcept;
+	bool EndsWith(const TStringView& val, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
+
+	// Returns true if this view contains `val`.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	bool Contains(const TStringView& val) const noexcept;
+	bool Contains(const TStringView& val, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Returns true if this view contains `val` starting from `index`.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	bool ContainsFrom(const TStringView& val, SizeType index) const noexcept;
+	bool ContainsFrom(const TStringView& val, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Returns the index of the first occurrence of `val`, or KOR_INDEX_NONE if not found.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	SizeType Find(const TStringView& val) const noexcept;
+	SizeType Find(const TStringView& val, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Returns the index of the first occurrence of `c`, or KOR_INDEX_NONE if not found.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	SizeType Find(CharType c) const noexcept;
+	SizeType Find(CharType c, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Returns the index of the first occurrence of `val` starting from `index`, or KOR_INDEX_NONE if not found.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	SizeType FindFrom(const TStringView& val, SizeType index) const noexcept;
+	SizeType FindFrom(const TStringView& val, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Returns the index of the first occurrence of `c` starting from `index`, or KOR_INDEX_NONE if not found.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	SizeType FindFrom(CharType c, SizeType index) const noexcept;
+	SizeType FindFrom(CharType c, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Split
+	// Produces owned TStrings since views cannot guarantee lifetime of split results.
+	// -------------------------------------------------------------------------
+
+	// Splits at the first occurrence of `delim`.
+	// Returns false if `delim` was not found. outLeft/outRight may be null.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	bool Split(const TStringView& delim, TStringView* outLeft, TStringView* outRight) const noexcept;
+	bool Split(const TStringView& delim, TStringView* outLeft, TStringView* outRight, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Splits into an array of owned substrings divided by `delim`.
+	// `discardEmpty` - if true, empty strings between consecutive delimiters are skipped.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	TArray<TStringView> SplitToArray(const TStringView& delim, bool discardEmpty = true) const noexcept;
+	TArray<TStringView> SplitToArray(const TStringView& delim, bool discardEmpty = true, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
+
+	// Iteration
+	// -------------------------------------------------------------------------
+
+	ConstIteratorType begin() const noexcept;
+	ConstIteratorType end() const noexcept;
 
 private:
-	KOR_FORCEINLINE void InitToEmpty()
-	{
-		_data.Empty(1);
-		AddTermChecked(_data);
-	}
-
-	KOR_FORCEINLINE void InitToFill(SizeType length, CharType val)
-	{
-		_data.Resize(length);
-		SMemory::FillTyped(_data.GetData(), val, length);
-	}
-	
-	template<
-		typename DataT,
-		typename TEnableIf<TIsSame<typename TDecay<DataT>::Type, DataType>::Value>::Type* = nullptr>
-	void AppendDataImpl(DataT&& data)
-	{
-		RemoveTerm(_data);
-		_data.Append(MoveIfPossible(data));
-		AddTerm(_data);
-	}
-
-	template<
-		typename StringT,
-		typename TEnableIf<TIsSame<typename TDecay<StringT>::Type, TString>::Value>::Type* = nullptr>
-	void AppendStringImpl(StringT&& str)
-	{
-		RemoveTerm(_data);
-		_data.Append(MoveIfPossible(str._data));
-		AddTerm(_data);
-	}
-
-	void AppendCharsImpl(const CharType* text, SizeType textLen = KOR_INDEX_NONE)
-	{
-		RemoveTerm(_data);
-		if (text)
-		{
-			_data.Append(text, textLen > 0 ? textLen : TT::SOps::Length(text) + 1);
-		}
-		AddTerm(_data);
-	}
-
-	KOR_FORCEINLINE void EmptyImpl(bool keepResources) { _data.Empty(keepResources); }
-	KOR_FORCEINLINE SizeType GetLastCharIndex() const { return _data.GetNum() - 2; }
-
-	KOR_FORCEINLINE static bool HasTerm(const DataType& data) { return !data.IsEmpty() && *data.GetLast() == TT::Constant::Null; }
-	KOR_FORCEINLINE static void AddTermChecked(DataType& data) { data.Add(TT::Constant::Null); }
-	KOR_FORCEINLINE static void AddTerm(DataType& data) { if (!HasTerm(data)) { AddTermChecked(data); }}
-	KOR_FORCEINLINE static void RemoveTermChecked(DataType& data) { data.RemoveAt(data.GetNum() - 1); }
-	KOR_FORCEINLINE static void RemoveTerm(DataType& data) { if (HasTerm(data)) { RemoveTermChecked(data); }}
-
-	static bool ContainsAtIndexImpl(const TString& str, const TString& val, SizeType idx, bool caseSensitive)
-	{
-		if(idx < 0 || str.GetLength() < idx + val.GetLength())
-			return false;
-
-		for(SizeType i = idx; i < idx + val.GetLastCharIndex(); ++i)
-		{
-			CharType lhs = str._data[i];
-			CharType rhs = val._data[i];
-
-			if (!caseSensitive)
-			{
-				lhs = TT::COps::ToLower(lhs);
-				rhs = TT::COps::ToLower(rhs);
-			}
-
-			if (lhs != rhs)
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	template<typename FuncType>
-	static void SplitBySubstringPrivate(
-		const TString& str, const TString& substr,
-		bool ignoreEmpty, bool caseSensitive,
-		SizeType maxSplits,
-		FuncType&& functor)
-	{
-		const SizeType mainLen = str.GetLength();
-		const SizeType subLen = substr.GetLength();
-
-		if(mainLen > 0 && mainLen > subLen)
-		{
-			const TArray<CharType> mainStr = caseSensitive ? str._data : str.ToLower()._data;
-			const TArray<CharType> subStr = caseSensitive ? substr._data : substr.ToLower()._data;
-
-			const CharType* init = mainStr.GetData();
-			const CharType* subChars = subStr.GetData();
-
-			while(const CharType* current = TT::SOps::Find(init, subChars, caseSensitive))
-			{
-				if (!ignoreEmpty || current-init)
-				{
-					const SizeType currIdx = KOR_PTR_DIFF(SizeType, init, mainStr.GetData());
-					const SizeType count = KOR_PTR_DIFF(SizeType, current, init);
-
-					if(functor(mainStr.GetData() + currIdx, count))
-						return;
-				}
-
-				init = current + subLen;
-
-				if(--maxSplits == 0)
-				{
-					break;
-				}
-			}
-
-			if (!ignoreEmpty || *init != TT::Constant::Null)
-			{
-				const SizeType currIdx = KOR_PTR_DIFF(SizeType, init, mainStr.GetData());
-				const SizeType count = mainStr.GetNum() - currIdx;
-
-				functor(mainStr.GetData() + currIdx, count);
-			}
-		}
-	}
-
-	DataType _data = {};
+	const CharType* _data = nullptr;
+	SizeType _len = 0;
 };
 
-template<typename T>
-struct TContainerTypeTraits<TString<T>> : public TContainerTypeTraits<void>
+template<typename CharT>
+class TString
 {
-	using Type = TString<T>; // optional
+	static_assert(TIsCharacter<CharT>::Value, "CharType must be character type");
 
-	using ElementType = typename Type::CharType;
-	using AllocatorType = typename Type::DataType::AllocatorType;
+	using CharConstant = TCharConstant<CharT>;
+	using CharOps = TCharOps<CharT>;
+	using StringOps = TStringOps<CharT>;
 
-	enum
-	{
-		IsContainer = true,
-		IsDynamic = true,
-		InlineMemory = true
-	};
+public:
+	using CharType = CharT;
+	using DataType = TArray<CharT, TArrayAllocator<CharT>>;
+
+	using SizeType = typename DataType::SizeType;
+
+	using IteratorType      = CharType*;
+	using ConstIteratorType = const CharType*;
+
+	// Constructors - Default, Copy, Move
+	// -------------------------------------------------------------------------
+
+	constexpr TString() noexcept = default;
+	TString(const TString& other) noexcept = default;
+	TString(TString&& other) noexcept = default;
+
+	// Constructors - From literal
+	// -------------------------------------------------------------------------
+
+	TString(const CharType* text) noexcept;
+	TString(const CharType* text, SizeType length) noexcept;
+
+	template<TSize N>
+	TString(const CharType (&text)[N]) noexcept;
+
+	// Constructor - Fill
+	// Constructs a string of `length` characters, all set to `val`.
+	// -------------------------------------------------------------------------
+
+	TString(SizeType length, CharType val = CharConstant::Null) noexcept;
+
+	// Constants
+	// -------------------------------------------------------------------------
+
+	// Returns a shared empty string. Prefer over default constructing when
+	// you need a const ref to an empty string, avoids allocation.
+	static constexpr const TString& GetEmpty() noexcept;
+
+	// Comparison operators
+	// Performs case-sensitive comparison.
+	// Use Equals() for case-insensitive comparison.
+	// -------------------------------------------------------------------------
+
+	bool operator==(const TString& other) const noexcept;
+	bool operator!=(const TString& other) const noexcept;
+
+	// Assignment operators
+	// -------------------------------------------------------------------------
+
+	TString& operator=(const TString& other) noexcept;
+	TString& operator=(TString&& other) noexcept;
+
+	// Arithmetic operators
+	// operator+  - Returns a new string with `other` appended.
+	// operator+= - Appends `other` in place.
+	// -------------------------------------------------------------------------
+
+	TString  operator+(const TString& other) const noexcept;
+	TString  operator+(TString&& other) const noexcept;
+	TString& operator+=(const TString& other) noexcept;
+	TString& operator+=(TString&& other) noexcept;
+
+	// Path operators
+	// Appends `other` with a path separator in between.
+	// Equivalent to appending '/' + other, handles trailing separators.
+	// -------------------------------------------------------------------------
+
+	TString  operator/(const TString& other) const noexcept;
+	TString& operator/=(const TString& other) noexcept;
+
+	// Dereference / subscript
+	// operator* - Returns raw char pointer, equivalent to GetChars().
+	// operator[] - Returns character at index, no bounds checking.
+	// -------------------------------------------------------------------------
+
+	const CharType* operator*() const noexcept;
+	CharType*       operator*() noexcept;
+	CharType        operator[](SizeType idx) const noexcept;
+
+	// Property getters
+	// -------------------------------------------------------------------------
+
+	// Returns true if `idx` is within [0, GetLength()).
+	bool IsValidIndex(SizeType idx) const noexcept;
+
+	// Returns true if the string has no characters.
+	bool IsEmpty() const noexcept;
+
+	// Returns the number of characters, excluding null terminator.
+	SizeType GetLength() const noexcept;
+
+	// Returns the underlying TArray.
+	const DataType& GetData() const noexcept;
+
+	// Returns a pointer to the null-terminated character buffer.
+	const CharType* GetChars() const noexcept;
+	CharType*       GetChars() noexcept;
+
+	// View
+	// Returns a non-owning view into this string's buffer.
+	// The view is valid as long as this string is alive and unmodified.
+	// -------------------------------------------------------------------------
+
+	TStringView<CharT> View() const noexcept;
+	TStringView<CharT> SubView(SizeType start, SizeType length) const noexcept;
+	TStringView<CharT> LeftView(SizeType count) const noexcept;
+	TStringView<CharT> RightView(SizeType count) const noexcept;
+
+	// Encoding / CharType conversions
+	// -------------------------------------------------------------------------
+
+	// Constructs a TString<CharT> by converting from a different char type.
+	template<typename OtherCharType>
+	static TString ConvertFrom(const OtherCharType* str) noexcept;
+
+	template<typename OtherCharType>
+	static TString ConvertFrom(const OtherCharType* str, SizeType length) noexcept;
+
+	template<typename OtherCharType, TSize N>
+	static TString ConvertFrom(const OtherCharType (&str)[N]) noexcept;
+
+	template<typename OtherCharType>
+	static TString ConvertFrom(const TString<OtherCharType>& str) noexcept;
+
+	// Converts this string to a different char type.
+	template<typename OtherCharType>
+	TString<OtherCharType> ConvertTo() const noexcept;
+
+	// Int conversions
+	// -------------------------------------------------------------------------
+
+	static TString FromInt(int64 val) noexcept;
+	static TString FromUInt(uint64 val) noexcept;
+
+	// Parses the string as an integer. `base` defaults to 10.
+	int64  ToInt(int32 base = 10) const noexcept;
+	uint64 ToUInt(int32 base = 10) const noexcept;
+
+	// Float conversions
+	// -------------------------------------------------------------------------
+
+	// Converts `val` to string. `precision` controls decimal places.
+	// `Format` controls notation: Auto, Fixed, Scientific.
+	template<EFloatFormat Format = EFloatFormat::Auto>
+	static TString FromFloat(double val, uint8 precision = 6) noexcept;
+	static TString FromFloat(double val, uint8 precision = 6, EFloatFormat format = EFloatFormat::Auto) noexcept;
+
+	// Parses the string as a double.
+	double ToFloat() const noexcept;
+
+	// Append
+	// -------------------------------------------------------------------------
+
+	void Append(const TString& other) noexcept;
+	void Append(TString&& other) noexcept;
+	void Append(const CharType* other, SizeType num) noexcept;
+
+	// Formatting
+	// -------------------------------------------------------------------------
+
+	// Returns a new formatted string. Uses the same format syntax as printf.
+	template<typename FmtT, typename... VarTypes>
+	static TString Format(const FmtT& fmt, const VarTypes&... args) noexcept;
+
+	// Appends a formatted string in place.
+	template<typename StringT, typename... ArgTypes>
+	void AppendFormat(StringT&& fmt, const ArgTypes&... args) noexcept;
+
+	// Query
+	// These functions do not modify the string.
+	// -------------------------------------------------------------------------
+
+	// Returns true if all characters are in the ASCII range (0-127).
+	bool IsAscii() const noexcept;
+
+	// Returns true if all characters are numeric digits.
+	bool IsNumeric() const noexcept;
+
+	// Returns true if all characters are whitespace.
+	bool IsWhitespace() const noexcept;
+
+	// Returns true if all characters are uppercase.
+	bool IsUpper() const noexcept;
+
+	// Returns true if all characters are lowercase.
+	bool IsLower() const noexcept;
+
+	// Compares this string with `other`. Returns 0 if equal, <0 if less, >0 if greater.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	int32 Compare(const TString& other) const noexcept;
+	int32 Compare(const TString& other, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
+
+	// Returns true if this string is equal to `other`.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	bool Equals(const TString& other) const noexcept;
+	bool Equals(const TString& other, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
+
+	// Returns true if this string begins with `val`.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	bool StartsWith(const TString& val) const noexcept;
+	bool StartsWith(const TString& val, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
+
+	// Returns true if this string ends with `val`.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	bool EndsWith(const TString& val) const noexcept;
+	bool EndsWith(const TString& val, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
+
+	// Returns true if this string contains `val`.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	bool Contains(const TString& val) const noexcept;
+	bool Contains(const TString& val, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Returns true if this string contains `val` starting from `index`.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	bool ContainsFrom(const TString& val, SizeType index) const noexcept;
+	bool ContainsFrom(const TString& val, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Returns the index of the first occurrence of `val`, or KOR_INDEX_NONE if not found.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	SizeType Find(const TString& val) const noexcept;
+	SizeType Find(const TString& val, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Returns the index of the first occurrence of `c`, or KOR_INDEX_NONE if not found.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	SizeType Find(CharType c) const noexcept;
+	SizeType Find(CharType c, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Returns the index of the first occurrence of `val` starting from `index`, or KOR_INDEX_NONE if not found.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	SizeType FindFrom(const TString& val, SizeType index) const noexcept;
+	SizeType FindFrom(const TString& val, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Returns the index of the first occurrence of `c` starting from `index`, or KOR_INDEX_NONE if not found.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	SizeType FindFrom(CharType c, SizeType index) const noexcept;
+	SizeType FindFrom(CharType c, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Substring
+	// Returns a new owned string. For zero-allocation alternatives see View, SubView, LeftView, RightView.
+	// -------------------------------------------------------------------------
+
+	// Returns a substring starting at `start` of `length` characters.
+	TString Sub(SizeType start, SizeType length) const noexcept;
+
+	// Returns the first `count` characters.
+	TString Left(SizeType count) const noexcept;
+
+	// Returns the last `count` characters.
+	TString Right(SizeType count) const noexcept;
+
+	// Mutation
+	// These functions modify the string in place.
+	// -------------------------------------------------------------------------
+
+	// Converts all characters to uppercase.
+	void ToUpper() noexcept;
+
+	// Converts all characters to lowercase.
+	void ToLower() noexcept;
+
+	// Removes leading whitespace.
+	void TrimStart() noexcept;
+
+	// Removes trailing whitespace.
+	void TrimEnd() noexcept;
+
+	// Removes leading and trailing whitespace.
+	void Trim() noexcept;
+
+	// Removes all characters from `idx` to the end.
+	void ChopRight(SizeType idx) noexcept;
+
+	// Removes all characters from the start up to `idx`.
+	void ChopLeft(SizeType idx) noexcept;
+
+	// Removes all characters in the range [firstIdx, secondIdx].
+	void ChopRange(SizeType firstIdx, SizeType secondIdx) noexcept;
+
+	// Inserts `other` at position `idx`, shifting existing characters right.
+	void Insert(SizeType idx, const TString& other) noexcept;
+
+	// Removes `count` characters starting at `idx`.
+	void Remove(SizeType idx, SizeType count) noexcept;
+
+	// Splits the string at the first occurrence of `delim`.
+	// Returns false if `delim` was not found. outLeft/outRight may be null.
+	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
+	bool Split(const TString& delim, TString* outLeft, TString* outRight) const noexcept;
+	bool Split(const TString& delim, TString* outLeft, TString* outRight, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+
+	// Splits the string into an array of substrings divided by `delim`.
+	// `discardEmpty` - if true, empty strings between consecutive delimiters are skipped.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	TArray<TString> SplitToArray(const TString& delim, bool discardEmpty = true) const noexcept;
+	TArray<TString> SplitToArray(const TString& delim, bool discardEmpty = true, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
+
+	// Replaces all occurrences of `from` with `to`.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	void Replace(const TString& from, const TString& to) noexcept;
+	void Replace(const TString& from, const TString& to, ESearchCase searchCase = ESearchCase::Sensitive) noexcept;
+
+	// Replaces all occurrences of character `from` with character `to`.
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	void Replace(CharType from, CharType to) noexcept;
+	void Replace(CharType from, CharType to, ESearchCase searchCase = ESearchCase::Sensitive) noexcept;
+
+	// Lifecycle & Memory
+	// -------------------------------------------------------------------------
+
+	// Returns a deep copy of this string.
+	TString Copy() const noexcept;
+
+	// Resets the string to `length` characters all set to `val`.
+	void Fill(SizeType length, CharType val = CharConstant::Null) noexcept;
+
+	// Clears the string and releases memory.
+	void Reset() noexcept;
+
+	// Clears the string but retains allocated memory.
+	void Empty() noexcept;
+
+	// Pre-allocates memory for at least `num` characters.
+	void Reserve(SizeType num) noexcept;
+
+	// Releases any excess allocated memory to fit the current length.
+	void ShrinkToFit() noexcept;
+
+	// Iteration
+	// -------------------------------------------------------------------------
+
+	IteratorType      begin() noexcept;
+	ConstIteratorType begin() const noexcept;
+	IteratorType      end() noexcept;
+	ConstIteratorType end() const noexcept;
+
+private:
+	DataType _data;
 };
 
-// Archive operator<< && operator>>
-////////////////////////////////////////////
+// [ Is TString ]
+// Checks if type is TString type
 
-template<typename CharType>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TString<CharType>& str)
-{
-	ar.Write(str.GetChars(), str.GetLength());
-	return ar;
-}
+template<typename T> struct TIsTString : TFalseType {};
+template<typename CharT> struct TIsTString<TString<CharT>> : TTrueType {};
 
-template<typename CharType>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TString<CharType>& str)
-{
-	typename TString<CharType>::DataType newData;
-	ar >> newData;
-	str = TString<CharType>(Move(newData));
-	return ar;
-}
+// [ Is TString View ]
+// Checks if type is TStringView type
+
+template<typename T> struct TIsTStringView : TFalseType {};
+template<typename CharT> struct TIsTStringView<TStringView<CharT>> : TTrueType {};
+
+#include "Kor/Inl/String.inl"
 
 // Convenience typedef for platform char
+using SStringView = TStringView<tchar>;
 using SString = TString<tchar>;
 
 KOR_NAMESPACE_END
