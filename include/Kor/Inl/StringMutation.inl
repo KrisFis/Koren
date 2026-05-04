@@ -17,6 +17,7 @@ template<typename CharT>
 void TString<CharT>::Append(const CharType* other, SizeType num) noexcept
 {
 }
+
 template<typename CharT>
 void TString<CharT>::ToUpper() noexcept
 {

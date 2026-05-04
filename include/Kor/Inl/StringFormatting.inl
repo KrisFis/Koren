@@ -67,7 +67,7 @@ TString<CharT> TString<CharT>::Format(const FmtT& fmt, const VarTypes&... args) 
 
 template<typename CharT>
 template<typename StringT, typename ... ArgTypes>
-void TString<CharT>::AppendFormat(const StringT& fmt, const ArgTypes&... args) noexcept
+KOR_FORCEINLINE void TString<CharT>::AppendFormat(const StringT& fmt, const ArgTypes&... args) noexcept
 {
 	Append(TString::Format(fmt, args...));
 }

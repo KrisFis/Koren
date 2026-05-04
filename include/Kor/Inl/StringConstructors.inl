@@ -50,7 +50,7 @@ KOR_FORCEINLINE TString<CharT>::TString(const CharType(& text)[N]) noexcept
 {}
 
 template<typename CharT>
-KOR_FORCEINLINE TString<CharT>::TString(SizeType length, CharType val) noexcept
+TString<CharT>::TString(SizeType length, CharType val) noexcept
 	: _data(length + 1) // +1 includes null terminator
 {
 	SMemory::FillTyped(_data.GetData(), val, length);
