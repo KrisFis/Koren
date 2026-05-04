@@ -15,9 +15,9 @@ class TStringView
 {
 	static_assert(TIsCharacter<CharT>::Value, "CharType must be character type");
 
-	using CharConstant = TCharConstant<CharT>;
-	using CharOps = TCharOps<CharT>;
-	using StringOps = TStringOps<CharT>;
+	using Constant = TCharConstant<CharT>;
+	using COps = TCharOps<CharT>;
+	using SOps = TStringOps<CharT>;
 
 public:
 	using CharType = CharT;
@@ -156,9 +156,9 @@ public:
 	bool Contains(const TStringView& val, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
 
 	// Returns true if this view contains `val` starting from `index`.
-	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
-	bool ContainsFrom(const TStringView& val, SizeType index) const noexcept;
-	bool ContainsFrom(const TStringView& val, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	bool ContainsAt(const TStringView& val, SizeType index) const noexcept;
+	bool ContainsAt(const TStringView& val, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
 
 	// Returns the index of the first occurrence of `val`, or KOR_INDEX_NONE if not found.
 	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
@@ -169,16 +169,6 @@ public:
 	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
 	SizeType Find(CharType c) const noexcept;
 	SizeType Find(CharType c, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
-
-	// Returns the index of the first occurrence of `val` starting from `index`, or KOR_INDEX_NONE if not found.
-	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
-	SizeType FindFrom(const TStringView& val, SizeType index) const noexcept;
-	SizeType FindFrom(const TStringView& val, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
-
-	// Returns the index of the first occurrence of `c` starting from `index`, or KOR_INDEX_NONE if not found.
-	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
-	SizeType FindFrom(CharType c, SizeType index) const noexcept;
-	SizeType FindFrom(CharType c, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
 
 	// Split
 	// Produces owned TStrings since views cannot guarantee lifetime of split results.
@@ -203,7 +193,7 @@ public:
 	ConstIteratorType end() const noexcept;
 
 private:
-	const CharType* _data = nullptr;
+	DataType _data = {};
 	SizeType _len = 0;
 };
 
@@ -212,9 +202,9 @@ class TString
 {
 	static_assert(TIsCharacter<CharT>::Value, "CharType must be character type");
 
-	using CharConstant = TCharConstant<CharT>;
-	using CharOps = TCharOps<CharT>;
-	using StringOps = TStringOps<CharT>;
+	using Constant = TCharConstant<CharT>;
+	using COps = TCharOps<CharT>;
+	using SOps = TStringOps<CharT>;
 
 public:
 	using CharType = CharT;
@@ -245,7 +235,7 @@ public:
 	// Constructs a string of `length` characters, all set to `val`.
 	// -------------------------------------------------------------------------
 
-	TString(SizeType length, CharType val = CharConstant::Null) noexcept;
+	TString(SizeType length, CharType val = Constant::Null) noexcept;
 
 	// Constants
 	// -------------------------------------------------------------------------
@@ -429,9 +419,9 @@ public:
 	bool Contains(const TString& val, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
 
 	// Returns true if this string contains `val` starting from `index`.
-	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
-	bool ContainsFrom(const TString& val, SizeType index) const noexcept;
-	bool ContainsFrom(const TString& val, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
+	template<ESearchCase Case = ESearchCase::Sensitive>
+	bool ContainsAt(const TString& val, SizeType index) const noexcept;
+	bool ContainsAt(const TString& val, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
 
 	// Returns the index of the first occurrence of `val`, or KOR_INDEX_NONE if not found.
 	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
@@ -442,16 +432,6 @@ public:
 	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
 	SizeType Find(CharType c) const noexcept;
 	SizeType Find(CharType c, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
-
-	// Returns the index of the first occurrence of `val` starting from `index`, or KOR_INDEX_NONE if not found.
-	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
-	SizeType FindFrom(const TString& val, SizeType index) const noexcept;
-	SizeType FindFrom(const TString& val, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
-
-	// Returns the index of the first occurrence of `c` starting from `index`, or KOR_INDEX_NONE if not found.
-	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
-	SizeType FindFrom(CharType c, SizeType index) const noexcept;
-	SizeType FindFrom(CharType c, SizeType index, ESearchCase searchCase = ESearchCase::Sensitive, ESearchDir searchDir = ESearchDir::Forward) const noexcept;
 
 	// Substring
 	// Returns a new owned string. For zero-allocation alternatives see View, SubView, LeftView, RightView.
@@ -529,7 +509,7 @@ public:
 	TString Copy() const noexcept;
 
 	// Resets the string to `length` characters all set to `val`.
-	void Fill(SizeType length, CharType val = CharConstant::Null) noexcept;
+	void Fill(SizeType length, CharType val = Constant::Null) noexcept;
 
 	// Clears the string and releases memory.
 	void Reset() noexcept;
@@ -552,7 +532,7 @@ public:
 	ConstIteratorType end() const noexcept;
 
 private:
-	DataType _data;
+	DataType _data = {};
 };
 
 // [ Is TString ]

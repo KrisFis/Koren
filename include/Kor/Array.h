@@ -77,6 +77,13 @@ public:
 
 	KOR_FORCEINLINE TArray& operator=(const ElementListType& list) { EmptyImpl(true); AppendImpl(list.begin(), list.size()); return *this; }
 
+	// Dereference operators
+	// operator* - Returns raw const element pointer, equivalent to GetData().
+	/////////////////////////////////
+
+	KOR_FORCEINLINE const ElementType* operator*() const noexcept { return GetData(); }
+	KOR_FORCEINLINE ElementType* operator*() noexcept { return GetData(); }
+
 	// Get operators
 	/////////////////////////////////
 

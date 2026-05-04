@@ -63,16 +63,25 @@ const typename TString<CharT>::DataType& TString<CharT>::GetData() const noexcep
 {
 }
 
+// Lifecycle
 #include "Kor/Inl/StringConstructors.inl"
-#include "Kor/Inl/StringConversions.inl"
-#include "Kor/Inl/StringFormatting.inl"
-#include "Kor/Inl/StringIterators.inl"
 #include "Kor/Inl/StringMemory.inl"
-#include "Kor/Inl/StringMutation.inl"
+
+// Core operations
 #include "Kor/Inl/StringOperators.inl"
+#include "Kor/Inl/StringMutation.inl"
+
+// Inspection
 #include "Kor/Inl/StringQuery.inl"
-#include "Kor/Inl/StringSplit.inl"
 #include "Kor/Inl/StringSubstring.inl"
+
+// Higher-level processing
+#include "Kor/Inl/StringSplit.inl"
+#include "Kor/Inl/StringFormatting.inl"
+#include "Kor/Inl/StringConversions.inl"
+
+// Iteration
+#include "Kor/Inl/StringIterators.inl"
 
 // Container traits
 // -------------------------------------------------------------------------
