@@ -4,31 +4,37 @@
 #pragma once // silence tooling
 
 template<typename CharT>
-typename TStringView<CharT>::ConstIteratorType TStringView<CharT>::begin() const noexcept
+KOR_FORCEINLINE typename TStringView<CharT>::ConstIteratorType TStringView<CharT>::begin() const noexcept
 {
+	return _data;
 }
 
 template<typename CharT>
-typename TString<CharT>::IteratorType TString<CharT>::begin() noexcept
+KOR_FORCEINLINE typename TString<CharT>::IteratorType TString<CharT>::begin() noexcept
 {
+	return _data.GetData();
 }
 
 template<typename CharT>
-typename TString<CharT>::ConstIteratorType TString<CharT>::begin() const noexcept
+KOR_FORCEINLINE typename TString<CharT>::ConstIteratorType TString<CharT>::begin() const noexcept
 {
+	return _data.GetData();
 }
 
 template<typename CharT>
-typename TStringView<CharT>::ConstIteratorType TStringView<CharT>::end() const noexcept
+KOR_FORCEINLINE typename TStringView<CharT>::ConstIteratorType TStringView<CharT>::end() const noexcept
 {
+	return _data + _len;
 }
 
 template<typename CharT>
-typename TString<CharT>::IteratorType TString<CharT>::end() noexcept
+KOR_FORCEINLINE typename TString<CharT>::IteratorType TString<CharT>::end() noexcept
 {
+	return _data.GetData() + (_data.GetNum() - 1);
 }
 
 template<typename CharT>
-typename TString<CharT>::ConstIteratorType TString<CharT>::end() const noexcept
+KOR_FORCEINLINE typename TString<CharT>::ConstIteratorType TString<CharT>::end() const noexcept
 {
+	return _data.GetData() + (_data.GetNum() - 1);
 }
