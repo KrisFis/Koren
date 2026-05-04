@@ -4,16 +4,6 @@
 #pragma once // silence tooling
 
 template<typename CharT>
-constexpr TStringView<CharT> TStringView<CharT>::GetEmpty() noexcept
-{
-}
-
-template<typename CharT>
-constexpr const TString<CharT>& TString<CharT>::GetEmpty() noexcept
-{
-}
-
-template<typename CharT>
 bool TStringView<CharT>::IsValidIndex(SizeType idx) const noexcept
 {
 }

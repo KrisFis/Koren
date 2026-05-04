@@ -33,24 +33,18 @@ public:
 	// View is trivially copyable, no move needed.
 	// -------------------------------------------------------------------------
 
-	constexpr TStringView() noexcept = default;
+	constexpr TStringView() noexcept;
 	constexpr TStringView(const TStringView& other) noexcept = default;
 	TStringView& operator=(const TStringView& other) noexcept = default;
 
 	// Constructors - From raw pointer
 	// -------------------------------------------------------------------------
 
-	constexpr TStringView(const CharType* text) noexcept;
-	constexpr TStringView(const CharType* text, SizeType length) noexcept;
+	TStringView(const CharType* text) noexcept;
+	TStringView(const CharType* text, SizeType length) noexcept;
 
 	template<TSize N>
-	constexpr TStringView(const CharType (&text)[N]) noexcept;
-
-	// Constants
-	// -------------------------------------------------------------------------
-
-	// Returns an empty view. No allocation, points to a static null terminator.
-	static constexpr TStringView GetEmpty() noexcept;
+	TStringView(const CharType (&text)[N]) noexcept;
 
 	// Comparison operators
 	// Performs case-sensitive comparison.
@@ -218,7 +212,7 @@ public:
 	// Constructors - Default, Copy, Move
 	// -------------------------------------------------------------------------
 
-	constexpr TString() noexcept = default;
+	constexpr TString() noexcept;
 	TString(const TString& other) noexcept = default;
 	TString(TString&& other) noexcept = default;
 
