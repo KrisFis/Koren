@@ -372,7 +372,7 @@ public:
 
 	// Appends a formatted string in place.
 	template<typename StringT, typename... ArgTypes>
-	void AppendFormat(StringT&& fmt, const ArgTypes&... args) noexcept;
+	void AppendFormat(const StringT& fmt, const ArgTypes&... args) noexcept;
 
 	// Query
 	// These functions do not modify the string.
