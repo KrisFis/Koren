@@ -20,16 +20,11 @@
 #define KOR_NODISCARD [[nodiscard]]
 #define KOR_NORETURN __attribute__((noreturn))
 
+#define KOR_INLINE inline
 #define KOR_FORCEINLINE inline __attribute__((always_inline))
 #define KOR_FORCENOINLINE __attribute__((noinline))
 
 #define KOR_UNREACHABLE_CODE() __builtin_unreachable()
-
-#if KOR_BUILD_DEBUG
-	#define KOR_FORCEINLINE_DEBUGGABLE inline
-#else
-	#define KOR_FORCEINLINE_DEBUGGABLE KOR_FORCEINLINE
-#endif
 
 #define KOR_DLL_EXPORT
 #define KOR_DLL_IMPORT

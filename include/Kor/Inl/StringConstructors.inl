@@ -15,26 +15,35 @@ KOR_FORCEINLINE constexpr TString<CharT>::TString() noexcept
 {}
 
 template<typename CharT>
-KOR_FORCEINLINE TStringView<CharT>::TStringView(const CharType* text) noexcept
-	: _data(text)
-	, _len(SOps::Length(text))
-{}
+KOR_FORCEINLINE_DEBUG TStringView<CharT>::TStringView(const CharType* text) noexcept
+{
+	KOR_ASSERT_DEBUG(text);
+	_data = text;
+	_len = SOps::Length(text);
+}
 
 template<typename CharT>
-KOR_FORCEINLINE TString<CharT>::TString(const CharType* text) noexcept
-	: _data(text, SOps::Length(text) + 1) // +1 includes null terminator
-{}
+KOR_FORCEINLINE_DEBUG TString<CharT>::TString(const CharType* text) noexcept
+{
+	KOR_ASSERT_DEBUG(text);
+	_data = DataType(text, SOps::Length(text) + 1) // +1 includes null terminator
+}
 
 template<typename CharT>
-KOR_FORCEINLINE constexpr TStringView<CharT>::TStringView(const CharType* text, SizeType length) noexcept
-	: _data(text)
-	, _len(length)
-{}
+KOR_FORCEINLINE_DEBUG constexpr TStringView<CharT>::TStringView(const CharType* text, SizeType length) noexcept
+{
+	KOR_ASSERT_DEBUG(text && length > 0);
+
+	_data = text;
+	_len = length;
+}
 
 template<typename CharT>
-KOR_FORCEINLINE TString<CharT>::TString(const CharType* text, SizeType length) noexcept
-	: _data(text, length + 1)
-{}
+KOR_FORCEINLINE_DEBUG TString<CharT>::TString(const CharType* text, SizeType length) noexcept
+{
+	KOR_ASSERT_DEBUG(text && length > 0);
+	_data = DataType(text, length + 1)
+}
 
 template<typename CharT>
 template<TSize N>
@@ -53,6 +62,8 @@ template<typename CharT>
 TString<CharT>::TString(SizeType length, CharType val) noexcept
 	: _data(length + 1) // +1 includes null terminator
 {
+	KOR_ASSERT_DEBUG(length > 0);
+
 	SMemory::FillTyped(_data.GetData(), val, length);
 	_data[length] = Constant::Null;
 }

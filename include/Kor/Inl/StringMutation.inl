@@ -6,16 +6,25 @@
 template<typename CharT>
 void TString<CharT>::Append(const TString& other) noexcept
 {
+	_data.Pop(); // remove null terminator
+	_data.Append(other._data); // includes other's null terminator
 }
 
 template<typename CharT>
 void TString<CharT>::Append(TString&& other) noexcept
 {
+	_data.Pop(); // remove null terminator
+	_data.Append(Move(other._data)); // includes other's null terminator
 }
 
 template<typename CharT>
 void TString<CharT>::Append(const CharType* other, SizeType num) noexcept
 {
+	KOR_ASSERT_DEBUG(other != nullptr);
+
+	_data.Pop(); // remove null terminator
+	_data.Append(other, num);
+	_data.Add(Constant::Null);
 }
 
 template<typename CharT>

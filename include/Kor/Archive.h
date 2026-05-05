@@ -68,7 +68,7 @@ struct SArchive
 	KOR_FORCEINLINE bool IsEmpty() const { return GetTotalBytes() <= 0; }
 
 	template<typename T = uint8>
-	KOR_FORCEINLINE_DEBUGGABLE SizeType GetTotal() const
+	KOR_FORCEINLINE_DEBUG SizeType GetTotal() const
 	{
 		if constexpr (sizeof(T) == sizeof(uint8))
 		{
@@ -83,7 +83,7 @@ struct SArchive
 
 	// Gets remaining offset in T size (aka. how many Ts till the end of the archive)
 	template<typename T = uint8>
-	KOR_FORCEINLINE_DEBUGGABLE SizeType GetRemainingOffset() const
+	KOR_FORCEINLINE_DEBUG SizeType GetRemainingOffset() const
 	{
 		if constexpr (sizeof(T) == sizeof(uint8))
 		{
@@ -99,7 +99,7 @@ struct SArchive
 	}
 
 	template<typename T = uint8>
-	KOR_FORCEINLINE_DEBUGGABLE SizeType GetOffset() const
+	KOR_FORCEINLINE_DEBUG SizeType GetOffset() const
 	{
 		if constexpr (sizeof(T) == sizeof(uint8))
 		{
@@ -114,7 +114,7 @@ struct SArchive
 
 	// Sets offset for T size
 	template<typename T = uint8>
-	KOR_FORCEINLINE_DEBUGGABLE void SetOffset(SizeType num)
+	KOR_FORCEINLINE_DEBUG void SetOffset(SizeType num)
 	{
 		SetBytesOffset(num * sizeof(T));
 	}
@@ -138,7 +138,7 @@ struct SArchive
 	virtual SizeType ReadBytes(void* ptr, SizeType size) = 0;
 
 	template<typename T>
-	KOR_FORCEINLINE_DEBUGGABLE SizeType Read(T* ptr, SizeType num)
+	KOR_FORCEINLINE_DEBUG SizeType Read(T* ptr, SizeType num)
 	{
 		const SizeType bytesRead = ReadBytes(ptr, sizeof(T) * num);
 		return bytesRead >= sizeof(T) ? bytesRead / sizeof(T) : 0;
@@ -148,7 +148,7 @@ struct SArchive
 	virtual SizeType WriteBytes(const void* ptr, SizeType size) = 0;
 
 	template<typename T>
-	KOR_FORCEINLINE_DEBUGGABLE SizeType Write(const T* ptr, SizeType num)
+	KOR_FORCEINLINE_DEBUG SizeType Write(const T* ptr, SizeType num)
 	{
 		const SizeType bytesWritten = WriteBytes(ptr, sizeof(T) * num);
 		return bytesWritten >= sizeof(T) ? bytesWritten / sizeof(T) : 0;
@@ -182,7 +182,7 @@ struct SArchive
 
 	// Func: (const void* packet, SizeType numOfBytes) -> bool
 	template<SizeType MaxPacketSize, typename FuncType>
-	KOR_FORCEINLINE_DEBUGGABLE bool ReadPacketsUntil(SizeType startOffset, FuncType&& func)
+	KOR_FORCEINLINE_DEBUG bool ReadPacketsUntil(SizeType startOffset, FuncType&& func)
 	{
 		if (!SetBytesOffset(startOffset)) return false;
 		return ReadPacketsUntil<MaxPacketSize>(Forward(func));
@@ -271,7 +271,7 @@ static SArchive& operator<<(SArchive& ar, SArchive& otherAr)
 	return ar;
 }
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, SArchive& otherAr)
+KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, SArchive& otherAr)
 {
 	otherAr << ar; // just switch streaming
 	return ar;
@@ -435,25 +435,25 @@ static SArchive& operator>>(SArchive& ar, double& val)
 	return ar;
 }
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, tchar val)
+KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, tchar val)
 {
 	ar.Read(&val, 1);
 	return ar;
 }
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, tchar& val)
+KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, tchar& val)
 {
 	ar.Write(&val, 1);
 	return ar;
 }
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const tchar* val)
+KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, const tchar* val)
 {
 	ar.Write(val, SStringOps::Length(val));
 	return ar;
 }
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, tchar* val)
+KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, tchar* val)
 {
 	ar.Read(val, SStringOps::Length(val));
 	return ar;

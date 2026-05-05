@@ -112,21 +112,21 @@ struct TContainerTypeTraits<TString<T>> : TContainerTypeTraits<void>
 // -------------------------------------------------------------------------
 
 template<typename CharType>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TStringView<CharType>& str)
+KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, const TStringView<CharType>& str)
 {
 	ar.Write(str.GetChars(), str.GetLength());
 	return ar;
 }
 
 template<typename CharType>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TString<CharType>& str)
+KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, const TString<CharType>& str)
 {
 	ar.Write(str.GetChars(), str.GetLength());
 	return ar;
 }
 
 template<typename CharType>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TStringView<CharType>& str)
+KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, TStringView<CharType>& str)
 {
 	typename TString<CharType>::DataType newData;
 	ar >> newData;
@@ -135,7 +135,7 @@ KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TStringView
 }
 
 template<typename CharType>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TString<CharType>& str)
+KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, TString<CharType>& str)
 {
 	typename TString<CharType>::DataType newData;
 	ar >> newData;

@@ -4,7 +4,12 @@
 #pragma once
 
 #include "Core/Build.h"
+
+#include "Kor/StringOps.h"
+#include "Kor/Memory.h"
 #include "Kor/Misc.h"
+
+// TODO: Decouple assert from logging and let user provide function pointer that will be called on assert
 
 // KOR_ASSERT(statement)
 // - Fatal
@@ -69,7 +74,19 @@
 		}
 	}
 
+#if KOR_BUILD_DEBUG
+	#define KOR_ASSERT_DEBUG(statement) KOR_ASSERT(statement)
+	#define KOR_EXPECT_DEBUG(statement) KOR_EXPECT(statement)
 #else
-	#define KOR_ASSERT(expression) (!!(expression))
-	#define KOR_EXPECT(expression) (!!(expression))
+	#define KOR_ASSERT_DEBUG(statement)
+	#define KOR_EXPECT_DEBUG(expression) (!!(expression))
 #endif
+
+#else
+	#define KOR_ASSERT(statement)
+	#define KOR_EXPECT(expression) (!!(expression))
+
+	#define KOR_ASSERT_DEBUG(statement)
+	#define KOR_EXPECT_DEBUG(expression) (!!(expression))
+#endif
+

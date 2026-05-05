@@ -117,7 +117,7 @@ KOR_FORCEINLINE bool TString<CharT>::Equals(const TString& other, ESearchCase se
 
 template<typename CharT>
 template<ESearchCase Case>
-KOR_FORCEINLINE_DEBUGGABLE bool TStringView<CharT>::StartsWith(const TStringView& val) const noexcept
+KOR_FORCEINLINE_DEBUG bool TStringView<CharT>::StartsWith(const TStringView& val) const noexcept
 {
 	if (val._len > _len) return false;
 	return SOps::Compare<Case>(_data, val._data, val._len) == 0;
@@ -125,7 +125,7 @@ KOR_FORCEINLINE_DEBUGGABLE bool TStringView<CharT>::StartsWith(const TStringView
 
 template<typename CharT>
 template<ESearchCase Case>
-KOR_FORCEINLINE_DEBUGGABLE bool TString<CharT>::StartsWith(const TString& val) const noexcept
+KOR_FORCEINLINE_DEBUG bool TString<CharT>::StartsWith(const TString& val) const noexcept
 {
 	const int32 len = _data.GetNum() - 1;
 	const int32 valLen = val._data.GetNum() - 1;
@@ -135,14 +135,14 @@ KOR_FORCEINLINE_DEBUGGABLE bool TString<CharT>::StartsWith(const TString& val) c
 }
 
 template<typename CharT>
-KOR_FORCEINLINE_DEBUGGABLE bool TStringView<CharT>::StartsWith(const TStringView& val, ESearchCase searchCase) const noexcept
+KOR_FORCEINLINE_DEBUG bool TStringView<CharT>::StartsWith(const TStringView& val, ESearchCase searchCase) const noexcept
 {
 	if (val._len > _len) return false;
 	return SOps::Compare(_data, val._data, val._len, searchCase) == 0;
 }
 
 template<typename CharT>
-KOR_FORCEINLINE_DEBUGGABLE bool TString<CharT>::StartsWith(const TString& val, ESearchCase searchCase) const noexcept
+KOR_FORCEINLINE_DEBUG bool TString<CharT>::StartsWith(const TString& val, ESearchCase searchCase) const noexcept
 {
 	const int32 len = _data.GetNum() - 1;
 	const int32 valLen = val._data.GetNum() - 1;
@@ -153,7 +153,7 @@ KOR_FORCEINLINE_DEBUGGABLE bool TString<CharT>::StartsWith(const TString& val, E
 
 template<typename CharT>
 template<ESearchCase Case>
-KOR_FORCEINLINE_DEBUGGABLE bool TStringView<CharT>::EndsWith(const TStringView& val) const noexcept
+KOR_FORCEINLINE_DEBUG bool TStringView<CharT>::EndsWith(const TStringView& val) const noexcept
 {
 	if (val._len > _len) return false;
 	return SOps::Compare<Case>(_data + (_len - val._len), val._data, val._len) == 0;
@@ -161,7 +161,7 @@ KOR_FORCEINLINE_DEBUGGABLE bool TStringView<CharT>::EndsWith(const TStringView& 
 
 template<typename CharT>
 template<ESearchCase Case>
-KOR_FORCEINLINE_DEBUGGABLE bool TString<CharT>::EndsWith(const TString& val) const noexcept
+KOR_FORCEINLINE_DEBUG bool TString<CharT>::EndsWith(const TString& val) const noexcept
 {
 	const int32 len = _data.GetNum() - 1;
 	const int32 valLen = val._data.GetNum() - 1;
@@ -171,14 +171,14 @@ KOR_FORCEINLINE_DEBUGGABLE bool TString<CharT>::EndsWith(const TString& val) con
 }
 
 template<typename CharT>
-KOR_FORCEINLINE_DEBUGGABLE bool TStringView<CharT>::EndsWith(const TStringView& val, ESearchCase searchCase) const noexcept
+KOR_FORCEINLINE_DEBUG bool TStringView<CharT>::EndsWith(const TStringView& val, ESearchCase searchCase) const noexcept
 {
 	if (val._len > _len) return false;
 	return SOps::Compare(_data + (_len - val._len), val._data, val._len, searchCase) == 0;
 }
 
 template<typename CharT>
-KOR_FORCEINLINE_DEBUGGABLE bool TString<CharT>::EndsWith(const TString& val, ESearchCase searchCase) const noexcept
+KOR_FORCEINLINE_DEBUG bool TString<CharT>::EndsWith(const TString& val, ESearchCase searchCase) const noexcept
 {
 	const int32 len = _data.GetNum() - 1;
 	const int32 valLen = val._data.GetNum() - 1;

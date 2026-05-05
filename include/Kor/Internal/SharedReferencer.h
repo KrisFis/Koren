@@ -128,7 +128,7 @@ namespace KOR_NAMESPACE Internal
 	}
 
 	template<typename ObjectType>
-	KOR_FORCEINLINE_DEBUGGABLE static CReferencerBase* NewCustomReferencer(ObjectType* obj)
+	KOR_FORCEINLINE_DEBUG static CReferencerBase* NewCustomReferencer(ObjectType* obj)
 	{
 		return NewCustomReferencerWithDeleter(obj, &DefaultDeleteObjectFunc<ObjectType>);
 	}

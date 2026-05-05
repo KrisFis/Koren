@@ -20,16 +20,11 @@
 #define KOR_NODISCARD __declspec(noreturn)
 #define KOR_NORETURN __declspec(noreturn)
 
+#define KOR_INLINE __inline
 #define KOR_FORCEINLINE __forceinline
 #define KOR_FORCENOINLINE __declspec(noinline)
 
 #define KOR_UNREACHABLE_CODE() __assume(false)
-
-#if KOR_BUILD_DEBUG
-	#define KOR_FORCEINLINE_DEBUGGABLE __inline
-#else
-	#define KOR_FORCEINLINE_DEBUGGABLE KOR_FORCEINLINE
-#endif
 
 #define KOR_DEBUG_BREAK() __debugbreak()
 
