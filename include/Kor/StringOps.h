@@ -72,10 +72,9 @@ struct TStringOps
 	// IsAscii
 	// Returns true if all characters in the string fall within the ASCII range (0x00-0x7F).
 	// * Always returns true when CharType is achar (assumed ASCII-safe)
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static bool IsAscii(const CharType* str) noexcept;
-
 	static bool IsAscii(const CharType* str, int32 len) noexcept;
 
 	template<int32 N>
@@ -84,10 +83,9 @@ struct TStringOps
 	// IsNumeric
 	// Returns true if all characters in the string are decimal digits (0-9).
 	// * Returns true for empty string
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static bool IsNumeric(const CharType* str) noexcept;
-
 	static bool IsNumeric(const CharType* str, int32 len) noexcept;
 
 	template<int32 N>
@@ -96,10 +94,9 @@ struct TStringOps
 	// IsWhitespace
 	// Returns true if all characters in the string are whitespace characters.
 	// * Returns true for empty string
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static bool IsWhitespace(const CharType* str) noexcept;
-
 	static bool IsWhitespace(const CharType* str, int32 len) noexcept;
 
 	template<int32 N>
@@ -107,10 +104,9 @@ struct TStringOps
 
 	// IsUpper
 	// Returns true if all characters in the string are uppercase.
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static bool IsUpper(const CharType* str) noexcept;
-
 	static bool IsUpper(const CharType* str, int32 len) noexcept;
 
 	template<int32 N>
@@ -118,10 +114,9 @@ struct TStringOps
 
 	// IsLower
 	// Returns true if all characters in the string are lowercase.
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static bool IsLower(const CharType* str) noexcept;
-
 	static bool IsLower(const CharType* str, int32 len) noexcept;
 
 	template<int32 N>
@@ -131,16 +126,14 @@ struct TStringOps
 	// Compares two strings lexicographically.
 	// Returns 0 if equal, negative if lhs < rhs, positive if lhs > rhs.
 	// * Prefer the template overload when Case is known at compile time
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	template<ESearchCase Case = ESearchCase::Sensitive>
 	static int32 Compare(const CharType* lhs, const CharType* rhs) noexcept;
-
 	static int32 Compare(const CharType* lhs, const CharType* rhs, ESearchCase searchCase) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive>
 	static int32 Compare(const CharType* lhs, const CharType* rhs, int32 len) noexcept;
-
 	static int32 Compare(const CharType* lhs, const CharType* rhs, int32 len, ESearchCase searchCase) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive, int32 N>
@@ -151,19 +144,36 @@ struct TStringOps
 
 	// Length
 	// Returns the number of characters before the null terminator.
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static int32 Length(const CharType* str) noexcept;
 
 	template<int32 N>
 	static int32 Length(const CharType (&)[N]) noexcept;
 
+	// Count Whitespaces
+	// Returns number of characters (backwards or forwards)
+	// -------------------------------------------------------------------------
+
+	template<ESearchDir Dir = ESearchDir::Forward>
+	static int32 CountWhitespaces(const CharType* str) noexcept;
+	static int32 CountWhitespaces(const CharType* str, ESearchDir searchDir) noexcept;
+
+	template<ESearchDir Dir = ESearchDir::Forward>
+	static int32 CountWhitespaces(const CharType* str, int32 len) noexcept;
+	static int32 CountWhitespaces(const CharType* str, int32 len, ESearchDir searchDir) noexcept;
+
+	template<ESearchDir Dir = ESearchDir::Forward, int32 N>
+	static int32 CountWhitespaces(const CharType (&str)[N]) noexcept;
+
+	template<int32 N>
+	static int32 CountWhitespaces(const CharType (&str)[N], ESearchDir searchDir) noexcept;
+
 	// ToUpper
 	// Converts all characters in the string to uppercase in-place.
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static void ToUpper(CharType* str) noexcept;
-
 	static void ToUpper(CharType* str, int32 len) noexcept;
 
 	template<int32 N>
@@ -171,10 +181,9 @@ struct TStringOps
 
 	// ToLower
 	// Converts all characters in the string to lowercase in-place.
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static void ToLower(CharType* str) noexcept;
-
 	static void ToLower(CharType* str, int32 len) noexcept;
 
 	template<int32 N>
@@ -183,7 +192,7 @@ struct TStringOps
 	// Fill
 	// Fills len characters of the buffer with the given character.
 	// * Does not write a null terminator
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static void Fill(CharType* str, CharType c, int32 maxLen) noexcept;
 
@@ -194,10 +203,9 @@ struct TStringOps
 	// Copies src into dest including the null terminator.
 	// * dest must be large enough to hold src
 	// * dest and src must not overlap
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static void Copy(CharType* dest, const CharType* src) noexcept;
-
 	static void Copy(CharType* dest, const CharType* src, int32 len) noexcept;
 
 	template<int32 N>
@@ -206,10 +214,9 @@ struct TStringOps
 	// Concatenate
 	// Appends src to the end of dest, writing a null terminator after.
 	// * dest must have enough remaining capacity to hold src
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static void Concatenate(CharType* dest, const CharType* src) noexcept;
-
 	static void Concatenate(CharType* dest, const CharType* src, int32 len) noexcept;
 
 	template<int32 N>
@@ -219,16 +226,14 @@ struct TStringOps
 	// Searches for a substring in str.
 	// Returns the index of the first (Forward) or last (Backward) match, or KOR_INDEX_NONE if not found.
 	// * Prefer the template overload when Case and Dir are known at compile time
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
 	static int32 Find(const CharType* str, const CharType* substr) noexcept;
-
 	static int32 Find(const CharType* str, const CharType* substr, ESearchCase searchCase, ESearchDir searchDir) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
 	static int32 Find(const CharType* str, const CharType* substr, int32 len, int32 subLen) noexcept;
-
 	static int32 Find(const CharType* str, const CharType* substr, int32 len, int32 subLen, ESearchCase searchCase, ESearchDir searchDir) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward, int32 N, int32 R>
@@ -241,16 +246,14 @@ struct TStringOps
 	// Searches for a character in str.
 	// Returns the index of the first (Forward) or last (Backward) occurrence, or KOR_INDEX_NONE if not found.
 	// * Prefer the template overload when Case and Dir are known at compile time
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
 	static int32 Find(const CharType* str, CharType c) noexcept;
-
 	static int32 Find(const CharType* str, CharType c, ESearchCase searchCase, ESearchDir searchDir) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward>
 	static int32 Find(const CharType* str, CharType c, int32 len) noexcept;
-
 	static int32 Find(const CharType* str, CharType c, int32 len, ESearchCase searchCase, ESearchDir searchDir) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive, ESearchDir Dir = ESearchDir::Forward, int32 N>
@@ -265,16 +268,14 @@ struct TStringOps
 	// * Uses a thread-local scratch buffer of SMemory::LARGE_BUFFER_SIZE
 	// * Result must fit within LARGE_BUFFER_SIZE or behavior is undefined
 	// * Prefer the template overload when Case is known at compile time
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	template<ESearchCase Case = ESearchCase::Sensitive>
 	static int32 Replace(CharType* str, const CharType* from, const CharType* to) noexcept;
-
 	static int32 Replace(CharType* str, const CharType* from, const CharType* to, ESearchCase searchCase) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive>
 	static int32 Replace(CharType* str, const CharType* from, const CharType* to, int32 maxLen) noexcept;
-
 	static int32 Replace(CharType* str, const CharType* from, const CharType* to, int32 maxLen, ESearchCase searchCase) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive, int32 N>
@@ -288,16 +289,14 @@ struct TStringOps
 	// Returns the number of replacements made.
 	// * When Case is Insensitive, both upper and lower forms of from are replaced with to as-is
 	// * Prefer the template overload when Case is known at compile time
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	template<ESearchCase Case = ESearchCase::Sensitive>
 	static int32 Replace(CharType* str, CharType from, CharType to) noexcept;
-
 	static int32 Replace(CharType* str, CharType from, CharType to, ESearchCase searchCase) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive>
 	static int32 Replace(CharType* str, CharType from, CharType to, int32 maxLen) noexcept;
-
 	static int32 Replace(CharType* str, CharType from, CharType to, int32 maxLen, ESearchCase searchCase) noexcept;
 
 	template<ESearchCase Case = ESearchCase::Sensitive, int32 N>
@@ -311,7 +310,7 @@ struct TStringOps
 	// Returns the number of characters written excluding null terminator, or negative on error.
 	// * Does not guarantee null termination - caller is responsible
 	// * Prefer the array ref overload when buffer size is known at compile time
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	template<typename... ArgT>
 	static int32 Format(CharType* str, const CharType* fmt, int32 maxLen, const ArgT&... args) noexcept;
@@ -323,7 +322,7 @@ struct TStringOps
 	// Returns the number of ToCharType units required to hold the converted string, excluding null terminator.
 	// Returns KOR_INDEX_NONE if len <= 0.
 	// * Passing a UTF8 mid-sequence len produces undefined count
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	template<typename ToCharType>
 	static int32 ConvertedLength(const CharType* str, int32 len) noexcept;
@@ -337,7 +336,7 @@ struct TStringOps
 	// Returns KOR_INDEX_NONE on error.
 	// * toStr must be large enough to hold the result - use ConvertedLength to determine required size
 	// * Passing a UTF8 mid-sequence len produces undefined count
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	template<typename ToCharType>
 	static int32 Convert(const CharType* str, ToCharType* toStr, int32 len) noexcept;
@@ -351,7 +350,7 @@ struct TStringOps
 	// * Does not skip leading whitespace - input must start with optional sign then digits
 	// * Stops at the first character that is not a valid digit in the given base
 	// * Use the outEnd overload to detect how many characters were consumed
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static int64 ToInt(const CharType* str, int32 base = 10) noexcept;
 	static int64 ToInt(const CharType* str, int32& outLen, int32 base) noexcept;
@@ -365,7 +364,7 @@ struct TStringOps
 	// On error, returns KOR_INDEX_NONE (-1)
 	// * Use the bounded overload to guard against buffer overflows - returns KOR_INDEX_NONE if too small
 	// * Prefer the array ref overload when buffer size is known at compile time
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static int32 FromInt(CharType* str, int64 value, int32 base = 10) noexcept;
 	static int32 FromInt(CharType* str, int64 value, int32 maxLen, int32 base) noexcept;
@@ -380,7 +379,7 @@ struct TStringOps
 	// Parses the string as a double.
 	// * Delegates to strtod/wcstod - leading whitespace is skipped per CRT behavior
 	// * Use the outEnd overload to detect how many characters were consumed
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static double ToFloat(const CharType* str) noexcept;
 	static double ToFloat(const CharType* str, int32& outLen) noexcept;
@@ -391,16 +390,14 @@ struct TStringOps
 	// * Buffer must be at least SMemory::MAX_BUFFER_SIZE_DOUBLE characters
 	// * Prefer the template overload when Format is known at compile time
 	// * Bounded overload returns would-be length on truncation (Format/snprintf semantics)
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	template<EFloatFormat Format = EFloatFormat::Fixed>
 	static int32 FromFloat(CharType* str, double value, int32 precision = 6) noexcept;
-
 	static int32 FromFloat(CharType* str, double value, int32 precision, EFloatFormat format) noexcept;
 
 	template<EFloatFormat Format = EFloatFormat::Fixed>
 	static int32 FromFloat(CharType* str, double value, int32 maxLen, int32 precision) noexcept;
-
 	static int32 FromFloat(CharType* str, double value, int32 maxLen, int32 precision, EFloatFormat format) noexcept;
 
 	template<EFloatFormat Format = EFloatFormat::Fixed, int32 N>

@@ -59,12 +59,12 @@ KOR_FORCEINLINE TString<CharT>::TString(const CharType(& text)[N]) noexcept
 {}
 
 template<typename CharT>
-TString<CharT>::TString(SizeType length, CharType val) noexcept
+KOR_FORCEINLINE_DEBUG TString<CharT>::TString(TString<CharT>::SizeType length, CharType val) noexcept
 	: _data(length + 1) // +1 includes null terminator
 {
 	KOR_ASSERT_DEBUG(length > 0);
 
-	SMemory::FillTyped(_data.GetData(), val, length);
+	SOps::Fill(_data.GetData(), val, length);
 	_data[length] = Constant::Null;
 }
 

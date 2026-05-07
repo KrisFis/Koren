@@ -21,19 +21,6 @@ namespace Internal
 	}
 }
 
-template<typename CharType>
-int32 TStringOps<CharType>::Length(const CharType* str) noexcept
-{
-	int32 len = 0; while (*str++) ++len; return len;
-}
-
-template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Length(const CharType(&)[N]) noexcept
-{
-	return N;
-}
-
 // Primitive inspection
 #include "Kor/Inl/StringOps_Query.inl"
 #include "Kor/Inl/StringOps_Compare.inl"

@@ -27,7 +27,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr) no
 	}
 	else
 	{
-		int32 last = -1;
+		int32 last = KOR_INDEX_NONE;
 		for (int32 i = 0; str[i]; ++i)
 		{
 			if (CharMayLower<Case>(str[i]) == CharMayLower<Case>(*substr))
