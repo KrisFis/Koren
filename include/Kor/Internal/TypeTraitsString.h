@@ -52,8 +52,8 @@ template<> struct TIsCharacterCompatible<achar, char8> : TTrueType {};
 #endif
 
 #if KOR_WCHAR_BYTES == 4
-template<> struct TIsCharacterCompatible<wchar, char32> : TTrueValue {};
-template<> struct TIsCharacterCompatible<char32, wchar> : TTrueValue {};
+template<> struct TIsCharacterCompatible<wchar, char32> : TTrueType {};
+template<> struct TIsCharacterCompatible<char32, wchar> : TTrueType {};
 #elif KOR_WCHAR_BYTES == 2
 template<> struct TIsCharacterCompatible<wchar, char16> : TTrueType {};
 template<> struct TIsCharacterCompatible<char16, wchar> : TTrueType {};

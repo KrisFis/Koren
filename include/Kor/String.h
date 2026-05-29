@@ -4,7 +4,8 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include "Kor/StringOps.h"
+
+#include "Kor/Assert.h"
 #include "Kor/Archive.h"
 #include "Kor/Array.h"
 
@@ -236,7 +237,7 @@ public:
 
 	// Returns a shared empty string. Prefer over default constructing when
 	// you need a const ref to an empty string, avoids allocation.
-	static constexpr const TString& GetEmpty() noexcept;
+	static const TString& GetEmpty() noexcept;
 
 	// Comparison operators
 	// Performs case-sensitive comparison.

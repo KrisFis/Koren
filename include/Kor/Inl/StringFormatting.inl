@@ -52,7 +52,7 @@ TString<CharT> TString<CharT>::Format(const FmtT& fmt, const VarTypes&... args) 
 	{
 		// Buffer was too small — resize to exact size and reformat
 		result._data.Resize(written + 1);
-		KOR_ASSERT(SOps::Format(result._data.GetData(), format, result._data.GetNum(), args...) == written);
+		KOR_ASSERT_DEBUG(SOps::Format(result._data.GetData(), format, result._data.GetNum(), args...) == written);
 	}
 	else
 	{

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/KorMinimal.h"
+#include "Kor/Core/Platform.h"
 #include "Kor/CharOps.h"
 
 #include KOR_PLATFORM_HEADER_FROM(Kor/Core, StringOps)
