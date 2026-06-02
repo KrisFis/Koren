@@ -67,8 +67,8 @@ template<typename CharType>
 KOR_FORCEINLINE constexpr bool TCharOps<CharType>::IsHexDigit(CharType c) noexcept
 {
 	return IsDigit(c)
-	       | ((c >= (CharType)'a') & (c <= (CharType)'f'))
-	       | ((c >= (CharType)'A') & (c <= (CharType)'F'));
+		| ((c >= (CharType)'a') & (c <= (CharType)'f'))
+		| ((c >= (CharType)'A') & (c <= (CharType)'F'));
 }
 
 template<typename CharType>
@@ -81,8 +81,8 @@ template<typename CharType>
 KOR_FORCEINLINE constexpr bool TCharOps<CharType>::IsWhitespace(CharType c) noexcept
 {
 	return (c == CharConstant::Space) | (c == CharConstant::Tab)
-	       | (c == CharConstant::LineFeed) | (c == CharConstant::CarriageReturn)
-	       | (c == CharConstant::VerticalTab) | (c == CharConstant::FormFeed);
+		| (c == CharConstant::LineFeed) | (c == CharConstant::CarriageReturn)
+		| (c == CharConstant::VerticalTab) | (c == CharConstant::FormFeed);
 }
 
 template<typename CharType>
@@ -113,7 +113,7 @@ template<typename CharType>
 KOR_FORCEINLINE constexpr bool TCharOps<CharType>::IsLinebreak(CharType c) noexcept
 {
 	return (uint32(UCharType(c)) - uint32(CharConstant::LineFeed))
-	       <= uint32(CharConstant::CarriageReturn - CharConstant::LineFeed);
+		<= uint32(CharConstant::CarriageReturn - CharConstant::LineFeed);
 }
 
 template<typename CharType>

@@ -40,14 +40,14 @@ KOR_FORCEINLINE void TString<CharT>::ToLower() noexcept
 template<typename CharT>
 KOR_FORCEINLINE void TString<CharT>::TrimStart() noexcept
 {
-	const int32 count = SOps::CountWhitespaces<ESearchDir::Forward>(*_data, _data.GetNum() - 1);
+	const int32 count = SOps::template CountWhitespaces<ESearchDir::Forward>(*_data, _data.GetNum() - 1);
 	return ChopLeft(count);
 }
 
 template<typename CharT>
 KOR_FORCEINLINE void TString<CharT>::TrimEnd() noexcept
 {
-	const int32 count = SOps::CountWhitespaces<ESearchDir::Backward>(*_data, _data.GetNum() - 1);
+	const int32 count = SOps::template CountWhitespaces<ESearchDir::Backward>(*_data, _data.GetNum() - 1);
 	return ChopRight(count);
 }
 
@@ -61,38 +61,52 @@ KOR_FORCEINLINE void TString<CharT>::Trim() noexcept
 template<typename CharT>
 void TString<CharT>::ChopRight(SizeType idx) noexcept
 {
-	// TODO: Missing TArray::RemoveAt overload for range
+	// Remove everything from idx to end (excluding null terminator)
+	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
+	const SizeType count = _data.GetNum() - 1 - idx;
+	_data.RemoveAt(idx, count);
+	_data[_data.GetNum() - 1] = Constant::Null;
 }
 
 template<typename CharT>
 void TString<CharT>::ChopLeft(SizeType idx) noexcept
 {
-	// TODO: Missing TArray::RemoveAt overload for range
+	// Remove everything before idx
+	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
+	_data.RemoveAt(0, idx);
+	// null terminator survives since we removed from the front
 }
 
 template<typename CharT>
 void TString<CharT>::ChopRange(SizeType firstIdx, SizeType secondIdx) noexcept
 {
-	// TODO: Missing TArray::RemoveAt overload for range
+	KOR_ASSERT_DEBUG(firstIdx >= 0 && secondIdx >= firstIdx && secondIdx < _data.GetNum() - 1);
+	_data.RemoveAt(firstIdx, secondIdx - firstIdx + 1);
+	_data[_data.GetNum() - 1] = Constant::Null;
 }
 
 template<typename CharT>
 void TString<CharT>::Insert(SizeType idx, const TString& other) noexcept
 {
-	// TODO: Missing TArray::Insert
+	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
+	// Insert without the other's null terminator
+	_data.Insert(idx, *other._data, other._data.GetNum() - 1);
+	_data[_data.GetNum() - 1] = Constant::Null;
 }
 
 template<typename CharT>
 void TString<CharT>::Remove(SizeType idx, SizeType count) noexcept
 {
-	// TODO: Missing TArray::RemoveAt overload for range
+	KOR_ASSERT_DEBUG(idx >= 0 && idx + count <= _data.GetNum() - 1);
+	_data.RemoveAt(idx, count);
+	_data[_data.GetNum() - 1] = Constant::Null;
 }
 
 template<typename CharT>
 template<ESearchCase Case>
 KOR_FORCEINLINE_DEBUG void TString<CharT>::Replace(const TString& from, const TString& to) noexcept
 {
-	SOps::Replace<Case>(*_data, *from._data, *to._data, _data.GetNum() - 1);
+	SOps::template Replace<Case>(*_data, *from._data, *to._data, _data.GetNum() - 1);
 }
 
 template<typename CharT>
@@ -106,7 +120,7 @@ template<typename CharT>
 template<ESearchCase Case>
 KOR_FORCEINLINE void TString<CharT>::Replace(CharType from, CharType to) noexcept
 {
-	SOps::Replace<Case>(*_data, from, to, _data.GetNum() - 1);
+	SOps::template Replace<Case>(*_data, from, to, _data.GetNum() - 1);
 }
 
 template<typename CharT>

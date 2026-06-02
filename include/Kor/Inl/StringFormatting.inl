@@ -36,7 +36,7 @@ TString<CharT> TString<CharT>::Format(const FmtT& fmt, const VarTypes&... args) 
 	static_assert(StringTraits::IsValid, "Format variable is not valid");
 
 	const CharType* format = nullptr;
-	if constexpr (StringTraits::IsTString)                                { format = fmt.GetChars(); }
+	if constexpr (StringTraits::IsTString) { format = fmt.GetChars(); }
 	else if constexpr (StringTraits::IsCArray || StringTraits::IsCString) { format = fmt; }
 
 	// Pre-allocate 512 chars — covers the majority of format strings without reallocation

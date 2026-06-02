@@ -10,8 +10,30 @@ KOR_FORCEINLINE constexpr TStringView<CharT>::TStringView() noexcept
 {}
 
 template<typename CharT>
+KOR_FORCEINLINE constexpr TStringView<CharT>::TStringView(Init::SZero) noexcept
+	: _data(nullptr)
+	, _len(0)
+{}
+
+template<typename CharT>
+KOR_FORCEINLINE constexpr TStringView<CharT>::TStringView(Init::SNoInit) noexcept
+	: _data(nullptr)
+	, _len(KOR_INDEX_NONE)
+{}
+
+template<typename CharT>
 KOR_FORCEINLINE constexpr TString<CharT>::TString() noexcept
 	: _data(&Constant::Null, 1)
+{}
+
+template<typename CharT>
+KOR_FORCEINLINE constexpr TString<CharT>::TString(Init::SZero) noexcept
+	: _data(Init::Zero)
+{}
+
+template<typename CharT>
+KOR_FORCEINLINE constexpr TString<CharT>::TString(Init::SNoInit) noexcept
+	: _data(Init::NoInit)
 {}
 
 template<typename CharT>

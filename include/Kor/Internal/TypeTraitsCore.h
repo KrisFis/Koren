@@ -55,7 +55,7 @@ template<typename T> struct TIsRValue<T&&> { enum { Value = true }; };
 // [Remove reference]
 // * Removes reference from type
 
-template <typename T> struct TRemoveReference      { typedef T Type; };
+template <typename T> struct TRemoveReference { typedef T Type; };
 template <typename T> struct TRemoveReference<T& > { typedef T Type; };
 template <typename T> struct TRemoveReference<T&&> { typedef T Type; };
 
@@ -213,7 +213,7 @@ template<typename T> struct TIsUnsigned
 // * Primary source of truth for integer type resolution by size
 // * Unsupported sizes will result in a compile error (incomplete type)
 template<TSize Size> struct TInt { static_assert(Size == 0, "TInt: unsupported size, must be 1, 2, 4 or 8"); };
-template <> struct TInt<1> { typedef int8  Signed; typedef uint8  Unsigned; };
+template <> struct TInt<1> { typedef int8 Signed; typedef uint8 Unsigned; };
 template <> struct TInt<2> { typedef int16 Signed; typedef uint16 Unsigned; };
 template <> struct TInt<4> { typedef int32 Signed; typedef uint32 Unsigned; };
 template <> struct TInt<8> { typedef int64 Signed; typedef uint64 Unsigned; };

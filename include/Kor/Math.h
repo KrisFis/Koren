@@ -83,10 +83,10 @@ struct SMath
 	{
 		uint32 pos = 0;
 		if (Value >= 1 << 16) { Value >>= 16; pos += 16; }
-		if (Value >= 1 << 8) { Value >>=  8; pos +=  8; }
-		if (Value >= 1 << 4) { Value >>=  4; pos +=  4; }
-		if (Value >= 1 << 2) { Value >>=  2; pos +=  2; }
-		if (Value >= 1 << 1) { pos +=  1; }
+		if (Value >= 1 << 8) { Value >>= 8; pos += 8; }
+		if (Value >= 1 << 4) { Value >>= 4; pos += 4; }
+		if (Value >= 1 << 2) { Value >>= 2; pos += 2; }
+		if (Value >= 1 << 1) { pos += 1; }
 		return (Value == 0) ? 0 : pos;
 	}
 
@@ -97,10 +97,10 @@ struct SMath
 		uint64 pos = 0;
 		if (Value >= 1ull << 32) { Value >>= 32; pos += 32; }
 		if (Value >= 1ull << 16) { Value >>= 16; pos += 16; }
-		if (Value >= 1ull << 8) { Value >>=  8; pos +=  8; }
-		if (Value >= 1ull << 4) { Value >>=  4; pos +=  4; }
-		if (Value >= 1ull << 2) { Value >>=  2; pos +=  2; }
-		if (Value >= 1ull << 1) { pos +=  1; }
+		if (Value >= 1ull << 8) { Value >>= 8; pos += 8; }
+		if (Value >= 1ull << 4) { Value >>= 4; pos += 4; }
+		if (Value >= 1ull << 2) { Value >>= 2; pos += 2; }
+		if (Value >= 1ull << 1) { pos += 1; }
 		return (Value == 0) ? 0 : pos;
 	}
 };

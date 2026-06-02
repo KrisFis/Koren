@@ -4,53 +4,63 @@
 #pragma once // silence tooling
 
 template<typename CharT>
-bool TStringView<CharT>::IsValidIndex(SizeType idx) const noexcept
+KOR_FORCEINLINE bool TStringView<CharT>::IsValidIndex(SizeType idx) const noexcept
 {
+	return SMath::IsWithin(idx, 0, _len);
 }
 
 template<typename CharT>
-bool TString<CharT>::IsValidIndex(SizeType idx) const noexcept
+KOR_FORCEINLINE bool TString<CharT>::IsValidIndex(SizeType idx) const noexcept
 {
+	return SMath::IsWithin(idx, 0, _data.GetNum() - 1);
 }
 
 template<typename CharT>
-bool TStringView<CharT>::IsEmpty() const noexcept
+KOR_FORCEINLINE bool TStringView<CharT>::IsEmpty() const noexcept
 {
+	return _len == 0;
 }
 
 template<typename CharT>
-bool TString<CharT>::IsEmpty() const noexcept
+KOR_FORCEINLINE bool TString<CharT>::IsEmpty() const noexcept
 {
+	return _data.IsEmpty();
 }
 
 template<typename CharT>
-typename TStringView<CharT>::SizeType TStringView<CharT>::GetLength() const noexcept
+KOR_FORCEINLINE typename TStringView<CharT>::SizeType TStringView<CharT>::GetLength() const noexcept
 {
+	return _len;
 }
 
 template<typename CharT>
-typename TString<CharT>::SizeType TString<CharT>::GetLength() const noexcept
+KOR_FORCEINLINE typename TString<CharT>::SizeType TString<CharT>::GetLength() const noexcept
 {
+	return _data.GetNum() - 1;
 }
 
 template<typename CharT>
-const typename TStringView<CharT>::CharType* TStringView<CharT>::GetChars() const noexcept
+KOR_FORCEINLINE const typename TStringView<CharT>::CharType* TStringView<CharT>::GetChars() const noexcept
 {
+	return _data;
 }
 
 template<typename CharT>
-const typename TString<CharT>::CharType* TString<CharT>::GetChars() const noexcept
+KOR_FORCEINLINE const typename TString<CharT>::CharType* TString<CharT>::GetChars() const noexcept
 {
+	return *_data;
 }
 
 template<typename CharT>
-typename TString<CharT>::CharType* TString<CharT>::GetChars() noexcept
+KOR_FORCEINLINE typename TString<CharT>::CharType* TString<CharT>::GetChars() noexcept
 {
+	return _data;
 }
 
 template<typename CharT>
-const typename TString<CharT>::DataType& TString<CharT>::GetData() const noexcept
+KOR_FORCEINLINE const typename TString<CharT>::DataType& TString<CharT>::GetData() const noexcept
 {
+	return *_data;
 }
 
 // Lifecycle

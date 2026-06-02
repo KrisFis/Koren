@@ -129,11 +129,11 @@ int32 TStringOps<CharType>::ConvertedLength(const CharType* str, int32 len) noex
 		for (int32 i = 0; i < len; ++i)
 		{
 			const uint32 cp = (uint32)(UCharType)str[i];
-			if      (cp <= 0x7F)    count += 1;
-			else if (cp <= 0x7FF)   count += 2;
-			else if (cp <= 0xFFFF)  count += 3;
+			if (cp <= 0x7F) count += 1;
+			else if (cp <= 0x7FF) count += 2;
+			else if (cp <= 0xFFFF) count += 3;
 			else if (cp <= 0x10FFFF)count += 4;
-			else                    count += 3; // U+FFFD fallback
+			else count += 3; // U+FFFD fallback
 		}
 		return count;
 	}
@@ -147,12 +147,12 @@ int32 TStringOps<CharType>::ConvertedLength(const CharType* str, int32 len) noex
 		while (i < len)
 		{
 			const uint8 byte = (uint8)str[i];
-			if      (byte == 0)              break;
-			else if (byte <= 0x7F)           { i += 1; }
-			else if ((byte & 0xE0) == 0xC0)  { i += 2; }
-			else if ((byte & 0xF0) == 0xE0)  { i += 3; }
-			else if ((byte & 0xF8) == 0xF0)  { i += 4; }
-			else                             { i += 1; } // invalid byte, still 1 output
+			if (byte == 0) break;
+			else if (byte <= 0x7F) { i += 1; }
+			else if ((byte & 0xE0) == 0xC0) { i += 2; }
+			else if ((byte & 0xF0) == 0xE0) { i += 3; }
+			else if ((byte & 0xF8) == 0xF0) { i += 4; }
+			else { i += 1; } // invalid byte, still 1 output
 			count++;
 		}
 		return count;

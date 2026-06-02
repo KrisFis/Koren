@@ -10,7 +10,7 @@ int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const C
 	CharType* buffer = Internal::GetScratchBuffer<CharType>();
 
 	const int32 fromLen = Length(from);
-	const int32 toLen   = Length(to);
+	const int32 toLen = Length(to);
 
 	int32 count = 0;
 
@@ -19,7 +19,7 @@ int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const C
 
 	while (*src)
 	{
-		int32 idx = Find<Case, ESearchDir::Forward>(src, from);
+		const int32 idx = Find<Case, ESearchDir::Forward>(src, from);
 		if (idx < 0)
 		{
 			while (*src) *dst++ = *src++;

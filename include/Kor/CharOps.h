@@ -139,9 +139,9 @@ struct TCharOps
 {
 	static_assert(TIsCharacter<T>::Value, "T must be a character type");
 
-	using CharType      = T;
-	using UCharType     = typename TMakeUnsigned<CharType>::Type;
-	using CharConstant  = TCharConstant<CharType>;
+	using CharType = T;
+	using UCharType = typename TMakeUnsigned<CharType>::Type;
+	using CharConstant = TCharConstant<CharType>;
 
 	// Constants
 	///////////////////////////////////////////////////////////////////////////////////
@@ -265,9 +265,9 @@ struct TCharOps
 	static constexpr CharType ToLower(CharType c) noexcept;
 };
 
-#include "Kor/Internal/CharOps.inl"
+#include "Kor/Inl/CharOps.inl"
 
-// Convenience typedefs for tchar
+	// Convenience typedefs for tchar
 using SCharOps = TCharOps<tchar>;
 using SCharConstant = TCharConstant<tchar>;
 

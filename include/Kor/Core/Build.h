@@ -10,7 +10,7 @@
 // Set via compiler flags: -DKOR_BUILD_DEBUG=1 or -DKOR_BUILD_RELEASE=1
 //
 // Supported: Debug, Release
-// Example:   KOR_BUILD_RELEASE
+// Example: KOR_BUILD_RELEASE
 ///////////////////////////////////////////////////////////////
 
 #ifndef KOR_BUILD_RELEASE
@@ -30,7 +30,7 @@
 // Detected automatically from predefined compiler macros.
 //
 // Supported: MSVC, CLANG, GCC
-// Example:   KOR_COMPILER_CLANG
+// Example: KOR_COMPILER_CLANG
 ///////////////////////////////////////////////////////////////
 
 #if defined(_MSC_VER)
@@ -60,7 +60,7 @@
 // Detected automatically. Exactly one will be set to 1.
 //
 // Supported: 32, 64
-// Example:   KOR_ARCHITECTURE_64
+// Example: KOR_ARCHITECTURE_64
 ///////////////////////////////////////////////////////////////
 
 #if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__)
@@ -98,7 +98,7 @@
 // Detected automatically
 //
 // Supported: Windows, Linux, Apple, Unix
-// Example:   KOR_PLATFORM_WINDOWS
+// Example: KOR_PLATFORM_WINDOWS
 ///////////////////////////////////////////////////////////////
 
 #if defined(_WIN32) || defined(_WIN64)

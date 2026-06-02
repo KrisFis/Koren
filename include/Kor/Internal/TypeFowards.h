@@ -5,6 +5,7 @@
 
 #include "Kor/Core/Build.h"
 
+// Required std include
 #include <initializer_list>
 
 KOR_NAMESPACE_BEGIN

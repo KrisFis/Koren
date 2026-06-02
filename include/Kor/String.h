@@ -27,7 +27,7 @@ public:
 	using DataType = const CharT*;
 	using SizeType = TArray<CharT, TArrayAllocator<CharT>>::SizeType;
 
-	using IteratorType      = const CharType*;
+	using IteratorType = const CharType*;
 	using ConstIteratorType = const CharType*;
 
 	// Constructors - Default, Copy, Move
@@ -47,6 +47,12 @@ public:
 	template<TSize N>
 	TStringView(const CharType (&text)[N]) noexcept;
 
+	// Constructors - Special/Forced
+	// -------------------------------------------------------------------------
+
+	explicit constexpr TStringView(Init::SZero) noexcept;
+	explicit constexpr TStringView(Init::SNoInit) noexcept;
+
 	// Comparison operators
 	// Performs case-sensitive comparison.
 	// Use Equals() for case-insensitive comparison.
@@ -61,7 +67,7 @@ public:
 	// -------------------------------------------------------------------------
 
 	const CharType* operator*() const noexcept;
-	CharType        operator[](SizeType idx) const noexcept;
+	CharType operator[](SizeType idx) const noexcept;
 
 	// Property getters
 	// -------------------------------------------------------------------------
@@ -98,7 +104,7 @@ public:
 	// -------------------------------------------------------------------------
 
 	// Parses the viewed string as an integer. `base` defaults to 10.
-	int64  ToInt(int32 base = 10) const noexcept;
+	int64 ToInt(int32 base = 10) const noexcept;
 	uint64 ToUInt(int32 base = 10) const noexcept;
 
 	// Float conversions
@@ -207,7 +213,7 @@ public:
 
 	using SizeType = typename DataType::SizeType;
 
-	using IteratorType      = CharType*;
+	using IteratorType = CharType*;
 	using ConstIteratorType = const CharType*;
 
 	// Constructors - Default, Copy, Move
@@ -230,7 +236,13 @@ public:
 	// Constructs a string of `length` characters, all set to `val`.
 	// -------------------------------------------------------------------------
 
-	TString(SizeType length, CharType val = Constant::Null) noexcept;
+	explicit TString(SizeType length, CharType val = Constant::Null) noexcept;
+
+	// Constructors - Special/Forced
+	// -------------------------------------------------------------------------
+
+	explicit constexpr TString(Init::SZero) noexcept;
+	explicit constexpr TString(Init::SNoInit) noexcept;
 
 	// Constants
 	// -------------------------------------------------------------------------
@@ -254,12 +266,12 @@ public:
 	TString& operator=(TString&& other) noexcept;
 
 	// Arithmetic operators
-	// operator+  - Returns a new string with `other` appended.
+	// operator+ - Returns a new string with `other` appended.
 	// operator+= - Appends `other` in place.
 	// -------------------------------------------------------------------------
 
-	TString  operator+(const TString& other) const noexcept;
-	TString  operator+(TString&& other) const noexcept;
+	TString operator+(const TString& other) const noexcept;
+	TString operator+(TString&& other) const noexcept;
 	TString& operator+=(const TString& other) noexcept;
 	TString& operator+=(TString&& other) noexcept;
 
@@ -268,7 +280,7 @@ public:
 	// Equivalent to appending '/' + other, handles trailing separators.
 	// -------------------------------------------------------------------------
 
-	TString  operator/(const TString& other) const noexcept;
+	TString operator/(const TString& other) const noexcept;
 	TString& operator/=(const TString& other) noexcept;
 
 	// Dereference / subscript
@@ -277,8 +289,8 @@ public:
 	// -------------------------------------------------------------------------
 
 	const CharType* operator*() const noexcept;
-	CharType*       operator*() noexcept;
-	CharType        operator[](SizeType idx) const noexcept;
+	CharType* operator*() noexcept;
+	CharType operator[](SizeType idx) const noexcept;
 
 	// Property getters
 	// -------------------------------------------------------------------------
@@ -297,7 +309,7 @@ public:
 
 	// Returns a pointer to the null-terminated character buffer.
 	const CharType* GetChars() const noexcept;
-	CharType*       GetChars() noexcept;
+	CharType* GetChars() noexcept;
 
 	// View
 	// Returns a non-owning view into this string's buffer.
@@ -314,9 +326,6 @@ public:
 
 	// Constructs a TString<CharT> by converting from a different char type.
 	template<typename OtherCharType>
-	static TString ConvertFrom(const OtherCharType* str) noexcept;
-
-	template<typename OtherCharType>
 	static TString ConvertFrom(const OtherCharType* str, SizeType length) noexcept;
 
 	template<typename OtherCharType, TSize N>
@@ -332,11 +341,11 @@ public:
 	// Int conversions
 	// -------------------------------------------------------------------------
 
-	static TString FromInt(int64 val) noexcept;
-	static TString FromUInt(uint64 val) noexcept;
+	static TString FromInt(int64 value, int32 base = 10) noexcept;
+	static TString FromUInt(uint64 value, int32 base = 10) noexcept;
 
 	// Parses the string as an integer. `base` defaults to 10.
-	int64  ToInt(int32 base = 10) const noexcept;
+	int64 ToInt(int32 base = 10) const noexcept;
 	uint64 ToUInt(int32 base = 10) const noexcept;
 
 	// Float conversions
@@ -345,8 +354,8 @@ public:
 	// Converts `val` to string. `precision` controls decimal places.
 	// `Format` controls notation: Auto, Fixed, Scientific.
 	template<EFloatFormat Format = EFloatFormat::Auto>
-	static TString FromFloat(double val, uint8 precision = 6) noexcept;
-	static TString FromFloat(double val, uint8 precision = 6, EFloatFormat format = EFloatFormat::Auto) noexcept;
+	static TString FromFloat(double value, uint8 precision = 6) noexcept;
+	static TString FromFloat(double value, uint8 precision = 6, EFloatFormat format = EFloatFormat::Auto) noexcept;
 
 	// Parses the string as a double.
 	double ToFloat() const noexcept;
@@ -521,9 +530,9 @@ public:
 	// Iteration
 	// -------------------------------------------------------------------------
 
-	IteratorType      begin() noexcept;
+	IteratorType begin() noexcept;
 	ConstIteratorType begin() const noexcept;
-	IteratorType      end() noexcept;
+	IteratorType end() noexcept;
 	ConstIteratorType end() const noexcept;
 
 private:

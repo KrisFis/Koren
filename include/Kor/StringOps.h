@@ -63,11 +63,11 @@ struct TStringOps
 {
 	static_assert(TIsCharacter<T>::Value, "CharType must be a character");
 
-	using CharType  = T;
+	using CharType = T;
 	using UCharType = typename TMakeUnsigned<CharType>::Type;
 
 	using CharOps = TCharOps<CharType>;
-	using CharConstant  = TCharConstant<CharType>;
+	using CharConstant = TCharConstant<CharType>;
 
 	// IsAscii
 	// Returns true if all characters in the string fall within the ASCII range (0x00-0x7F).
@@ -335,6 +335,7 @@ struct TStringOps
 	// Returns the number of ToCharType units written, excluding null terminator.
 	// Returns KOR_INDEX_NONE on error.
 	// * toStr must be large enough to hold the result - use ConvertedLength to determine required size
+	// * len represents size of str, excluding null terminator
 	// * Passing a UTF8 mid-sequence len produces undefined count
 	// -------------------------------------------------------------------------
 
