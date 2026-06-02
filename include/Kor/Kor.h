@@ -7,7 +7,7 @@
 // * Should include all features and functionality of Kor
 /////////////////////////////////////////
 
-// Look at "Configurations.h" to see defines that affects features provided
+// Look at "Build.h" to see defines that affects features provided
 
 // CORE
 #include "Kor/KorMinimal.h"
