@@ -89,20 +89,6 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType* str, const CharTyp
 }
 
 template<typename CharType>
-template<ESearchCase Case, int32 N>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType(& str)[N], const CharType* from, const CharType* to) noexcept
-{
-	return Replace(str, from, to, N);
-}
-
-template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType(& str)[N], const CharType* from, const CharType* to, ESearchCase searchCase) noexcept
-{
-	return Replace(str, from, to, N, searchCase);
-}
-
-template<typename CharType>
 template<ESearchCase Case>
 int32 TStringOps<CharType>::Replace(CharType* str, CharType from, CharType to) noexcept
 {
@@ -158,18 +144,4 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType* str, CharType from
 	return searchCase == ESearchCase::Sensitive
 		? Replace<ESearchCase::Sensitive>(str, from, to, maxLen)
 		: Replace<ESearchCase::Insensitive>(str, from, to, maxLen);
-}
-
-template<typename CharType>
-template<ESearchCase Case, int32 N>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType(& str)[N], CharType from, CharType to) noexcept
-{
-	return Replace<Case>(str, from, to, N);
-}
-
-template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType(& str)[N], CharType from, CharType to, ESearchCase searchCase) noexcept
-{
-	return Replace(str, from, to, N, searchCase);
 }

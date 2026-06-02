@@ -116,22 +116,6 @@ TString<CharT> TString<CharT>::ConvertFrom(const OtherCharType* str, SizeType le
 }
 
 template<typename CharT>
-template<typename OtherCharType, TSize N>
-TString<CharT> TString<CharT>::ConvertFrom(const OtherCharType(& str)[N]) noexcept
-{
-	const SizeType convLen = TStringOps<OtherCharType>::template ConvertedLength<CharT>(str);
-	KOR_ASSERT_DEBUG(convLen > 0);
-
-	TString result(Init::Zero);
-	result._data.Resize(convLen + 1);
-
-	TStringOps<OtherCharType>::template Convert<CharT>(str, *result._data);
-	result._data[convLen] = Constant::Null;
-
-	return result;
-}
-
-template<typename CharT>
 template<typename OtherCharType>
 KOR_FORCEINLINE TString<CharT> TString<CharT>::ConvertFrom(const TString<OtherCharType>& str) noexcept
 {

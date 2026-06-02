@@ -117,20 +117,6 @@ int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, in
 }
 
 template<typename CharType>
-template<ESearchCase Case, ESearchDir Dir, int32 N, int32 R>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Find(const CharType(& str)[N], const CharType(& subStr)[R]) noexcept
-{
-	return Find<Case, Dir>(str, subStr, N, R);
-}
-
-template<typename CharType>
-template<int32 N, int32 R>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Find(const CharType(& str)[N], const CharType(& subStr)[R], ESearchCase searchCase, ESearchDir searchDir) noexcept
-{
-	return Find(str, subStr, N, R, searchCase, searchDir);
-}
-
-template<typename CharType>
 template<ESearchCase Case, ESearchDir Dir>
 int32 TStringOps<CharType>::Find(const CharType* str, CharType c) noexcept
 {
@@ -215,18 +201,4 @@ int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 len, ESe
 			? Find<ESearchCase::Insensitive, ESearchDir::Forward>(str, c, len)
 			: Find<ESearchCase::Insensitive, ESearchDir::Backward>(str, c, len);
 	}
-}
-
-template<typename CharType>
-template<ESearchCase Case, ESearchDir Dir, int32 N>
-int32 TStringOps<CharType>::Find(const CharType(& str)[N], CharType c) noexcept
-{
-	return Find<Case, Dir>(str, c, N);
-}
-
-template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Find(const CharType(& str)[N], CharType c, ESearchCase searchCase, ESearchDir searchDir) noexcept
-{
-	return Find(str, c, N, searchCase, searchDir);
 }

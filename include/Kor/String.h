@@ -337,9 +337,6 @@ public:
 	template<typename OtherCharType>
 	static TString ConvertFrom(const OtherCharType* str, SizeType length) noexcept;
 
-	template<typename OtherCharType, TSize N>
-	static TString ConvertFrom(const OtherCharType (&str)[N]) noexcept;
-
 	template<typename OtherCharType>
 	static TString ConvertFrom(const TString<OtherCharType>& str) noexcept;
 

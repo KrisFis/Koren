@@ -70,14 +70,14 @@ KOR_FORCEINLINE_DEBUG TString<CharT>::TString(const CharType* text, SizeType len
 template<typename CharT>
 template<TSize N>
 KOR_FORCEINLINE TStringView<CharT>::TStringView(const CharType(& text)[N]) noexcept
-	: _data(text)
+	: _data(static_cast<const CharType*>(text))
 	, _len(N - 1) // -1 excludes null terminator
 {}
 
 template<typename CharT>
 template<TSize N>
 KOR_FORCEINLINE TString<CharT>::TString(const CharType(& text)[N]) noexcept
-	: _data(text, N) // N includes null terminator
+	: _data(static_cast<const CharType*>(text), N) // N includes null terminator
 {}
 
 template<typename CharT>
