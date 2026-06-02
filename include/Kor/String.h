@@ -5,6 +5,9 @@
 
 #include "Kor/KorMinimal.h"
 
+#include "Kor/CharOps.h"
+#include "Kor/StringOps.h"
+
 #include "Kor/Assert.h"
 #include "Kor/Archive.h"
 #include "Kor/Array.h"
@@ -19,6 +22,9 @@ class TStringView
 	using Constant = TCharConstant<CharT>;
 	using COps = TCharOps<CharT>;
 	using SOps = TStringOps<CharT>;
+
+	template<typename OtherCharT>
+	friend class TStringView;
 
 public:
 	using CharType = CharT;
@@ -206,6 +212,9 @@ class TString
 	using Constant = TCharConstant<CharT>;
 	using COps = TCharOps<CharT>;
 	using SOps = TStringOps<CharT>;
+
+	template<typename OtherCharT>
+	friend class TString;
 
 public:
 	using CharType = CharT;

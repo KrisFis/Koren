@@ -5,15 +5,13 @@
 template<typename CharT>
 KOR_FORCEINLINE bool TStringView<CharT>::operator==(const TStringView& other) const noexcept
 {
-	if (_len != other._len) return false;
-	return SOps::Compare(_data, other._data, _len) == 0;
+	return Equals<ESearchCase::Sensitive>(other);
 }
 
 template<typename CharT>
 KOR_FORCEINLINE bool TString<CharT>::operator==(const TString& other) const noexcept
 {
-	if (_data.GetNum() != other._data.GetNum()) return false;
-	return SOps::Compare(*_data, *other._data, _data.GetNum() - 1) == 0;
+	return Equals<ESearchCase::Sensitive>(other);
 }
 
 template<typename CharT>
@@ -88,8 +86,8 @@ TString<CharT> TString<CharT>::operator+(const TString& other) const noexcept
 	const int32 otherLen = other._data.GetNum() - 1;
 
 	result._data.Resize(thisLen + otherLen + 1);
-	SOps::Copy(result._data, *_data, thisLen);
-	SOps::Copy(result._data + thisLen, *other._data, otherLen);
+	SOps::Copy(*result._data, *_data, thisLen);
+	SOps::Copy(*result._data + thisLen, *other._data, otherLen);
 	result._data[thisLen + otherLen] = Constant::Null;
 
 	return result;
@@ -132,7 +130,7 @@ TString<CharT> TString<CharT>::operator/(const TString& other) const noexcept
 	SOps::Copy(*result._data, *_data, thisLen);
 	result._data[thisLen] = Constant::Slash;
 
-	SOps::Copy(result._data[thisLen + 1], *other._data, otherLen);
+	SOps::Copy(* result._data + thisLen + 1, *other._data, otherLen);
 	result._data[thisLen + 1 + otherLen] = Constant::Null;
 
 	return result;
@@ -147,7 +145,7 @@ TString<CharT>& TString<CharT>::operator/=(const TString& other) noexcept
 	_data.Resize(thisLen + 1 + otherLen + 1);
 
 	_data[thisLen] = Constant::Slash;
-	SOps::Copy(_data[thisLen + 1], *other._data, otherLen);
+	SOps::Copy(*_data + thisLen + 1, *other._data, otherLen);
 	_data[thisLen + 1 + otherLen] = Constant::Null;
 
 	return *this;

@@ -93,26 +93,30 @@ template<typename CharT>
 template<ESearchCase Case>
 KOR_FORCEINLINE bool TStringView<CharT>::Equals(const TStringView& other) const noexcept
 {
-	return Compare<Case>(other) == 0;
+	if (_len != other._len) return false;
+	return SOps::template Compare<Case>(_data, other._data, _len) == 0;
 }
 
 template<typename CharT>
 template<ESearchCase Case>
 KOR_FORCEINLINE bool TString<CharT>::Equals(const TString& other) const noexcept
 {
-	return Compare<Case>(other) == 0;
+	if (_data.GetNum() != other._data.GetNum()) return false;
+	return SOps::template Compare<Case>(*_data, *other._data, _data.GetNum() - 1) == 0;
 }
 
 template<typename CharT>
 KOR_FORCEINLINE bool TStringView<CharT>::Equals(const TStringView& other, ESearchCase searchCase) const noexcept
 {
-	return Compare(other, searchCase) == 0;
+	if (_len != other._len) return false;
+	return SOps::Compare(_data, other._data, _len, searchCase) == 0;
 }
 
 template<typename CharT>
 KOR_FORCEINLINE bool TString<CharT>::Equals(const TString& other, ESearchCase searchCase) const noexcept
 {
-	return Compare(other, searchCase) == 0;
+	if (_data.GetNum() != other._data.GetNum()) return false;
+	return SOps::Compare(*_data, *other._data, _data.GetNum() - 1, searchCase) == 0;
 }
 
 template<typename CharT>

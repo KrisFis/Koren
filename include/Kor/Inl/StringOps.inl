@@ -5,7 +5,7 @@
 
 namespace Internal
 {
-	template<typename CharT, ESearchCase Case>
+	template<ESearchCase Case, typename CharT>
 	KOR_FORCEINLINE static CharT CharMayLower(CharT c)
 	{
 		if constexpr (Case == ESearchCase::Insensitive) return TCharOps<CharT>::ToLower(c);

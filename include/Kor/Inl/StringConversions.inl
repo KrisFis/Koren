@@ -9,7 +9,7 @@ TString<CharT> TString<CharT>::FromInt(int64 value, int32 base) noexcept
 	TString result(Init::Zero);
 	result._data.Resize(SMemory::BUFFER_SIZE_INT64_MAX);
 
-	const int32 convLen = SOps::FromInt(result._data, value, SMemory::BUFFER_SIZE_INT64_MAX, base);
+	const int32 convLen = SOps::FromInt(*result._data, value, SMemory::BUFFER_SIZE_INT64_MAX, base);
 	KOR_ASSERT_DEBUG(convLen > 0);
 
 	result._data.Resize(convLen + 1);
@@ -24,7 +24,7 @@ TString<CharT> TString<CharT>::FromUInt(uint64 value, int32 base) noexcept
 	TString result(Init::Zero);
 	result._data.Resize(SMemory::BUFFER_SIZE_INT64_MAX);
 
-	const int32 convLen = SOps::FromUInt(result._data, value, SMemory::BUFFER_SIZE_INT64_MAX, base);
+	const int32 convLen = SOps::FromUInt(*result._data, value, SMemory::BUFFER_SIZE_INT64_MAX, base);
 	KOR_ASSERT_DEBUG(convLen > 0);
 
 	result._data.Resize(convLen + 1);
@@ -64,7 +64,7 @@ TString<CharT> TString<CharT>::FromFloat(double value, uint8 precision) noexcept
 	TString result(Init::Zero);
 	result._data.Resize(SMemory::BUFFER_SIZE_DOUBLE_MAX);
 
-	const int32 convLen = SOps::template FromFloat<Format>(result._data, value, SMemory::BUFFER_SIZE_DOUBLE_MAX, precision);
+	const int32 convLen = SOps::template FromFloat<Format>(*result._data, value, SMemory::BUFFER_SIZE_DOUBLE_MAX, precision);
 	KOR_ASSERT_DEBUG(convLen > 0);
 
 	result._data.Resize(convLen + 1);
@@ -103,13 +103,13 @@ template<typename CharT>
 template<typename OtherCharType>
 TString<CharT> TString<CharT>::ConvertFrom(const OtherCharType* str, SizeType length) noexcept
 {
-	const SizeType convLen = SOps::template ConvertedLength<CharT>(str, length);
+	const SizeType convLen = TStringOps<OtherCharType>::template ConvertedLength<CharT>(str, length);
 	KOR_ASSERT_DEBUG(convLen > 0);
 
 	TString result(Init::Zero);
 	result._data.Resize(convLen + 1);
 
-	SOps::template Convert<OtherCharType>(str, result._data, length);
+	TStringOps<OtherCharType>::template Convert<CharT>(str, *result._data, length);
 	result._data[convLen] = Constant::Null;
 
 	return result;
@@ -119,13 +119,13 @@ template<typename CharT>
 template<typename OtherCharType, TSize N>
 TString<CharT> TString<CharT>::ConvertFrom(const OtherCharType(& str)[N]) noexcept
 {
-	const SizeType convLen = SOps::template ConvertedLength<CharT>(str);
+	const SizeType convLen = TStringOps<OtherCharType>::template ConvertedLength<CharT>(str);
 	KOR_ASSERT_DEBUG(convLen > 0);
 
 	TString result(Init::Zero);
 	result._data.Resize(convLen + 1);
 
-	SOps::template Convert<OtherCharType>(str, result._data);
+	TStringOps<OtherCharType>::template Convert<CharT>(str, *result._data);
 	result._data[convLen] = Constant::Null;
 
 	return result;
