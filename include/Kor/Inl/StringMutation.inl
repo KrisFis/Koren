@@ -59,7 +59,7 @@ KOR_FORCEINLINE void TString<CharT>::Trim() noexcept
 }
 
 template<typename CharT>
-void TString<CharT>::ChopRight(SizeType idx) noexcept
+KOR_FORCEINLINE_DEBUG void TString<CharT>::ChopRight(SizeType idx) noexcept
 {
 	// Remove everything from idx to end (excluding null terminator)
 	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
@@ -69,7 +69,7 @@ void TString<CharT>::ChopRight(SizeType idx) noexcept
 }
 
 template<typename CharT>
-void TString<CharT>::ChopLeft(SizeType idx) noexcept
+KOR_FORCEINLINE_DEBUG void TString<CharT>::ChopLeft(SizeType idx) noexcept
 {
 	// Remove everything before idx
 	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
@@ -78,7 +78,7 @@ void TString<CharT>::ChopLeft(SizeType idx) noexcept
 }
 
 template<typename CharT>
-void TString<CharT>::ChopRange(SizeType firstIdx, SizeType secondIdx) noexcept
+KOR_FORCEINLINE_DEBUG void TString<CharT>::ChopRange(SizeType firstIdx, SizeType secondIdx) noexcept
 {
 	KOR_ASSERT_DEBUG(firstIdx >= 0 && secondIdx >= firstIdx && secondIdx < _data.GetNum() - 1);
 	_data.RemoveAt(firstIdx, secondIdx - firstIdx + 1);
@@ -86,7 +86,7 @@ void TString<CharT>::ChopRange(SizeType firstIdx, SizeType secondIdx) noexcept
 }
 
 template<typename CharT>
-void TString<CharT>::Insert(SizeType idx, const TString& other) noexcept
+KOR_FORCEINLINE_DEBUG void TString<CharT>::Insert(SizeType idx, const TString& other) noexcept
 {
 	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
 	// Insert without the other's null terminator
@@ -95,7 +95,7 @@ void TString<CharT>::Insert(SizeType idx, const TString& other) noexcept
 }
 
 template<typename CharT>
-void TString<CharT>::Remove(SizeType idx, SizeType count) noexcept
+KOR_FORCEINLINE_DEBUG void TString<CharT>::Remove(SizeType idx, SizeType count) noexcept
 {
 	KOR_ASSERT_DEBUG(idx >= 0 && idx + count <= _data.GetNum() - 1);
 	_data.RemoveAt(idx, count);
@@ -104,7 +104,7 @@ void TString<CharT>::Remove(SizeType idx, SizeType count) noexcept
 
 template<typename CharT>
 template<ESearchCase Case>
-KOR_FORCEINLINE_DEBUG void TString<CharT>::Replace(const TString& from, const TString& to) noexcept
+KOR_FORCEINLINE void TString<CharT>::Replace(const TString& from, const TString& to) noexcept
 {
 	SOps::template Replace<Case>(*_data, *from._data, *to._data, _data.GetNum() - 1);
 }

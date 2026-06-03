@@ -49,7 +49,7 @@ int32 TStringOps<CharType>::CountWhitespaces(const CharType* str) noexcept
 }
 
 template<typename CharType>
-int32 TStringOps<CharType>::CountWhitespaces(const CharType* str, ESearchDir searchDir) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::CountWhitespaces(const CharType* str, ESearchDir searchDir) noexcept
 {
 	return searchDir == ESearchDir::Forward 
 		? CountWhitespaces<ESearchDir::Forward>(str)

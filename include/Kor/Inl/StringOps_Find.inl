@@ -144,7 +144,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, CharType c) noexcept
 }
 
 template<typename CharType>
-int32 TStringOps<CharType>::Find(const CharType* str, CharType c, ESearchCase searchCase, ESearchDir searchDir) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::Find(const CharType* str, CharType c, ESearchCase searchCase, ESearchDir searchDir) noexcept
 {
 	if (searchCase == ESearchCase::Sensitive)
 	{
@@ -187,7 +187,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 strLen) 
 }
 
 template<typename CharType>
-int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 strLen, ESearchCase searchCase, ESearchDir searchDir) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 strLen, ESearchCase searchCase, ESearchDir searchDir) noexcept
 {
 	if (searchCase == ESearchCase::Sensitive)
 	{

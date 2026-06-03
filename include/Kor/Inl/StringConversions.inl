@@ -74,7 +74,7 @@ TString<CharT> TString<CharT>::FromFloat(double value, uint8 precision) noexcept
 }
 
 template<typename CharT>
-TString<CharT> TString<CharT>::FromFloat(double value, uint8 precision, EFloatFormat format) noexcept
+KOR_FORCEINLINE TString<CharT> TString<CharT>::FromFloat(double value, uint8 precision, EFloatFormat format) noexcept
 {
 	switch (format)
 	{
