@@ -2,7 +2,7 @@
 
 **A header-only foundational C++ library** - my personal alternative to the STL, inspired by Unreal Engine's architecture but written in pure C++ from scratch.
 
-Started as a learning exercise in implementing STL-like containers and types. It has since grown into a generic foundation library I use across my own projects under the **Alternity Arts** umbrella.
+Started as a learning exercise in implementing STL-like containers and types. It has since grown into a generic foundation library I use across my own projects.
 
 > **Note:** Still a work in progress. Some types currently typedef from `std::` as placeholders - these are intended to be replaced with custom implementations over time.
 
