@@ -58,13 +58,13 @@ int32 TStringOps<CharType>::CountWhitespaces(const CharType* str, ESearchDir sea
 
 template<typename CharType>
 template<ESearchDir Dir>
-int32 TStringOps<CharType>::CountWhitespaces(const CharType* str, int32 len) noexcept
+int32 TStringOps<CharType>::CountWhitespaces(const CharType* str, int32 strLen) noexcept
 {
 	int32 result = 0;
 
 	if constexpr (Dir == ESearchDir::Forward)
 	{
-		while (len-- > 0)
+		while (strLen-- > 0)
 		{
 			if (!CharOps::IsWhitespace(*str++)) break;
 			++result;
@@ -72,8 +72,8 @@ int32 TStringOps<CharType>::CountWhitespaces(const CharType* str, int32 len) noe
 	}
 	else
 	{
-		str += len - 1;
-		while(len-- > 0)
+		str += strLen - 1;
+		while(strLen-- > 0)
 		{
 			if (!CharOps::IsWhitespace(*str--)) break;
 			++result;
@@ -84,11 +84,11 @@ int32 TStringOps<CharType>::CountWhitespaces(const CharType* str, int32 len) noe
 }
 
 template<typename CharType>
-KOR_FORCEINLINE int32 TStringOps<CharType>::CountWhitespaces(const CharType* str, int32 len, ESearchDir searchDir) noexcept
+KOR_FORCEINLINE int32 TStringOps<CharType>::CountWhitespaces(const CharType* str, int32 strLen, ESearchDir searchDir) noexcept
 {
 	return searchDir == ESearchDir::Forward 
-		? CountWhitespaces<ESearchDir::Forward>(str, len)
-		: CountWhitespaces<ESearchDir::Backward>(str, len);
+		? CountWhitespaces<ESearchDir::Forward>(str, strLen)
+		: CountWhitespaces<ESearchDir::Backward>(str, strLen);
 }
 
 template<typename CharType>
@@ -106,11 +106,11 @@ bool TStringOps<CharType>::IsAscii(const CharType* str) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsAscii(const CharType* str, int32 len) noexcept
+bool TStringOps<CharType>::IsAscii(const CharType* str, int32 strLen) noexcept
 {
 	if constexpr (!TIsSame<CharType, achar>::Value)
 	{
-		while(len-- > 0)
+		while(strLen-- > 0)
 		{
 			if (!CharOps::IsAscii(*str++)) return false;
 		}
@@ -131,9 +131,9 @@ bool TStringOps<CharType>::IsNumeric(const CharType* str) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsNumeric(const CharType* str, int32 len) noexcept
+bool TStringOps<CharType>::IsNumeric(const CharType* str, int32 strLen) noexcept
 {
-	while(len-- > 0)
+	while(strLen-- > 0)
 	{
 		if (!CharOps::IsDigit(*str++)) return false;
 	}
@@ -153,9 +153,9 @@ bool TStringOps<CharType>::IsWhitespace(const CharType* str) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsWhitespace(const CharType* str, int32 len) noexcept
+bool TStringOps<CharType>::IsWhitespace(const CharType* str, int32 strLen) noexcept
 {
-	while(len-- > 0)
+	while(strLen-- > 0)
 	{
 		if (!CharOps::IsWhitespace(*str++)) return false;
 	}
@@ -175,9 +175,9 @@ bool TStringOps<CharType>::IsUpper(const CharType* str) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsUpper(const CharType* str, int32 len) noexcept
+bool TStringOps<CharType>::IsUpper(const CharType* str, int32 strLen) noexcept
 {
-	while(len-- > 0)
+	while(strLen-- > 0)
 	{
 		if (!CharOps::IsUpper(*str++)) return false;
 	}
@@ -197,9 +197,9 @@ bool TStringOps<CharType>::IsLower(const CharType* str) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsLower(const CharType* str, int32 len) noexcept
+bool TStringOps<CharType>::IsLower(const CharType* str, int32 strLen) noexcept
 {
-	while(len-- > 0)
+	while(strLen-- > 0)
 	{
 		if (!CharOps::IsLower(*str++)) return false;
 	}

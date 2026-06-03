@@ -359,9 +359,9 @@ public:
 
 	// Converts `val` to string. `precision` controls decimal places.
 	// `Format` controls notation: Auto, Fixed, Scientific.
-	template<EFloatFormat Format = EFloatFormat::Auto>
+	template<EFloatFormat Format = EFloatFormat::Fixed>
 	static TString FromFloat(double value, uint8 precision = 6) noexcept;
-	static TString FromFloat(double value, uint8 precision = 6, EFloatFormat format = EFloatFormat::Auto) noexcept;
+	static TString FromFloat(double value, uint8 precision = 6, EFloatFormat format = EFloatFormat::Fixed) noexcept;
 
 	// Parses the string as a double.
 	double ToFloat() const noexcept;

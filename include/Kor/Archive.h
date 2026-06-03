@@ -403,8 +403,8 @@ static SArchive& operator<<(SArchive& ar, const double val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SMemory::BUFFER_SIZE_DOUBLE_MAX];
-		if (SStringOps::FromFloat(buffer, val, SMemory::BUFFER_SIZE_DOUBLE_MAX, 4))
+		thread_local tchar buffer[SMemory::BUFFER_SIZE_DOUBLE_MAX + 1];
+		if (SStringOps::FromFloat(buffer, val, SMemory::BUFFER_SIZE_DOUBLE_MAX + 1, 4))
 		{
 			ar.Write(buffer, SStringOps::Length(buffer));
 		}

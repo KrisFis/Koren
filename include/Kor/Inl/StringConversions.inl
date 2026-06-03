@@ -62,9 +62,9 @@ template<EFloatFormat Format>
 TString<CharT> TString<CharT>::FromFloat(double value, uint8 precision) noexcept
 {
 	TString result(Init::Zero);
-	result._data.Resize(SMemory::BUFFER_SIZE_DOUBLE_MAX);
+	result._data.Resize(SMemory::BUFFER_SIZE_DOUBLE_MAX + 1);
 
-	const int32 convLen = SOps::template FromFloat<Format>(*result._data, value, SMemory::BUFFER_SIZE_DOUBLE_MAX, precision);
+	const int32 convLen = SOps::template FromFloat<Format>(*result._data, value, result._data.GetNum(), precision);
 	KOR_ASSERT_DEBUG(convLen > 0);
 
 	result._data.Resize(convLen + 1);
@@ -83,7 +83,7 @@ TString<CharT> TString<CharT>::FromFloat(double value, uint8 precision, EFloatFo
 		case EFloatFormat::Scientific:
 			return FromFloat<EFloatFormat::Scientific>(value, precision);
 		default:
-			return FromFloat<EFloatFormat::Auto>(value, precision);
+			return FromFloat<EFloatFormat::Compact>(value, precision);
 	}
 }
 
@@ -109,7 +109,7 @@ TString<CharT> TString<CharT>::ConvertFrom(const OtherCharType* str, SizeType le
 	TString result(Init::Zero);
 	result._data.Resize(convLen + 1);
 
-	TStringOps<OtherCharType>::template Convert<CharT>(str, *result._data, length);
+	TStringOps<OtherCharType>::template Convert<CharT>(*result._data, str, length);
 	result._data[convLen] = Constant::Null;
 
 	return result;
