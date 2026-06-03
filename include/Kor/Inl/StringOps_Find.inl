@@ -27,7 +27,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr) no
 	}
 	else
 	{
-		int32 last = -1;
+		int32 last = KOR_INDEX_NONE;
 		for (int32 i = 0; str[i]; ++i)
 		{
 			if (CharMayLower<Case>(str[i]) == CharMayLower<Case>(*substr))
@@ -63,15 +63,15 @@ int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, ES
 
 template<typename CharType>
 template<ESearchCase Case, ESearchDir Dir>
-int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, int32 len, int32 subLen) noexcept
+int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, int32 strLen, int32 subLen) noexcept
 {
 	using namespace Internal;
 
-	if (subLen > len) return KOR_INDEX_NONE;
+	if (subLen > strLen) return KOR_INDEX_NONE;
 
 	if constexpr (Dir == ESearchDir::Forward)
 	{
-		const int32 limit = len - subLen;
+		const int32 limit = strLen - subLen;
 		for (int32 i = 0; i <= limit; ++i)
 		{
 			int32 sub = 0;
@@ -85,7 +85,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, in
 	}
 	else
 	{
-		const int32 limit = len - subLen;
+		const int32 limit = strLen - subLen;
 		for (int32 i = limit; i >= 0; --i)
 		{
 			int32 sub = 0;
@@ -100,34 +100,20 @@ int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, in
 }
 
 template<typename CharType>
-int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, int32 len, int32 subLen, ESearchCase searchCase, ESearchDir searchDir) noexcept
+int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, int32 strLen, int32 subLen, ESearchCase searchCase, ESearchDir searchDir) noexcept
 {
 	if (searchCase == ESearchCase::Sensitive)
 	{
 		return searchDir == ESearchDir::Forward
-			? Find<ESearchCase::Sensitive, ESearchDir::Forward>(str, substr, len, subLen)
-			: Find<ESearchCase::Sensitive, ESearchDir::Backward>(str, substr, len, subLen);
+			? Find<ESearchCase::Sensitive, ESearchDir::Forward>(str, substr, strLen, subLen)
+			: Find<ESearchCase::Sensitive, ESearchDir::Backward>(str, substr, strLen, subLen);
 	}
 	else
 	{
 		return searchDir == ESearchDir::Forward
-			? Find<ESearchCase::Insensitive, ESearchDir::Forward>(str, substr, len, subLen)
-			: Find<ESearchCase::Insensitive, ESearchDir::Backward>(str, substr, len, subLen);
+			? Find<ESearchCase::Insensitive, ESearchDir::Forward>(str, substr, strLen, subLen)
+			: Find<ESearchCase::Insensitive, ESearchDir::Backward>(str, substr, strLen, subLen);
 	}
-}
-
-template<typename CharType>
-template<ESearchCase Case, ESearchDir Dir, int32 N, int32 R>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Find(const CharType(& str)[N], const CharType(& subStr)[R]) noexcept
-{
-	return Find<Case, Dir>(str, subStr, N, R);
-}
-
-template<typename CharType>
-template<int32 N, int32 R>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Find(const CharType(& str)[N], const CharType(& subStr)[R], ESearchCase searchCase, ESearchDir searchDir) noexcept
-{
-	return Find(str, subStr, N, R, searchCase, searchDir);
 }
 
 template<typename CharType>
@@ -176,7 +162,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, CharType c, ESearchCase se
 
 template<typename CharType>
 template<ESearchCase Case, ESearchDir Dir>
-int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 len) noexcept
+int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 strLen) noexcept
 {
 	using namespace Internal;
 
@@ -184,7 +170,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 len) noe
 
 	if constexpr (Dir == ESearchDir::Forward)
 	{
-		for (int32 i = 0; i < len; ++i)
+		for (int32 i = 0; i < strLen; ++i)
 		{
 			if (CharMayLower<Case>(str[i]) == lc) return i;
 		}
@@ -192,7 +178,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 len) noe
 	}
 	else
 	{
-		for (int32 i = len - 1; i >= 0; --i)
+		for (int32 i = strLen - 1; i >= 0; --i)
 		{
 			if (CharMayLower<Case>(str[i]) == lc) return i;
 		}
@@ -201,32 +187,18 @@ int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 len) noe
 }
 
 template<typename CharType>
-int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 len, ESearchCase searchCase, ESearchDir searchDir) noexcept
+int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 strLen, ESearchCase searchCase, ESearchDir searchDir) noexcept
 {
 	if (searchCase == ESearchCase::Sensitive)
 	{
 		return searchDir == ESearchDir::Forward
-			? Find<ESearchCase::Sensitive, ESearchDir::Forward>(str, c, len)
-			: Find<ESearchCase::Sensitive, ESearchDir::Backward>(str, c, len);
+			? Find<ESearchCase::Sensitive, ESearchDir::Forward>(str, c, strLen)
+			: Find<ESearchCase::Sensitive, ESearchDir::Backward>(str, c, strLen);
 	}
 	else
 	{
 		return searchDir == ESearchDir::Forward
-			? Find<ESearchCase::Insensitive, ESearchDir::Forward>(str, c, len)
-			: Find<ESearchCase::Insensitive, ESearchDir::Backward>(str, c, len);
+			? Find<ESearchCase::Insensitive, ESearchDir::Forward>(str, c, strLen)
+			: Find<ESearchCase::Insensitive, ESearchDir::Backward>(str, c, strLen);
 	}
-}
-
-template<typename CharType>
-template<ESearchCase Case, ESearchDir Dir, int32 N>
-int32 TStringOps<CharType>::Find(const CharType(& str)[N], CharType c) noexcept
-{
-	return Find<Case, Dir>(str, c, N);
-}
-
-template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Find(const CharType(& str)[N], CharType c, ESearchCase searchCase, ESearchDir searchDir) noexcept
-{
-	return Find(str, c, N, searchCase, searchDir);
 }

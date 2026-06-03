@@ -18,9 +18,9 @@ void TStringOps<CharType>::ToUpper(CharType* str) noexcept
 }
 
 template<typename CharType>
-void TStringOps<CharType>::ToUpper(CharType* str, int32 len) noexcept
+void TStringOps<CharType>::ToUpper(CharType* str, int32 strLen) noexcept
 {
-	while(len-- > 0)
+	while(strLen-- > 0)
 	{
 		*str = CharOps::ToUpper(*str);
 
@@ -29,13 +29,6 @@ void TStringOps<CharType>::ToUpper(CharType* str, int32 len) noexcept
 
 		++str;
 	}
-}
-
-template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE void TStringOps<CharType>::ToUpper(CharType(& str)[N]) noexcept
-{
-	ToUpper(str, N);
 }
 
 template<typename CharType>
@@ -49,9 +42,9 @@ void TStringOps<CharType>::ToLower(CharType* str) noexcept
 }
 
 template<typename CharType>
-void TStringOps<CharType>::ToLower(CharType* str, int32 len) noexcept
+void TStringOps<CharType>::ToLower(CharType* str, int32 strLen) noexcept
 {
-	while(len-- > 0)
+	while(strLen-- > 0)
 	{
 		*str = CharOps::ToLower(*str);
 		++str;
@@ -59,23 +52,9 @@ void TStringOps<CharType>::ToLower(CharType* str, int32 len) noexcept
 }
 
 template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE void TStringOps<CharType>::ToLower(CharType(& str)[N]) noexcept
+void TStringOps<CharType>::Fill(CharType* str, CharType c, int32 strLen) noexcept
 {
-	return ToLower(str, N);
-}
-
-template<typename CharType>
-void TStringOps<CharType>::Fill(CharType* str, CharType c, int32 len) noexcept
-{
-	while(len-- > 0) *str = c;
-}
-
-template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE void TStringOps<CharType>::Fill(CharType(& str)[N], CharType c) noexcept
-{
-	return Fill(str, c, N);
+	while(strLen-- > 0) *str = c;
 }
 
 template<typename CharType>
@@ -85,18 +64,11 @@ void TStringOps<CharType>::Copy(CharType* dest, const CharType* src) noexcept
 }
 
 template<typename CharType>
-void TStringOps<CharType>::Copy(CharType* dest, const CharType* src, int32 len) noexcept
+void TStringOps<CharType>::Copy(CharType* dest, const CharType* src, int32 srcLen) noexcept
 {
-	if (len <= 0) return;
-	while (len-- > 0) { *(dest++) = *(src++); }
+	if (srcLen <= 0) return;
+	while (srcLen-- > 0) { *(dest++) = *(src++); }
 	*dest = CharConstant::Null;
-}
-
-template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE void TStringOps<CharType>::Copy(CharType(& dest)[N], const CharType* src) noexcept
-{
-	Copy(dest, src, N);
 }
 
 template<typename CharType>
@@ -108,16 +80,9 @@ void TStringOps<CharType>::Concatenate(CharType* dest, const CharType* src) noex
 }
 
 template<typename CharType>
-void TStringOps<CharType>::Concatenate(CharType* dest, const CharType* src, int32 len) noexcept
+void TStringOps<CharType>::Concatenate(CharType* dest, const CharType* src, int32 srcLen) noexcept
 {
 	dest += Length(dest); // moves at '\0' character
-	while(len-- > 0) { *(dest++) = *(src++); }
+	while(srcLen-- > 0) { *(dest++) = *(src++); }
 	*dest = CharConstant::Null; // ensure '\0' to the end
-}
-
-template<typename CharType>
-template<int32 N>
-KOR_FORCEINLINE void TStringOps<CharType>::Concatenate(CharType* dest, const CharType(& src)[N]) noexcept
-{
-	return Concatenate(dest, src, N);
 }

@@ -38,17 +38,3 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Compare(const CharType* lhs, const C
 		? Compare<ESearchCase::Sensitive>(lhs, rhs, len)
 		: Compare<ESearchCase::Insensitive>(lhs, rhs, len);
 }
-
-template<typename CharType>
-template<ESearchCase Case, int32 len>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Compare(CharType(& lhs)[len], const CharType* rhs) noexcept
-{
-	return Compare<Case>(lhs, rhs, len);
-}
-
-template<typename CharType>
-template<int32 len>
-KOR_FORCEINLINE int32 TStringOps<CharType>::Compare(CharType(& lhs)[len], const CharType* rhs, ESearchCase searchCase) noexcept
-{
-	return Compare(lhs, rhs, len, searchCase);
-}

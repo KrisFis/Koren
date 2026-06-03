@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Core/Build.h"
+#include "Kor/Core/Build.h"
 #include "Kor/Internal/IsValidProvider.h"
 
 KOR_NAMESPACE_BEGIN

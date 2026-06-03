@@ -24,17 +24,17 @@ struct SMisc : public SPlatformMisc
 	static constexpr int32 STDOUT_FILE_NO = 1;
 	static constexpr int32 STDERR_FILE_NO = 2;
 
-	KOR_FORCEINLINE_DEBUGGABLE static int64 ReadFromStdin(void* buffer, int64 size)
+	KOR_FORCEINLINE_DEBUG static int64 ReadFromStdin(void* buffer, int64 size)
 	{
 		return SPlatformMisc::ReadFromFile(STDIN_FILE_NO, buffer, size);
 	}
 
-	KOR_FORCEINLINE_DEBUGGABLE static int64 WriteToStdout(const void* buffer, int64 size)
+	KOR_FORCEINLINE_DEBUG static int64 WriteToStdout(const void* buffer, int64 size)
 	{
 		return SPlatformMisc::WriteToFile(STDOUT_FILE_NO, buffer, size);
 	}
 
-	KOR_FORCEINLINE_DEBUGGABLE static int64 WriteToStderr(const void* buffer, int64 size)
+	KOR_FORCEINLINE_DEBUG static int64 WriteToStderr(const void* buffer, int64 size)
 	{
 		return SPlatformMisc::WriteToFile(STDERR_FILE_NO, buffer, size);
 	}

@@ -12,23 +12,23 @@ KOR_NAMESPACE_BEGIN
 // * Unicode types are: char8, char16, char32 and wchar
 
 template<typename T>
-struct TIsCharacterUnicode : TFalseValue {};
+struct TIsCharacterUnicode : TFalseType {};
 #if KOR_CHAR8_NATIVE
-template<> struct TIsCharacterUnicode<char8> : TTrueValue {};
+template<> struct TIsCharacterUnicode<char8> : TTrueType {};
 #endif
-template<> struct TIsCharacterUnicode<char16> : TTrueValue {};
-template<> struct TIsCharacterUnicode<char32> : TTrueValue {};
-template<> struct TIsCharacterUnicode<wchar> : TTrueValue {};
+template<> struct TIsCharacterUnicode<char16> : TTrueType {};
+template<> struct TIsCharacterUnicode<char32> : TTrueType {};
+template<> struct TIsCharacterUnicode<wchar> : TTrueType {};
 
 // [ Is Character Fixed Width ]
 // Character test whether type is fixed-width type
 // * Fixed-Width types enforce characters to always within width
 
-template<typename T> struct TIsCharacterFixedWidth : TFalseValue {};
-template<> struct TIsCharacterFixedWidth<achar> : TTrueValue {};
-template<> struct TIsCharacterFixedWidth<wchar> : TTrueValue {};
-template<> struct TIsCharacterFixedWidth<char16> : TTrueValue {};
-template<> struct TIsCharacterFixedWidth<char32> : TTrueValue {};
+template<typename T> struct TIsCharacterFixedWidth : TFalseType {};
+template<> struct TIsCharacterFixedWidth<achar> : TTrueType {};
+template<> struct TIsCharacterFixedWidth<wchar> : TTrueType {};
+template<> struct TIsCharacterFixedWidth<char16> : TTrueType {};
+template<> struct TIsCharacterFixedWidth<char32> : TTrueType {};
 
 // [ Is Character Variable Width ]
 // Character tests whether type is variable-width type
@@ -44,19 +44,19 @@ struct TIsCharacterVariableWidth
 // Character test whether source type is binary compatible with destination type
 // * Non-commutative
 
-template<typename SrcT, typename DestT> struct TIsCharacterCompatible : TFalseValue { };
-template<typename T> struct TIsCharacterCompatible<T, T> : TTrueValue {};
+template<typename SrcT, typename DestT> struct TIsCharacterCompatible : TFalseType { };
+template<typename T> struct TIsCharacterCompatible<T, T> : TTrueType {};
 
 #if KOR_CHAR8_NATIVE
-template<> struct TIsCharacterCompatible<achar, char8> : TTrueValue {};
+template<> struct TIsCharacterCompatible<achar, char8> : TTrueType {};
 #endif
 
 #if KOR_WCHAR_BYTES == 4
-template<> struct TIsCharacterCompatible<wchar, char32> : TTrueValue {};
-template<> struct TIsCharacterCompatible<char32, wchar> : TTrueValue {};
+template<> struct TIsCharacterCompatible<wchar, char32> : TTrueType {};
+template<> struct TIsCharacterCompatible<char32, wchar> : TTrueType {};
 #elif KOR_WCHAR_BYTES == 2
-template<> struct TIsCharacterCompatible<wchar, char16> : TTrueValue {};
-template<> struct TIsCharacterCompatible<char16, wchar> : TTrueValue {};
+template<> struct TIsCharacterCompatible<wchar, char16> : TTrueType {};
+template<> struct TIsCharacterCompatible<char16, wchar> : TTrueType {};
 #endif
 
 KOR_NAMESPACE_END

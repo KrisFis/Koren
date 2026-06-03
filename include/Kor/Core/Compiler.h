@@ -32,3 +32,18 @@
 ///////////////////////////////////////////////////////////////
 
 #include KOR_COMPILER_HEADER_FROM(Kor/Core, Compiler)
+
+// Type macros
+///////////////////////////////////////////////////////////////
+
+#if KOR_BUILD_DEBUG
+#define KOR_FORCEINLINE_DEBUG KOR_INLINE
+#else
+#define KOR_FORCEINLINE_DEBUG KOR_FORCEINLINE
+#endif
+
+// Conditionally noexcept if expr is noexcept.
+#define KOR_NOEXCEPT_EXPR(expr) noexcept(noexcept(expr))
+
+// Same + deduced return type from expr.
+#define KOR_NOEXCEPT_RET(expr) noexcept(noexcept(expr)) -> decltype(expr)

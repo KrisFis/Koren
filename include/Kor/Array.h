@@ -36,20 +36,26 @@ public:
 	// Constructors
 	/////////////////////////////////
 
-	KOR_FORCEINLINE TArray() : _allocator(), _num(0) {}
-	KOR_FORCEINLINE TArray(const TArray& other) : _allocator(), _num(0) { AppendImpl(other); }
+	KOR_FORCEINLINE constexpr TArray() noexcept : _allocator(), _num(0) {}
+
+	KOR_FORCEINLINE constexpr TArray(Init::SNoInit) : _allocator(), _num(KOR_INDEX_NONE) {}
+	KOR_FORCEINLINE constexpr TArray(Init::SZero) : _allocator(), _num(0) {}
+
+	KOR_FORCEINLINE TArray(const TArray& other) noexcept : _allocator(), _num(0) { AppendImpl(other); }
 	KOR_FORCEINLINE TArray(TArray&& other) noexcept : _allocator(), _num(0) { ReplaceImpl(Move(other)); }
-	KOR_FORCEINLINE TArray(SizeType num, bool reserveOnly = false) : _allocator(), _num(0)
+	KOR_FORCEINLINE TArray(SizeType num, bool reserveOnly = false) noexcept : _allocator(), _num(0)
 	{
 		if (reserveOnly) ReserveImpl(num);
 		else GrowImpl(num);
 	}
-	KOR_FORCEINLINE TArray(const ElementListType& list) : _allocator() , _num(0)
+	KOR_FORCEINLINE TArray(const ElementListType& list) noexcept
+		: _allocator()
+		, _num(0)
 	{
 		AppendImpl(list.begin(), list.size());
 	}
 
-	KOR_FORCEINLINE TArray(const ElementT* data, SizeType num)
+	KOR_FORCEINLINE TArray(const ElementT* data, SizeType num) noexcept
 		: _allocator()
 		, _num(0)
 	{
@@ -74,6 +80,13 @@ public:
 	KOR_FORCEINLINE TArray& operator=(TArray&& other) noexcept { ReplaceImpl(Move(other)); return *this; }
 
 	KOR_FORCEINLINE TArray& operator=(const ElementListType& list) { EmptyImpl(true); AppendImpl(list.begin(), list.size()); return *this; }
+
+	// Dereference operators
+	// operator* - Returns raw const element pointer, equivalent to GetData().
+	/////////////////////////////////
+
+	KOR_FORCEINLINE const ElementType* operator*() const noexcept { return GetData(); }
+	KOR_FORCEINLINE ElementType* operator*() noexcept { return GetData(); }
 
 	// Get operators
 	/////////////////////////////////
@@ -243,6 +256,12 @@ public:
 		RemoveImpl(idx);
 	}
 
+	KOR_FORCEINLINE void RemoveAt(SizeType idx, SizeType count)
+	{
+		if (!IsValidIndex(idx) || count <= 0) return;
+		RemoveImpl(idx, count);
+	}
+
 	KOR_FORCEINLINE void RemoveAtSwap(SizeType idx)
 	{
 		if(!IsValidIndex(idx)) return;
@@ -269,6 +288,23 @@ public:
 		RemoveSwapImpl(idx);
 
 		return copy;
+	}
+
+	void Insert(SizeType idx, const ElementT* data, SizeType num)
+	{
+		if (!IsValidIndex(idx) || !data || num <= 0) return;
+
+		_num += num;
+		GrowIfNeededImpl();
+
+		// Shift existing elements right to make room
+		SMemory::Move(
+			GetElementAtImpl(idx + num),
+			GetElementAtImpl(idx),
+			sizeof(ElementT) * (_num - idx - num)
+		);
+
+		SMemory::CopyTyped(GetElementAtImpl(idx), data, num);
 	}
 
 	KOR_FORCEINLINE void Pop()
@@ -400,6 +436,7 @@ public:
 
 	KOR_FORCEINLINE void ShrinkToFit() { if(_num < _allocator.GetSize()) ShrinkImpl(_num); }
 
+	KOR_FORCEINLINE void SetNum(SizeType num) { ResizeImpl(num); }
 	KOR_FORCEINLINE void Resize(SizeType num) { ResizeImpl(num); }
 	KOR_FORCEINLINE void Reserve(SizeType num) { if (num > _num) { ReserveImpl(num); } else { ShrinkImpl(num); }; }
 
@@ -460,9 +497,6 @@ private:
 		if(idx != _num - 1)
 		{
 			// Moves entire allocation by one index down
-
-			// NOTE(jan.kristian.fisera):
-			// * Is it worth to cache start index and try to move from start in case that would be fewer iterations ?
 			SMemory::Move(
 				GetElementAtImpl(idx),
 				GetElementAtImpl(idx + 1),
@@ -471,6 +505,30 @@ private:
 		}
 
 		--_num;
+	}
+
+	void RemoveImpl(SizeType idx, SizeType count)
+	{
+		// Clamp count to not exceed bounds
+		if (idx + count > _num)
+		{
+			count = _num - idx;
+		}
+
+		DestructElementsPrivate(GetElementAtImpl(idx), count);
+
+		const SizeType remaining = _num - idx - count;
+		if (remaining > 0)
+		{
+			// Moves entire allocation by count
+			SMemory::Move(
+				GetElementAtImpl(idx),
+				GetElementAtImpl(idx + count),
+				sizeof(ElementT) * remaining
+			);
+		}
+
+		_num -= count;
 	}
 
 	void SwapImpl(SizeType firstIdx, SizeType secondIdx, SizeType num)
@@ -666,7 +724,7 @@ private:
 	}
 
 	AllocatorT _allocator = {};
-	SizeType _num = KOR_INDEX_NONE;
+	SizeType _num = 0;
 };
 
 template<typename ElementT, typename AllocatorT>

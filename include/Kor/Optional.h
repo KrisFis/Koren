@@ -153,7 +153,7 @@ private:
 ////////////////////////////////////////////
 
 template<typename T>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TOptional<T>& optional)
+KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, const TOptional<T>& optional)
 {
 	if (optional.IsSet())
 	{
@@ -164,7 +164,7 @@ KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TOpti
 }
 
 template<typename T>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TOptional<T>& optional)
+KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, TOptional<T>& optional)
 {
 	if (optional.IsSet())
 	{

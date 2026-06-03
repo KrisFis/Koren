@@ -5,6 +5,7 @@
 
 #include "Kor/Core/Build.h"
 
+// Required std include
 #include <initializer_list>
 
 KOR_NAMESPACE_BEGIN
@@ -18,7 +19,7 @@ struct SArchive;
 /////////////////////////////////
 
 template<typename T>
-struct TString;
+class TString;
 
 template<typename ElementT>
 class TArrayAllocator;

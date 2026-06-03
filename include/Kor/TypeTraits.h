@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Core/Build.h"
+#include "Kor/Core/Build.h"
 #include "Kor/Internal/TypeTraitsConstruct.h"
 #include "Kor/Internal/TypeTraitsContainers.h"
 #include "Kor/Internal/TypeTraitsCore.h"

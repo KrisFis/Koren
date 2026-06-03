@@ -24,7 +24,7 @@ KOR_FORCEINLINE constexpr bool TCharOps<CharType>::IsAscii(CharType c) noexcept
 template<typename CharType>
 KOR_FORCEINLINE constexpr bool TCharOps<CharType>::IsDigit(CharType c) noexcept
 {
-	return (c >= (CharType)'0') & (c <= (CharType)'9');
+	return (c >= CharConstant::Zero) & (c <= CharConstant::Nine);
 }
 
 template<typename CharType>
@@ -67,22 +67,22 @@ template<typename CharType>
 KOR_FORCEINLINE constexpr bool TCharOps<CharType>::IsHexDigit(CharType c) noexcept
 {
 	return IsDigit(c)
-	       | ((c >= (CharType)'a') & (c <= (CharType)'f'))
-	       | ((c >= (CharType)'A') & (c <= (CharType)'F'));
+		| ((c >= (CharType)'a') & (c <= (CharType)'f'))
+		| ((c >= (CharType)'A') & (c <= (CharType)'F'));
 }
 
 template<typename CharType>
 KOR_FORCEINLINE constexpr bool TCharOps<CharType>::IsSign(CharType c) noexcept
 {
-	return (c == (CharType)'+') | (c == (CharType)'-');
+	return (c == CharConstant::Plus) | (c == CharConstant::Minus);
 }
 
 template<typename CharType>
 KOR_FORCEINLINE constexpr bool TCharOps<CharType>::IsWhitespace(CharType c) noexcept
 {
 	return (c == CharConstant::Space) | (c == CharConstant::Tab)
-	       | (c == CharConstant::LineFeed) | (c == CharConstant::CarriageReturn)
-	       | (c == CharConstant::VerticalTab) | (c == CharConstant::FormFeed);
+		| (c == CharConstant::LineFeed) | (c == CharConstant::CarriageReturn)
+		| (c == CharConstant::VerticalTab) | (c == CharConstant::FormFeed);
 }
 
 template<typename CharType>
@@ -113,35 +113,52 @@ template<typename CharType>
 KOR_FORCEINLINE constexpr bool TCharOps<CharType>::IsLinebreak(CharType c) noexcept
 {
 	return (uint32(UCharType(c)) - uint32(CharConstant::LineFeed))
-	       <= uint32(CharConstant::CarriageReturn - CharConstant::LineFeed);
+		<= uint32(CharConstant::CarriageReturn - CharConstant::LineFeed);
 }
 
 template<typename CharType>
-KOR_FORCEINLINE constexpr int32 TCharOps<CharType>::DigitToInt(CharType c) noexcept
+KOR_FORCEINLINE constexpr int32 TCharOps<CharType>::ToInt(CharType c) noexcept
+{
+	if (IsDigit(c))			return int32(UCharType(c)) - int32('0');
+	if (IsLowerAlpha(c))	return int32(UCharType(c)) - int32('a') + 10;
+	if (IsUpperAlpha(c))	return int32(UCharType(c)) - int32('A') + 10;
+	return KOR_INDEX_NONE;
+}
+
+template<typename CharType>
+KOR_FORCEINLINE constexpr CharType TCharOps<CharType>::FromInt(int32 n) noexcept
+{
+	if (uint32(n) <= 9u) return (CharType)('0' + n);
+	if (uint32(n) <= 35u) return (CharType)('a' + (n - 10));
+	return CharConstant::Null;
+}
+
+template<typename CharType>
+KOR_FORCEINLINE constexpr int32 TCharOps<CharType>::ToDigit(CharType c) noexcept
 {
 	return IsDigit(c) ? int32(UCharType(c)) - int32('0') : KOR_INDEX_NONE;
 }
 
 template<typename CharType>
-KOR_FORCEINLINE constexpr int32 TCharOps<CharType>::HexToInt(CharType c) noexcept
+KOR_FORCEINLINE constexpr CharType TCharOps<CharType>::FromDigit(int32 n) noexcept
 {
-	if (IsDigit(c)) return int32(UCharType(c)) - int32('0');
+	return (uint32(n) <= 9u) ? (CharType)('0' + n) : CharConstant::Null;
+}
+
+template<typename CharType>
+KOR_FORCEINLINE constexpr int32 TCharOps<CharType>::ToHex(CharType c) noexcept
+{
+	if (IsDigit(c))								return int32(UCharType(c)) - int32('0');
 	if (IsLowerAlpha(c) & (c <= (CharType)'f')) return int32(UCharType(c)) - int32('a') + 10;
 	if (IsUpperAlpha(c) & (c <= (CharType)'F')) return int32(UCharType(c)) - int32('A') + 10;
 	return KOR_INDEX_NONE;
 }
 
 template<typename CharType>
-KOR_FORCEINLINE constexpr int32 TCharOps<CharType>::IntToDigit(int32 n) noexcept
-{
-	return (uint32(n) <= 9u) ? (CharType)('0' + n) : CharConstant::Null;
-}
-
-template<typename CharType>
-KOR_FORCEINLINE constexpr CharType TCharOps<CharType>::IntToHex(int32 n, bool bUpper) noexcept
+KOR_FORCEINLINE constexpr CharType TCharOps<CharType>::FromHex(int32 n) noexcept
 {
 	if (uint32(n) <= 9u) return (CharType)('0' + n);
-	if (uint32(n) <= 15u) return (CharType)((bUpper ? 'A' : 'a') + (n - 10));
+	if (uint32(n) <= 15u) return (CharType)('a' + (n - 10));
 	return CharConstant::Null;
 }
 

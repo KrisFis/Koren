@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include "Kor/CString.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -69,7 +68,7 @@ struct SArchive
 	KOR_FORCEINLINE bool IsEmpty() const { return GetTotalBytes() <= 0; }
 
 	template<typename T = uint8>
-	KOR_FORCEINLINE_DEBUGGABLE SizeType GetTotal() const
+	KOR_FORCEINLINE_DEBUG SizeType GetTotal() const
 	{
 		if constexpr (sizeof(T) == sizeof(uint8))
 		{
@@ -84,7 +83,7 @@ struct SArchive
 
 	// Gets remaining offset in T size (aka. how many Ts till the end of the archive)
 	template<typename T = uint8>
-	KOR_FORCEINLINE_DEBUGGABLE SizeType GetRemainingOffset() const
+	KOR_FORCEINLINE_DEBUG SizeType GetRemainingOffset() const
 	{
 		if constexpr (sizeof(T) == sizeof(uint8))
 		{
@@ -100,7 +99,7 @@ struct SArchive
 	}
 
 	template<typename T = uint8>
-	KOR_FORCEINLINE_DEBUGGABLE SizeType GetOffset() const
+	KOR_FORCEINLINE_DEBUG SizeType GetOffset() const
 	{
 		if constexpr (sizeof(T) == sizeof(uint8))
 		{
@@ -115,7 +114,7 @@ struct SArchive
 
 	// Sets offset for T size
 	template<typename T = uint8>
-	KOR_FORCEINLINE_DEBUGGABLE void SetOffset(SizeType num)
+	KOR_FORCEINLINE_DEBUG void SetOffset(SizeType num)
 	{
 		SetBytesOffset(num * sizeof(T));
 	}
@@ -139,7 +138,7 @@ struct SArchive
 	virtual SizeType ReadBytes(void* ptr, SizeType size) = 0;
 
 	template<typename T>
-	KOR_FORCEINLINE_DEBUGGABLE SizeType Read(T* ptr, SizeType num)
+	KOR_FORCEINLINE_DEBUG SizeType Read(T* ptr, SizeType num)
 	{
 		const SizeType bytesRead = ReadBytes(ptr, sizeof(T) * num);
 		return bytesRead >= sizeof(T) ? bytesRead / sizeof(T) : 0;
@@ -149,7 +148,7 @@ struct SArchive
 	virtual SizeType WriteBytes(const void* ptr, SizeType size) = 0;
 
 	template<typename T>
-	KOR_FORCEINLINE_DEBUGGABLE SizeType Write(const T* ptr, SizeType num)
+	KOR_FORCEINLINE_DEBUG SizeType Write(const T* ptr, SizeType num)
 	{
 		const SizeType bytesWritten = WriteBytes(ptr, sizeof(T) * num);
 		return bytesWritten >= sizeof(T) ? bytesWritten / sizeof(T) : 0;
@@ -183,7 +182,7 @@ struct SArchive
 
 	// Func: (const void* packet, SizeType numOfBytes) -> bool
 	template<SizeType MaxPacketSize, typename FuncType>
-	KOR_FORCEINLINE_DEBUGGABLE bool ReadPacketsUntil(SizeType startOffset, FuncType&& func)
+	KOR_FORCEINLINE_DEBUG bool ReadPacketsUntil(SizeType startOffset, FuncType&& func)
 	{
 		if (!SetBytesOffset(startOffset)) return false;
 		return ReadPacketsUntil<MaxPacketSize>(Forward(func));
@@ -217,10 +216,10 @@ struct SArchive
 		else if (!IsString()) return nullptr;
 
 		// pooled pointer
-		thread_local tchar buffer[SCString::LARGE_BUFFER_SIZE];
+		thread_local tchar buffer[SMemory::BUFFER_SIZE_LARGE];
 
 		const SizeType oldOffset = ar.template GetOffset<tchar>();
-		const SizeType expectedReadNum = SMath::Min<SizeType>(SCString::LARGE_BUFFER_SIZE, GetTotal<tchar>());
+		const SizeType expectedReadNum = SMath::Min<SizeType>(SMemory::BUFFER_SIZE_LARGE, GetTotal<tchar>());
 
 		if (expectedReadNum <= 0) return nullptr;
 
@@ -272,7 +271,7 @@ static SArchive& operator<<(SArchive& ar, SArchive& otherAr)
 	return ar;
 }
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, SArchive& otherAr)
+KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, SArchive& otherAr)
 {
 	otherAr << ar; // just switch streaming
 	return ar;
@@ -324,10 +323,10 @@ static SArchive& operator<<(SArchive& ar, const int32 val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SCString::MAX_BUFFER_SIZE_INT32];
-		if (SCString::FromInt32(val, buffer, SCString::MAX_BUFFER_SIZE_INT32))
+		thread_local tchar buffer[SMemory::BUFFER_SIZE_INT32_MAX];
+		if (SStringOps::FromInt(buffer, val, SMemory::BUFFER_SIZE_INT32_MAX, 10))
 		{
-			ar.Write(buffer, SCString::GetLength(buffer));
+			ar.Write(buffer, SStringOps::Length(buffer));
 		}
 	}
 
@@ -344,13 +343,13 @@ static SArchive& operator>>(SArchive& ar, int32& val)
 	{
 		const tchar* buffer = ar.ReadPooledStringByPred(
 			ar,
-			[](const tchar& character) -> bool
+			[](const tchar& c) -> bool
 			{
-				return (character >= KTEXT('0') && character <= KTEXT('9')) || character == KTEXT('-');
+				return SCharOps::IsSign(c) | SCharOps::IsDigit(c);
 			}
 		);
 
-		val = buffer ? SCString::ToInt32(buffer) : 0;
+		val = buffer ? SStringOps::ToInt(buffer) : 0;
 	}
 
 	return ar;
@@ -364,10 +363,10 @@ static SArchive& operator<<(SArchive& ar, const int64 val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SCString::MAX_BUFFER_SIZE_INT64];
-		if (SCString::FromInt64(val, buffer, SCString::MAX_BUFFER_SIZE_INT64))
+		thread_local tchar buffer[SMemory::BUFFER_SIZE_INT64_MAX];
+		if (SStringOps::FromInt(buffer, val, SMemory::BUFFER_SIZE_INT64_MAX, 10))
 		{
-			ar.Write(buffer, SCString::GetLength(buffer));
+			ar.Write(buffer, SStringOps::Length(buffer));
 		}
 	}
 
@@ -384,13 +383,13 @@ static SArchive& operator>>(SArchive& ar, int64& val)
 	{
 		const tchar* buffer = ar.ReadPooledStringByPred(
 			ar,
-			[](const tchar& character) -> bool
+			[](const tchar& c) -> bool
 			{
-				return (character >= KTEXT('0') && character <= KTEXT('9')) || character == KTEXT('-');
+				return SCharOps::IsSign(c) | SCharOps::IsDigit(c);
 			}
 		);
 
-		val = buffer ? SCString::ToInt64(buffer) : 0;
+		val = buffer ? SStringOps::ToInt(buffer) : 0;
 	}
 
 	return ar;
@@ -404,10 +403,10 @@ static SArchive& operator<<(SArchive& ar, const double val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SCString::MAX_BUFFER_SIZE_DOUBLE];
-		if (SCString::FromDouble(val, 4, buffer, SCString::MAX_BUFFER_SIZE_DOUBLE))
+		thread_local tchar buffer[SMemory::BUFFER_SIZE_DOUBLE_MAX + 1];
+		if (SStringOps::FromFloat(buffer, val, SMemory::BUFFER_SIZE_DOUBLE_MAX + 1, 4))
 		{
-			ar.Write(buffer, SCString::GetLength(buffer));
+			ar.Write(buffer, SStringOps::Length(buffer));
 		}
 	}
 
@@ -424,39 +423,39 @@ static SArchive& operator>>(SArchive& ar, double& val)
 	{
 		const tchar* buffer = ar.ReadPooledStringByPred(
 			ar,
-			[](const tchar& character) -> bool
+			[](const tchar& c) -> bool
 			{
-				return (character >= KTEXT('0') && character <= KTEXT('9')) || character == KTEXT('.') || character == KTEXT('-');
+				return SCharOps::IsSign(c) | SCharOps::IsDigit(c) | (c == SCharConstant::Dot);
 			}
 		);
 
-		val = buffer ? SCString::ToDouble(buffer) : 0.0;
+		val = buffer ? SStringOps::ToFloat(buffer) : 0.0;
 	}
 
 	return ar;
 }
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, tchar val)
+KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, tchar val)
 {
 	ar.Read(&val, 1);
 	return ar;
 }
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, tchar& val)
+KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, tchar& val)
 {
 	ar.Write(&val, 1);
 	return ar;
 }
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const tchar* val)
+KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, const tchar* val)
 {
-	ar.Write(val, SCString::GetLength(val));
+	ar.Write(val, SStringOps::Length(val));
 	return ar;
 }
 
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, tchar* val)
+KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, tchar* val)
 {
-	ar.Read(val, SCString::GetLength(val));
+	ar.Read(val, SStringOps::Length(val));
 	return ar;
 }
 

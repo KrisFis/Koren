@@ -16,7 +16,7 @@ All library types live under the `Kor::` namespace. The name comes from *Koren* 
 #include "Kor/Kor.h"
 
 Kor::TArray<int> myArray;
-Kor::FString myStr = KOR_TEXT("Hello World!");
+Kor::SString myStr = KOR_TEXT("Hello World!");
 ```
 
 ---
@@ -35,25 +35,25 @@ Kor::FString myStr = KOR_TEXT("Hello World!");
 | 64-bit           |    YES     | `KOR_ARCHITECTURE_64` |
 | 32-bit           |     NO     | `KOR_ARCHITECTURE_32` |
 
-| **Compiler**  | **Tested** | **Macro**                              |
-|:--------------|:----------:|:---------------------------------------|
-| MSVC          |    YES     | `KOR_COMPILER_MSVC`                    |
-| Clang         |    YES     | `KOR_COMPILER_GNUC && KOR_COMPILER_CLANG` |
-| GCC           |    YES     | `KOR_COMPILER_GNUC && KOR_COMPILER_GCC`   |
+| **Compiler** | **Tested** | **Macro**                                 |
+|:-------------|:----------:|:------------------------------------------|
+| MSVC         |    YES     | `KOR_COMPILER_MSVC`                       |
+| Clang        |    YES     | `KOR_COMPILER_GNUC && KOR_COMPILER_CLANG` |
+| GCC          |    YES     | `KOR_COMPILER_GNUC && KOR_COMPILER_GCC`   |
 
 ---
 
 ## Features
 
-| **Description**                | **Example**                                    |
-|:-------------------------------|:-----------------------------------------------|
-| STL-like containers            | `TArray`, `TSharedPtr`                         |
-| Lightweight math library       | `SMath::Abs`, `SMath::Lerp`                    |
-| Human-readable build macros    | `KOR_BUILD_RELEASE`, `PLATFORM_WINDOWS`        |
-| Extra utility types            | `TSharedClass`, `TAsync`                       |
-| Object-oriented string helpers | `SString::Split`                               |
-| Character encoding             | `KOR_TEXT("myText")`, `KTEXT("myText")`          |
-| Debug assertions               | `KOR_DEMAND`, `KOR_EXPECT`, `KOR_REQUIRE`        |
+| **Description**                | **Example**                               |
+|:-------------------------------|:------------------------------------------|
+| STL-like containers            | `TArray`, `TSharedPtr`                    |
+| Lightweight math library       | `SMath::Abs`, `SMath::Lerp`               |
+| Human-readable build macros    | `KOR_BUILD_RELEASE`, `PLATFORM_WINDOWS`   |
+| Extra utility types            | `TSharedClass`, `TAsync`                  |
+| Object-oriented string helpers | `SString::Split`                          |
+| Character encoding             | `KOR_TEXT("myText")`, `KTEXT("myText")`   |
+| Debug assertions               | `KOR_DEMAND`, `KOR_EXPECT`, `KOR_REQUIRE` |
 
 ---
 
@@ -93,13 +93,13 @@ if (KOR_EXPECT(index < size))       // non-fatal - recoverable expectation
 
 ## STL Equivalents
 
-| **Description**   | **Koren**              | **STL equivalent**       |
-|:------------------|:----------------------:|:------------------------:|
-| Smart pointers    | `TSharedPtr, TWeakPtr` | `shared_ptr, weak_ptr`   |
-| Dynamic array     | `TArray`               | `vector`                 |
-| Dynamic string    | `TString<CharType>`    | `string`                 |
-| FIFO container    | `TQueue`               | `queue`                  |
-| Optional value    | `TOptional`            | `optional`               |
+| **Description**   |       **Koren**        |   **STL equivalent**   |
+|:------------------|:----------------------:|:----------------------:|
+| Smart pointers    | `TSharedPtr, TWeakPtr` | `shared_ptr, weak_ptr` |
+| Dynamic array     |        `TArray`        |        `vector`        |
+| Dynamic string    |  `TString<CharType>`   |   `string, wstring`    |
+| FIFO container    |        `TQueue`        |        `queue`         |
+| Optional value    |      `TOptional`       |       `optional`       |
 
 ---
 

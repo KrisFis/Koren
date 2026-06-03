@@ -9,10 +9,13 @@
 
 // Look at "Build.h" to see defines that affects features provided
 
-// IMPORTANT CORE
+// CORE
 #include "Kor/Core/Build.h"
 #include "Kor/Core/Compiler.h"
 #include "Kor/Core/Platform.h"
+
+// INITIALIZATION
+#include "Kor/Internal/InitTags.h"
 
 // FORWARDS
 #include "Kor/Internal/TypeFowards.h"

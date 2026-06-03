@@ -90,7 +90,7 @@
 #define KOR_INDEX_NONE -1
 
 // Pointer arithmetic helpers
-#define KOR_PTR_DIFF(RetType, Ptr1, Ptr2) static_cast<RetType>(Ptr1 -Ptr2)
+#define KOR_PTR_DIFF(RetType, Ptr1, Ptr2) static_cast<RetType>(Ptr1 - Ptr2)
 
 KOR_NAMESPACE_BEGIN
 

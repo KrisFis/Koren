@@ -12,14 +12,19 @@ KOR_NAMESPACE_BEGIN
 
 typedef decltype(sizeof(0)) TSize;
 
+// [[ TVoid ]]
+// * Gets any param and returns void type
+
+template <typename... ArgsT> struct TVoid { using Type = void; };
+
 // [Bool Value]
 // * False and true value
 
 template<bool T> struct TBoolValue { static constexpr bool Value = T; };
 template<typename> struct TValue : TBoolValue<true> {};
 
-typedef TBoolValue<true> TTrueValue;
-typedef TBoolValue<false> TFalseValue;
+typedef TBoolValue<true> TTrueType;
+typedef TBoolValue<false> TFalseType;
 
 // [Enable if]
 // * Enables compilation of specific template function/struct when condition met
@@ -50,7 +55,7 @@ template<typename T> struct TIsRValue<T&&> { enum { Value = true }; };
 // [Remove reference]
 // * Removes reference from type
 
-template <typename T> struct TRemoveReference      { typedef T Type; };
+template <typename T> struct TRemoveReference { typedef T Type; };
 template <typename T> struct TRemoveReference<T& > { typedef T Type; };
 template <typename T> struct TRemoveReference<T&&> { typedef T Type; };
 
@@ -208,7 +213,7 @@ template<typename T> struct TIsUnsigned
 // * Primary source of truth for integer type resolution by size
 // * Unsupported sizes will result in a compile error (incomplete type)
 template<TSize Size> struct TInt { static_assert(Size == 0, "TInt: unsupported size, must be 1, 2, 4 or 8"); };
-template <> struct TInt<1> { typedef int8  Signed; typedef uint8  Unsigned; };
+template <> struct TInt<1> { typedef int8 Signed; typedef uint8 Unsigned; };
 template <> struct TInt<2> { typedef int16 Signed; typedef uint16 Unsigned; };
 template <> struct TInt<4> { typedef int32 Signed; typedef uint32 Unsigned; };
 template <> struct TInt<8> { typedef int64 Signed; typedef uint64 Unsigned; };

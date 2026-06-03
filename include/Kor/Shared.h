@@ -89,7 +89,7 @@ private:
 
 	// const PtrType&
 	// * Copy
-	KOR_FORCEINLINE_DEBUGGABLE void ReplaceBy(const TSharedPtr& other)
+	KOR_FORCEINLINE_DEBUG void ReplaceBy(const TSharedPtr& other)
 	{
 		// How it should work ? (Copy implementation)
 
@@ -105,7 +105,7 @@ private:
 
 	// PtrType&&
 	// * Move
-	KOR_FORCEINLINE_DEBUGGABLE void ReplaceBy(TSharedPtr&& other)
+	KOR_FORCEINLINE_DEBUG void ReplaceBy(TSharedPtr&& other)
 	{
 		// How it should work ? (move implementation)
 
@@ -127,7 +127,7 @@ private:
 ////////////////////////////////////////////
 
 template<typename T>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TSharedPtr<T>& sharedPtr)
+KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, const TSharedPtr<T>& sharedPtr)
 {
 	if (sharedPtr.IsValid())
 	{
@@ -138,7 +138,7 @@ KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TShar
 }
 
 template<typename T>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TSharedPtr<T>& sharedPtr)
+KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, TSharedPtr<T>& sharedPtr)
 {
 	if (sharedPtr.IsValid())
 	{
@@ -252,7 +252,7 @@ private:
 	// const PtrType&
 	// * Copy
 	template<typename PtrType>
-	KOR_FORCEINLINE_DEBUGGABLE void ReplaceBy(const PtrType& other)
+	KOR_FORCEINLINE_DEBUG void ReplaceBy(const PtrType& other)
 	{
 		// How it should work ? (Copy implementation)
 
@@ -274,7 +274,7 @@ private:
 	// PtrType&&
 	// * Move
 	template<typename PtrType>
-	KOR_FORCEINLINE_DEBUGGABLE void ReplaceBy(PtrType&& other)
+	KOR_FORCEINLINE_DEBUG void ReplaceBy(PtrType&& other)
 	{
 		// How it should work ? (move implementation)
 
@@ -311,7 +311,7 @@ private:
 ////////////////////////////////////////////
 
 template<typename T>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TWeakPtr<T>& weakPtr)
+KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, const TWeakPtr<T>& weakPtr)
 {
 	if (weakPtr.IsValid())
 	{
@@ -322,7 +322,7 @@ KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator<<(SArchive& ar, const TWeak
 }
 
 template<typename T>
-KOR_FORCEINLINE_DEBUGGABLE static SArchive& operator>>(SArchive& ar, TWeakPtr<T>& weakPtr)
+KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, TWeakPtr<T>& weakPtr)
 {
 	if (weakPtr.IsValid())
 	{
@@ -384,7 +384,7 @@ private:
 };
 
 template<typename T, typename InstanceT = T>
-KOR_FORCEINLINE_DEBUGGABLE static TSharedPtr<T> MakeShareable(InstanceT* instance)
+KOR_FORCEINLINE_DEBUG static TSharedPtr<T> MakeShareable(InstanceT* instance)
 {
 	static_assert(TIsDerivedFrom<InstanceT,T>::Value, "Instance type must be derived from return type");
 
@@ -399,7 +399,7 @@ KOR_FORCEINLINE_DEBUGGABLE static TSharedPtr<T> MakeShareable(InstanceT* instanc
 }
 
 template<typename T, typename... ArgTypes>
-KOR_FORCEINLINE_DEBUGGABLE static TSharedPtr<T> MakeShared(ArgTypes&&... args)
+KOR_FORCEINLINE_DEBUG static TSharedPtr<T> MakeShared(ArgTypes&&... args)
 {
 	if constexpr (sizeof...(args) > 0)
 	{

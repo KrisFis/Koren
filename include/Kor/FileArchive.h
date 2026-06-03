@@ -40,19 +40,19 @@ struct SCFileArchive : public SArchive
 		fseek(_file, currOff, SEEK_SET);
 		return result;
 	}
-	KOR_FORCEINLINE_DEBUGGABLE virtual SizeType GetBytesOffset() const override
+	KOR_FORCEINLINE_DEBUG virtual SizeType GetBytesOffset() const override
 	{
 		return ftell(_file);
 	}
-	KOR_FORCEINLINE_DEBUGGABLE virtual bool SetBytesOffset(SizeType offset) override
+	KOR_FORCEINLINE_DEBUG virtual bool SetBytesOffset(SizeType offset) override
 	{
 		return fseek(_file, offset, SEEK_SET) == 0;
 	}
-	KOR_FORCEINLINE_DEBUGGABLE virtual SizeType ReadBytes(void* ptr, SizeType size) override
+	KOR_FORCEINLINE_DEBUG virtual SizeType ReadBytes(void* ptr, SizeType size) override
 	{
 		return fread(ptr, sizeof(uint8), size, _file);
 	}
-	KOR_FORCEINLINE_DEBUGGABLE virtual SizeType WriteBytes(const void* ptr, SizeType size) override
+	KOR_FORCEINLINE_DEBUG virtual SizeType WriteBytes(const void* ptr, SizeType size) override
 	{
 		return fwrite(ptr, sizeof(uint8), size, _file);
 	}
