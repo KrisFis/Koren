@@ -14,6 +14,14 @@
 
 KOR_NAMESPACE_BEGIN
 
+// [ String View ]
+// Non-owning, read-only view into a character buffer.
+// * CharType must satisfy TIsCharacter
+// * Does not own the buffer; lifetime is the caller's responsibility
+// * Not guaranteed to be null-terminated unless constructed from a
+//   null-terminated source and not sliced via Sub/Left/Right
+// * Trivially copyable; prefer passing by value over const ref
+// * Split produces views into the same buffer, same lifetime rules apply
 template<typename CharT>
 class TStringView
 {
@@ -204,6 +212,15 @@ private:
 	SizeType _len = 0;
 };
 
+// [ String ]
+// Owning, null-terminated, mutable string.
+// * CharType must satisfy TIsCharacter
+// * Always null-terminated; GetChars() is safe to pass to C APIs
+// * Backed by TArray; all mutation operations may reallocate
+// * Views (View, SubView, LeftView, RightView) are valid only while
+//   the string is alive and unmodified — any mutation invalidates them
+// * Split produces owned copies; SplitToArray returns TArray<TString>
+// * Format/AppendFormat use printf-style syntax
 template<typename CharT>
 class TString
 {
