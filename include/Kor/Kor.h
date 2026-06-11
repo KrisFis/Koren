@@ -14,7 +14,7 @@
 
 // UTILITIES
 #include "Kor/Math.h"
-#include "Kor/Memory.h"
+#include "Kor/MemoryOps.h"
 #include "Kor/Misc.h"
 
 // CONTAINERS

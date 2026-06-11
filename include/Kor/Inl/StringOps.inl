@@ -16,7 +16,7 @@ namespace Internal
 	template<typename CharType>
 	KOR_FORCEINLINE static CharType* GetScratchBuffer() noexcept
 	{
-		thread_local CharType buffer[SMemory::BUFFER_SIZE_LARGE];
+		thread_local CharType buffer[KOR_BUFFER_SIZE_LARGE];
 		return buffer;
 	}
 }

@@ -32,7 +32,7 @@ int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const C
 		++count;
 	}
 
-	*dst = CharConstant::Null;
+	*dst = TCharConstant<CharType>::Null;
 	Copy(str, buffer);
 	return count;
 }
@@ -75,7 +75,7 @@ int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const C
 		++count;
 	}
 
-	*dst = CharConstant::Null;
+	*dst = TCharConstant<CharType>::Null;
 	Copy(str, buffer, maxLen);
 	return count;
 }

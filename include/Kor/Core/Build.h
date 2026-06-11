@@ -159,11 +159,6 @@
 	#define KOR_DEFAULT_WARNING_SUPPRESS 1
 #endif
 
-// Whether global "new" and "delete" are redirected to Kor allocators. See: Memory.h
-#ifndef KOR_NEW_DELETE
-	#define KOR_NEW_DELETE 0
-#endif
-
 // Whether the library is wrapped in the "Kor" namespace.
 // Disable only if namespace collisions require it.
 #ifndef KOR_USE_NAMESPACE

@@ -7,9 +7,9 @@ template<typename CharT>
 TString<CharT> TString<CharT>::FromInt(int64 value, int32 base) noexcept
 {
 	TString result(Init::Zero);
-	result._data.Resize(SMemory::BUFFER_SIZE_INT64_MAX);
+	result._data.Resize(SStringConstant::BufferSize_Int64);
 
-	const int32 convLen = SOps::FromInt(*result._data, value, SMemory::BUFFER_SIZE_INT64_MAX, base);
+	const int32 convLen = SOps::FromInt(*result._data, value, SStringConstant::BufferSize_Int64, base);
 	KOR_ASSERT_DEBUG(convLen > 0);
 
 	result._data.Resize(convLen + 1);
@@ -22,9 +22,9 @@ template<typename CharT>
 TString<CharT> TString<CharT>::FromUInt(uint64 value, int32 base) noexcept
 {
 	TString result(Init::Zero);
-	result._data.Resize(SMemory::BUFFER_SIZE_INT64_MAX);
+	result._data.Resize(SStringConstant::BufferSize_UInt64);
 
-	const int32 convLen = SOps::FromUInt(*result._data, value, SMemory::BUFFER_SIZE_INT64_MAX, base);
+	const int32 convLen = SOps::FromUInt(*result._data, value, SStringConstant::BufferSize_UInt64, base);
 	KOR_ASSERT_DEBUG(convLen > 0);
 
 	result._data.Resize(convLen + 1);
@@ -62,7 +62,7 @@ template<EFloatFormat Format>
 TString<CharT> TString<CharT>::FromFloat(double value, uint8 precision) noexcept
 {
 	TString result(Init::Zero);
-	result._data.Resize(SMemory::BUFFER_SIZE_DOUBLE_MAX + 1);
+	result._data.Resize(SStringConstant::BufferSize_Double);
 
 	const int32 convLen = SOps::template FromFloat<Format>(*result._data, value, result._data.GetNum(), precision);
 	KOR_ASSERT_DEBUG(convLen > 0);

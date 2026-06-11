@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include "Kor/Memory.h"
+#include "Kor/MemoryOps.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -54,8 +54,8 @@ public:
 		if (num <= 0) return nullptr;
 
 		ElementType* newData = _data
-			? SMemory::ReallocTyped<ElementType>(_data, _size + num)
-			: SMemory::MallocTyped<ElementType>(_size + num);
+			? SMemoryOps::ReallocAs<ElementType>(_data, _size + num)
+			: SMemoryOps::MallocAs<ElementType>(_size + num);
 
 		ElementType* elementPtr = newData + _size;
 
@@ -70,7 +70,7 @@ public:
 	{
 		if(_data)
 		{
-			SMemory::Free(_data);
+			SMemoryOps::Free(_data);
 
 			_data = nullptr;
 			_size = 0;

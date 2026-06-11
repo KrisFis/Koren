@@ -13,7 +13,7 @@ template<typename CharT>
 KOR_FORCEINLINE void TString<CharT>::Fill(SizeType length, CharType val) noexcept
 {
 	_data.Resize(length + 1);
-	SMemory::FillTyped(_data.GetData(), val, length);
+	SMemoryOps::FillAs(_data.GetData(), val, length);
 	_data[length] = Constant::Null;
 }
 

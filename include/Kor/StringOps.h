@@ -6,11 +6,11 @@
 #include "Kor/Core/Platform.h"
 #include "Kor/CharOps.h"
 
-#include KOR_PLATFORM_HEADER_FROM(Kor/Core, StringOps)
+#include KOR_PLATFORM_HEADER_FROM(Kor/Core, String)
 
 KOR_NAMESPACE_BEGIN
 
-// Platform typedefs type
+// Platform typedefs
 template<typename CharType>
 using TPlatformStringOps = KOR_PLATFORM_TEMPLATE(StringOps<CharType>);
 
@@ -35,7 +35,7 @@ enum class ESearchCase : uint8
 {
 	// exact character match
 	Sensitive = 0,
-	// case-folded match via CharOps::ToLower
+	// case-folded match via TCharOps<CharType>::ToLower
 	Insensitive
 };
 
@@ -48,6 +48,17 @@ enum class EFloatFormat : uint8
 	Scientific,
 	// fixed or scientific, whichever is shorter (%g)
 	Compact,
+};
+
+struct SStringConstant
+{
+	static constexpr uint16 BufferSize_Int32 = 10+1+1; // 2147483648 + sign + null
+	static constexpr uint16 BufferSize_UInt32 = 10+1; // 4294967295 + null
+
+	static constexpr uint16 BufferSize_Int64 = 19+1+1; // 9223372036854775808 + sign + null
+	static constexpr uint16 BufferSize_UInt64 = 20+1; // 18446744073709551615 + null
+
+	static constexpr uint16 BufferSize_Double = 309+40; // _CVTBUFSIZE
 };
 
 // [ String Ops ]
@@ -65,9 +76,6 @@ struct TStringOps
 
 	using CharType = T;
 	using UCharType = typename TMakeUnsigned<CharType>::Type;
-
-	using CharOps = TCharOps<CharType>;
-	using CharConstant = TCharConstant<CharType>;
 
 	// IsAscii
 	// Returns true if all characters in the string fall within the ASCII range (0x00-0x7F).

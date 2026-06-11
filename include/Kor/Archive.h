@@ -216,10 +216,10 @@ struct SArchive
 		else if (!IsString()) return nullptr;
 
 		// pooled pointer
-		thread_local tchar buffer[SMemory::BUFFER_SIZE_LARGE];
+		thread_local tchar buffer[KOR_BUFFER_SIZE_LARGE];
 
 		const SizeType oldOffset = ar.template GetOffset<tchar>();
-		const SizeType expectedReadNum = SMath::Min<SizeType>(SMemory::BUFFER_SIZE_LARGE, GetTotal<tchar>());
+		const SizeType expectedReadNum = SMath::Min<SizeType>(KOR_BUFFER_SIZE_LARGE, GetTotal<tchar>());
 
 		if (expectedReadNum <= 0) return nullptr;
 
@@ -259,12 +259,12 @@ static SArchive& operator<<(SArchive& ar, SArchive& otherAr)
 		const uint32 remainingBytes = (otherAr.GetTotalBytes() - otherAr.GetBytesOffset());
 		if (remainingBytes > 0)
 		{
-			uint8* buffer = SMemory::MallocTyped<uint8>(remainingBytes);
+			uint8* buffer = SMemoryOps::MallocAs<uint8>(remainingBytes);
 			{
 				otherAr.ReadBytes(buffer, remainingBytes);
 				ar.WriteBytes(buffer, remainingBytes);
 			}
-			SMemory::Free(buffer);
+			SMemoryOps::Free(buffer);
 		}
 	}
 
@@ -323,8 +323,8 @@ static SArchive& operator<<(SArchive& ar, const int32 val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SMemory::BUFFER_SIZE_INT32_MAX];
-		if (SStringOps::FromInt(buffer, val, SMemory::BUFFER_SIZE_INT32_MAX, 10))
+		thread_local tchar buffer[SStringConstant::BufferSize_Int32];
+		if (SStringOps::FromInt(buffer, val, SStringConstant::BufferSize_Int32, 10))
 		{
 			ar.Write(buffer, SStringOps::Length(buffer));
 		}
@@ -363,8 +363,8 @@ static SArchive& operator<<(SArchive& ar, const int64 val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SMemory::BUFFER_SIZE_INT64_MAX];
-		if (SStringOps::FromInt(buffer, val, SMemory::BUFFER_SIZE_INT64_MAX, 10))
+		thread_local tchar buffer[SStringConstant::BufferSize_Int64];
+		if (SStringOps::FromInt(buffer, val, SStringConstant::BufferSize_Int64, 10))
 		{
 			ar.Write(buffer, SStringOps::Length(buffer));
 		}
@@ -403,8 +403,8 @@ static SArchive& operator<<(SArchive& ar, const double val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SMemory::BUFFER_SIZE_DOUBLE_MAX + 1];
-		if (SStringOps::FromFloat(buffer, val, SMemory::BUFFER_SIZE_DOUBLE_MAX + 1, 4))
+		thread_local tchar buffer[SStringConstant::BufferSize_Double];
+		if (SStringOps::FromFloat(buffer, val, SStringConstant::BufferSize_Double, 4))
 		{
 			ar.Write(buffer, SStringOps::Length(buffer));
 		}

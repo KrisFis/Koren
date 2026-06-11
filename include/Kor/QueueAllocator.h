@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include "Kor/Memory.h"
+#include "Kor/MemoryOps.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -61,7 +61,7 @@ public:
 		NodeType* prevNode = _tail;
 		for(SizeType i = 0; i < num; ++i)
 		{
-			NodeType* newNode = SMemory::MallocTyped<NodeType>();
+			NodeType* newNode = SMemoryOps::MallocAs<NodeType>();
 			newNode->Previous = prevNode;
 			newNode->Next = nullptr;
 
@@ -104,7 +104,7 @@ public:
 			}
 		}
 
-		SMemory::Free(node);
+		SMemoryOps::Free(node);
 		--_size;
 	}
 
@@ -114,7 +114,7 @@ public:
 		while(currentNode != nullptr)
 		{
 			NodeType* nextNode = currentNode->Next;
-			SMemory::Free(currentNode);
+			SMemoryOps::Free(currentNode);
 			currentNode = nextNode;
 		}
 

@@ -8,10 +8,10 @@ void TStringOps<CharType>::ToUpper(CharType* str) noexcept
 {
 	while(*str)
 	{
-		*str = CharOps::ToUpper(*str);
+		*str = TCharOps<CharType>::ToUpper(*str);
 
 		// Compiler dependent order of read
-		// *(str++) = CharOps::ToUpper(*str);
+		// *(str++) = TCharOps<CharType>::ToUpper(*str);
 
 		++str;
 	}
@@ -22,10 +22,10 @@ void TStringOps<CharType>::ToUpper(CharType* str, int32 strLen) noexcept
 {
 	while(strLen-- > 0)
 	{
-		*str = CharOps::ToUpper(*str);
+		*str = TCharOps<CharType>::ToUpper(*str);
 
 		// Compiler dependent order of read
-		// *(str++) = CharOps::ToUpper(*str);
+		// *(str++) = TCharOps<CharType>::ToUpper(*str);
 
 		++str;
 	}
@@ -36,7 +36,7 @@ void TStringOps<CharType>::ToLower(CharType* str) noexcept
 {
 	while(*str)
 	{
-		*str = CharOps::ToLower(*str);
+		*str = TCharOps<CharType>::ToLower(*str);
 		++str;
 	}
 }
@@ -46,7 +46,7 @@ void TStringOps<CharType>::ToLower(CharType* str, int32 strLen) noexcept
 {
 	while(strLen-- > 0)
 	{
-		*str = CharOps::ToLower(*str);
+		*str = TCharOps<CharType>::ToLower(*str);
 		++str;
 	}
 }
@@ -68,7 +68,7 @@ void TStringOps<CharType>::Copy(CharType* dest, const CharType* src, int32 srcLe
 {
 	if (srcLen <= 0) return;
 	while (srcLen-- > 0) { *(dest++) = *(src++); }
-	*dest = CharConstant::Null;
+	*dest = TCharConstant<CharType>::Null;
 }
 
 template<typename CharType>
@@ -76,7 +76,7 @@ void TStringOps<CharType>::Concatenate(CharType* dest, const CharType* src) noex
 {
 	dest += Length(dest); // moves at '\0' character
 	while(*src) { *(dest++) = *(src++); }
-	*dest = CharConstant::Null; // ensure '\0' to the end
+	*dest = TCharConstant<CharType>::Null; // ensure '\0' to the end
 }
 
 template<typename CharType>
@@ -84,5 +84,5 @@ void TStringOps<CharType>::Concatenate(CharType* dest, const CharType* src, int3
 {
 	dest += Length(dest); // moves at '\0' character
 	while(srcLen-- > 0) { *(dest++) = *(src++); }
-	*dest = CharConstant::Null; // ensure '\0' to the end
+	*dest = TCharConstant<CharType>::Null; // ensure '\0' to the end
 }

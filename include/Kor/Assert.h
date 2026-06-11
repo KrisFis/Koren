@@ -6,7 +6,7 @@
 #include "Kor/Core/Build.h"
 
 #include "Kor/StringOps.h"
-#include "Kor/Memory.h"
+#include "Kor/MemoryOps.h"
 #include "Kor/Misc.h"
 
 // TODO: Decouple assert from logging and let user provide function pointer that will be called on assert
@@ -58,7 +58,7 @@
 
 		static void LogFailed(const achar* Expression, const achar* File, int32 Line) noexcept
 		{
-			thread_local achar LOG_BUFFER[SMemory::BUFFER_SIZE_LARGE];
+			thread_local achar LOG_BUFFER[KOR_BUFFER_SIZE_LARGE];
 			const int32 result = TStringOps<achar>::Format(
 				LOG_BUFFER,
 				KOR_TEXT_ANSI("ASSERT: '%s' at '%s:%d'\n"),

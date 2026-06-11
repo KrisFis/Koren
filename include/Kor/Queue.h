@@ -5,7 +5,7 @@
 
 #include "Kor/KorMinimal.h"
 
-#include "Kor/Memory.h"
+#include "Kor/MemoryOps.h"
 #include "Kor/QueueAllocator.h"
 
 KOR_NAMESPACE_BEGIN
@@ -82,7 +82,7 @@ private:
 		AllocatorNodeType* node = _allocator.GetHead();
 		if(node)
 		{
-			SMemory::CopyTyped(&outVal, &node->Value);
+			SMemoryOps::CopyAs(&outVal, &node->Value);
 		}
 
 		return node != nullptr;
@@ -91,14 +91,14 @@ private:
 	AllocatorNodeType* AddImpl(const ElementT& val)
 	{
 		AllocatorNodeType* node = _allocator.Allocate(1);
-		SMemory::MoveTyped(&node->Value, &val);
+		SMemoryOps::MoveAs(&node->Value, &val);
 		return node;
 	}
 
 	AllocatorNodeType* AddImpl(ElementT&& val)
 	{
 		AllocatorNodeType* node = _allocator.Allocate(1);
-		SMemory::MoveTyped(&node->Value, &val);
+		SMemoryOps::MoveAs(&node->Value, &val);
 		return node;
 	}
 
@@ -110,7 +110,7 @@ private:
 			return false;
 		}
 
-		SMemory::Destruct(&node->Value);
+		SMemoryOps::Destruct(&node->Value);
 		_allocator.Deallocate(node);
 
 		return true;
@@ -124,7 +124,7 @@ private:
 			return false;
 		}
 
-		SMemory::MoveTyped(&outVal, &node->Value);
+		SMemoryOps::MoveAs(&outVal, &node->Value);
 		_allocator.Deallocate(node);
 
 		return true;
@@ -137,7 +137,7 @@ private:
 		{
 			while(currentNode != nullptr)
 			{
-				SMemory::Destruct(&currentNode->Value);
+				SMemoryOps::Destruct(&currentNode->Value);
 				currentNode = currentNode->Next;
 			}
 
@@ -153,7 +153,7 @@ private:
 		while(currentNode != nullptr)
 		{
 			AllocatorNodeType* newNode = _allocator.Allocate(1);
-			SMemory::CopyTyped(&newNode->Value, &currentNode->Value);
+			SMemoryOps::CopyAs(&newNode->Value, &currentNode->Value);
 		}
 	}
 

@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include "Kor/Memory.h"
+#include "Kor/MemoryOps.h"
 #include "Kor/TypeTraits.h"
 
 KOR_NAMESPACE_BEGIN
@@ -86,8 +86,8 @@ public:
 	{
 		if(_data)
 		{
-			SMemory::Destruct(_data);
-			SMemory::Free(_data);
+			SMemoryOps::Destruct(_data);
+			SMemoryOps::Free(_data);
 			_data = nullptr;
 		}
 	}
@@ -96,14 +96,14 @@ private:
 
 	void FillToEmpty(const ElementType& InValue)
 	{
-		_data = SMemory::MallocTyped<ElementType>();
-		SMemory::CopyTyped(_data, &InValue);
+		_data = SMemoryOps::MallocAs<ElementType>();
+		SMemoryOps::CopyAs(_data, &InValue);
 	}
 
 	void FillToEmpty(ElementType&& InValue)
 	{
-		_data = SMemory::MallocTyped<ElementType>();
-		SMemory::MoveTyped(_data, &InValue);
+		_data = SMemoryOps::MallocAs<ElementType>();
+		SMemoryOps::MoveAs(_data, &InValue);
 	}
 
 	KOR_FORCEINLINE void FillToEmpty(const TOptional& other)
@@ -140,7 +140,7 @@ private:
 	{
 		if(Lhs.IsSet() == Rhs.IsSet())
 		{
-			return Lhs.IsSet() && SMemory::IsEqual(Lhs._data, Rhs._data) == 0;
+			return Lhs.IsSet() && SMemoryOps::IsEqualAs(Lhs._data, Rhs._data) == 0;
 		}
 
 		return false;

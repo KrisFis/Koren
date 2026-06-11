@@ -141,6 +141,9 @@ typedef wchar tchar;
 typedef char tchar;
 #endif
 
+#define KOR_BUFFER_SIZE_SMALL (1024)
+#define KOR_BUFFER_SIZE_LARGE (4096)
+
 namespace Internal::TypeTests
 {
 	static_assert(sizeof(uint8) == 1, "uint8 type size test failed.");

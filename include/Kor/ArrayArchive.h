@@ -66,7 +66,7 @@ struct TArrayArchive : public SArchive
 
 		if (elementsToRead > 0)
 		{
-			SMemory::Copy(ptr, _data.GetData() + (_offset * ELEMENT_SIZE), elementsToRead * ELEMENT_SIZE);
+			SMemoryOps::Copy(ptr, _data.GetData() + (_offset * ELEMENT_SIZE), elementsToRead * ELEMENT_SIZE);
 			_offset += elementsToRead;
 		}
 
@@ -84,7 +84,7 @@ struct TArrayArchive : public SArchive
 			_data.Resize(elementsToWrite + _offset);
 		}
 
-		SMemory::Copy(_data.GetData() + (_offset * ELEMENT_SIZE), ptr, size);
+		SMemoryOps::Copy(_data.GetData() + (_offset * ELEMENT_SIZE), ptr, size);
 		_offset += elementsToWrite;
 
 		return elementsToWrite * ELEMENT_SIZE;

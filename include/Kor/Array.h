@@ -5,7 +5,7 @@
 
 #include "Kor/KorMinimal.h"
 #include "Kor/Math.h"
-#include "Kor/Memory.h"
+#include "Kor/MemoryOps.h"
 
 #include "Kor/ArrayAllocator.h"
 
@@ -185,7 +185,7 @@ public:
 	{
 		AddUninitializedImpl();
 
-		SMemory::Construct(GetElementAtImpl(_num - 1), Forward<ArgTypes>(args)...);
+		SMemoryOps::Construct(GetElementAtImpl(_num - 1), Forward<ArgTypes>(args)...);
 		return _num - 1;
 	}
 
@@ -195,7 +195,7 @@ public:
 		AddUninitializedImpl();
 
 		ElementT* newEl = GetElementAtImpl(_num - 1);
-		SMemory::Construct(newEl, Forward<ArgTypes>(args)...);
+		SMemoryOps::Construct(newEl, Forward<ArgTypes>(args)...);
 		return *newEl;
 	}
 
@@ -210,7 +210,7 @@ public:
 		int32 removedNum = 0;
 		for(SizeType i = _num - 1; i >= 0; --i)
 		{
-			if(!SMemory::IsEqual(GetElementAtImpl(i), &val)) continue;
+			if(!SMemoryOps::IsEqualAs(GetElementAtImpl(i), &val)) continue;
 			RemoveImpl(i);
 			++removedNum;
 		}
@@ -225,7 +225,7 @@ public:
 		int32 removedNum = 0;
 		for(SizeType i = _num - 1; i >= 0; --i)
 		{
-			if(!SMemory::IsEqual(GetElementAtImpl(i), &val)) continue;
+			if(!SMemoryOps::IsEqualAs(GetElementAtImpl(i), &val)) continue;
 			RemoveSwapImpl(i);
 			++removedNum;
 		}
@@ -298,13 +298,13 @@ public:
 		GrowIfNeededImpl();
 
 		// Shift existing elements right to make room
-		SMemory::Move(
+		SMemoryOps::Move(
 			GetElementAtImpl(idx + num),
 			GetElementAtImpl(idx),
 			sizeof(ElementT) * (_num - idx - num)
 		);
 
-		SMemory::CopyTyped(GetElementAtImpl(idx), data, num);
+		SMemoryOps::CopyAs(GetElementAtImpl(idx), data, num);
 	}
 
 	KOR_FORCEINLINE void Pop()
@@ -352,7 +352,7 @@ public:
 	{
 		for(SizeType i = 0; i < _num; ++i)
 		{
-			if(SMemory::IsEqual(GetElementAtImpl(i), &val))
+			if(SMemoryOps::IsEqualAs(GetElementAtImpl(i), &val))
 			{
 				return i;
 			}
@@ -462,7 +462,7 @@ private:
 		_num += num;
 		GrowIfNeededImpl();
 
-		SMemory::ZeroTyped(GetElementAtImpl(_num - num), num);
+		SMemoryOps::ZeroAs(GetElementAtImpl(_num - num), num);
 	}
 
 	KOR_FORCEINLINE void AddUninitializedImpl(SizeType num = 1)
@@ -480,7 +480,7 @@ private:
 		if(idx != _num - 1)
 		{
 			// Swaps last element with this
-			SMemory::Move(
+			SMemoryOps::Move(
 				GetElementAtImpl(idx),
 				GetElementAtImpl(_num - 1),
 				sizeof(ElementT)
@@ -497,7 +497,7 @@ private:
 		if(idx != _num - 1)
 		{
 			// Moves entire allocation by one index down
-			SMemory::Move(
+			SMemoryOps::Move(
 				GetElementAtImpl(idx),
 				GetElementAtImpl(idx + 1),
 				sizeof(ElementT) * (_num - idx - 1)
@@ -521,7 +521,7 @@ private:
 		if (remaining > 0)
 		{
 			// Moves entire allocation by count
-			SMemory::Move(
+			SMemoryOps::Move(
 				GetElementAtImpl(idx),
 				GetElementAtImpl(idx + count),
 				sizeof(ElementT) * remaining
@@ -536,7 +536,7 @@ private:
 		// Copy to temporary storage
 		AllocatorT tmp;
 		tmp.Allocate(num);
-		SMemory::CopyTyped(
+		SMemoryOps::CopyAs(
 			tmp.GetData(),
 			GetElementAtImpl(firstIdx),
 			sizeof(ElementT) * num
@@ -544,7 +544,7 @@ private:
 
 		// Do swap to first index
 		// * elements from second idx to first
-		SMemory::CopyTyped(
+		SMemoryOps::CopyAs(
 			GetElementAtImpl(firstIdx),
 			GetElementAtImpl(secondIdx),
 			sizeof(ElementT) * num
@@ -552,7 +552,7 @@ private:
 
 		// Do swap to second index
 		// * copied elements from first idx to second
-		SMemory::CopyTyped(
+		SMemoryOps::CopyAs(
 			GetElementAtImpl(secondIdx),
 			tmp.GetData(),
 			sizeof(ElementT) * num
@@ -577,7 +577,7 @@ private:
 		// Copy to temporary allocator
 		AllocatorT tmp;
 		tmp.Allocate(num);
-		SMemory::CopyTyped(
+		SMemoryOps::CopyAs(
 			tmp.GetData(),
 			_allocator.GetData(),
 			num
@@ -586,7 +586,7 @@ private:
 		// Move data back to main allocator
 		_allocator.Release();
 		_allocator.Allocate(num);
-		SMemory::CopyTyped(
+		SMemoryOps::CopyAs(
 			_allocator.GetData(),
 			tmp.GetData(),
 			num
@@ -640,7 +640,7 @@ private:
 
 			_num += num;
 			GrowIfNeededImpl();
-			SMemory::CopyTyped(_allocator.GetData() + oldCount, data, num);
+			SMemoryOps::CopyAs(_allocator.GetData() + oldCount, data, num);
 		}
 	}
 
@@ -653,7 +653,7 @@ private:
 			_num += num;
 			GrowIfNeededImpl();
 
-			SMemory::MoveTyped(_allocator.GetData() + oldCount, data);
+			SMemoryOps::MoveAs(_allocator.GetData() + oldCount, data);
 		}
 		else
 		{
@@ -712,7 +712,7 @@ private:
 	{
 		for(SizeType i = 0; i < num; ++i)
 		{
-			SMemory::Destruct(element);
+			SMemoryOps::Destruct(element);
 			++element;
 		}
 	}
@@ -720,7 +720,7 @@ private:
 	KOR_FORCEINLINE static bool CompareAllocatorsPrivate(const AllocatorT* lhs, const AllocatorT* rhs, SizeType size)
 	{
 		return (lhs->GetSize() >= size && rhs->GetSize() >= size) ?
-			SMemory::IsEqual(lhs->GetData(), rhs->GetData(), size) : false;
+			SMemoryOps::IsEqualAs(lhs->GetData(), rhs->GetData(), size) : false;
 	}
 
 	AllocatorT _allocator = {};
