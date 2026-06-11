@@ -6,7 +6,6 @@
 #include "Kor/Core/Build.h"
 
 #include "Kor/StringOps.h"
-#include "Kor/MemoryOps.h"
 #include "Kor/Misc.h"
 
 // TODO: Decouple assert from logging and let user provide function pointer that will be called on assert
