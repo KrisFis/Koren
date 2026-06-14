@@ -179,7 +179,6 @@ struct TContainerTypeTraits<TQueue<ElementT, AllocatorT>> : public TContainerTyp
 
 	enum
 	{
-		IsContainer = true,
 		IsDynamic = true
 	};
 };

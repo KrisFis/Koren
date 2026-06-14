@@ -192,9 +192,11 @@ struct SArchive
 	// * Takes all data and copies to provided container
 	/////////////////////////
 
-	template<typename ContainerT, typename ContainerTT = TContainerTypeTraits<ContainerT>>
-	typename TEnableIf<ContainerTT::IsContainer, bool>::Type CopyToContainer(ContainerT& outContainer)
+	template<typename ContainerT>
+	bool CopyToContainer(ContainerT& outContainer)
 	{
+		static_assert(!TIsSame<typename TContainerTypeTraits<ContainerT>::ElementType, void>::Value, "Invalid container type");
+
 		if (!AllowsRead()) return false;
 
 		const SizeType oldOffset = GetBytesOffset();

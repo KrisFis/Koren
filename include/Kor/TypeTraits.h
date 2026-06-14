@@ -6,6 +6,7 @@
 #include "Kor/Core/Build.h"
 #include "Kor/Internal/TypeTraitsConstruct.h"
 #include "Kor/Internal/TypeTraitsContainers.h"
+#include "Kor/Internal/TypeTraitsAllocators.h"
 #include "Kor/Internal/TypeTraitsCore.h"
 #include "Kor/Internal/TypeTraitsDecayHelper.h"
 #include "Kor/Internal/TypeTraitsForward.h"

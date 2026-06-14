@@ -7,6 +7,11 @@
 
 KOR_NAMESPACE_BEGIN
 
+// [Container Type Traits]
+// * Defines meta about a container type.
+// * Specialize this for each container type, setting ElementType to a non-void type.
+// * ElementType = void (default) is the sentinel meaning "not a container" — TIsContainer relies on this invariant.
+
 template<typename T>
 struct TContainerTypeTraits
 {
@@ -19,42 +24,9 @@ struct TContainerTypeTraits
 	// Flags
 	enum
 	{
-		IsContainer = false,
 		IsDynamic = false,
 		InlineMemory = false
 	};
-};
-
-// [Is Container]
-// * Checks whether specific type is container type
-
-template<typename T>
-struct TIsContainer { enum { Value = TContainerTypeTraits<T>::IsContainer }; };
-
-// [Is Dynamic Container]
-// * Checks whether specific type is container and can do dynamic allocations
-
-template<typename T>
-struct TIsDynamicContainer
-{
-private:
-	typedef TContainerTypeTraits<T> ContainerT;
-
-public:
-	enum { Value = ContainerT::IsContainer && ContainerT::IsDynamic };
-};
-
-// [Is Fixed Container]
-// * Checks whether specific type is container and cannot do dynamic allocations
-
-template<typename T>
-struct TIsFixedContainer
-{
-private:
-	typedef TContainerTypeTraits<T> ContainerT;
-
-public:
-	enum { Value = ContainerT::IsContainer && !ContainerT::IsDynamic };
 };
 
 KOR_NAMESPACE_END
