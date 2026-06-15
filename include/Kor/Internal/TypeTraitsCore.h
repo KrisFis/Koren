@@ -26,6 +26,18 @@ template<typename> struct TValue : TBoolValue<true> {};
 typedef TBoolValue<true> TTrueType;
 typedef TBoolValue<false> TFalseType;
 
+// [Is Same]
+// * Checks whether specified types are the same
+
+template<typename T, typename R> struct TIsSame { enum { Value = false }; };
+template<typename T> struct TIsSame<T, T> { enum { Value = true }; };
+
+// [Get Nth type]
+// * Gets Nth type from parameter pack
+
+template<TSize N, typename T, typename... ArgTypes> struct TGetNthType { typedef typename TGetNthType<N - 1, ArgTypes...>::Type Type; };
+template<typename T, typename... ArgTypes> struct TGetNthType<0, T, ArgTypes...> { typedef T Type; };
+
 // [Enable if]
 // * Enables compilation of specific template function/struct when condition met
 

@@ -241,7 +241,7 @@ private:
 };
 
 template<typename ElementT, typename AllocatorT>
-struct TContainerTypeTraits<TArray<ElementT, AllocatorT>> : public TContainerTypeTraits<void>
+struct TContainerTraits<TArray<ElementT, AllocatorT>> : public TContainerTraits<void>
 {
 	using ElementType = ElementType;
 	using AllocatorType = AllocatorType;

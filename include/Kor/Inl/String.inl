@@ -87,7 +87,7 @@ KOR_FORCEINLINE const typename TString<CharT>::DataType& TString<CharT>::GetData
 // -------------------------------------------------------------------------
 
 template<typename T>
-struct TContainerTypeTraits<TStringView<T>> : TContainerTypeTraits<void>
+struct TContainerTraits<TStringView<T>> : TContainerTraits<void>
 {
 	using ElementType = typename T;
 	using AllocatorType = void;
@@ -100,7 +100,7 @@ struct TContainerTypeTraits<TStringView<T>> : TContainerTypeTraits<void>
 };
 
 template<typename T>
-struct TContainerTypeTraits<TString<T>> : TContainerTypeTraits<void>
+struct TContainerTraits<TString<T>> : TContainerTraits<void>
 {
 	using ElementType = typename T;
 	using AllocatorType = typename TString<T>::DataType::AllocatorType;

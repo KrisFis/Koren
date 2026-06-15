@@ -11,7 +11,7 @@ KOR_NAMESPACE_BEGIN
 // * Defines meta about container type
 
 template<typename T>
-struct TAllocatorTypeTraits
+struct TAllocatorTraits
 {
 	// Internal element type
 	using ElementType = void;

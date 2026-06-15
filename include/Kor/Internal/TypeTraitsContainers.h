@@ -5,15 +5,17 @@
 
 #include "Kor/Core/Build.h"
 
+#include "Kor/Internal/TypeTraitsCore.h"
+
 KOR_NAMESPACE_BEGIN
 
-// [Container Type Traits]
+// [Container Traits]
 // * Defines meta about a container type.
 // * Specialize this for each container type, setting ElementType to a non-void type.
 // * ElementType = void (default) is the sentinel meaning "not a container" — TIsContainer relies on this invariant.
 
 template<typename T>
-struct TContainerTypeTraits
+struct TContainerTraits
 {
 	// Internal element type
 	using ElementType = void;

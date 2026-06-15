@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Kor/Core/Build.h"
+
 #include "Kor/Internal/TypeTraitsConstruct.h"
 #include "Kor/Internal/TypeTraitsContainers.h"
 #include "Kor/Internal/TypeTraitsAllocators.h"
@@ -59,23 +60,11 @@ public: // Value
 template<typename BaseType, typename DerivedType>
 struct TIsBaseOf : TIsDerivedFrom<DerivedType, BaseType> {};
 
-// [Is Same]
-// * Checks whether specified types are the same
-
-template<typename T, typename R> struct TIsSame { enum { Value = false }; };
-template<typename T> struct TIsSame<T, T> { enum { Value = true }; };
-
 // [Is Castable]
 // * Checks whether specific types could be casted to each other
 
 template<typename T, typename R>
 struct TIsCastable { enum { Value = TIsDerivedFrom<T, R>::Value || TIsBaseOf<T, R>::Value }; };
-
-// [Get Nth type]
-// * Gets Nth type from parameter pack
-
-template<uint32 N, typename T, typename... ArgTypes> struct TGetNthType { typedef typename TGetNthType<N - 1, ArgTypes...>::Type Type; };
-template<typename T, typename... ArgTypes> struct TGetNthType<0, T, ArgTypes...> { typedef T Type; };
 
 // [Decay]
 // * Returns the decayed type

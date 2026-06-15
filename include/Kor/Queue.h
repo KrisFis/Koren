@@ -172,7 +172,7 @@ private:
 };
 
 template<typename ElementT, typename AllocatorT>
-struct TContainerTypeTraits<TQueue<ElementT, AllocatorT>> : public TContainerTypeTraits<void>
+struct TContainerTraits<TQueue<ElementT, AllocatorT>> : public TContainerTraits<void>
 {
 	using ElementType = ElementT;
 	using AllocatorType = AllocatorT;
