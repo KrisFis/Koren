@@ -7,7 +7,7 @@
 
 KOR_NAMESPACE_BEGIN
 
-// [Allocator Type Traits]
+// [Allocator Traits]
 // * Defines meta about container type
 
 template<typename T>

@@ -1,28 +1,15 @@
-// Copyright Jan Kristian Fisera. All Rights Reserved.
+﻿// Copyright Jan Kristian Fisera. All Rights Reserved.
 // Licensed under the MIT License. See LICENSE in the repository root.
 
 #pragma once // silence tooling
 
-// Constructors, Destructor
-//#include "Kor/Inl/ArrayConstructors.inl
-
-// Assign, Compare, Dereference, Index operators
-//#include "Kor/Inl/ArrayOperators.inl
-
-// Property Getters, Validation, Get, Find Index, Find Element, Contains
-//#include "Kor/Inl/ArrayQuery.inl
-
-// Reserve / Resize / Reset, Fill / Assign
-//#include "Kor/Inl/ArrayMemory.inl
-
-// Add, Emplace, Insert, Append, Remove, Replace, Swap
-//#include "Kor/Inl/ArrayMutation.inl
-
-// Sort, Reverse
-//#include "Kor/Inl/ArraySort.inl
-
-// Iterators
-//#include "Kor/Inl/ArrayIterators.inl
+#include "Kor/Inl/ArrayConstructors.inl"
+#include "Kor/Inl/ArrayOperators.inl"
+#include "Kor/Inl/ArrayQuery.inl"
+#include "Kor/Inl/ArrayMemory.inl"
+#include "Kor/Inl/ArrayMutation.inl"
+#include "Kor/Inl/ArraySort.inl"
+#include "Kor/Inl/ArrayIterators.inl"
 
 // Container traits
 // -------------------------------------------------------------------------
