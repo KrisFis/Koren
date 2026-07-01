@@ -3,6 +3,44 @@
 
 #pragma once // silence tooling
 
+// Validation
+
+template<typename ElementT, typename AllocatorT>
+const ElementT* TArray<ElementT, AllocatorT>::GetData() const noexcept
+{
+	return _allocator.GetData();
+}
+
+template<typename ElementT, typename AllocatorT>
+ElementT* TArray<ElementT, AllocatorT>::GetData() noexcept
+{
+	return _allocator.GetData();
+}
+
+template<typename ElementT, typename AllocatorT>
+typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::GetNum() const noexcept
+{
+	return _num;
+}
+
+template<typename ElementT, typename AllocatorT>
+typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::GetReservedNum() const noexcept
+{
+	return _allocator.GetNum();
+}
+
+template<typename ElementT, typename AllocatorT>
+bool TArray<ElementT, AllocatorT>::IsEmpty() const noexcept
+{
+	return _num == 0;
+}
+
+template<typename ElementT, typename AllocatorT>
+bool TArray<ElementT, AllocatorT>::IsValidIndex(SizeType idx) const noexcept
+{
+	return idx >= 0 && idx < _num;
+}
+
 #include "Kor/Inl/ArrayConstructors.inl"
 #include "Kor/Inl/ArrayOperators.inl"
 #include "Kor/Inl/ArrayQuery.inl"

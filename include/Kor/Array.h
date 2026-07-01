@@ -278,13 +278,13 @@ public:
 
 	// Removes all elements for which `predicate(element)` returns true,
 	// preserving order. Returns the number of elements removed.
-	// Note: not marked noexcept; predicate exception behaviour is unknown.
+	// Note: not marked noexcept; predicate exception behavior is unknown.
 	template<typename Predicate>
 	SizeType RemoveByPredicate(Predicate&& predicate, bool allowShrink = true);
 
 	// Removes all elements for which `predicate(element)` returns true using
 	// swap-with-last (does not preserve order). Returns the number removed.
-	// Note: not marked noexcept; predicate exception behaviour is unknown.
+	// Note: not marked noexcept; predicate exception behavior is unknown.
 	template<typename Predicate>
 	SizeType RemoveSwapByPredicate(Predicate&& predicate, bool allowShrink = true);
 
@@ -360,14 +360,14 @@ public:
 
 	// Sorts elements using `predicate(a, b)` returning true if `a` should come
 	// before `b`.
-	// Note: not marked noexcept; predicate exception behaviour is unknown.
+	// Note: not marked noexcept; predicate exception behavior is unknown.
 	template<typename Predicate>
 	void Sort(Predicate&& predicate);
 
 	// Stable sort: preserves relative order of equivalent elements.
 	void StableSort() noexcept;
 
-	// Note: not marked noexcept; predicate exception behaviour is unknown.
+	// Note: not marked noexcept; predicate exception behavior is unknown.
 	template<typename Predicate>
 	void StableSort(Predicate&& predicate);
 
@@ -382,7 +382,7 @@ public:
 
 	// Returns the index of the first element for which `func(element)` returns
 	// true, or KOR_INDEX_NONE.
-	// Note: not marked noexcept; functor exception behaviour is unknown.
+	// Note: not marked noexcept; functor exception behavior is unknown.
 	template<typename Functor>
 	SizeType FindIndexByFunc(Functor&& func) const;
 
@@ -396,7 +396,7 @@ public:
 
 	// Returns a pointer to the first element for which `func(element)` returns
 	// true, or null if not found.
-	// Note: not marked noexcept; functor exception behaviour is unknown.
+	// Note: not marked noexcept; functor exception behavior is unknown.
 	template<typename Functor>
 	const ElementType* FindByFunc(Functor&& func) const;
 
@@ -418,7 +418,7 @@ public:
 	bool Contains(const ElementType& val) const noexcept;
 
 	// Returns true if any element satisfies `func(element)`.
-	// Note: not marked noexcept; functor exception behaviour is unknown.
+	// Note: not marked noexcept; functor exception behavior is unknown.
 	template<typename Functor>
 	bool ContainsByFunc(Functor&& func) const;
 

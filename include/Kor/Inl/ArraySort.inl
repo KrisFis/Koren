@@ -3,4 +3,29 @@
 
 #pragma once // silence tooling
 
-// Sort, Reverse
+template<typename ElementT, typename AllocatorT>
+void TArray<ElementT, AllocatorT>::Sort() noexcept
+{
+}
+
+template<typename ElementT, typename AllocatorT>
+template<typename Predicate>
+void TArray<ElementT, AllocatorT>::Sort(Predicate&& predicate)
+{
+}
+
+template<typename ElementT, typename AllocatorT>
+void TArray<ElementT, AllocatorT>::StableSort() noexcept
+{
+}
+
+template<typename ElementT, typename AllocatorT>
+template<typename Predicate>
+void TArray<ElementT, AllocatorT>::StableSort(Predicate&& predicate)
+{
+}
+
+template<typename ElementT, typename AllocatorT>
+void TArray<ElementT, AllocatorT>::Reverse() noexcept
+{
+}
