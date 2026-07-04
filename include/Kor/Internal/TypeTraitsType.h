@@ -58,4 +58,10 @@ struct THasVirtualDestructor { enum { Value = __has_virtual_destructor(T) }; };
 template<typename T, typename = void> struct THasEqualOperator { enum { Value = false };};
 template<typename T> struct THasEqualOperator<T, decltype(DeclVal<T>() == DeclVal<T>(), void())> { enum { Value = true };};
 
+// [Is Complete]
+// * Checks whether specific type is complete type
+
+template<typename T, typename = void> struct TIsComplete : TFalseValue {};
+template<typename T> struct TIsComplete<T, TVoid<decltype(sizeof(T))>> : TTrueValue {};
+
 KOR_NAMESPACE_END

@@ -4,27 +4,46 @@
 #pragma once
 
 #include "Kor/Core/Build.h"
+#include "Kor/Internal/TypeTraitsType.h"
 
 KOR_NAMESPACE_BEGIN
 
-// [Container Traits]
-// * Defines meta about a container type.
-
+// [Container Traits Base]
+// * Shared defaults for container trait specializations.
+// * ElementType/AllocatorType default to "void" as a not-a-container sentinel.
+// * Specializations of TContainerTraits should inherit from this and override as needed.
 template<typename T>
-struct TContainerTraits
+struct TContainerTraitsBase
 {
-	// Internal element type
 	using ElementType = void;
-
-	// Internal allocator type
 	using AllocatorType = void;
+	using SizeType = void;
 
-	// Flags
 	enum
 	{
 		IsDynamic = false,
 		InlineMemory = false
 	};
 };
+
+// [Container Traits]
+// * Defines meta about a container type.
+// * Is intentionally left as forward declare
+//
+// Example Declaration:
+//
+// template<>
+// struct TContainerTraits<MyContainer> : TContainerTraitsBase<MyContainer>
+// {
+//    using AllocatorType = typename MyContainer::AllocatorType;
+//    enum { IsDynamic = true }
+// }
+template<typename T>
+struct TContainerTraits;
+
+// [Is Container]
+// * Checks whether specific type is a container (defines TContainerTraits)
+template<typename T>
+struct TIsContainer : TBoolValue<TIsComplete<TContainerTraits<T>>::Value> {};
 
 KOR_NAMESPACE_END

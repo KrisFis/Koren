@@ -4,24 +4,43 @@
 #pragma once
 
 #include "Kor/Core/Build.h"
+#include "Kor/Internal/TypeTraitsType.h"
 
 KOR_NAMESPACE_BEGIN
 
-// [Allocator Traits]
-// * Defines meta about container type
+// [Allocator Traits Base]
+// * Shared defaults for allocator trait specializations.
+// * Specializations of TAllocatorTraits should inherit from this and override as needed.
 
 template<typename T>
-struct TAllocatorTraits
+struct TAllocatorTraitsBase
 {
-	// Internal element type
-	using ElementType = void;
+	using SizeType = void;
 
-	// Flags
 	enum
 	{
 		IsDynamic = false,
 		InlineMemory = false
 	};
 };
+
+// [Allocator Traits]
+// * Defines meta about an allocator type.
+// * Is intentionally left as forward declare
+//
+// Example Declaration:
+//
+// template<>
+// struct TAllocatorTraits<MyAllocator> : TAllocatorTraitsBase<MyAllocator>
+// {
+//    enum { IsDynamic = true }
+// }
+template<typename T>
+struct TAllocatorTraits;
+
+// [Is Allocator]
+// * Checks whether specific type is an allocator (defines TAllocatorTraits)
+template<typename T>
+struct TIsAllocator : TBoolValue<TIsComplete<TAllocatorTraits<T>>::Value> {};
 
 KOR_NAMESPACE_END

@@ -25,26 +25,28 @@ template<typename ElementT, typename AllocatorT>
 class TArray
 {
 public:
+	// Asserts
+	// -------------------------------------------------------------------------
+
+	static_assert(
+		!TIsSame<ElementT, void>::Value && !TIsReference<ElementT>::Value,
+		"ElementType must be a non-void, non-reference type");
+
+	static_assert(TIsAllocator<AllocatorT>::Value,
+		"AllocatorType must be a valid allocator type");
+
+	static_assert(TIsSigned<typename TAllocatorTraits<AllocatorT>::SizeType>::Value,
+		"SizeType must be a valid signed type");
+
 	// Types
 	// -------------------------------------------------------------------------
 
 	using ElementType = ElementT;
 	using AllocatorType = AllocatorT;
-	using SizeType = typename AllocatorType::SizeType;
+	using SizeType = typename TAllocatorTraits<AllocatorT>::SizeType;
 	using ILType = std::initializer_list<ElementType>;
 	using ArrayIteratorType = ElementType*;
 	using ConstArrayIteratorType = const ElementType*;
-
-	// Asserts
-	// -------------------------------------------------------------------------
-
-	static_assert(
-		!TIsSame<ElementType, void>::Value && !TIsReference<ElementType>::Value,
-		"ElementType must be a non-void, non-reference type");
-
-	static_assert(
-		!TIsSame<AllocatorType, void>::Value && TIsSigned<SizeType>::Value,
-		"AllocatorType must be a valid array allocator type with a signed SizeType");
 
 	// Constructors
 	// -------------------------------------------------------------------------

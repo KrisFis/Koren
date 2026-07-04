@@ -6,7 +6,6 @@
 #include "Kor/Core/Build.h"
 #include "Kor/Internal/TypeTraitsCore.h"
 
-////////////////////////////////////////////////////////
 // VARIADIC ITERATOR TRAIT
 // * Iterates through var args and calls method with each type
 // * Iterates from the very last var type to first var type
@@ -18,12 +17,11 @@
 // * @param... -> Values to pass to call
 // * Example usage:
 // **
-// ** DECLARE_VARIADIC_ITERATOR_RET_TRAIT(FMyVarIterator, uint32, *, MyMethod)
+// ** KOR_DECLARE_VARIADIC_ITERATOR_RET_TRAIT(FMyVarIterator, uint32, *, MyMethod)
 // **
 // ** template<typename T> uint32 MyMethod() { /* implementation dependent to T */ }
-// ** template<typename... MyArgs> void CalculateMyMethodResults() { uint32 result = EXECUTE_VARIADIC_ITERATOR_TRAIT(FMyVarIterator, MyArgs); }
-// **
-////////////////////////////////////////////////////////
+// ** template<typename... MyArgs> void CalculateMyMethodResults() { uint32 result = KOR_EXECUTE_VARIADIC_ITERATOR_TRAIT(FMyVarIterator, MyArgs); }
+// -------------------------------------------------------------------------
 
 #define KOR_EXECUTE_VARIADIC_ITERATOR_TRAIT(DeclareName, VarTypesName) DeclareName<sizeof...(VarTypesName)-1, VarTypesName...>::Execute()
 
@@ -46,15 +44,38 @@
 																																\
 	};
 
-#define KOR_DECLARE_VARIADIC_ITERATOR_TRAIT(DeclareName, InMethodName) DECLARE_VARIADIC_ITERATOR_RET_TRAIT(DeclareName, void, ;, InMethodName)
+#define KOR_DECLARE_VARIADIC_ITERATOR_TRAIT(DeclareName, InMethodName) KOR_DECLARE_VARIADIC_ITERATOR_RET_TRAIT(DeclareName, void, ;, InMethodName)
 
-////////////////////////////////////////////////////////
 // GENERATES METHOD/FIELD CHECK TRAIT
-// * TODO(kristian.fisera): MISSING COMMENT
-////////////////////////////////////////////////////////
+// * Generates a trait struct with a static constexpr bool "Value"
+// * "Value" is true if the given expression is well-formed for CheckType, false otherwise
+// * Detection uses the TVoid (void_t) SFINAE idiom: the specialization only matches
+//   when the tested expression compiles, falling back to the primary (false) template otherwise
+// * CheckType is decayed via TPure<CheckType>::Type before testing, so cv/ref-qualified
+//   types are handled consistently
+// * @param1 -> Name of the generated trait
+// * @param2 -> Expression to test for validity (see per-macro notes below)
+// *
+// * KOR_GENERATE_HAS_GLOBAL_METHOD_TRAIT(DeclareName, MethodCall)
+// ** Tests whether a free/global function call expression is well-formed
+// ** "TestType" may be referenced inside MethodCall
+// ** Example: KOR_GENERATE_HAS_GLOBAL_METHOD_TRAIT(FHasToString, ToString<TestType>)
+// **          FHasToString<FMyType>::Value
+// *
+// * KOR_GENERATE_HAS_METHOD_TRAIT(DeclareName, MethodCall)
+// ** Tests whether TestType has a member method matching MethodCall
+// ** MethodCall is appended to DeclVal<TestType>(), e.g. pass "Foo()" to test TestType::Foo()
+// ** Example: KOR_GENERATE_HAS_METHOD_TRAIT(FHasIsSharedInitialized, IsSharedInitialized())
+// **          FHasIsSharedInitialized<FMyType>::Value
+// *
+// * KOR_GENERATE_HAS_FIELD_TRAIT(DeclareName, FieldName)
+// ** Tests whether TestType has a member field/member named FieldName
+// ** Example: KOR_GENERATE_HAS_FIELD_TRAIT(FHasCount, Count)
+// **          FHasCount<FMyType>::Value
+// -------------------------------------------------------------------------
 
 // In "MethodCall" parameter "TestType" can be used
-#define KOR_GENERATE_HAS_GLOBAL_METHOD_TRAIT(DeclareName, MethodCall)																\
+#define KOR_GENERATE_HAS_GLOBAL_METHOD_TRAIT(DeclareName, MethodCall)															\
 	template <typename CheckType>																								\
 	struct DeclareName																											\
 	{																															\
@@ -62,11 +83,8 @@
 																																\
 		typedef typename TPure<CheckType>::Type PureType;																		\
 																																\
-		template<typename TestType> static auto TestHasMethod(int32)->TValue<decltype(MethodCall())>;							\
-																																\
-		template<typename> static auto TestHasMethod(int64)->TBoolValue<false>;													\
-																																\
-		template<class TestType> struct FGetTestValue : decltype(TestHasMethod<TestType>(0)){};									\
+		template<class TestType, typename = void> struct FGetTestValue : TFalseValue {};										\
+		template<class TestType> struct FGetTestValue<TestType, TVoid<decltype(MethodCall())>> : TTrueValue {};					\
 																																\
 	public:																														\
 																																\
@@ -75,40 +93,34 @@
 
 // In "MethodCall" parameter "TestType" can be used
 #define KOR_GENERATE_HAS_METHOD_TRAIT(DeclareName, MethodCall)																		\
-	template <typename CheckType>																								\
-	struct DeclareName																											\
-	{																															\
-	private:																													\
-																																\
-		typedef typename TPure<CheckType>::Type PureType;																		\
-																																\
-		template<typename TestType> static auto TestHasMethod(int32)->TValue<decltype(DeclVal<TestType>().MethodCall)>;			\
-																																\
-		template<typename> static auto TestHasMethod(int64)->TBoolValue<false>;													\
-																																\
-		template<class TestType> struct FGetTestValue : decltype(TestHasMethod<TestType>(0)){};									\
-																																\
-	public:																														\
-																																\
-		static constexpr bool Value = FGetTestValue<PureType>::Value;															\
+	template <typename CheckType>																									\
+	struct DeclareName																												\
+	{																																\
+	private:																														\
+																																	\
+		typedef typename TPure<CheckType>::Type PureType;																			\
+																																	\
+		template<class TestType, typename = void> struct FGetTestValue : TFalseValue {};											\
+		template<class TestType> struct FGetTestValue<TestType, TVoid<decltype(DeclVal<TestType>().MethodCall)>> : TTrueValue {};	\
+																																	\
+	public:																															\
+																																	\
+		static constexpr bool Value = FGetTestValue<PureType>::Value;																\
 	};
 
 #define KOR_GENERATE_HAS_FIELD_TRAIT(DeclareName, FieldName)																		\
-	template <typename CheckType>																								\
-	struct DeclareName																											\
-	{																															\
-	private:																													\
-																																\
-		typedef typename TPure<CheckType>::Type PureType;																		\
-																																\
-		template<typename TestType> static auto TestHasField(int32)->TValue<decltype(&TestType::FieldName)>;					\
-																																\
-		template<typename> static auto TestHasField(int64)->TBoolValue<false>;													\
-																																\
-		template<class TestType> struct FGetTestValue : decltype(TestHasField<TestType>(0)){};									\
-																																\
-	public:																														\
-																																\
-		static constexpr bool Value = FGetTestValue<PureType>::Value;															\
+	template <typename CheckType>																									\
+	struct DeclareName																												\
+	{																																\
+	private:																														\
+																																	\
+		typedef typename TPure<CheckType>::Type PureType;																			\
+																																	\
+		template<class TestType, typename = void> struct FGetTestValue : TFalseValue {};											\
+		template<class TestType> struct FGetTestValue<TestType, TVoid<decltype(&TestType::FieldName)>> : TTrueValue {};				\
+																																	\
+	public:																															\
+																																	\
+		static constexpr bool Value = FGetTestValue<PureType>::Value;																\
 	};
 	

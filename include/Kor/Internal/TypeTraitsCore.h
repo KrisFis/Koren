@@ -13,56 +13,62 @@ KOR_NAMESPACE_BEGIN
 typedef decltype(sizeof(0)) TSize;
 
 // [[ TVoid ]]
-// * Gets any param and returns void type
+// * Void type
 
-template <typename... ArgsT> struct TVoid { using Type = void; };
+template<typename...>
+using TVoid = void;
+
+// [Type]
+// * Defines "Type" as provided type
+
+template<typename T> struct TType { using Type = T; };
 
 // [Bool Value]
-// * False and true value
+// * Defines "Value" from provided const bool
 
 template<bool T> struct TBoolValue { static constexpr bool Value = T; };
 template<typename> struct TValue : TBoolValue<true> {};
 
-typedef TBoolValue<true> TTrueType;
-typedef TBoolValue<false> TFalseType;
+typedef TBoolValue<true> TTrueValue;
+typedef TBoolValue<false> TFalseValue;
 
 // [Is Same]
 // * Checks whether specified types are the same
 
-template<typename T, typename R> struct TIsSame { enum { Value = false }; };
-template<typename T> struct TIsSame<T, T> { enum { Value = true }; };
+template<typename T, typename R> struct TIsSame : TFalseValue {};
+template<typename T> struct TIsSame<T, T> : TTrueValue {};
 
 // [Get Nth type]
 // * Gets Nth type from parameter pack
 
-template<TSize N, typename T, typename... ArgTypes> struct TGetNthType { typedef typename TGetNthType<N - 1, ArgTypes...>::Type Type; };
-template<typename T, typename... ArgTypes> struct TGetNthType<0, T, ArgTypes...> { typedef T Type; };
+template<TSize N, typename T, typename... ArgTypes> struct TGetNthType : TType<typename TGetNthType<N - 1, ArgTypes...>::Type> {};
+template<typename T, typename... ArgTypes> struct TGetNthType<0, T, ArgTypes...> : TType<T> {};
 
 // [Enable if]
 // * Enables compilation of specific template function/struct when condition met
 
 template<bool T, typename R = void> struct TEnableIf;
-template<typename R> struct TEnableIf<true, R> { typedef R Type; };
+template<typename R> struct TEnableIf<true, R> : TType<R> {};
 template<typename R> struct TEnableIf<false, R> {};
 
 // [Is Reference]
 // * Checks whether provided type is reference
 
-template<typename T> struct TIsReference { enum { Value = false }; };
-template<typename T> struct TIsReference<T&> { enum { Value = true }; };
-template<typename T> struct TIsReference<T&&> { enum { Value = true }; };
+template<typename T> struct TIsReference : TFalseValue {};
+template<typename T> struct TIsReference<T&> : TTrueValue {};
+template<typename T> struct TIsReference<T&&> : TTrueValue {};
 
 // [Is LValue]
 // * Checks whether provided type is lvalue reference
 
-template<typename T> struct TIsLValue { enum { Value = false }; };
-template<typename T> struct TIsLValue<T&> { enum { Value = true }; };
+template<typename T> struct TIsLValue : TFalseValue {};
+template<typename T> struct TIsLValue<T&> : TTrueValue {};
 
 // [Is RValue]
 // * Checks whether provided type is rvalue reference
 
-template<typename T> struct TIsRValue { enum { Value = false }; };
-template<typename T> struct TIsRValue<T&&> { enum { Value = true }; };
+template<typename T> struct TIsRValue : TFalseValue {};
+template<typename T> struct TIsRValue<T&&> : TTrueValue {};
 
 // [Remove reference]
 // * Removes reference from type
@@ -74,10 +80,10 @@ template <typename T> struct TRemoveReference<T&&> { typedef T Type; };
 // [Is Const]
 // * Checks whether provided type is const, volatile or both
 
-template<typename T> struct TIsConst { enum { Value = false }; };
-template<typename T> struct TIsConst<const T> { enum { Value = true }; };
-template<typename T> struct TIsConst<volatile T> { enum { Value = true }; };
-template<typename T> struct TIsConst<const volatile T> { enum { Value = true }; };
+template<typename T> struct TIsConst : TFalseValue {};
+template<typename T> struct TIsConst<const T> : TTrueValue {};
+template<typename T> struct TIsConst<volatile T> : TTrueValue {};
+template<typename T> struct TIsConst<const volatile T> : TTrueValue {};
 
 // [Remove Const]
 // * Removes "const" and "volatile" from type
@@ -91,24 +97,21 @@ template<typename T> struct TRemoveConst<const volatile T> { typedef T Type; };
 // * Removes const and reference from specific type
 
 template<typename T>
-struct TRemoveConstReference
-{
-	typedef typename TRemoveConst<typename TRemoveReference<T>::Type>::Type Type;
-};
+struct TRemoveConstReference : TType<typename TRemoveConst<typename TRemoveReference<T>::Type>::Type> {};
 
 // [Remove Extent]
 // * Removes extent '[]' from the type
 
-template<typename T> struct TRemoveExtent { typedef T Type; };
-template<typename T, TSize N> struct TRemoveExtent<T[N]> { typedef T Type; };
+template<typename T> struct TRemoveExtent : TType<T> {};
+template<typename T, TSize N> struct TRemoveExtent<T[N]> : TType<T> {};
 template<typename T> struct TRemoveExtent<T[]> { typedef T Type; };
 
 // [Is Pointer]
 // * Checks whether provided type is pointer
 
-template <typename T> struct TIsPointer { enum { Value = false }; };
-template <typename T> struct TIsPointer<T*> { enum { Value = true }; };
-template <typename T> struct TIsPointer<const T*> { enum { Value = true }; };
+template <typename T> struct TIsPointer : TFalseValue {};
+template <typename T> struct TIsPointer<T*> : TTrueValue {};
+template <typename T> struct TIsPointer<const T*> : TTrueValue {};
 
 // [Remove Pointer]
 // * Removes pointer from provided type
@@ -120,57 +123,57 @@ template<typename T> struct TRemovePointer<const T*> { typedef T Type; };
 // [Is Array]
 // * Checks whether specific type is array
 
-template<typename T> struct TIsArray { enum { Value = false }; };
-template<typename T> struct TIsArray<T[]> { enum { Value = true }; };
-template<typename T, uint32 N> struct TIsArray<T[N]> { enum { Value = true }; };
+template<typename T> struct TIsArray : TFalseValue {};
+template<typename T> struct TIsArray<T[]> : TTrueValue {};
+template<typename T, uint32 N> struct TIsArray<T[N]> : TTrueValue {};
 
 // [Is Function]
 // * Checks whether specific type is function
 
-template<typename T> struct TIsFunction { enum { Value = false }; };
-template <typename RetType, typename... Params> struct TIsFunction<RetType(Params...)> { enum { Value = true }; };
+template<typename T> struct TIsFunction : TFalseValue {};
+template <typename RetType, typename... Params> struct TIsFunction<RetType(Params...)> : TTrueValue {};
 
 // [Is Bool]
 // * Checks whether specific type is bool type
 
-template<typename T> struct TIsBool { enum { Value = false }; };
-template<> struct TIsBool<bool> { enum { Value = true }; };
+template<typename T> struct TIsBool : TFalseValue {};
+template<> struct TIsBool<bool> : TTrueValue {};
 
 // [Is Floating]
 // * Checks whether specific type is floating type
 // * Floating types are: float, double
 
-template<typename T> struct TIsFloating { enum { Value = false }; };
-template<> struct TIsFloating<float> { enum { Value = true }; };
-template<> struct TIsFloating<double> { enum { Value = true }; };
-template<> struct TIsFloating<long double> { enum { Value = true }; };
+template<typename T> struct TIsFloating : TFalseValue {};
+template<> struct TIsFloating<float> : TTrueValue {};
+template<> struct TIsFloating<double> : TTrueValue {};
+template<> struct TIsFloating<long double> : TTrueValue {};
 
 // [Is Character]
 // * Checks whether specific type is character type
 // * Character types are: char, wchar
 
-template<typename T> struct TIsCharacter { enum { Value = false }; };
-template<> struct TIsCharacter<achar> { enum { Value = true }; };
+template<typename T> struct TIsCharacter : TFalseValue {};
+template<> struct TIsCharacter<achar> : TTrueValue {};
 #if KOR_CHAR8_NATIVE
-template<> struct TIsCharacter<char8> { enum { Value = true }; };
+template<> struct TIsCharacter<char8> : TTrueValue {};
 #endif
-template<> struct TIsCharacter<wchar> { enum { Value = true }; };
-template<> struct TIsCharacter<char16> { enum { Value = true }; };
-template<> struct TIsCharacter<char32> { enum { Value = true }; };
+template<> struct TIsCharacter<wchar> : TTrueValue {};
+template<> struct TIsCharacter<char16> : TTrueValue {};
+template<> struct TIsCharacter<char32> : TTrueValue {};
 
 // [Is Integer]
 // * Checks whether specific type is integer type
 // * Integer types are: int8, int16, int32, int64, uint8, uint16, uint32, uint64
 
-template<typename T> struct TIsIntegral { enum { Value = false }; };
-template<> struct TIsIntegral<int8> { enum { Value = true }; };
-template<> struct TIsIntegral<int16> { enum { Value = true }; };
-template<> struct TIsIntegral<int32> { enum { Value = true }; };
-template<> struct TIsIntegral<int64> { enum { Value = true }; };
-template<> struct TIsIntegral<uint8> { enum { Value = true }; };
-template<> struct TIsIntegral<uint16> { enum { Value = true }; };
-template<> struct TIsIntegral<uint32> { enum { Value = true }; };
-template<> struct TIsIntegral<uint64> { enum { Value = true }; };
+template<typename T> struct TIsIntegral : TFalseValue {};
+template<> struct TIsIntegral<int8> : TTrueValue {};
+template<> struct TIsIntegral<int16> : TTrueValue {};
+template<> struct TIsIntegral<int32> : TTrueValue {};
+template<> struct TIsIntegral<int64> : TTrueValue {};
+template<> struct TIsIntegral<uint8> : TTrueValue {};
+template<> struct TIsIntegral<uint16> : TTrueValue {};
+template<> struct TIsIntegral<uint32> : TTrueValue {};
+template<> struct TIsIntegral<uint64> : TTrueValue {};
 
 // [Is Arithmetic]
 // * Checks whether specific type is arithmetic

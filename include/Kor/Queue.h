@@ -172,14 +172,17 @@ private:
 };
 
 template<typename ElementT, typename AllocatorT>
-struct TContainerTraits<TQueue<ElementT, AllocatorT>> : public TContainerTraits<void>
+struct TContainerTraits<TQueue<ElementT, AllocatorT>>
+	: TContainerTraitsBase<TQueue<ElementT, AllocatorT>>
 {
 	using ElementType = ElementT;
 	using AllocatorType = AllocatorT;
+	using SizeType = TAllocatorTraits<AllocatorT>::SizeType;
 
 	enum
 	{
-		IsDynamic = true
+		IsDynamic = TAllocatorTraits<AllocatorT>::IsDynamic,
+		InlineMemory = TAllocatorTraits<AllocatorT>::InlineMemory,
 	};
 };
 

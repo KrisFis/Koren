@@ -7,39 +7,20 @@
 
 namespace KOR_NAMESPACE Internal
 {
-	// Checks whether WeakThis field exists
-	// * Thats indicator of SharedClass
 	template<typename T>
 	struct TIsSharedClassType
 	{
-
-	private: // Typedefs
-
-		typedef typename TDecay<T>::Type PureType;
-
-	private: // WeakThis test
-
-		template<typename TestType> static auto TestHasSharedInit(int32)->TValue<decltype(DeclVal<TestType>().IsSharedInitialized())>;
-		template<typename TestType>	static auto TestHasSharedInit(int64)->TBoolValue<false>;
-
-		template<typename TestType> struct FGetHasSharedInitTest : decltype(TestHasSharedInit<TestType>(0)) {};
-
-	private: // Private init method
-
-		template<typename TestType> static auto TestHasAsShared(int32)->TValue<decltype(DeclVal<TestType>().AsShared())>;
-		template<typename TestType>	static auto TestHasAsShared(int64)->TBoolValue<false>;
-
-		template<typename TestType> struct FGetHasAsSharedTest : decltype(TestHasAsShared<TestType>(0)) {};
+	private:
+		KOR_GENERATE_HAS_METHOD_TRAIT(FGetHasSharedInitTest, IsSharedInitialized())
+		KOR_GENERATE_HAS_METHOD_TRAIT(FGetHasAsSharedTest, AsShared())
 
 	public:
-
 		enum
 		{
-			HasSharedInit = FGetHasSharedInitTest<PureType>::Value,
-			HasAsShared = FGetHasAsSharedTest<PureType>::Value,
+			HasSharedInit = FGetHasSharedInitTest<T>::Value,
+			HasAsShared = FGetHasAsSharedTest<T>::Value,
 
 			Value = HasSharedInit && HasAsShared
 		};
-
 	};
 }

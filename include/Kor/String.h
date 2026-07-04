@@ -39,7 +39,7 @@ public:
 
 	// TODO: Replace with TArrayView once implemented
 	using DataType = const CharT*;
-	using SizeType = TArray<CharT, TArrayAllocator<CharT>>::SizeType;
+	using SizeType = int32;
 
 	using IteratorType = const CharType*;
 	using ConstIteratorType = const CharType*;
@@ -235,9 +235,9 @@ class TString
 
 public:
 	using CharType = CharT;
-	using DataType = TArray<CharT, TArrayAllocator<CharT>>;
+	using DataType = TArray<CharT>;
 
-	using SizeType = typename DataType::SizeType;
+	using SizeType = typename TContainerTraits<DataType>::SizeType;
 
 	using IteratorType = CharType*;
 	using ConstIteratorType = const CharType*;
@@ -565,14 +565,14 @@ private:
 // [ Is TString ]
 // Checks if type is TString type
 
-template<typename T> struct TIsTString : TFalseType {};
-template<typename CharT> struct TIsTString<TString<CharT>> : TTrueType {};
+template<typename T> struct TIsTString : TFalseValue {};
+template<typename CharT> struct TIsTString<TString<CharT>> : TTrueValue {};
 
 // [ Is TString View ]
 // Checks if type is TStringView type
 
-template<typename T> struct TIsTStringView : TFalseType {};
-template<typename CharT> struct TIsTStringView<TStringView<CharT>> : TTrueType {};
+template<typename T> struct TIsTStringView : TFalseValue {};
+template<typename CharT> struct TIsTStringView<TStringView<CharT>> : TTrueValue {};
 
 #include "Kor/Inl/String.inl"
 

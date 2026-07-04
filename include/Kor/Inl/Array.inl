@@ -53,14 +53,16 @@ bool TArray<ElementT, AllocatorT>::IsValidIndex(SizeType idx) const noexcept
 // -------------------------------------------------------------------------
 
 template<typename ElementT, typename AllocatorT>
-struct TContainerTraits<TArray<ElementT, AllocatorT> > : TContainerTraits<void>
+struct TContainerTraits<TArray<ElementT, AllocatorT> >
+	: TContainerTraitsBase<TArray<ElementT, AllocatorT>>
 {
-	using ElementType = ElementType;
-	using AllocatorType = AllocatorType;
+	using ElementType = ElementT;
+	using AllocatorType = AllocatorT;
+	using SizeType = TAllocatorTraits<AllocatorT>::SizeType;
 
 	enum
 	{
-		IsDynamic = true,
-		InlineMemory = TIsSame<AllocatorType, TArrayAllocator<ElementType> >::Value
+		IsDynamic = TAllocatorTraits<AllocatorT>::IsDynamic,
+		InlineMemory = TAllocatorTraits<AllocatorT>::InlineMemory
 	};
 };
