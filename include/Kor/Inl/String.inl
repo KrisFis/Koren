@@ -93,12 +93,6 @@ struct TContainerTraits<TStringView<T>>
 	using ElementType = typename T;
 	using AllocatorType = void;
 	using SizeType = int32;
-
-	enum
-	{
-		IsDynamic = false,
-		InlineMemory = true
-	};
 };
 
 template<typename T>
@@ -106,14 +100,8 @@ struct TContainerTraits<TString<T>>
 	: TContainerTraitsBase<TString<T>>
 {
 	using ElementType = typename T;
-	using AllocatorType = typename TString<T>::DataType::AllocatorType;
-	using SizeType = TAllocatorTraits<AllocatorType>::SizeType;
-
-	enum
-	{
-		IsDynamic = TAllocatorTraits<AllocatorType>::IsDynamic,
-		InlineMemory = TAllocatorTraits<AllocatorType>::InlineMemory,
-	};
+	using AllocatorType = typename TContainerTraits<TString<T>::DataType>::AllocatorType;
+	using SizeType = TContainerTraits<TString<T>::DataType>::SizeType;
 };
 
 // Archive operator<< && operator>>

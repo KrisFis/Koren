@@ -195,7 +195,7 @@ struct SArchive
 	template<typename ContainerT>
 	bool CopyToContainer(ContainerT& outContainer)
 	{
-		static_assert(!TIsSame<typename TContainerTypeTraits<ContainerT>::ElementType, void>::Value, "Invalid container type");
+		static_assert(TIsContainer<ContainerT>::Value, "Invalid container type");
 
 		if (!AllowsRead()) return false;
 
@@ -279,10 +279,10 @@ KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, SArchive& otherA
 	return ar;
 }
 
-template<typename ContainerT, typename ContainerTT = TContainerTypeTraits<ContainerT>>
-inline static typename TEnableIf<ContainerTT::IsContainer, SArchive&>::Type operator<<(SArchive& ar, const ContainerT& container)
+template<typename ContainerT>
+inline static typename TEnableIf<TIsContainer<ContainerT>::Value, SArchive&>::Type operator<<(SArchive& ar, const ContainerT& container)
 {
-	if constexpr (ContainerTT::InlineMemory)
+	if constexpr (TContainerTypeTraits<ContainerT>::InlineMemory)
 	{
 		ar.Write(container.Begin(), container.GetNum());
 	}
@@ -297,8 +297,8 @@ inline static typename TEnableIf<ContainerTT::IsContainer, SArchive&>::Type oper
 	return ar;
 }
 
-template<typename ContainerT, typename ContainerTT = TContainerTypeTraits<ContainerT>>
-inline static typename TEnableIf<ContainerTT::IsContainer, SArchive&>::Type operator>>(SArchive& ar, ContainerT& container)
+template<typename ContainerT>
+inline static typename TEnableIf<TIsContainer<ContainerT>::Value, SArchive&>::Type operator>>(SArchive& ar, ContainerT& container)
 {
 	container.Resize(ar.GetRemainingOffset<typename ContainerTT::ElementType>());
 

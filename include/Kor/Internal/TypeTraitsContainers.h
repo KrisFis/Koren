@@ -4,26 +4,20 @@
 #pragma once
 
 #include "Kor/Core/Build.h"
-#include "Kor/Internal/TypeTraitsType.h"
+#include "Kor/Internal/TypeTraitsAllocators.h"
 
 KOR_NAMESPACE_BEGIN
 
 // [Container Traits Base]
 // * Shared defaults for container trait specializations.
-// * ElementType/AllocatorType default to "void" as a not-a-container sentinel.
 // * Specializations of TContainerTraits should inherit from this and override as needed.
+
 template<typename T>
 struct TContainerTraitsBase
 {
 	using ElementType = void;
 	using AllocatorType = void;
 	using SizeType = void;
-
-	enum
-	{
-		IsDynamic = false,
-		InlineMemory = false
-	};
 };
 
 // [Container Traits]

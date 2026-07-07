@@ -178,12 +178,6 @@ struct TContainerTraits<TQueue<ElementT, AllocatorT>>
 	using ElementType = ElementT;
 	using AllocatorType = AllocatorT;
 	using SizeType = TAllocatorTraits<AllocatorT>::SizeType;
-
-	enum
-	{
-		IsDynamic = TAllocatorTraits<AllocatorT>::IsDynamic,
-		InlineMemory = TAllocatorTraits<AllocatorT>::InlineMemory,
-	};
 };
 
 KOR_NAMESPACE_END
