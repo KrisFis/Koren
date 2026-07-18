@@ -13,12 +13,7 @@ KOR_NAMESPACE_BEGIN
 class CAllocator
 {
 public:
-	// Types
-	// -------------------------------------------------------------------------
 	using SizeType = int64;
-
-	// Model interface
-	// -------------------------------------------------------------------------
 
 	// Allocates a raw, untyped memory block.
 	// @param bytes - Number of bytes to allocate.
@@ -55,14 +50,9 @@ class TTypedAllocator
 	static_assert(TIsAllocator<AllocatorT>::Value, "AllocatorT must be allocator type");
 	static_assert(TIsPure<ElementT>::Value, "ElementT must be pure type");
 public:
-	// Types
-	// -------------------------------------------------------------------------
 	using AllocatorType = AllocatorT;
 	using ElementType = ElementT;
 	using SizeType = typename TAllocatorTraits<AllocatorT>::SizeType;
-
-	// Operators
-	// -------------------------------------------------------------------------
 
 	// Provides direct member access to the underlying untyped allocator.
 	AllocatorType* operator->() noexcept;
@@ -71,9 +61,6 @@ public:
 	// Dereferences to the underlying untyped allocator.
 	AllocatorType* operator*() noexcept;
 	const AllocatorType* operator*() const noexcept;
-
-	// Properties
-	// -------------------------------------------------------------------------
 
 	// Returns the underlying untyped allocator.
 	AllocatorType& Get() noexcept;
