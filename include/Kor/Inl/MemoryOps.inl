@@ -147,10 +147,14 @@ KOR_INLINE void* SMemoryOps::Realloc(void* ptr, uint64 size, uint64 alignment) n
 	KOR_ASSERT_DEBUG(SMath::IsPowerOfTwo(alignment));
 
 	if (alignment <= KOR_DEFAULT_HEAP_ALIGNMENT)
+	{
 		return SPlatformMemoryOps::Realloc(ptr, size);
+	}
 
 	if (!ptr)
+	{
 		return Malloc(size, alignment);
+	}
 
 	const SAlignHeader oldHeader = *SAlignHeader::Get(ptr);
 	const int64 oldOffset = KOR_PTR_DIFF(int64, ptr, oldHeader.RawPointer);

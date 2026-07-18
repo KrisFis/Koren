@@ -29,11 +29,13 @@ KOR_FORCEINLINE const AllocatorT* TTypedAllocator<AllocatorT, ElementT>::operato
 
 KOR_FORCEINLINE void* CAllocator::Allocate(SizeType bytes, SizeType alignment) noexcept
 {
+	KOR_ASSERT_DEBUG(bytes > 0);
 	return SMemoryOps::Malloc(bytes, alignment);
 }
 
 KOR_FORCEINLINE void* CAllocator::Reallocate(void* ptr, SizeType bytes, SizeType alignment) noexcept
 {
+	KOR_ASSERT_DEBUG(bytes > 0);
 	return SMemoryOps::Realloc(ptr, bytes, alignment);
 }
 
