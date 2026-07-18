@@ -8,6 +8,8 @@
 
 KOR_NAMESPACE_BEGIN
 
+// See Allocator.h for model concept
+
 // [Allocator Traits Base]
 // * Shared defaults for allocator trait specializations.
 // * Specializations of TAllocatorTraits should inherit from this and override as needed.
