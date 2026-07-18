@@ -37,6 +37,9 @@ struct SUnixTypes
 	typedef char8_t Char8;
 	typedef char16_t Char16;
 	typedef char32_t Char32;
+
+	typedef intptr_t IntPtr;
+	typedef uintptr_t UIntPtr;
 };
 
 KOR_NAMESPACE_END

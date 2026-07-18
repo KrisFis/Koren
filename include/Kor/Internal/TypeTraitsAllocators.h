@@ -16,12 +16,6 @@ template<typename T>
 struct TAllocatorTraitsBase
 {
 	using SizeType = void;
-
-	enum
-	{
-		IsDynamic = false,
-		InlineMemory = false
-	};
 };
 
 // [Allocator Traits]
@@ -33,7 +27,7 @@ struct TAllocatorTraitsBase
 // template<>
 // struct TAllocatorTraits<MyAllocator> : TAllocatorTraitsBase<MyAllocator>
 // {
-//    enum { IsDynamic = true }
+//    using SizeType = MyAllocator::SizeType;
 // }
 template<typename T>
 struct TAllocatorTraits;

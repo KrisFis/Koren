@@ -33,7 +33,7 @@
 
 #include KOR_COMPILER_HEADER_FROM(Kor/Core, Compiler)
 
-// Type macros
+// Other macros
 ///////////////////////////////////////////////////////////////
 
 #if KOR_BUILD_DEBUG

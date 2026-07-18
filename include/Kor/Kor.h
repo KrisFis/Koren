@@ -23,7 +23,7 @@
 #include "Kor/Queue.h"
 
 // ALLOCATORS
-#include "Kor/ArrayAllocator.h"
+#include "Kor/Allocator.h"
 #include "Kor/FixedArrayAllocator.h"
 #include "Kor/QueueAllocator.h"
 

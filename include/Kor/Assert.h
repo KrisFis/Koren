@@ -49,7 +49,7 @@
 		KOR_FORCEINLINE static void Crash() noexcept
 		{
 			*((uint8*)0) = 0;
-			KOR_UNREACHABLE_CODE();
+			KOR_UNREACHABLE();
 		}
 
 		KOR_OPTIMIZATIONS_RESET();

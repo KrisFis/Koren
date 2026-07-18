@@ -23,3 +23,6 @@
 // TYPE MANIPULATION/GENERATION/SFINAE
 #include "Kor/TypeTraits.h"
 #include "Kor/TypeTraitsMacros.h"
+
+// Assert
+#include "Kor/Assert.h"

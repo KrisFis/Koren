@@ -7,7 +7,7 @@
 #include "Kor/Math.h"
 #include "Kor/MemoryOps.h"
 
-#include "Kor/ArrayAllocator.h"
+#include "Kor/Allocator.h"
 
 KOR_NAMESPACE_BEGIN
 

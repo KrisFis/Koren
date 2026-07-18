@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
+#include "Kor/Math.h"
 #include KOR_PLATFORM_HEADER_FROM(Kor/Core, Memory)
 
 #include <new>
@@ -41,45 +42,58 @@ struct SMemoryOps
 {
 	// Free
 	// Releases a previously allocated block.
+	// * `alignment` must match the value passed to the corresponding Malloc/Calloc/Realloc call.
 	// -------------------------------------------------------------------------
 
 	static void Free(void* ptr) noexcept;
+	static void Free(void* ptr, uint64 alignment) noexcept;
 
 	// Malloc / MallocAs
 	// Allocates uninitialized memory. MallocAs takes an element count; Malloc takes a byte size.
+	// * Once allocated with a given `alignment`, all subsequent calls on that
+	//   block (Free/Realloc) must be passed the SAME alignment.
 	// -------------------------------------------------------------------------
 
-	static void* Malloc(int64 size) noexcept;
-	template<typename T> static T* MallocAs(int64 num = 1) noexcept;
+	static void* Malloc(uint64 size) noexcept;
+	static void* Malloc(uint64 size, uint64 alignment) noexcept;
+	template<typename T> static T* MallocAs(uint64 num = 1) noexcept;
+	template<typename T> static T* MallocAs(uint64 num, uint64 alignment) noexcept;
 
 	// Calloc / CallocAs
 	// Allocates zero-initialized memory. CallocAs takes an element count; Calloc takes a byte size.
+	// * Once allocated with a given `alignment`, all subsequent calls on that
+	//   block (Free/Realloc) must be passed the SAME alignment.
 	// -------------------------------------------------------------------------
 
-	static void* Calloc(int64 size) noexcept;
-	template<typename T> static T* CallocAs(int64 num = 1) noexcept;
+	static void* Calloc(uint64 size) noexcept;
+	static void* Calloc(uint64 size, uint64 alignment) noexcept;
+	template<typename T> static T* CallocAs(uint64 num = 1) noexcept;
+	template<typename T> static T* CallocAs(uint64 num, uint64 alignment) noexcept;
 
 	// Realloc / ReallocAs
 	// Resizes a previously allocated block. ReallocAs takes an element count; Realloc takes a byte size.
+	// * `alignment` must match the value originally used to allocate `ptr`.
 	// -------------------------------------------------------------------------
 
-	static void* Realloc(void* ptr, int64 size) noexcept;
-	template<typename T> static T* ReallocAs(T* ptr, int64 num = 1) noexcept;
+	static void* Realloc(void* ptr, uint64 size) noexcept;
+	static void* Realloc(void* ptr, uint64 size, uint64 alignment) noexcept;
+	template<typename T> static T* ReallocAs(T* ptr, uint64 num = 1) noexcept;
+	template<typename T> static T* ReallocAs(T* ptr, uint64 num, uint64 alignment) noexcept;
 
 	// Copy / CopyAs
 	// Copies elements from src to dest. CopyAs invokes copy construction for non-bitwise-copyable types.
 	// * Ranges must not overlap; use Move/MoveAs for overlapping regions
 	// -------------------------------------------------------------------------
 
-	static void* Copy(void* dest, const void* src, int64 size) noexcept;
-	template<typename T> static void CopyAs(T* to, const T* from, int64 num = 1) noexcept;
+	static void* Copy(void* dest, const void* src, uint64 size) noexcept;
+	template<typename T> static void CopyAs(T* to, const T* from, uint64 num = 1) noexcept;
 
 	// Move / MoveAs
 	// Moves a single element from src to dest. MoveAs invokes move construction for non-bitwise-movable types.
 	// * MoveAs operates on a single element; use CopyAs for ranges
 	// -------------------------------------------------------------------------
 
-	static void* Move(void* dest, const void* src, int64 size) noexcept;
+	static void* Move(void* dest, const void* src, uint64 size) noexcept;
 	template<typename T> static void MoveAs(T* to, T* from) noexcept;
 
 	// Fill / FillAs
@@ -87,31 +101,31 @@ struct SMemoryOps
 	// * Fill sets each byte to val (same semantics as memset)
 	// -------------------------------------------------------------------------
 
-	static void* Fill(void* dest, int32 val, int64 size) noexcept;
-	template<typename T> static void FillAs(const T* dst, T val, int64 num = 1) noexcept;
+	static void* Fill(void* dest, int32 val, uint64 size) noexcept;
+	template<typename T> static void FillAs(const T* dst, T val, uint64 num = 1) noexcept;
 
 	// Zero / ZeroAs
 	// Zeroes memory. ZeroAs invokes default construction for non-bitwise-copyable types.
 	// -------------------------------------------------------------------------
 
-	static void* Zero(void* dest, int64 size) noexcept;
-	template<typename T> static void ZeroAs(const T* dst, int64 num = 1) noexcept;
+	static void* Zero(void* dest, uint64 size) noexcept;
+	template<typename T> static void ZeroAs(const T* dst, uint64 num = 1) noexcept;
 
 	// Compare / CompareAs
 	// Compares two memory regions. Returns negative, zero, or positive like memcmp.
 	// * CompareAs compares element-by-element; ordering uses operator< for non-bitwise-comparable types
 	// -------------------------------------------------------------------------
 
-	static int32 Compare(const void* lhs, const void* rhs, int64 size) noexcept;
-	template<typename T> static int32 CompareAs(const T* lhs, const T* rhs, int64 num = 1) noexcept;
+	static int32 Compare(const void* lhs, const void* rhs, uint64 size) noexcept;
+	template<typename T> static int32 CompareAs(const T* lhs, const T* rhs, uint64 num = 1) noexcept;
 
 	// IsEqual / IsEqualAs
 	// Returns true if both memory regions are identical.
 	// * IsEqualAs uses operator== for non-bitwise-comparable types
 	// -------------------------------------------------------------------------
 
-	static bool IsEqual(const void* lhs, const void* rhs, int64 size) noexcept;
-	template<typename T> static bool IsEqualAs(const T* lhs, const T* rhs, int64 num = 1) noexcept;
+	static bool IsEqual(const void* lhs, const void* rhs, uint64 size) noexcept;
+	template<typename T> static bool IsEqualAs(const T* lhs, const T* rhs, uint64 num = 1) noexcept;
 
 	// Construct
 	// Constructs a T in-place at ptr. Zero-initializes if trivially constructible.

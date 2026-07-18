@@ -3,46 +3,204 @@
 
 #pragma once // silence tooling
 
+namespace Internal::Memory
+{
+	struct SAlignHeader
+	{
+		KOR_FORCEINLINE static SAlignHeader* Get(void* alignedPtr) noexcept
+		{
+			return (SAlignHeader*)alignedPtr - 1;
+		}
+
+		void* RawPointer = nullptr;
+		uint64 Size = 0;
+	};
+
+	KOR_FORCEINLINE uint64 GetAlignedSize(uint64 size, uint64 alignment) noexcept
+	{
+		return size + alignment - 1 + sizeof(SAlignHeader);
+	}
+
+	KOR_FORCEINLINE void* GetAlignedPtr(void* ptr, uint64 alignment) noexcept
+	{
+		const uintptr afterHeader = (uintptr)ptr + sizeof(SAlignHeader);
+		const uintptr alignedAddr = (afterHeader + alignment - 1) & ~((uintptr)alignment - 1);
+
+		return (void*)alignedAddr;
+	}
+
+	KOR_FORCEINLINE void InitAlignHeader(void* alignPtr, void* rawPtr, uint64 size) noexcept
+	{
+		SAlignHeader* header = SAlignHeader::Get(alignPtr);
+		header->RawPointer = rawPtr;
+		header->Size = size;
+	}
+}
+
 KOR_FORCEINLINE void SMemoryOps::Free(void* ptr) noexcept
 {
 	return SPlatformMemoryOps::Free(ptr);
 }
 
-template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::MallocAs(int64 num) noexcept
+KOR_FORCEINLINE void SMemoryOps::Free(void* ptr, uint64 alignment) noexcept
 {
-	return (T*)SPlatformMemoryOps::Malloc(num * sizeof(T));
+	using namespace Internal::Memory;
+
+	KOR_ASSERT_DEBUG(SMath::IsPowerOfTwo(alignment));
+
+	if (alignment <= KOR_DEFAULT_HEAP_ALIGNMENT)
+	{
+		SPlatformMemoryOps::Free(ptr);
+		return;
+	}
+
+	KOR_ASSERT_DEBUG(ptr);
+	void* rawPtr = SAlignHeader::Get(ptr)->RawPointer;
+	SPlatformMemoryOps::Free(rawPtr);
 }
 
-KOR_FORCEINLINE void* SMemoryOps::Malloc(int64 size) noexcept
+KOR_FORCEINLINE void* SMemoryOps::Malloc(uint64 size) noexcept
 {
 	return SPlatformMemoryOps::Malloc(size);
 }
 
-template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::CallocAs(int64 num) noexcept
+KOR_INLINE void* SMemoryOps::Malloc(uint64 size, uint64 alignment) noexcept
 {
-	return (T*)SPlatformMemoryOps::Calloc(num * sizeof(T));
+	using namespace Internal::Memory;
+
+	KOR_ASSERT_DEBUG(SMath::IsPowerOfTwo(alignment));
+
+	if (alignment <= KOR_DEFAULT_HEAP_ALIGNMENT)
+	{
+		return SPlatformMemoryOps::Malloc(size);
+	}
+
+	const uint64 alignedSize = GetAlignedSize(size, alignment);
+	void* rawPtr = SPlatformMemoryOps::Malloc(alignedSize);
+	if (!rawPtr) return nullptr;
+
+	void* alignedPtr = GetAlignedPtr(rawPtr, alignment);
+	InitAlignHeader(alignedPtr, rawPtr, size);
+
+	return alignedPtr;
 }
 
-KOR_FORCEINLINE void* SMemoryOps::Calloc(int64 size) noexcept
+template<typename T>
+KOR_FORCEINLINE T* SMemoryOps::MallocAs(uint64 num) noexcept
+{
+	return (T*)Malloc(num * sizeof(T), alignof(T));
+}
+
+template<typename T>
+KOR_FORCEINLINE T* SMemoryOps::MallocAs(uint64 num, uint64 alignment) noexcept
+{
+	return (T*)Malloc(num * sizeof(T), alignment);
+}
+
+KOR_FORCEINLINE void* SMemoryOps::Calloc(uint64 size) noexcept
 {
 	return SPlatformMemoryOps::Calloc(size);
 }
 
-template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::ReallocAs(T* ptr, int64 num) noexcept
+KOR_INLINE void* SMemoryOps::Calloc(uint64 size, uint64 alignment) noexcept
 {
-	return (T*)SPlatformMemoryOps::Realloc(ptr, num * sizeof(T));
+	using namespace Internal::Memory;
+
+	KOR_ASSERT_DEBUG(SMath::IsPowerOfTwo(alignment));
+
+	if (alignment <= KOR_DEFAULT_HEAP_ALIGNMENT)
+	{
+		return SPlatformMemoryOps::Calloc(size);
+	}
+
+	const uint64 alignedSize = GetAlignedSize(size, alignment);
+	void* rawPtr = SPlatformMemoryOps::Calloc(alignedSize);
+	if (!rawPtr) return nullptr;
+
+	void* alignedPtr = GetAlignedPtr(rawPtr, alignment);
+	InitAlignHeader(alignedPtr, rawPtr, size);
+
+	return alignedPtr;
 }
 
-KOR_FORCEINLINE void* SMemoryOps::Realloc(void* ptr, int64 size) noexcept
+template<typename T>
+KOR_FORCEINLINE T* SMemoryOps::CallocAs(uint64 num) noexcept
+{
+	return (T*)Calloc(num * sizeof(T), alignof(T));
+}
+
+template<typename T>
+KOR_FORCEINLINE T* SMemoryOps::CallocAs(uint64 num, uint64 alignment) noexcept
+{
+	return (T*)Calloc(num * sizeof(T), alignment);
+}
+
+KOR_FORCEINLINE void* SMemoryOps::Realloc(void* ptr, uint64 size) noexcept
 {
 	return SPlatformMemoryOps::Realloc(ptr, size);
 }
 
+KOR_INLINE void* SMemoryOps::Realloc(void* ptr, uint64 size, uint64 alignment) noexcept
+{
+	using namespace Internal::Memory;
+
+	KOR_ASSERT_DEBUG(SMath::IsPowerOfTwo(alignment));
+
+	if (alignment <= KOR_DEFAULT_HEAP_ALIGNMENT)
+		return SPlatformMemoryOps::Realloc(ptr, size);
+
+	if (!ptr)
+		return Malloc(size, alignment);
+
+	const SAlignHeader oldHeader = *SAlignHeader::Get(ptr);
+	const int64 oldOffset = KOR_PTR_DIFF(int64, ptr, oldHeader.RawPointer);
+
+	const uint64 newAlignedSize = GetAlignedSize(size, alignment);
+	void* newRawPtr = SPlatformMemoryOps::Realloc(oldHeader.RawPointer, newAlignedSize);
+	if (!newRawPtr)
+	{
+		return nullptr;
+	}
+
+	void* newAlignedPtr = GetAlignedPtr(newRawPtr, alignment);
+	const int64 newOffset = KOR_PTR_DIFF(int64, newAlignedPtr, newRawPtr);
+
+	// The raw->aligned offset is a function of the raw address itself,
+	// so it can shift even when alignment is unchanged. If it did,
+	// slide the data back onto the correctly aligned position.
+	if (newOffset != oldOffset)
+	{
+		void* oldDataInNewBlock = (uint8*)newRawPtr + oldOffset;
+		const uint64 bytesToMove = oldHeader.Size < size ? oldHeader.Size : size;
+		SPlatformMemoryOps::Move(newAlignedPtr, oldDataInNewBlock, bytesToMove);
+	}
+
+	// Header must be written LAST — the move above can overlap the
+	// header's own memory region until data lands in its final spot.
+	InitAlignHeader(newAlignedPtr, newRawPtr, size);
+
+	return newAlignedPtr;
+}
+
 template<typename T>
-KOR_FORCEINLINE void SMemoryOps::CopyAs(T* to, const T* from, int64 num) noexcept
+KOR_FORCEINLINE T* SMemoryOps::ReallocAs(T* ptr, uint64 num) noexcept
+{
+	return (T*)SPlatformMemoryOps::Realloc(ptr, num * sizeof(T), alignof(T));
+}
+
+template<typename T>
+KOR_FORCEINLINE T* SMemoryOps::ReallocAs(T* ptr, uint64 num, uint64 alignment) noexcept
+{
+	return (T*)SPlatformMemoryOps::Realloc(ptr, num * sizeof(T), alignment);
+}
+
+KOR_FORCEINLINE void* SMemoryOps::Copy(void* dest, const void* src, uint64 size) noexcept
+{
+	return SPlatformMemoryOps::Copy(dest, src, size);
+}
+
+template<typename T>
+KOR_FORCEINLINE void SMemoryOps::CopyAs(T* to, const T* from, uint64 num) noexcept
 {
 	if constexpr (!TTypeTraits<T>::IsBitwiseCopyable)
 	{
@@ -63,9 +221,9 @@ KOR_FORCEINLINE void SMemoryOps::CopyAs(T* to, const T* from, int64 num) noexcep
 	}
 }
 
-KOR_FORCEINLINE void* SMemoryOps::Copy(void* dest, const void* src, int64 size) noexcept
+KOR_FORCEINLINE void* SMemoryOps::Move(void* dest, const void* src, uint64 size) noexcept
 {
-	return SPlatformMemoryOps::Copy(dest, src, size);
+	return SPlatformMemoryOps::Move(dest, src, size);
 }
 
 template<typename T>
@@ -84,13 +242,13 @@ KOR_FORCEINLINE void SMemoryOps::MoveAs(T* to, T* from) noexcept
 	}
 }
 
-KOR_FORCEINLINE void* SMemoryOps::Move(void* dest, const void* src, int64 size) noexcept
+KOR_FORCEINLINE void* SMemoryOps::Fill(void* dest, int32 val, uint64 size) noexcept
 {
-	return SPlatformMemoryOps::Move(dest, src, size);
+	return SPlatformMemoryOps::Fill(dest, val, size);
 }
 
 template<typename T>
-KOR_FORCEINLINE void SMemoryOps::FillAs(const T* dst, T val, int64 num) noexcept
+KOR_FORCEINLINE void SMemoryOps::FillAs(const T* dst, T val, uint64 num) noexcept
 {
 	if constexpr (!TTypeTraits<T>::IsBitwiseCopyable)
 	{
@@ -109,13 +267,13 @@ KOR_FORCEINLINE void SMemoryOps::FillAs(const T* dst, T val, int64 num) noexcept
 	}
 }
 
-KOR_FORCEINLINE void* SMemoryOps::Fill(void* dest, int32 val, int64 size) noexcept
+KOR_FORCEINLINE void* SMemoryOps::Zero(void* dest, uint64 size) noexcept
 {
-	return SPlatformMemoryOps::Fill(dest, val, size);
+	return SPlatformMemoryOps::Zero(dest, size);
 }
 
 template<typename T>
-KOR_FORCEINLINE void SMemoryOps::ZeroAs(const T* dst, int64 num) noexcept
+KOR_FORCEINLINE void SMemoryOps::ZeroAs(const T* dst, uint64 num) noexcept
 {
 	if constexpr (!TTypeTraits<T>::IsBitwiseCopyable)
 	{
@@ -133,13 +291,13 @@ KOR_FORCEINLINE void SMemoryOps::ZeroAs(const T* dst, int64 num) noexcept
 	}
 }
 
-KOR_FORCEINLINE void* SMemoryOps::Zero(void* dest, int64 size) noexcept
+KOR_FORCEINLINE int32 SMemoryOps::Compare(const void* lhs, const void* rhs, uint64 size) noexcept
 {
-	return SPlatformMemoryOps::Zero(dest, size);
+	return SPlatformMemoryOps::Compare(lhs, rhs, size);
 }
 
 template<typename T>
-KOR_FORCEINLINE int32 SMemoryOps::CompareAs(const T* lhs, const T* rhs, int64 num) noexcept
+KOR_FORCEINLINE int32 SMemoryOps::CompareAs(const T* lhs, const T* rhs, uint64 num) noexcept
 {
 	if constexpr (!TTypeTraits<T>::IsBitwiseComparable)
 	{
@@ -157,13 +315,13 @@ KOR_FORCEINLINE int32 SMemoryOps::CompareAs(const T* lhs, const T* rhs, int64 nu
 	}
 }
 
-KOR_FORCEINLINE int32 SMemoryOps::Compare(const void* lhs, const void* rhs, int64 size) noexcept
+KOR_FORCEINLINE bool SMemoryOps::IsEqual(const void* lhs, const void* rhs, uint64 size) noexcept
 {
-	return SPlatformMemoryOps::Compare(lhs, rhs, size);
+	return SPlatformMemoryOps::Compare(lhs, rhs, size) == 0;
 }
 
 template<typename T>
-KOR_FORCEINLINE bool SMemoryOps::IsEqualAs(const T* lhs, const T* rhs, int64 num) noexcept
+KOR_FORCEINLINE bool SMemoryOps::IsEqualAs(const T* lhs, const T* rhs, uint64 num) noexcept
 {
 	if constexpr (!TTypeTraits<T>::IsBitwiseComparable)
 	{
@@ -184,11 +342,6 @@ KOR_FORCEINLINE bool SMemoryOps::IsEqualAs(const T* lhs, const T* rhs, int64 num
 			sizeof(T) * num
 		) == 0;
 	}
-}
-
-KOR_FORCEINLINE bool SMemoryOps::IsEqual(const void* lhs, const void* rhs, int64 size) noexcept
-{
-	return SPlatformMemoryOps::Compare(lhs, rhs, size) == 0;
 }
 
 template<typename T, typename... ArgTypes>

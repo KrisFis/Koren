@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include "Kor/ArrayAllocator.h"
+#include "Kor/Allocator.h"
 
 KOR_NAMESPACE_BEGIN
 

@@ -16,31 +16,31 @@ struct SWin32MemoryOps
 	KOR_INLINE static HANDLE GetHeap() noexcept { static HANDLE procHeap = ::GetProcessHeap(); return procHeap; }
 
 	// Allocates new memory
-	KOR_FORCEINLINE static void* Malloc(int64 size) noexcept { return HeapAlloc(GetHeap(), 0, size); }
+	KOR_FORCEINLINE static void* Malloc(uint64 size) noexcept { return HeapAlloc(GetHeap(), 0, size); }
 
 	// Allocates new memory and sets every bit to zero
-	KOR_FORCEINLINE static void* Calloc(int64 size) noexcept { return HeapAlloc(GetHeap(), HEAP_ZERO_MEMORY, size); }
+	KOR_FORCEINLINE static void* Calloc(uint64 size) noexcept { return HeapAlloc(GetHeap(), HEAP_ZERO_MEMORY, size); }
 
 	// Reallocates memory preferably in the same memory block
-	KOR_FORCEINLINE static void* Realloc(void* ptr, int64 size) noexcept { return HeapReAlloc(GetHeap(), 0, ptr, size); }
+	KOR_FORCEINLINE static void* Realloc(void* ptr, uint64 size) noexcept { return HeapReAlloc(GetHeap(), 0, ptr, size); }
 
 	// Deallocates memory
 	KOR_FORCEINLINE static void Free(void* ptr) noexcept { HeapFree(GetHeap(), 0, ptr); }
 
 	// Copies block of memory from destination to source (does not handle overlapping)
-	KOR_FORCEINLINE static void* Copy(void* dest, const void* src, int64 size) noexcept { return CopyMemory(dest, src, size); }
+	KOR_FORCEINLINE static void* Copy(void* dest, const void* src, uint64 size) noexcept { return CopyMemory(dest, src, size); }
 
 	// Copies block of memory from destination to source (handles overlapping)
-	KOR_FORCEINLINE static void* Move(void* dest, const void* src, int64 size) noexcept { return MoveMemory(dest, src, size); }
+	KOR_FORCEINLINE static void* Move(void* dest, const void* src, uint64 size) noexcept { return MoveMemory(dest, src, size); }
 
 	// Fills block of memory with specific value
-	KOR_FORCEINLINE static void* Fill(void* dest, int32 val, int64 size) noexcept { return FillMemory(dest, size, val); }
+	KOR_FORCEINLINE static void* Fill(void* dest, int32 val, uint64 size) noexcept { return FillMemory(dest, size, val); }
 
 	// Fills block of memory with zero value
-	KOR_FORCEINLINE static void* Zero(void* dest, int64 size) noexcept { return ZeroMemory(dest, size); }
+	KOR_FORCEINLINE static void* Zero(void* dest, uint64 size) noexcept { return ZeroMemory(dest, size); }
 
 	// Compares two blocks of memory
-	KOR_FORCEINLINE static int32 Compare(const void* lhs, const void* rhs, int64 size) noexcept { return RtlEqualMemory(lhs, rhs, size); }
+	KOR_FORCEINLINE static int32 Compare(const void* lhs, const void* rhs, uint64 size) noexcept { return RtlEqualMemory(lhs, rhs, size); }
 };
 
 KOR_NAMESPACE_END
