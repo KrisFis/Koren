@@ -43,6 +43,7 @@ public:
 
 	using ElementType = ElementT;
 	using AllocatorType = AllocatorT;
+	using ElementAllocatorType = TTypedAllocator<AllocatorT, ElementType>;
 	using SizeType = typename TAllocatorTraits<AllocatorT>::SizeType;
 	using ILType = std::initializer_list<ElementType>;
 	using ArrayIteratorType = ElementType*;
@@ -437,8 +438,17 @@ public:
 	ConstArrayIteratorType end() const noexcept;
 
 private:
-	AllocatorType _allocator = {};
+	// Allocator instance for _data
+	ElementAllocatorType _allocator = {};
+
+	// Allocated data
+	ElementType* _data = nullptr;
+
+	// Number of initialized elements
 	SizeType _num = 0;
+
+	// Number of reserved elements (size of _data buffer)
+	SizeType _reservedNum = 0;
 };
 
 #include "Kor/Inl/Array.inl"

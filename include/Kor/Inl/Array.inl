@@ -8,13 +8,13 @@
 template<typename ElementT, typename AllocatorT>
 const ElementT* TArray<ElementT, AllocatorT>::GetData() const noexcept
 {
-	return _allocator.GetData();
+	return _data;
 }
 
 template<typename ElementT, typename AllocatorT>
 ElementT* TArray<ElementT, AllocatorT>::GetData() noexcept
 {
-	return _allocator.GetData();
+	return _data;
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -26,7 +26,7 @@ typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Ge
 template<typename ElementT, typename AllocatorT>
 typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::GetReservedNum() const noexcept
 {
-	return _allocator.GetNum();
+	return _reservedNum;
 }
 
 template<typename ElementT, typename AllocatorT>
