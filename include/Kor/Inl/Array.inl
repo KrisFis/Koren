@@ -3,8 +3,6 @@
 
 #pragma once // silence tooling
 
-// Validation
-
 template<typename ElementT, typename AllocatorT>
 const ElementT* TArray<ElementT, AllocatorT>::GetData() const noexcept
 {

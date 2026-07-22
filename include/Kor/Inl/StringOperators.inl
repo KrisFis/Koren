@@ -61,7 +61,7 @@ KOR_FORCEINLINE_DEBUG CharT TString<CharT>::operator[](SizeType idx) const noexc
 template<typename CharT>
 KOR_FORCEINLINE TString<CharT>& TString<CharT>::operator=(const TString& other) noexcept
 {
-	if (this != &other)
+	if (this != &other) [[ likely ]]
 	{
 		_data = other._data;
 	}
@@ -71,7 +71,7 @@ KOR_FORCEINLINE TString<CharT>& TString<CharT>::operator=(const TString& other) 
 template<typename CharT>
 KOR_FORCEINLINE TString<CharT>& TString<CharT>::operator=(TString&& other) noexcept
 {
-	if (this != &other)
+	if (this != &other) [[ likely ]]
 	{
 		_data = Move(other._data);
 	}

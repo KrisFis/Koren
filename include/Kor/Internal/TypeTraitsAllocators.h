@@ -18,6 +18,16 @@ template<typename T>
 struct TAllocatorTraitsBase
 {
 	using SizeType = void;
+
+	enum
+	{
+		// Supports and needs alignment as part of its method signatures
+		// * Alignment parameter should come immediately after main signature
+		NeedsAlignment = false,
+
+		// Supports reallocation of previously allocated memory
+		HasReallocate = false,
+	}
 };
 
 // [Allocator Traits]

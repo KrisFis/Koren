@@ -38,6 +38,12 @@ template<>
 struct TAllocatorTraits<CAllocator> : TAllocatorTraitsBase<CAllocator>
 {
 	using SizeType = typename CAllocator::SizeType;
+
+	enum
+	{
+		NeedsAlignment = false,
+		HasReallocate = false,
+	}
 };
 
 // Adapter of AllocatorT for ElementT
