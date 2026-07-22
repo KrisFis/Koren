@@ -59,9 +59,6 @@ public:
 	// ensuring valid state before use.
 	constexpr TArray(Init::SNoInit) noexcept;
 
-	// Constructs an empty array with all memory zero-initialized.
-	constexpr TArray(Init::SZero) noexcept;
-
 	// Copy-constructs from another array. Performs a deep copy of all elements.
 	TArray(const TArray& other) noexcept;
 
@@ -439,16 +436,16 @@ public:
 
 private:
 	// Allocator instance for _data
-	ElementAllocatorType _allocator = {};
+	ElementAllocatorType _allocator;
 
 	// Allocated data
-	ElementType* _data = nullptr;
+	ElementType* _data;
 
 	// Number of initialized elements
-	SizeType _num = 0;
+	SizeType _num;
 
 	// Number of reserved elements (size of _data buffer)
-	SizeType _reservedNum = 0;
+	SizeType _reservedNum;
 };
 
 #include "Kor/Inl/Array.inl"

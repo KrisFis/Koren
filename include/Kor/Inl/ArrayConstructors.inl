@@ -4,19 +4,16 @@
 #pragma once // silence tooling
 
 template<typename ElementT, typename AllocatorT>
-constexpr TArray<ElementT, AllocatorT>::TArray() noexcept
-{
-}
+KOR_FORCEINLINE constexpr TArray<ElementT, AllocatorT>::TArray() noexcept
+	: _allocator()
+	, _data(nullptr)
+	, _num(0)
+	, _reservedNum(0)
+{}
 
 template<typename ElementT, typename AllocatorT>
-constexpr TArray<ElementT, AllocatorT>::TArray(Init::SNoInit) noexcept
-{
-}
-
-template<typename ElementT, typename AllocatorT>
-constexpr TArray<ElementT, AllocatorT>::TArray(Init::SZero) noexcept
-{
-}
+KOR_FORCEINLINE constexpr TArray<ElementT, AllocatorT>::TArray(Init::SNoInit) noexcept
+{}
 
 template<typename ElementT, typename AllocatorT>
 TArray<ElementT, AllocatorT>::TArray(const TArray& other) noexcept
