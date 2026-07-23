@@ -6,23 +6,23 @@
 template<typename ElementT, typename AllocatorT>
 FORCEINLINE typename TArray<ElementT, AllocatorT>::ArrayIteratorType TArray<ElementT, AllocatorT>::begin() noexcept
 {
-	return _allocator.GetData();
+	return _data;
 }
 
 template<typename ElementT, typename AllocatorT>
 FORCEINLINE typename TArray<ElementT, AllocatorT>::ConstArrayIteratorType TArray<ElementT, AllocatorT>::begin() const noexcept
 {
-	return _allocator.GetData();
+	return _data;
 }
 
 template<typename ElementT, typename AllocatorT>
 FORCEINLINE typename TArray<ElementT, AllocatorT>::ArrayIteratorType TArray<ElementT, AllocatorT>::end() noexcept
 {
-	return _allocator.GetData() + _num;
+	return _data + _num;
 }
 
 template<typename ElementT, typename AllocatorT>
 FORCEINLINE typename TArray<ElementT, AllocatorT>::ConstArrayIteratorType TArray<ElementT, AllocatorT>::end() const noexcept
 {
-	return _allocator.GetData() + _num;
+	return _data + _num;
 }

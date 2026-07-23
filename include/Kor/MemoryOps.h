@@ -89,7 +89,8 @@ struct SMemoryOps
 	template<typename T> static void CopyAs(T* to, const T* from, uint64 num = 1) noexcept;
 
 	// Move / MoveAs
-	// Moves a single element from src to dest. MoveAs invokes move construction for non-bitwise-movable types.
+	// Moves a single element from src to dest. 
+	// * MoveAs invokes move construction for non-bitwise-movable types.
 	// * MoveAs operates on a single element; use CopyAs for ranges
 	// -------------------------------------------------------------------------
 
@@ -97,7 +98,8 @@ struct SMemoryOps
 	template<typename T> static void MoveAs(T* to, T* from) noexcept;
 
 	// Fill / FillAs
-	// Fills memory with a repeated value. FillAs invokes copy construction for non-bitwise-copyable types.
+	// Fills memory with a repeated value. 
+	// * FillAs invokes copy construction for non-bitwise-copyable types.
 	// * Fill sets each byte to val (same semantics as memset)
 	// -------------------------------------------------------------------------
 
@@ -105,11 +107,20 @@ struct SMemoryOps
 	template<typename T> static void FillAs(const T* dst, T val, uint64 num = 1) noexcept;
 
 	// Zero / ZeroAs
-	// Zeroes memory. ZeroAs invokes default construction for non-bitwise-copyable types.
+	// Zeroes memory. 
+	// * ZeroAs invokes default construction for non-bitwise-copyable types.
 	// -------------------------------------------------------------------------
 
 	static void* Zero(void* dest, uint64 size) noexcept;
 	template<typename T> static void ZeroAs(const T* dst, uint64 num = 1) noexcept;
+
+	// Swap
+	// Swaps values between lhs and rhs
+	// * SwapAs invokes default construction for non-bitwise-movable types.
+	// -------------------------------------------------------------------------
+
+	static void Swap(void* lhs, void* rhs, uint64 size) noexcept;
+	template<typename T> static void SwapAs(T* lhs, T* rhs, uint64 num = 1) noexcept;
 
 	// Compare / CompareAs
 	// Compares two memory regions. Returns negative, zero, or positive like memcmp.

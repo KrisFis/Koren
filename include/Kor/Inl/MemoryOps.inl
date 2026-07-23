@@ -215,13 +215,10 @@ KOR_FORCEINLINE void SMemoryOps::CopyAs(T* to, const T* from, uint64 num) noexce
 			++to;
 			++from;
 		}
-	} else
+	} 
+	else
 	{
-		SPlatformMemoryOps::Copy(
-			to,
-			from,
-			sizeof(T) * num
-		);
+		Copy(to, from, sizeof(T) * num);
 	}
 }
 
@@ -236,13 +233,10 @@ KOR_FORCEINLINE void SMemoryOps::MoveAs(T* to, T* from) noexcept
 	if constexpr (!TTypeTraits<T>::IsBitwiseMovable)
 	{
 		::new((void*) to) T(*from);
-	} else
+	} 
+	else
 	{
-		SPlatformMemoryOps::Move(
-			to,
-			from,
-			sizeof(T)
-		);
+		Move(to, from, sizeof(T));
 	}
 }
 
@@ -261,13 +255,10 @@ KOR_FORCEINLINE void SMemoryOps::FillAs(const T* dst, T val, uint64 num) noexcep
 			::new((void*) dst) T(val);
 			++dst;
 		}
-	} else
+	} 
+	else
 	{
-		SPlatformMemoryOps::Fill(
-			dst,
-			val,
-			sizeof(T) * num
-		);
+		Fill(dst, val, sizeof(T) * num);
 	}
 }
 
@@ -286,12 +277,57 @@ KOR_FORCEINLINE void SMemoryOps::ZeroAs(const T* dst, uint64 num) noexcept
 			::new((void*) dst) T();
 			++dst;
 		}
-	} else
+	} 
+	else
 	{
-		SPlatformMemoryOps::Zero(
-			dst,
-			sizeof(T) * num
-		);
+		Zero(dst, sizeof(T) * num);
+	}
+}
+
+
+KOR_FORCEINLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcept
+{
+	// No malloc SBO approach
+	// * Instead of calling malloc, we use small buffer
+	// * TODO: Use scratch buffer, like string ops
+
+	constexpr uint64 chunkSize = 256;
+    uint8 temp[chunkSize];
+
+    while (size)
+    {
+        const uint64 chunk = size > chunkSize ? chunkSize : size;
+
+        Memcpy(temp, a, chunk);
+        Memcpy(a, b, chunk);
+        Memcpy(b, temp, chunk);
+
+        a = (uint8*)a + chunk;
+        b = (uint8*)b + chunk;
+        size -= chunk;
+    }
+}
+
+template<typename T>
+KOR_FORCEINLINE void SMemoryOps::SwapAs(T* lhs, T* rhs, uint64 num) noexcept
+{	
+	if constexpr (TIsScalar<T>::Value || !TTypeTraits<T>::IsBitwiseCopyable)
+	{
+		T tmp(Move(*lhs));
+		a = Move(b);
+		b = Move(tmp);
+	}
+	else
+	{
+		struct SAlignedMem
+		{
+			alignas(T) uint8 Bytes[sizeof(T)];
+		};
+
+		SAlignedMem temp;
+		*(SAlignedMem*)&temp = *(SAlignedMem*)a;
+		*(SAlignedMem*)a    = *(SAlignedMem*)b;
+		*(SAlignedMem*)b    = *(SAlignedMem*)&temp;
 	}
 }
 
@@ -313,9 +349,10 @@ KOR_FORCEINLINE int32 SMemoryOps::CompareAs(const T* lhs, const T* rhs, uint64 n
 			++rhs;
 		}
 		return 0;
-	} else
+	} 
+	else
 	{
-		return SPlatformMemoryOps::Compare(lhs, rhs, sizeof(T) * num);
+		return Compare(lhs, rhs, sizeof(T) * num);
 	}
 }
 
@@ -338,13 +375,10 @@ KOR_FORCEINLINE bool SMemoryOps::IsEqualAs(const T* lhs, const T* rhs, uint64 nu
 		}
 
 		return true;
-	} else
+	} 
+	else
 	{
-		return SPlatformMemoryOps::Compare(
-			lhs,
-			rhs,
-			sizeof(T) * num
-		) == 0;
+		return IsEqual(lhs, rhs, sizeof(T) * num);
 	}
 }
 
