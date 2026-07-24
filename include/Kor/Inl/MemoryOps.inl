@@ -284,23 +284,19 @@ KOR_FORCEINLINE void SMemoryOps::ZeroAs(const T* dst, uint64 num) noexcept
 	}
 }
 
-
-KOR_FORCEINLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcept
+KOR_INLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcept
 {
-	// No malloc SBO approach
-	// * Instead of calling malloc, we use small buffer
-	// * TODO: Use scratch buffer, like string ops
+    uint8 temp[KOR_BUFFER_SIZE_SMALL]
 
-	constexpr uint64 chunkSize = 256;
-    uint8 temp[chunkSize];
-
-    while (size)
+    while (size > 0)
     {
-        const uint64 chunk = size > chunkSize ? chunkSize : size;
+        const uint64 chunk = size > KOR_BUFFER_SIZE_SMALL 
+        	? KOR_BUFFER_SIZE_SMALL 
+        	: size;
 
-        Memcpy(temp, a, chunk);
-        Memcpy(a, b, chunk);
-        Memcpy(b, temp, chunk);
+        Copy(temp, a, chunk);
+        Copy(a, b, chunk);
+        Copy(b, temp, chunk);
 
         a = (uint8*)a + chunk;
         b = (uint8*)b + chunk;

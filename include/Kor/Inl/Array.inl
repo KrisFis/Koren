@@ -4,37 +4,49 @@
 #pragma once // silence tooling
 
 template<typename ElementT, typename AllocatorT>
-const ElementT* TArray<ElementT, AllocatorT>::GetData() const noexcept
+KOR_FORCEINLINE TArray<ElementT, AllocatorT>::ElementAllocatorType& TArray<ElementT, AllocatorT>::GetAllocator() noexcept
+{
+	return _allocator;
+}
+
+template<typename ElementT, typename AllocatorT>
+KOR_FORCEINLINE const TArray<ElementT, AllocatorT>::ElementAllocatorType& TArray<ElementT, AllocatorT>GetAllocator() const noexcept
+{
+	return _allocator;
+}
+
+template<typename ElementT, typename AllocatorT>
+KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorT>::GetData() noexcept
 {
 	return _data;
 }
 
 template<typename ElementT, typename AllocatorT>
-ElementT* TArray<ElementT, AllocatorT>::GetData() noexcept
+KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::GetData() const noexcept
 {
 	return _data;
 }
 
 template<typename ElementT, typename AllocatorT>
-typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::GetNum() const noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::GetNum() const noexcept
 {
 	return _num;
 }
 
 template<typename ElementT, typename AllocatorT>
-typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::GetReservedNum() const noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::GetReservedNum() const noexcept
 {
 	return _reservedNum;
 }
 
 template<typename ElementT, typename AllocatorT>
-bool TArray<ElementT, AllocatorT>::IsEmpty() const noexcept
+KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::IsEmpty() const noexcept
 {
 	return _num == 0;
 }
 
 template<typename ElementT, typename AllocatorT>
-bool TArray<ElementT, AllocatorT>::IsValidIndex(SizeType idx) const noexcept
+KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::IsValidIndex(SizeType idx) const noexcept
 {
 	return idx >= 0 && idx < _num;
 }

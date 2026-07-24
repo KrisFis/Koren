@@ -127,8 +127,8 @@ template<typename T, typename C> struct TIsMemberPointer<T C::*> : TTrueValue {}
 // [Remove Pointer]
 // * Removes pointer from provided type
 
-template<typename T> struct TRemovePointer { typedef T Type; };
-template<typename T> struct TRemovePointer<T*> { typedef T Type; };
+template<typename T> struct TRemovePointer : TType<T> {};
+template<typename T> struct TRemovePointer<T*> : TType<T> {};
 
 // [Is Array]
 // * Checks whether specific type is array
@@ -197,43 +197,43 @@ template<> struct TIsInteger<uint16> : TTrueValue {};
 template<> struct TIsInteger<uint32> : TTrueValue {};
 template<> struct TIsInteger<uint64> : TTrueValue {};
 
-// [Is abstract type]
-// * Checks whether specific type is abstract
-
-template<typename T>
-struct TIsAbstractType { enum { Value = __is_abstract(T) }; };
-
-// [Is class type]
-// * Checks whether specific type is class
-
-template<typename T>
-struct TIsClassType { enum { Value = __is_class(T) }; };
-
-// [Is enum type]
-// * Checks whether specific type is enum
-
-template<typename T>
-struct TIsEnum { enum { Value = __is_enum(T) }; };
-
 // [Is empty type]
 // * Checks whether specific type is empty
 // ** has no non-static members/fields and if so, then each is bit-fields of zero length
 // ** this check is applied to each base class, if everything passes with true, then result is true
 
 template<typename T>
-struct TIsEmptyType { enum { Value = __is_empty(T) }; };
+struct TIsEmpty : TBoolValue<__is_empty(T)> {};
+
+// [Is abstract type]
+// * Checks whether specific type is abstract
+
+template<typename T>
+struct TIsAbstract : TBoolValue<__is_abstract(T)> {};
+
+// [Is class type]
+// * Checks whether specific type is class
+
+template<typename T>
+struct TIsClass : TBoolValue<__is_class(T)> {};
+
+// [Is enum type]
+// * Checks whether specific type is enum
+
+template<typename T>
+struct TIsEnum : TBoolValue<__is_enum(T)> {};
 
 // [Is POD type]
 // * Checks whether specific type is POD (C-lang compatible type)
 
 template<typename T>
-struct TIsPODType { enum { Value = __is_pod(T) }; };
+struct TIsPOD : TBoolValue<__is_pod(T)> {};
 
 // [Is union type]
 // * Checks whether specific type is union
 
 template<typename T>
-struct TIsUnionType { enum { Value = __is_union(T) }; };
+struct TIsUnion : TBoolValue<__is_union(T)> {};
 
 // [Is Integral]
 // * Checks whether specific type is integral
@@ -314,6 +314,7 @@ template<typename T> struct TIsUnsigned
 // * Maps a byte size to its corresponding signed and unsigned integer types
 // * Primary source of truth for integer type resolution by size
 // * Unsupported sizes will result in a compile error (incomplete type)
+
 template<TSize Size> struct TInt { static_assert(Size == 0, "TInt: unsupported size, must be 1, 2, 4 or 8"); };
 template<> struct TInt<1> { typedef int8 Signed; typedef uint8 Unsigned; };
 template<> struct TInt<2> { typedef int16 Signed; typedef uint16 Unsigned; };
@@ -323,12 +324,14 @@ template<> struct TInt<8> { typedef int64 Signed; typedef uint64 Unsigned; };
 // [TMakeUnsigned]
 // * Convenience wrapper around TInt - resolves to unsigned integer of given size
 // * Example: TMakeUnsigned<int32>::Type → uint32
+
 template<typename T>
 struct TMakeUnsigned { typedef typename TInt<sizeof(T)>::Unsigned Type; };
 
 // [TMakeSigned]
 // * Convenience wrapper around TInt - resolves to signed integer of given size
 // * Example: TMakeSigned<uint32>::Type → int32
+
 template<typename T>
 struct TMakeSigned { typedef typename TInt<sizeof(T)>::Signed Type; };
 

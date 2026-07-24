@@ -53,12 +53,26 @@ struct TAllocatorTraits<CAllocator> : TAllocatorTraitsBase<CAllocator>
 template<typename AllocatorT, typename ElementT>
 class TTypedAllocator
 {
-	static_assert(TIsAllocator<AllocatorT>::Value, "AllocatorT must be allocator type");
-	static_assert(TIsPure<ElementT>::Value, "ElementT must be pure type");
 public:
+	// Asserts
+	// -------------------------------------------------------------------------
+
+	static_assert(
+		!TIsVoid<ElementT>::Value && TIsPure<ElementT>::Value,
+		"ElementType must be a non-void and pure type");
+
+	static_assert(TIsAllocator<AllocatorT>::Value,
+		"AllocatorType must be a valid allocator type");
+
+	// Types
+	// -------------------------------------------------------------------------
+
 	using AllocatorType = AllocatorT;
 	using ElementType = ElementT;
 	using SizeType = typename TAllocatorTraits<AllocatorT>::SizeType;
+
+	// Operators
+	// -------------------------------------------------------------------------
 
 	// Provides direct member access to the underlying untyped allocator.
 	AllocatorType* operator->() noexcept;
@@ -68,16 +82,21 @@ public:
 	AllocatorType* operator*() noexcept;
 	const AllocatorType* operator*() const noexcept;
 
+	// Getters
+	// -------------------------------------------------------------------------
+
 	// Returns the underlying untyped allocator.
 	AllocatorType& Get() noexcept;
 	const AllocatorType& Get() const noexcept;
+
+	// Allocator Interface
+	// -------------------------------------------------------------------------
 
 	// Allocate
 	// * Allocates storage for num elements, using ElementType's natural alignment.
 	// @param num - Number of elements to allocate storage for.
 	// @param alignment - Required alignment of the returned block, in bytes.
 	// @return Pointer to the allocated elements, or nullptr on failure.
-	// -------------------------------------------------------------------------
 
 	ElementType* Allocate(SizeType num = 1) noexcept;
 	ElementType* Allocate(SizeType num, SizeType alignment) noexcept;
@@ -87,7 +106,6 @@ public:
 	// @param num - New number of elements the block should hold.
 	// @param alignment - Required alignment of the returned block, in bytes.
 	// @return Pointer to the (possibly relocated) elements, or nullptr on failure.
-	// -------------------------------------------------------------------------
 
 	ElementType* Reallocate(ElementType* ptr, SizeType num) noexcept;
 	ElementType* Reallocate(ElementType* ptr, SizeType num, SizeType alignment) noexcept;
@@ -96,7 +114,6 @@ public:
 	// Frees a block previously returned by Allocate/Reallocate, using ElementType's natural alignment.
 	// @param ptr - Block to free.
 	// @param alignment - Alignment the block was originally allocated with.
-	// -------------------------------------------------------------------------
 
 	void Deallocate(ElementType* ptr) noexcept;
 	void Deallocate(ElementType* ptr, SizeType alignment) noexcept;

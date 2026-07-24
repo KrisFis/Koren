@@ -29,8 +29,8 @@ public:
 	// -------------------------------------------------------------------------
 
 	static_assert(
-		!TIsSame<ElementT, void>::Value && !TIsReference<ElementT>::Value,
-		"ElementType must be a non-void, non-reference type");
+		!TIsVoid<ElementT>::Value && TIsPure<ElementT>::Value,
+		"ElementType must be a non-void and pure type");
 
 	static_assert(TIsAllocator<AllocatorT>::Value,
 		"AllocatorType must be a valid allocator type");
@@ -113,10 +113,14 @@ public:
 	// Property Getters
 	// -------------------------------------------------------------------------
 
+	// Returns allocator instance used for allocating elements
+	ElementAllocatorType& GetAllocator() noexcept;
+	const ElementAllocatorType& GetAllocator() const noexcept;
+
 	// Returns a pointer to the underlying data buffer. May be null if empty
 	// and no allocation has been made.
-	const ElementType* GetData() const noexcept;
 	ElementType* GetData() noexcept;
+	const ElementType* GetData() const noexcept;
 
 	// Returns the number of elements currently stored.
 	SizeType GetNum() const noexcept;

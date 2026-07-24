@@ -27,7 +27,7 @@ struct TAllocatorTraitsBase
 
 		// Supports reallocation of previously allocated memory
 		HasReallocate = false,
-	}
+	};
 };
 
 // [Allocator Traits]

@@ -59,35 +59,66 @@ KOR_FORCEINLINE const AllocatorT& TTypedAllocator<AllocatorT, ElementT>::Get() c
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Allocate(SizeType num) noexcept
 {
-	return (ElementType*)_allocator.Allocate(num * sizeof(ElementType), alignof(ElementType));
+	return Allocate(num, alignof(ElementType));
 }
 
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Allocate(SizeType num, SizeType alignment) noexcept
 {
-	return (ElementType*)_allocator.Allocate(num * sizeof(ElementType), alignment);
+	using Traits = TAllocatorTraits<AllocatorT>;
+
+	if constexpr (Traits::NeedsAlignment)
+	{
+		return (ElementType*)_allocator.Allocate(num * sizeof(ElementType), alignment);
+	}
+	else
+	{
+		return (ElementType*)_allocator.Allocate(num * sizeof(ElementType));
+	}
 }
 
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Reallocate(ElementType* ptr, SizeType num) noexcept
 {
-	return (ElementType*)_allocator.Reallocate(ptr, num * sizeof(ElementType), alignof(ElementType));
+	return Reallocate(ptr, num, alignof(ElementType));
 }
 
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Reallocate(ElementType* ptr, SizeType num, SizeType alignment) noexcept
 {
-	return (ElementType*)_allocator.Reallocate(ptr, num * sizeof(ElementType), alignment);
+	using Traits = TAllocatorTraits<AllocatorT>;
+
+	static_assert(
+		Traits::HasReallocate, 
+		"AllocatorType has no native Reallocate. Caller must Allocate + Copy + Deallocate manually, since only the container knows the old element count");
+
+	if constexpr (Traits::NeedsAlignment)
+	{
+		return (ElementType*)_allocator.Reallocate(ptr, num * sizeof(ElementType), alignment);
+	}
+	else
+	{
+		return (ElementType*)_allocator.Reallocate(ptr, num * sizeof(ElementType));
+	}
 }
 
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE void TTypedAllocator<AllocatorT, ElementT>::Deallocate(ElementType* ptr) noexcept
 {
-	_allocator.Deallocate(ptr, alignof(ElementType));
+	Deallocate(ptr, alignof(ElementType));
 }
 
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE void TTypedAllocator<AllocatorT, ElementT>::Deallocate(ElementType* ptr, SizeType alignment) noexcept
 {
-	_allocator.Deallocate(ptr, alignment);
+	using Traits = TAllocatorTraits<AllocatorT>;
+
+	if constexpr (Traits::NeedsAlignment)
+	{
+		_allocator.Deallocate(ptr, alignment);
+	}
+	else
+	{
+		_allocator.Deallocate(ptr);
+	}
 }

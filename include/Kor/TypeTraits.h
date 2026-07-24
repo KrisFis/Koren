@@ -128,7 +128,7 @@ template <typename T>
 struct TCallTraits : TGetType<T>
 {
 private:
-	enum { IsSmallType = ((sizeof(T) <= sizeof(void*)) && TIsPODType<T>::Value ) || TIsArithmetic<T>::Value };
+	enum { IsSmallType = ((sizeof(T) <= sizeof(void*)) && TIsPOD<T>::Value ) || TIsArithmetic<T>::Value };
 
 public:
 	typedef typename Internals::TCallTraitsHelper<T, IsSmallType>::Type Param;
