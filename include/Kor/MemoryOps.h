@@ -35,9 +35,7 @@ struct SMemoryConstant
 
 // [ Memory Ops ]
 // Platform-agnostic memory operations.
-// * Typed variants (As suffix) operate on element counts, not byte sizes
-// * Typed variants dispatch on TTypeTraits to use construction/destruction where needed
-// * Raw variants operate on bytes and forward directly to SPlatformMemoryOps
+// * Typed variants operate on element counts, not byte sizes
 struct SMemoryOps
 {
 	// Free
