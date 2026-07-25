@@ -206,7 +206,7 @@ KOR_FORCEINLINE void* SMemoryOps::Copy(void* dest, const void* src, uint64 size)
 template<typename T>
 KOR_FORCEINLINE void SMemoryOps::CopyAs(T* to, const T* from, uint64 num) noexcept
 {
-	if constexpr (!TTypeTraits<T>::IsBitwiseCopyable)
+	if constexpr (!TIsTriviallyCopyConstructible<T>::Value)
 	{
 		while (num-- > 0)
 		{
@@ -230,9 +230,9 @@ KOR_FORCEINLINE void* SMemoryOps::Move(void* dest, const void* src, uint64 size)
 template<typename T>
 KOR_FORCEINLINE void SMemoryOps::MoveAs(T* to, T* from) noexcept
 {
-	if constexpr (!TTypeTraits<T>::IsBitwiseMovable)
+	if constexpr (!TIsTriviallyMoveConstructible<T>::Value)
 	{
-		::new((void*) to) T(*from);
+		::new((void*) to) T(::Move(*from));
 	} 
 	else
 	{
@@ -248,7 +248,7 @@ KOR_FORCEINLINE void* SMemoryOps::Fill(void* dest, int32 val, uint64 size) noexc
 template<typename T>
 KOR_FORCEINLINE void SMemoryOps::FillAs(const T* dst, T val, uint64 num) noexcept
 {
-	if constexpr (!TTypeTraits<T>::IsBitwiseCopyable)
+	if constexpr (!TIsTriviallyCopyConstructible<T>::Value)
 	{
 		while (num-- > 0)
 		{
@@ -270,7 +270,7 @@ KOR_FORCEINLINE void* SMemoryOps::Zero(void* dest, uint64 size) noexcept
 template<typename T>
 KOR_FORCEINLINE void SMemoryOps::ZeroAs(const T* dst, uint64 num) noexcept
 {
-	if constexpr (!TTypeTraits<T>::IsBitwiseCopyable)
+	if constexpr (!TIsTriviallyConstructible<T>::Value)
 	{
 		while (num-- > 0)
 		{
@@ -286,44 +286,47 @@ KOR_FORCEINLINE void SMemoryOps::ZeroAs(const T* dst, uint64 num) noexcept
 
 KOR_INLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcept
 {
-    uint8 temp[KOR_BUFFER_SIZE_SMALL]
+	uint8 temp[KOR_BUFFER_SIZE_SMALL];
 
-    while (size > 0)
-    {
-        const uint64 chunk = size > KOR_BUFFER_SIZE_SMALL 
-        	? KOR_BUFFER_SIZE_SMALL 
-        	: size;
+	while (size > 0)
+	{
+		const uint64 chunk = size > KOR_BUFFER_SIZE_SMALL
+			? KOR_BUFFER_SIZE_SMALL
+			: size;
 
-        Copy(temp, a, chunk);
-        Copy(a, b, chunk);
-        Copy(b, temp, chunk);
+		SPlatformMemoryOps::Copy(temp, lhs, chunk);
+		SPlatformMemoryOps::Copy(lhs, rhs, chunk);
+		SPlatformMemoryOps::Copy(rhs, temp, chunk);
 
-        a = (uint8*)a + chunk;
-        b = (uint8*)b + chunk;
-        size -= chunk;
-    }
+		lhs = (uint8*)lhs + chunk;
+		rhs = (uint8*)rhs + chunk;
+		size -= chunk;
+	}
 }
 
 template<typename T>
 KOR_FORCEINLINE void SMemoryOps::SwapAs(T* lhs, T* rhs, uint64 num) noexcept
 {	
-	if constexpr (TIsScalar<T>::Value || !TTypeTraits<T>::IsBitwiseCopyable)
+	if constexpr (!TIsTriviallyMoveConstructible<T>::Value || !TIsTriviallyMoveAssignable<T>::Value)
 	{
-		T tmp(Move(*lhs));
-		a = Move(b);
-		b = Move(tmp);
+		while (num-- > 0)
+		{
+			T tmp(::Move(*lhs));
+			*lhs = ::Move(*rhs);
+			*rhs = ::Move(tmp);
+
+			++lhs;
+			++rhs;
+		}
 	}
 	else
 	{
-		struct SAlignedMem
+		while (num-- > 0)
 		{
-			alignas(T) uint8 Bytes[sizeof(T)];
-		};
-
-		SAlignedMem temp;
-		*(SAlignedMem*)&temp = *(SAlignedMem*)a;
-		*(SAlignedMem*)a    = *(SAlignedMem*)b;
-		*(SAlignedMem*)b    = *(SAlignedMem*)&temp;
+			Swap(lhs, rhs, sizeof(T));
+			++lhs;
+			++rhs;
+		}
 	}
 }
 
@@ -335,7 +338,7 @@ KOR_FORCEINLINE int32 SMemoryOps::Compare(const void* lhs, const void* rhs, uint
 template<typename T>
 KOR_FORCEINLINE int32 SMemoryOps::CompareAs(const T* lhs, const T* rhs, uint64 num) noexcept
 {
-	if constexpr (!TTypeTraits<T>::IsBitwiseComparable)
+	if constexpr (!TIsFundamental<T>::Value && !TIsEnum<T>::Value)
 	{
 		while (num-- > 0)
 		{
@@ -360,7 +363,7 @@ KOR_FORCEINLINE bool SMemoryOps::IsEqual(const void* lhs, const void* rhs, uint6
 template<typename T>
 KOR_FORCEINLINE bool SMemoryOps::IsEqualAs(const T* lhs, const T* rhs, uint64 num) noexcept
 {
-	if constexpr (!TTypeTraits<T>::IsBitwiseComparable)
+	if constexpr (!TIsFundamental<T>::Value && !TIsEnum<T>::Value)
 	{
 		while (num-- > 0)
 		{
@@ -378,24 +381,112 @@ KOR_FORCEINLINE bool SMemoryOps::IsEqualAs(const T* lhs, const T* rhs, uint64 nu
 	}
 }
 
-template<typename T, typename... ArgTypes>
-KOR_FORCEINLINE void SMemoryOps::Construct(T* ptr, ArgTypes&&... Args) noexcept
+template<typename T, typename... ArgsT>
+KOR_FORCEINLINE void SMemoryOps::Construct(T* ptr, ArgsT&&... Args) noexcept
 {
-	if constexpr (!TIsTriviallyConstructible<T, ArgTypes...>::Value)
+	if constexpr (sizeof...(ArgsT) == 0)
 	{
-		::new((void*) ptr) T(Forward<ArgTypes>(Args)...);
+		if constexpr (!TIsTriviallyConstructible<T>::Value)
+		{
+			::new((void*) ptr) T();
+		}
+		else
+		{
+			SPlatformMemoryOps::Zero(ptr, sizeof(T));
+		}
 	}
 	else
 	{
-		SPlatformMemoryOps::Zero(ptr, sizeof(T));
+		using FirstArgType = typename TFirstArg<ArgsT...>::Type;
+		using CleanFirstArgType = typename TClean<FirstArgType>::Type;
+		constexpr bool IsSameAsT = TIsSame<CleanFirstArgType, T>::Value;
+		constexpr bool IsRValueArg = !TIsLValue<FirstArgType>::Value;
+
+		if constexpr (sizeof...(ArgsT) == 1 &&
+			IsSameAsT &&
+			IsRValueArg &&
+			TIsTriviallyMoveConstructible<T>::Value)
+		{
+			SPlatformMemoryOps::Move(ptr, (const void*)&Args..., sizeof(T));
+		}
+		else if constexpr (sizeof...(ArgsT) == 1 &&
+			IsSameAsT &&
+			TIsTriviallyCopyConstructible<T>::Value)
+		{
+			SPlatformMemoryOps::Copy(ptr, (const void*)&Args..., sizeof(T));
+		}
+		else
+		{
+			::new((void*) ptr) T(Forward<ArgsT>(Args)...);
+		}
+	}
+}
+
+
+template<typename T>
+KOR_FORCEINLINE void SMemoryOps::DefaultConstruct(T* ptr, uint64 num) noexcept
+{
+	if constexpr (!TIsTriviallyConstructible<T>::Value)
+	{
+		while(num-- > 0)
+		{
+			::new((void*) ptr) T();
+			++ptr;
+		}
+	}
+	else
+	{
+		SPlatformMemoryOps::Zero(ptr, num * sizeof(T));
+	}
+}
+
+template<typename T, typename R>
+KOR_FORCEINLINE void SMemoryOps::CopyConstruct(T* dest, const R* src, uint64 num) noexcept
+{
+	if constexpr (!TIsSame<T, R>::Value || !TIsTriviallyCopyConstructible<T>::Value)
+	{
+		while (num-- > 0)
+		{
+			::new((void*) dest) T(*src);
+
+			++dest;
+			++src;
+		}
+	}
+	else
+	{
+		SPlatformMemoryOps::Copy(dest, src, num * sizeof(T));
+	}
+}
+
+template<typename T, typename R>
+KOR_FORCEINLINE void SMemoryOps::MoveConstruct(T* dest, R* src, uint64 num) noexcept
+{
+	if constexpr (!TIsSame<T, R>::Value || !TIsTriviallyMoveConstructible<T>::Value)
+	{
+		while (num-- > 0)
+		{
+			::new((void*) dest) T(::Move(*src));
+
+			++dest;
+			++src;
+		}
+	}
+	else
+	{
+		SPlatformMemoryOps::Move(dest, src, num * sizeof(T));
 	}
 }
 
 template<typename T>
-KOR_FORCEINLINE void SMemoryOps::Destruct(T* ptr) noexcept
+KOR_FORCEINLINE void SMemoryOps::Destruct(T* ptr, uint64 num) noexcept
 {
 	if constexpr (!TIsTriviallyDestructible<T>::Value)
 	{
-		ptr->~T();
+		while (num-- > 0)
+		{
+			ptr->~T();
+			++ptr;
+		}
 	}
 }

@@ -11,7 +11,7 @@ namespace Internal
 		static_assert(TIsCharacter<CharT>::Value, "CharT must be character type");
 
 	private:
-		using RawFmtT = typename TRemoveConstReference<FmtT>::Type;
+		using RawFmtT = typename TClean<FmtT>::Type;
 		using PureFmt = typename TPure<FmtT>::Type;
 
 	public:

@@ -71,12 +71,18 @@ struct TIsCastable { enum { Value = TIsDerivedFrom<T, R>::Value || TIsBaseOf<T, 
 // * ie. applies array-to-pointer and function-to-pointer conversions
 
 template<typename T>
-struct TDecay
-{
-	typedef typename Internals::TDecayHelper<
-		typename TRemoveConstReference<T>::Type
-	>::Type Type;
-};
+struct TDecay : TType<
+		typename Internals::TDecayHelper<
+		typename TClean<T>::Type
+	>::Type>
+{};
+
+// [Clean]
+// * Removes const, volatile and reference from provided type
+// * Essentially stripping all qualifiers related to template passing
+
+template<typename T>
+struct TClean : TType<typename TRemoveConst<typename TRemoveReference<T>::Type>::Type> {};
 
 // [Pure]
 // * Removes all qualifiers
@@ -85,7 +91,7 @@ template<typename T>
 struct TPure
 {
 private:
-	using TestType = typename TRemoveConstReference<T>::Type;
+	using TestType = typename TClean<T>::Type;
 
 public:
 	typedef typename TChoose<
@@ -149,31 +155,6 @@ struct TLimits
 
 	static constexpr T Max = (T)((uint64)1 << (sizeof(T) * 8 - (IsSigned ? 1 : 0))) - 1;
 	static constexpr T Min = IsSigned ? (-(int64)((uint64)1 << (sizeof(T) * 8 - 1))) : 0;
-};
-
-// [Type Traits]
-// Tells information about the type
-
-template<typename T>
-struct TTypeTraits
-{
-	enum
-	{
-		IsFundamental = TIsFundamental<T>::Value,
-		IsEnum = TIsEnum<T>::Value,
-
-		HasDefaultConstructor = !TIsTriviallyConstructible<T>::Value,
-
-		HasCopyConstructor = !TIsTriviallyCopyConstructible<T>::Value,
-		HasMoveConstructor = !TIsTriviallyMoveConstructible<T>::Value,
-
-		HasCopyAssign = !TIsTriviallyCopyAssignable<T>::Value,
-		HasMoveAssign = !TIsTriviallyMoveAssignable<T>::Value,
-
-		IsBitwiseCopyable = !HasCopyConstructor && !HasCopyAssign,
-		IsBitwiseMovable = !HasMoveConstructor && !HasMoveAssign,
-		IsBitwiseComparable = IsFundamental || IsEnum || !THasEqualOperator<T>::Value
-	};
 };
 
 KOR_NAMESPACE_END

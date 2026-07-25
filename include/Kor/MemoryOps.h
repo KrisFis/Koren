@@ -89,7 +89,7 @@ struct SMemoryOps
 	template<typename T> static void CopyAs(T* to, const T* from, uint64 num = 1) noexcept;
 
 	// Move / MoveAs
-	// Moves a single element from src to dest. 
+	// Moves a single element from src to dest.
 	// * MoveAs invokes move construction for non-bitwise-movable types.
 	// * MoveAs operates on a single element; use CopyAs for ranges
 	// -------------------------------------------------------------------------
@@ -98,7 +98,7 @@ struct SMemoryOps
 	template<typename T> static void MoveAs(T* to, T* from) noexcept;
 
 	// Fill / FillAs
-	// Fills memory with a repeated value. 
+	// Fills memory with a repeated value.
 	// * FillAs invokes copy construction for non-bitwise-copyable types.
 	// * Fill sets each byte to val (same semantics as memset)
 	// -------------------------------------------------------------------------
@@ -107,7 +107,7 @@ struct SMemoryOps
 	template<typename T> static void FillAs(const T* dst, T val, uint64 num = 1) noexcept;
 
 	// Zero / ZeroAs
-	// Zeroes memory. 
+	// Zeroes memory.
 	// * ZeroAs invokes default construction for non-bitwise-copyable types.
 	// -------------------------------------------------------------------------
 
@@ -115,7 +115,7 @@ struct SMemoryOps
 	template<typename T> static void ZeroAs(const T* dst, uint64 num = 1) noexcept;
 
 	// Swap
-	// Swaps values between lhs and rhs
+	// Swaps values between lhs and rhs.
 	// * SwapAs invokes default construction for non-bitwise-movable types.
 	// -------------------------------------------------------------------------
 
@@ -139,18 +139,45 @@ struct SMemoryOps
 	template<typename T> static bool IsEqualAs(const T* lhs, const T* rhs, uint64 num = 1) noexcept;
 
 	// Construct
-	// Constructs a T in-place at ptr. Zero-initializes if trivially constructible.
+	// Constructs a T in-place from arbitrary args. Single element only.
+	// * Zero-initializes if no args and trivially constructible.
+	// * Bitwise-copies/moves if the single arg is a T and trivially copy/move constructible.
 	// -------------------------------------------------------------------------
 
-	template<typename T, typename... ArgTypes>
-	static void Construct(T* ptr, ArgTypes&&... Args) noexcept;
+	template<typename T, typename... ArgsT>
+	static void Construct(T* ptr, ArgsT&&... Args) noexcept;
 
-	// Destruct
-	// Invokes the destructor of T at ptr. No-op if trivially destructible.
+	// DefaultConstruct
+	// Default-constructs `num` elements at ptr. Zero-fills if trivially constructible.
 	// -------------------------------------------------------------------------
 
 	template<typename T>
-	static void Destruct(T* ptr) noexcept;
+	static void DefaultConstruct(T* ptr, uint64 num = 1) noexcept;
+
+	// CopyConstruct
+	// Copy-constructs `num` elements at dest, one-to-one from src.
+	// * Bitwise-copies when T == R and trivially copy-constructible.
+	// * Ranges must not overlap.
+	// -------------------------------------------------------------------------
+
+	template<typename T, typename R>
+	static void CopyConstruct(T* dest, const R* src, uint64 num = 1) noexcept;
+
+	// MoveConstruct
+	// Move-constructs `num` elements at dest, one-to-one from src.
+	// * Bitwise-copies (src left unchanged) when T == R and trivially move-constructible.
+	// * Ranges must not overlap.
+	// -------------------------------------------------------------------------
+
+	template<typename T, typename R>
+	static void MoveConstruct(T* dest, R* src, uint64 num = 1) noexcept;
+
+	// Destruct
+	// Invokes the destructor of T at ptr, for `num` elements. No-op if trivially destructible.
+	// -------------------------------------------------------------------------
+
+	template<typename T>
+	static void Destruct(T* ptr, uint64 num = 1) noexcept;
 };
 
 #include "Kor/Inl/MemoryOps.inl"

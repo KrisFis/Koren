@@ -17,13 +17,13 @@ struct TIsConstructible { enum { Value = __is_constructible(T, ArgTypes...) }; }
 // * Checks whether specific type is copy constructible
 
 template<typename T>
-struct TIsCopyConstructible : TIsConstructible<T, const typename TRemoveConstReference<T>::Type&> {};
+struct TIsCopyConstructible : TIsConstructible<T, const typename TClean<T>::Type&> {};
 
 // [Is move constructible]
 // * Checks whether specific type is move constructible
 
 template<typename T>
-struct TIsMoveConstructible : TIsConstructible<T, typename TRemoveConstReference<T>::Type&&> {};
+struct TIsMoveConstructible : TIsConstructible<T, typename TClean<T>::Type&&> {};
 
 // Trivial type
 ////////////////////////////////////////////////////////////////
@@ -38,13 +38,13 @@ struct TIsTriviallyConstructible { enum { Value = __is_trivially_constructible(T
 // * Checks whether specific type can be trivially constructed from its own copy
 
 template<typename T>
-struct TIsTriviallyCopyConstructible : TIsTriviallyConstructible<T, const typename TRemoveConstReference<T>::Type&> {};
+struct TIsTriviallyCopyConstructible : TIsTriviallyConstructible<T, const typename TClean<T>::Type&> {};
 
 // [Is trivially move constructible]
 // * Checks whether specific type can be trivially constructed from its own move
 
 template<typename T>
-struct TIsTriviallyMoveConstructible : TIsTriviallyConstructible<T, typename TRemoveConstReference<T>::Type&&> {};
+struct TIsTriviallyMoveConstructible : TIsTriviallyConstructible<T, typename TClean<T>::Type&&> {};
 
 // [Is trivially destructible]
 // * Checks whether specific type has trivial destructor
@@ -71,13 +71,13 @@ struct TIsTriviallyAssignable { enum { Value = __is_trivially_assignable(T, R) }
 // * Checks whether specific type can be trivially assigned from its own copy
 
 template<typename T>
-struct TIsTriviallyCopyAssignable : TIsTriviallyAssignable<T, const typename TRemoveConstReference<T>::Type&> {};
+struct TIsTriviallyCopyAssignable : TIsTriviallyAssignable<T, const typename TClean<T>::Type&> {};
 
 // [Is trivially move assignable]
 // * Checks whether specific type can be trivially assigned from its own move
 
 template<typename T>
-struct TIsTriviallyMoveAssignable : TIsTriviallyAssignable<T, typename TRemoveConstReference<T>::Type&&> {};
+struct TIsTriviallyMoveAssignable : TIsTriviallyAssignable<T, typename TClean<T>::Type&&> {};
 
 // [Is trivially copyable]
 // * Checks whether specific type can be trivially copied

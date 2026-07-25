@@ -52,7 +52,7 @@ namespace KOR_NAMESPACE Internal
 
 	private:
 
-		typedef typename TRemoveConstReference<T>::Type ClearType;
+		typedef typename TClean<T>::Type ClearType;
 
 	public:
 

@@ -43,11 +43,14 @@ typedef TBoolValue<false> TFalseValue;
 template<typename T, typename R> struct TIsSame : TFalseValue {};
 template<typename T> struct TIsSame<T, T> : TTrueValue {};
 
-// [Get Nth type]
-// * Gets Nth type from parameter pack
+// [Get Nth arg]
+// * Gets Nth arg type from parameter pack
 
-template<TSize N, typename T, typename... ArgTypes> struct TGetNthType : TType<typename TGetNthType<N - 1, ArgTypes...>::Type> {};
-template<typename T, typename... ArgTypes> struct TGetNthType<0, T, ArgTypes...> : TType<T> {};
+template<TSize N, typename T, typename... ArgsT> struct TNthArg : TType<typename TNthArg<N - 1, ArgsT...>::Type> {};
+template<typename T, typename... ArgsT> struct TNthArg<0, T, ArgsT...> : TType<T> {};
+
+template<typename T, typename... ArgsT> struct TFirstArg : TType<typename TNthArg<0, T, ArgsT...>::Type> {};
+template<typename T, typename... ArgsT> struct TLastArg : TType<typename TNthArg<sizeof...(ArgsT), T, ArgsT...>::Type> {};
 
 // [Enable if]
 // * Enables compilation of specific template function/struct when condition met
@@ -97,12 +100,6 @@ template<typename T> struct TRemoveConst { typedef T Type; };
 template<typename T> struct TRemoveConst<const T> { typedef T Type; };
 template<typename T> struct TRemoveConst<volatile T> { typedef T Type; };
 template<typename T> struct TRemoveConst<const volatile T> { typedef T Type; };
-
-// [Remove const reference]
-// * Removes const and reference from specific type
-
-template<typename T>
-struct TRemoveConstReference : TType<typename TRemoveConst<typename TRemoveReference<T>::Type>::Type> {};
 
 // [Remove Extent]
 // * Removes extent '[]' from the type

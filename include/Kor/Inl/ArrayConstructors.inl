@@ -16,16 +16,14 @@ KOR_FORCEINLINE constexpr TArray<ElementT, AllocatorT>::TArray(Init::SNoInit) no
 {}
 
 template<typename ElementT, typename AllocatorT>
-TArray<ElementT, AllocatorT>::TArray(const TArray& other) noexcept
+KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const TArray& other) noexcept
 {
-	if (this != &other) [[ likely ]]
-	{
-		CopyFrom(other._data, other._num);
-	}
+	using Impl = Internal::Array::SImpl<ElementT, AllocatorT>;
+	Impl::Copy(*this, other);
 }
 
 template<typename ElementT, typename AllocatorT>
-TArray<ElementT, AllocatorT>::TArray(TArray&& other) noexcept
+KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(TArray&& other) noexcept
 {
 	if (this != &other) [[ likely ]]
 	{
@@ -34,12 +32,12 @@ TArray<ElementT, AllocatorT>::TArray(TArray&& other) noexcept
 }
 
 template<typename ElementT, typename AllocatorT>
-TArray<ElementT, AllocatorT>::TArray(SizeType num, bool reserveOnly) noexcept
+KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, bool reserveOnly) noexcept
 {
 }
 
 template<typename ElementT, typename AllocatorT>
-TArray<ElementT, AllocatorT>::TArray(const ILType& list) noexcept
+KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ILType& list) noexcept
 {
 	// We expect that std::initializer_list's iterators are pointers
 	// * In case which this assumption is incorrect, 
@@ -48,15 +46,15 @@ TArray<ElementT, AllocatorT>::TArray(const ILType& list) noexcept
 }
 
 template<typename ElementT, typename AllocatorT>
-TArray<ElementT, AllocatorT>::TArray(const ElementType* data, SizeType num) noexcept
+KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ElementType* data, SizeType num) noexcept
 {
 	KOR_ASSERT_DEBUG(!!data && num > 0);
 	CopyFrom(data, num);
 }
 
 template<typename ElementT, typename AllocatorT>
-TArray<ElementT, AllocatorT>::~TArray() noexcept
+KOR_FORCEINLINE TArray<ElementT, AllocatorT>::~TArray() noexcept
 {
-	Destruct(_data, _num);
+	SMemoryOps::Destruct(_data, _num);
 	_allocator.Deallocate(_data);
 }
