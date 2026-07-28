@@ -84,6 +84,12 @@ struct TDecay : TType<
 template<typename T>
 struct TClean : TType<typename TRemoveConst<typename TRemoveReference<T>::Type>::Type> {};
 
+// [Is Clean]
+// * Checks if type is clean type (no qualifiers)
+
+template<typename T>
+struct TIsClean : TBoolValue<TIsSame<typename TClean<T>::Type, T>::Value> {};
+
 // [Pure]
 // * Removes all qualifiers
 
@@ -109,7 +115,7 @@ public:
 // * Checks if type is pure type (no qualifiers)
 
 template<typename T>
-struct TIsPure { enum { Value = TIsSame<typename TPure<T>::Value, T>::Value }; };
+struct TIsPure : TBoolValue<TIsSame<typename TPure<T>::Value, T>::Value> {};
 
 // [Get type]
 // * Gets type variations

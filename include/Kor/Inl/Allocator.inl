@@ -6,25 +6,25 @@
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE AllocatorT* TTypedAllocator<AllocatorT, ElementT>::operator->() noexcept
 {
-	return &_allocator;
+	return this;
 }
 
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE const AllocatorT* TTypedAllocator<AllocatorT, ElementT>::operator->() const noexcept
 {
-	return &_allocator;
+	return this;
 }
 
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE AllocatorT* TTypedAllocator<AllocatorT, ElementT>::operator*() noexcept
 {
-	return &_allocator;
+	return this;
 }
 
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE const AllocatorT* TTypedAllocator<AllocatorT, ElementT>::operator*() const noexcept
 {
-	return &_allocator;
+	return this;
 }
 
 KOR_FORCEINLINE void* CAllocator::Allocate(SizeType bytes, SizeType alignment) noexcept
@@ -47,13 +47,13 @@ KOR_FORCEINLINE void CAllocator::Deallocate(void* ptr, SizeType alignment) noexc
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE AllocatorT& TTypedAllocator<AllocatorT, ElementT>::Get() noexcept
 {
-	return _allocator;
+	return *this;
 }
 
 template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE const AllocatorT& TTypedAllocator<AllocatorT, ElementT>::Get() const noexcept
 {
-	return _allocator;
+	return *this;
 }
 
 template<typename AllocatorT, typename ElementT>
@@ -69,11 +69,11 @@ KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Allocate(SizeTy
 
 	if constexpr (Traits::NeedsAlignment)
 	{
-		return (ElementType*)_allocator.Allocate(num * sizeof(ElementType), alignment);
+		return (ElementType*)AllocatorType::Allocate(num * sizeof(ElementType), alignment);
 	}
 	else
 	{
-		return (ElementType*)_allocator.Allocate(num * sizeof(ElementType));
+		return (ElementType*)AllocatorType::Allocate(num * sizeof(ElementType));
 	}
 }
 
@@ -94,11 +94,11 @@ KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Reallocate(Elem
 
 	if constexpr (Traits::NeedsAlignment)
 	{
-		return (ElementType*)_allocator.Reallocate(ptr, num * sizeof(ElementType), alignment);
+		return (ElementType*)AllocatorType::Reallocate(ptr, num * sizeof(ElementType), alignment);
 	}
 	else
 	{
-		return (ElementType*)_allocator.Reallocate(ptr, num * sizeof(ElementType));
+		return (ElementType*)AllocatorType::Reallocate(ptr, num * sizeof(ElementType));
 	}
 }
 
@@ -115,10 +115,10 @@ KOR_FORCEINLINE void TTypedAllocator<AllocatorT, ElementT>::Deallocate(ElementTy
 
 	if constexpr (Traits::NeedsAlignment)
 	{
-		_allocator.Deallocate(ptr, alignment);
+		AllocatorType::Deallocate(ptr, alignment);
 	}
 	else
 	{
-		_allocator.Deallocate(ptr);
+		AllocatorType::Deallocate(ptr);
 	}
 }

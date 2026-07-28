@@ -41,25 +41,27 @@ struct TAllocatorTraits<CAllocator> : TAllocatorTraitsBase<CAllocator>
 
 	enum
 	{
-		NeedsAlignment = false,
-		HasReallocate = false,
+		NeedsAlignment = true,
+		HasReallocate = true,
 	}
 };
 
+// TTypedAllocator
 // Adapter of AllocatorT for ElementT
-// * Wraps an untyped (byte-oriented) allocator and exposes an element-typed interface
-// ** converting element counts to byte sizes and casting the returned pointers to ElementType*.
-// NOTE: Is not specifying traits and is technically not TIsAllocator, as its only adapter
+// * Wraps an untyped allocator and exposes an element-typed interface (element counts -> bytes).
+// * Inherits AllocatorT for EBO on empty allocators. AllocatorT must not be final.
+// * Alignment handling depends on TAllocatorTraits<AllocatorT>::NeedsAlignment.
+// * Custom specializations should preserve EBO so TIsEmpty checks stay meaningful.
 template<typename AllocatorT, typename ElementT>
-class TTypedAllocator
+class TTypedAllocator : protected AllocatorT
 {
 public:
 	// Asserts
 	// -------------------------------------------------------------------------
 
 	static_assert(
-		!TIsVoid<ElementT>::Value && TIsPure<ElementT>::Value,
-		"ElementType must be a non-void and pure type");
+		!TIsVoid<ElementT>::Value && TIsClean<ElementT>::Value,
+		"ElementType must be a non-void clean type");
 
 	static_assert(TIsAllocator<AllocatorT>::Value,
 		"AllocatorType must be a valid allocator type");
@@ -117,9 +119,6 @@ public:
 
 	void Deallocate(ElementType* ptr) noexcept;
 	void Deallocate(ElementType* ptr, SizeType alignment) noexcept;
-
-private:
-	AllocatorType _allocator;
 };
 
 #include "Kor/Inl/Allocator.inl"
