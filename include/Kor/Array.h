@@ -60,21 +60,35 @@ public:
 	constexpr TArray(Init::SNoInit) noexcept;
 
 	// Copy-constructs from another array. Performs a deep copy of all elements.
+	// The new array's capacity is exactly Num of `other`; slack is not preserved.
 	TArray(const TArray& other) noexcept;
 
-	// Move-constructs from another array. Source is left in a valid empty state.
-	TArray(TArray&& other) noexcept;
+	// Move-constructs from another array. Buffer, Num, and capacity are stolen
+	// as-is. Source is left in a valid, empty state (Data=nullptr, Num=0, Max=0).
+	constexpr TArray(TArray&& other) noexcept;
 
-	// Constructs with `num` elements. If `reserveOnly` is true, capacity is
-	// reserved but no elements are added (Num remains 0).
-	TArray(SizeType num, bool reserveOnly = false) noexcept;
-
-	// Constructs from an initializer list.
+	// Constructs from an initializer list. Performs a deep copy of all elements.
 	TArray(const ILType& list) noexcept;
 
 	// Constructs by copying `num` elements from a raw pointer. Pointer must not
 	// be null and must point to at least `num` valid elements.
 	TArray(const ElementType* data, SizeType num) noexcept;
+
+	// Reserves capacity for `num` elements. Num remains 0; no elements are
+	// constructed.
+	TArray(SizeType num, Init::SNoInit) noexcept;
+
+	// Reserves capacity for `num` elements and default-constructs each one.
+	// Num becomes `num`.
+	TArray(SizeType num, Init::SDefault) noexcept;
+
+	// Reserves capacity for `num` elements and zero-initializes the buffer.
+	// Num becomes `num`. Only valid for trivially-constructible ElementType.
+	TArray(SizeType num, Init::SZero) noexcept;
+
+	// Reserves capacity for `num` elements, each copy-constructed from `value`.
+	// Num becomes `num`.
+	TArray(SizeType num, const ElementType& value) noexcept;
 
 	// Destructor
 	// -------------------------------------------------------------------------

@@ -11,6 +11,10 @@ KOR_NAMESPACE_BEGIN
 // Types opt in by adding constructor overloads for the relevant tag types.
 namespace Init
 {
+	// Request default-initialization (default construction performed)
+	struct SDefault {};
+	inline constexpr SDefault Default {};
+
 	// Request zero-initialization (all bytes set to zero)
 	struct SZero {};
 	inline constexpr SZero Zero {};

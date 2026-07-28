@@ -21,17 +21,17 @@
 
 #if KOR_USE_ASSERT
 
-	#define KOR_ASSERT(statement)													\
-		if (KOR_UNLIKELY(!(statement)))													\
+	#define KOR_ASSERT(statement)														\
+		if (!(statement)) [[ unlikely ]]												\
 		{																				\
-			KOR_NAMESPACE Internal::LogFailed(#statement, __FILE__, __LINE__);	\
-			KOR_NAMESPACE Internal::Crash();										\
+			KOR_NAMESPACE Internal::LogFailed(#statement, __FILE__, __LINE__);			\
+			KOR_NAMESPACE Internal::Crash();											\
 		}
 
-	#define KOR_EXPECT(expression)													\
+	#define KOR_EXPECT(expression)														\
 		(KOR_LIKELY(!!(expression)) || []()												\
 		{ 																				\
-			KOR_NAMESPACE Internal::LogFailed(#expression, __FILE__, __LINE__);	\
+			KOR_NAMESPACE Internal::LogFailed(#expression, __FILE__, __LINE__);			\
 			static bool didBreak = false; 												\
 			if (!didBreak) 																\
 			{ 																			\
