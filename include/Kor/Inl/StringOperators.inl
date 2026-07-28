@@ -79,7 +79,7 @@ KOR_FORCEINLINE TString<CharT>& TString<CharT>::operator=(TString&& other) noexc
 }
 
 template<typename CharT>
-TString<CharT> TString<CharT>::operator+(const TString& other) const noexcept
+KOR_INLINE TString<CharT> TString<CharT>::operator+(const TString& other) const noexcept
 {
 	TString result(Init::Zero);
 	const int32 thisLen = _data.GetNum() - 1;
@@ -100,7 +100,7 @@ KOR_FORCEINLINE TString<CharT> TString<CharT>::operator+(TString&& other) const 
 }
 
 template<typename CharT>
-TString<CharT>& TString<CharT>::operator+=(const TString& other) noexcept
+KOR_INLINE TString<CharT>& TString<CharT>::operator+=(const TString& other) noexcept
 {
 	const int32 thisLen = _data.GetNum() - 1;
 	const int32 otherLen = other._data.GetNum() - 1;
@@ -119,7 +119,7 @@ KOR_FORCEINLINE TString<CharT>& TString<CharT>::operator+=(TString&& other) noex
 }
 
 template<typename CharT>
-TString<CharT> TString<CharT>::operator/(const TString& other) const noexcept
+KOR_INLINE TString<CharT> TString<CharT>::operator/(const TString& other) const noexcept
 {
 	const int32 thisLen = _data.GetNum() - 1;
 	const int32 otherLen = other._data.GetNum() - 1;
@@ -137,7 +137,7 @@ TString<CharT> TString<CharT>::operator/(const TString& other) const noexcept
 }
 
 template<typename CharT>
-TString<CharT>& TString<CharT>::operator/=(const TString& other) noexcept
+KOR_INLINE TString<CharT>& TString<CharT>::operator/=(const TString& other) noexcept
 {
 	const int32 thisLen = _data.GetNum() - 1;
 	const int32 otherLen = other._data.GetNum() - 1;

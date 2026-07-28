@@ -4,7 +4,7 @@
 #pragma once // silence tooling
 
 template<typename CharType>
-int32 TStringOps<CharType>::Length(const CharType* str) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Length(const CharType* str) noexcept
 {
 	int32 len = 0; while (*str++) ++len; return len;
 }
@@ -18,7 +18,7 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Length(const CharType(&)[N]) noexcep
 
 template<typename CharType>
 template<ESearchDir Dir>
-int32 TStringOps<CharType>::CountWhitespaces(const CharType* str) noexcept
+KOR_INLINE int32 TStringOps<CharType>::CountWhitespaces(const CharType* str) noexcept
 {
 	int32 result = 0;
 
@@ -58,7 +58,7 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::CountWhitespaces(const CharType* str
 
 template<typename CharType>
 template<ESearchDir Dir>
-int32 TStringOps<CharType>::CountWhitespaces(const CharType* str, int32 strLen) noexcept
+KOR_INLINE int32 TStringOps<CharType>::CountWhitespaces(const CharType* str, int32 strLen) noexcept
 {
 	int32 result = 0;
 
@@ -92,7 +92,7 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::CountWhitespaces(const CharType* str
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsAscii(const CharType* str) noexcept
+KOR_INLINE bool TStringOps<CharType>::IsAscii(const CharType* str) noexcept
 {
 	if constexpr (!TIsSame<CharType, achar>::Value)
 	{
@@ -106,7 +106,7 @@ bool TStringOps<CharType>::IsAscii(const CharType* str) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsAscii(const CharType* str, int32 strLen) noexcept
+KOR_INLINE bool TStringOps<CharType>::IsAscii(const CharType* str, int32 strLen) noexcept
 {
 	if constexpr (!TIsSame<CharType, achar>::Value)
 	{
@@ -120,7 +120,7 @@ bool TStringOps<CharType>::IsAscii(const CharType* str, int32 strLen) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsNumeric(const CharType* str) noexcept
+KOR_INLINE bool TStringOps<CharType>::IsNumeric(const CharType* str) noexcept
 {
 	while(*str)
 	{
@@ -131,7 +131,7 @@ bool TStringOps<CharType>::IsNumeric(const CharType* str) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsNumeric(const CharType* str, int32 strLen) noexcept
+KOR_INLINE bool TStringOps<CharType>::IsNumeric(const CharType* str, int32 strLen) noexcept
 {
 	while(strLen-- > 0)
 	{
@@ -142,7 +142,7 @@ bool TStringOps<CharType>::IsNumeric(const CharType* str, int32 strLen) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsWhitespace(const CharType* str) noexcept
+KOR_INLINE bool TStringOps<CharType>::IsWhitespace(const CharType* str) noexcept
 {
 	while(*str)
 	{
@@ -153,7 +153,7 @@ bool TStringOps<CharType>::IsWhitespace(const CharType* str) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsWhitespace(const CharType* str, int32 strLen) noexcept
+KOR_INLINE bool TStringOps<CharType>::IsWhitespace(const CharType* str, int32 strLen) noexcept
 {
 	while(strLen-- > 0)
 	{
@@ -164,7 +164,7 @@ bool TStringOps<CharType>::IsWhitespace(const CharType* str, int32 strLen) noexc
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsUpper(const CharType* str) noexcept
+KOR_INLINE bool TStringOps<CharType>::IsUpper(const CharType* str) noexcept
 {
 	while(*str)
 	{
@@ -175,7 +175,7 @@ bool TStringOps<CharType>::IsUpper(const CharType* str) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsUpper(const CharType* str, int32 strLen) noexcept
+KOR_INLINE bool TStringOps<CharType>::IsUpper(const CharType* str, int32 strLen) noexcept
 {
 	while(strLen-- > 0)
 	{
@@ -186,7 +186,7 @@ bool TStringOps<CharType>::IsUpper(const CharType* str, int32 strLen) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsLower(const CharType* str) noexcept
+KOR_INLINE bool TStringOps<CharType>::IsLower(const CharType* str) noexcept
 {
 	while(*str)
 	{
@@ -197,7 +197,7 @@ bool TStringOps<CharType>::IsLower(const CharType* str) noexcept
 }
 
 template<typename CharType>
-bool TStringOps<CharType>::IsLower(const CharType* str, int32 strLen) noexcept
+KOR_INLINE bool TStringOps<CharType>::IsLower(const CharType* str, int32 strLen) noexcept
 {
 	while(strLen-- > 0)
 	{

@@ -42,7 +42,7 @@ KOR_FORCEINLINE void SMemoryOps::Free(void* ptr) noexcept
 	return SPlatformMemoryOps::Free(ptr);
 }
 
-KOR_FORCEINLINE void SMemoryOps::Free(void* ptr, uint64 alignment) noexcept
+KOR_INLINE void SMemoryOps::Free(void* ptr, uint64 alignment) noexcept
 {
 	using namespace Internal::Memory;
 
@@ -54,7 +54,7 @@ KOR_FORCEINLINE void SMemoryOps::Free(void* ptr, uint64 alignment) noexcept
 		return;
 	}
 
-	KOR_ASSERT_DEBUG(ptr);
+	KOR_ASSERT(ptr);
 	void* rawPtr = SAlignHeader::Get(ptr)->RawPointer;
 	SPlatformMemoryOps::Free(rawPtr);
 }
@@ -68,7 +68,7 @@ KOR_INLINE void* SMemoryOps::Malloc(uint64 size, uint64 alignment) noexcept
 {
 	using namespace Internal::Memory;
 
-	KOR_ASSERT_DEBUG(SMath::IsPowerOfTwo(alignment));
+	KOR_ASSERT(SMath::IsPowerOfTwo(alignment));
 
 	if (alignment <= KOR_DEFAULT_HEAP_ALIGNMENT)
 	{
@@ -321,12 +321,7 @@ KOR_FORCEINLINE void SMemoryOps::SwapAs(T* lhs, T* rhs, uint64 num) noexcept
 	}
 	else
 	{
-		while (num-- > 0)
-		{
-			Swap(lhs, rhs, sizeof(T));
-			++lhs;
-			++rhs;
-		}
+		Swap(lhs, rhs, num * sizeof(T));
 	}
 }
 

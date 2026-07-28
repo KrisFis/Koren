@@ -29,7 +29,7 @@ namespace Internal
 
 template<typename CharT>
 template<typename FmtT, typename ... VarTypes>
-TString<CharT> TString<CharT>::Format(const FmtT& fmt, const VarTypes&... args) noexcept
+KOR_INLINE TString<CharT> TString<CharT>::Format(const FmtT& fmt, const VarTypes&... args) noexcept
 {
 	using StringTraits = Internal::TTStringFormatTraits<CharT, FmtT>;
 	static_assert(sizeof...(VarTypes) > 0, "No arguments provided. Use construction from fmt directly instead");

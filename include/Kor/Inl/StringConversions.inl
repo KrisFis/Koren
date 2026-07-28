@@ -4,7 +4,7 @@
 #pragma once // silence tooling
 
 template<typename CharT>
-TString<CharT> TString<CharT>::FromInt(int64 value, int32 base) noexcept
+KOR_INLINE TString<CharT> TString<CharT>::FromInt(int64 value, int32 base) noexcept
 {
 	TString result(Init::Zero);
 	result._data.Resize(SStringConstant::BufferSize_Int64);
@@ -19,7 +19,7 @@ TString<CharT> TString<CharT>::FromInt(int64 value, int32 base) noexcept
 }
 
 template<typename CharT>
-TString<CharT> TString<CharT>::FromUInt(uint64 value, int32 base) noexcept
+KOR_INLINE TString<CharT> TString<CharT>::FromUInt(uint64 value, int32 base) noexcept
 {
 	TString result(Init::Zero);
 	result._data.Resize(SStringConstant::BufferSize_UInt64);
@@ -59,7 +59,7 @@ KOR_FORCEINLINE uint64 TString<CharT>::ToUInt(int32 base) const noexcept
 
 template<typename CharT>
 template<EFloatFormat Format>
-TString<CharT> TString<CharT>::FromFloat(double value, uint8 precision) noexcept
+KOR_INLINE TString<CharT> TString<CharT>::FromFloat(double value, uint8 precision) noexcept
 {
 	TString result(Init::Zero);
 	result._data.Resize(SStringConstant::BufferSize_Double);
@@ -101,7 +101,7 @@ KOR_FORCEINLINE double TString<CharT>::ToFloat() const noexcept
 
 template<typename CharT>
 template<typename OtherCharType>
-TString<CharT> TString<CharT>::ConvertFrom(const OtherCharType* str, SizeType length) noexcept
+KOR_INLINE TString<CharT> TString<CharT>::ConvertFrom(const OtherCharType* str, SizeType length) noexcept
 {
 	const SizeType convLen = TStringOps<OtherCharType>::template ConvertedLength<CharT>(str, length);
 	KOR_ASSERT_DEBUG(convLen > 0);

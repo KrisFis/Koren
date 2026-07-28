@@ -4,21 +4,21 @@
 #pragma once // silence tooling
 
 template<typename CharT>
-KOR_FORCEINLINE void TString<CharT>::Append(const TString& other) noexcept
+KOR_INLINE void TString<CharT>::Append(const TString& other) noexcept
 {
 	_data.Pop(); // remove null terminator
 	_data.Append(other._data); // includes other's null terminator
 }
 
 template<typename CharT>
-KOR_FORCEINLINE void TString<CharT>::Append(TString&& other) noexcept
+KOR_INLINE void TString<CharT>::Append(TString&& other) noexcept
 {
 	_data.Pop(); // remove null terminator
 	_data.Append(Move(other._data)); // includes other's null terminator
 }
 
 template<typename CharT>
-KOR_FORCEINLINE void TString<CharT>::Append(const CharType* other, SizeType num) noexcept
+KOR_INLINE void TString<CharT>::Append(const CharType* other, SizeType num) noexcept
 {
 	_data.Pop(); // remove null terminator
 	_data.Append(other, num);
@@ -59,7 +59,7 @@ KOR_FORCEINLINE void TString<CharT>::Trim() noexcept
 }
 
 template<typename CharT>
-KOR_FORCEINLINE_DEBUG void TString<CharT>::ChopRight(SizeType idx) noexcept
+KOR_INLINE void TString<CharT>::ChopRight(SizeType idx) noexcept
 {
 	// Remove everything from idx to end (excluding null terminator)
 	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
@@ -69,7 +69,7 @@ KOR_FORCEINLINE_DEBUG void TString<CharT>::ChopRight(SizeType idx) noexcept
 }
 
 template<typename CharT>
-KOR_FORCEINLINE_DEBUG void TString<CharT>::ChopLeft(SizeType idx) noexcept
+KOR_INLINE void TString<CharT>::ChopLeft(SizeType idx) noexcept
 {
 	// Remove everything before idx
 	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
@@ -78,7 +78,7 @@ KOR_FORCEINLINE_DEBUG void TString<CharT>::ChopLeft(SizeType idx) noexcept
 }
 
 template<typename CharT>
-KOR_FORCEINLINE_DEBUG void TString<CharT>::ChopRange(SizeType firstIdx, SizeType secondIdx) noexcept
+KOR_INLINE void TString<CharT>::ChopRange(SizeType firstIdx, SizeType secondIdx) noexcept
 {
 	KOR_ASSERT_DEBUG(firstIdx >= 0 && secondIdx >= firstIdx && secondIdx < _data.GetNum() - 1);
 	_data.RemoveAt(firstIdx, secondIdx - firstIdx + 1);
@@ -86,7 +86,7 @@ KOR_FORCEINLINE_DEBUG void TString<CharT>::ChopRange(SizeType firstIdx, SizeType
 }
 
 template<typename CharT>
-KOR_FORCEINLINE_DEBUG void TString<CharT>::Insert(SizeType idx, const TString& other) noexcept
+KOR_INLINE void TString<CharT>::Insert(SizeType idx, const TString& other) noexcept
 {
 	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
 	// Insert without the other's null terminator
@@ -95,7 +95,7 @@ KOR_FORCEINLINE_DEBUG void TString<CharT>::Insert(SizeType idx, const TString& o
 }
 
 template<typename CharT>
-KOR_FORCEINLINE_DEBUG void TString<CharT>::Remove(SizeType idx, SizeType count) noexcept
+KOR_INLINE void TString<CharT>::Remove(SizeType idx, SizeType count) noexcept
 {
 	KOR_ASSERT_DEBUG(idx >= 0 && idx + count <= _data.GetNum() - 1);
 	_data.RemoveAt(idx, count);

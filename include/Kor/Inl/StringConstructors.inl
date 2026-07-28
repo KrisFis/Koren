@@ -37,7 +37,7 @@ KOR_FORCEINLINE constexpr TString<CharT>::TString(Init::SNoInit) noexcept
 {}
 
 template<typename CharT>
-KOR_FORCEINLINE TStringView<CharT>::TStringView(const CharType* text) noexcept
+KOR_INLINE TStringView<CharT>::TStringView(const CharType* text) noexcept
 {
 	if (text)
 	{
@@ -52,7 +52,7 @@ KOR_FORCEINLINE TStringView<CharT>::TStringView(const CharType* text) noexcept
 }
 
 template<typename CharT>
-KOR_FORCEINLINE TString<CharT>::TString(const CharType* text) noexcept
+KOR_INLINE TString<CharT>::TString(const CharType* text) noexcept
 {
 	if (text)
 	{
@@ -65,7 +65,7 @@ KOR_FORCEINLINE TString<CharT>::TString(const CharType* text) noexcept
 }
 
 template<typename CharT>
-KOR_FORCEINLINE TStringView<CharT>::TStringView(const CharType* text, SizeType length) noexcept
+KOR_INLINE TStringView<CharT>::TStringView(const CharType* text, SizeType length) noexcept
 {
 	if (text && length > 0)
 	{
@@ -80,7 +80,7 @@ KOR_FORCEINLINE TStringView<CharT>::TStringView(const CharType* text, SizeType l
 }
 
 template<typename CharT>
-KOR_FORCEINLINE TString<CharT>::TString(const CharType* text, SizeType length) noexcept
+KOR_INLINE TString<CharT>::TString(const CharType* text, SizeType length) noexcept
 {
 	if (text && length > 0)
 	{
@@ -107,7 +107,7 @@ KOR_FORCEINLINE TString<CharT>::TString(const CharType(& text)[N]) noexcept
 {}
 
 template<typename CharT>
-KOR_FORCEINLINE TString<CharT>::TString(SizeType length, CharType val) noexcept
+KOR_INLINE TString<CharT>::TString(SizeType length, CharType val) noexcept
 {
 	if (length > 0)
 	{

@@ -5,7 +5,7 @@
 
 template<typename CharType>
 template<ESearchCase Case>
-int32 TStringOps<CharType>::Compare(const CharType* lhs, const CharType* rhs) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Compare(const CharType* lhs, const CharType* rhs) noexcept
 {
 	using namespace Internal;
 
@@ -23,7 +23,7 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Compare(const CharType* lhs, const C
 
 template<typename CharType>
 template<ESearchCase Case>
-int32 TStringOps<CharType>::Compare(const CharType* lhs, const CharType* rhs, int32 len) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Compare(const CharType* lhs, const CharType* rhs, int32 len) noexcept
 {
 	using namespace Internal;
 

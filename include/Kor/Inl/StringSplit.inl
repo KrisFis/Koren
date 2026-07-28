@@ -5,7 +5,7 @@
 
 template<typename CharT>
 template<ESearchCase Case, ESearchDir Dir>
-bool TStringView<CharT>::Split(const TStringView& delim, TStringView* outLeft, TStringView* outRight) const noexcept
+KOR_INLINE bool TStringView<CharT>::Split(const TStringView& delim, TStringView* outLeft, TStringView* outRight) const noexcept
 {
 	const SizeType thisLen = _len;
 	const SizeType delimLen = delim._len;
@@ -26,7 +26,7 @@ bool TStringView<CharT>::Split(const TStringView& delim, TStringView* outLeft, T
 
 template<typename CharT>
 template<ESearchCase Case, ESearchDir Dir>
-bool TString<CharT>::Split(const TString& delim, TString* outLeft, TString* outRight) const noexcept
+KOR_INLINE bool TString<CharT>::Split(const TString& delim, TString* outLeft, TString* outRight) const noexcept
 {
 	const SizeType thisLen = _data.GetNum() - 1;
 	const SizeType delimLen = delim._data.GetNum() - 1;
@@ -81,7 +81,7 @@ KOR_FORCEINLINE bool TString<CharT>::Split(const TString& delim, TString* outLef
 
 template<typename CharT>
 template<ESearchCase Case>
-TArray<TStringView<CharT>> TStringView<CharT>::SplitToArray(const TStringView& delim, bool discardEmpty) const noexcept
+KOR_INLINE TArray<TStringView<CharT>> TStringView<CharT>::SplitToArray(const TStringView& delim, bool discardEmpty) const noexcept
 {
 	TArray<TStringView> result;
 
@@ -117,7 +117,7 @@ TArray<TStringView<CharT>> TStringView<CharT>::SplitToArray(const TStringView& d
 
 template<typename CharT>
 template<ESearchCase Case>
-TArray<TString<CharT>> TString<CharT>::SplitToArray(const TString& delim, bool discardEmpty) const noexcept
+KOR_INLINE TArray<TString<CharT>> TString<CharT>::SplitToArray(const TString& delim, bool discardEmpty) const noexcept
 {
 	TArray<TString> result;
 

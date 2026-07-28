@@ -10,8 +10,8 @@ void TStringOps<CharType>::ToUpper(CharType* str) noexcept
 	{
 		*str = TCharOps<CharType>::ToUpper(*str);
 
-		// Compiler dependent order of read
-		// *(str++) = TCharOps<CharType>::ToUpper(*str);
+		// This: *(str++) = TCharOps<CharType>::ToUpper(*str);
+		// Would be compiler dependent order of read
 
 		++str;
 	}
@@ -24,8 +24,8 @@ void TStringOps<CharType>::ToUpper(CharType* str, int32 strLen) noexcept
 	{
 		*str = TCharOps<CharType>::ToUpper(*str);
 
-		// Compiler dependent order of read
-		// *(str++) = TCharOps<CharType>::ToUpper(*str);
+		// This: *(str++) = TCharOps<CharType>::ToUpper(*str);
+		// Would be compiler dependent order of read
 
 		++str;
 	}

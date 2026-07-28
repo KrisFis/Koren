@@ -10,7 +10,7 @@ KOR_FORCEINLINE TString<CharT> TString<CharT>::Copy() const noexcept
 }
 
 template<typename CharT>
-KOR_FORCEINLINE void TString<CharT>::Fill(SizeType length, CharType val) noexcept
+KOR_INLINE void TString<CharT>::Fill(SizeType length, CharType val) noexcept
 {
 	_data.Resize(length + 1);
 	SMemoryOps::FillAs(_data.GetData(), val, length);
@@ -18,14 +18,14 @@ KOR_FORCEINLINE void TString<CharT>::Fill(SizeType length, CharType val) noexcep
 }
 
 template<typename CharT>
-KOR_FORCEINLINE void TString<CharT>::Reset() noexcept
+KOR_INLINE void TString<CharT>::Reset() noexcept
 {
 	_data.Reset();
 	_data.Add(Constant::Null);
 }
 
 template<typename CharT>
-KOR_FORCEINLINE void TString<CharT>::Empty() noexcept
+KOR_INLINE void TString<CharT>::Empty() noexcept
 {
 	_data.Empty();
 	_data.Add(Constant::Null);

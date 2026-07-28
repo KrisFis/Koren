@@ -5,7 +5,7 @@
 
 template<typename CharType>
 template<ESearchCase Case>
-int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const CharType* to) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const CharType* to) noexcept
 {
 	CharType* buffer = Internal::GetScratchBuffer<CharType>();
 
@@ -47,7 +47,7 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType* str, const CharTyp
 
 template<typename CharType>
 template<ESearchCase Case>
-int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const CharType* to, int32 maxLen) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Replace(CharType* str, const CharType* from, const CharType* to, int32 maxLen) noexcept
 {
 	CharType* buffer = Internal::GetScratchBuffer<CharType>();
 
@@ -90,7 +90,7 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType* str, const CharTyp
 
 template<typename CharType>
 template<ESearchCase Case>
-int32 TStringOps<CharType>::Replace(CharType* str, CharType from, CharType to) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Replace(CharType* str, CharType from, CharType to) noexcept
 {
 	int32 result = 0;
 
@@ -119,7 +119,7 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Replace(CharType* str, CharType from
 
 template<typename CharType>
 template<ESearchCase Case>
-int32 TStringOps<CharType>::Replace(CharType* str, CharType from, CharType to, int32 maxLen) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Replace(CharType* str, CharType from, CharType to, int32 maxLen) noexcept
 {
 	int32 result = 0;
 

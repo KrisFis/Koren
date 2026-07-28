@@ -84,7 +84,7 @@ namespace Internal
 
 template<typename CharType>
 template<typename ToCharType>
-int32 TStringOps<CharType>::ConvertedLength(const CharType* str, int32 strLen) noexcept
+KOR_INLINE int32 TStringOps<CharType>::ConvertedLength(const CharType* str, int32 strLen) noexcept
 {
 	static_assert(TIsCharacter<ToCharType>::Value, "Destination Character Type is not a character type");
 
@@ -151,7 +151,7 @@ int32 TStringOps<CharType>::ConvertedLength(const CharType* str, int32 strLen) n
 
 template<typename CharType>
 template<typename ToCharType>
-int32 TStringOps<CharType>::Convert(ToCharType* dest, const CharType* src, int32 srcLen) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Convert(ToCharType* dest, const CharType* src, int32 srcLen) noexcept
 {
 	static_assert(TIsCharacter<ToCharType>::Value, "Destination Character Type is not a character type");
 

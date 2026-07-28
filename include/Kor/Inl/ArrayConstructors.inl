@@ -16,7 +16,7 @@ KOR_FORCEINLINE constexpr TArray<ElementT, AllocatorT>::TArray(Init::SNoInit) no
 {}
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const TArray& other) noexcept
+KOR_INLINE TArray<ElementT, AllocatorT>::TArray(const TArray& other) noexcept
 {
 	if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
 	{
@@ -42,7 +42,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const TArray& other) noexce
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE constexpr TArray<ElementT, AllocatorT>::TArray(TArray&& other) noexcept
+KOR_INLINE constexpr TArray<ElementT, AllocatorT>::TArray(TArray&& other) noexcept
 {
 	if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
 	{
@@ -68,7 +68,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ILType& list) noexcep
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ElementType* data, SizeType num) noexcept
+KOR_INLINE TArray<ElementT, AllocatorT>::TArray(const ElementType* data, SizeType num) noexcept
 	: TArray()
 {
 	if (!data || num <= 0) return;
@@ -94,7 +94,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SNoInit
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SDefault) noexcept
+KOR_INLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SDefault) noexcept
 	: TArray()
 {
 	if (num <= 0) return;
@@ -109,7 +109,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SDefaul
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SZero) noexcept
+KOR_INLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SZero) noexcept
 	: TArray()
 {
 	if (num <= 0) return;
@@ -124,7 +124,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SZero) 
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, const ElementType& value) noexcept
+KOR_INLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, const ElementType& value) noexcept
 	: TArray()
 {
 	if (num <= 0) return;
@@ -142,7 +142,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, const Element
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>::~TArray() noexcept
+KOR_INLINE TArray<ElementT, AllocatorT>::~TArray() noexcept
 {
 	if (!_data) return;
 
