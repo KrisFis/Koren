@@ -90,7 +90,12 @@
 #define KOR_INDEX_NONE -1
 
 // Pointer arithmetic helpers
+
+// Byte diff
 #define KOR_PTR_DIFF(RetType, Ptr1, Ptr2) (RetType)((uintptr)Ptr1 - (uintptr)Ptr2)
+
+// Typed diff
+#define KOR_PTR_TYPED_DIFF(RetType, Ptr1, Ptr2) (RetType)(Ptr1 - Ptr2)
 
 // Default heap alignment
 // * Heap Alignment guarantees alignment sufficient for the strictest fundamental type

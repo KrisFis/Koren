@@ -11,13 +11,16 @@
 
 KOR_NAMESPACE_BEGIN
 
+// Forward declare for private array friend
+namespace Internal::Array { struct SFriend; }
+
 // [TArray]
 // A dynamically-sized, heap-allocated array container.
 //
 // Contract:
 // - ElementType must be a non-void, non-reference type
 // - AllocatorType must expose a signed SizeType
-// - All index parameters are bounds-checked via assert in debug builds
+// - All index parameters are bounds-checked via assert
 // - Ownership is exclusive; copying performs a deep copy, moving transfers ownership
 // - Iterators and pointers into the array are invalidated by any operation that
 //   modifies capacity (Reserve, Add, Remove, Resize, etc.)
@@ -55,10 +58,6 @@ public:
 	// Default-constructs an empty array with no allocation.
 	constexpr TArray() noexcept;
 
-	// Constructs without initializing internal state. Caller is responsible for
-	// ensuring valid state before use.
-	constexpr TArray(Init::SNoInit) noexcept;
-
 	// Copy-constructs from another array. Performs a deep copy of all elements.
 	// The new array's capacity is exactly Num of `other`; slack is not preserved.
 	TArray(const TArray& other) noexcept;
@@ -72,23 +71,27 @@ public:
 
 	// Constructs by copying `num` elements from a raw pointer. Pointer must not
 	// be null and must point to at least `num` valid elements.
-	TArray(const ElementType* data, SizeType num) noexcept;
+	explicit TArray(const ElementType* data, SizeType num) noexcept;
+
+	// Constructs without initializing internal state. Caller is responsible for
+	// ensuring valid state before use.
+	explicit constexpr TArray(Init::SNoInit) noexcept;
 
 	// Reserves capacity for `num` elements. Num remains 0; no elements are
 	// constructed.
-	TArray(SizeType num, Init::SNoInit) noexcept;
+	explicit TArray(SizeType num, Init::SNoInit) noexcept;
 
 	// Reserves capacity for `num` elements and default-constructs each one.
 	// Num becomes `num`.
-	TArray(SizeType num, Init::SDefault) noexcept;
+	explicit TArray(SizeType num, Init::SDefault) noexcept;
 
 	// Reserves capacity for `num` elements and zero-initializes the buffer.
 	// Num becomes `num`. Only valid for trivially-constructible ElementType.
-	TArray(SizeType num, Init::SZero) noexcept;
+	explicit TArray(SizeType num, Init::SZero) noexcept;
 
 	// Reserves capacity for `num` elements, each copy-constructed from `value`.
 	// Num becomes `num`.
-	TArray(SizeType num, const ElementType& value) noexcept;
+	explicit TArray(SizeType num, const ElementType& value) noexcept;
 
 	// Destructor
 	// -------------------------------------------------------------------------
@@ -114,13 +117,13 @@ public:
 
 	// Returns a raw pointer to the underlying data buffer. May be null if the
 	// array has never allocated (i.e. empty with no reserve).
-	const ElementType* operator*() const noexcept;
 	ElementType* operator*() noexcept;
+	const ElementType* operator*() const noexcept;
 
 	// Index Operators
 	// -------------------------------------------------------------------------
 
-	// Asserts that `idx` is a valid index in debug builds.
+	// Asserts that `idx` is a valid index.
 	ElementType& operator[](SizeType idx) noexcept;
 	const ElementType& operator[](SizeType idx) const noexcept;
 
@@ -155,18 +158,18 @@ public:
 	// Get
 	// -------------------------------------------------------------------------
 
-	// Returns a pointer to the element at `idx`. Asserts in debug builds.
+	// Returns a pointer to the element at `idx`. Asserts.
 	// Returns null if `idx` is out of range in release builds.
-	const ElementType* GetAt(SizeType idx) const noexcept;
 	ElementType* GetAt(SizeType idx) noexcept;
+	const ElementType* GetAt(SizeType idx) const noexcept;
 
 	// Returns a pointer to the first element, or null if empty.
-	const ElementType* GetFirst() const noexcept;
 	ElementType* GetFirst() noexcept;
+	const ElementType* GetFirst() const noexcept;
 
 	// Returns a pointer to the last element, or null if empty.
-	const ElementType* GetLast() const noexcept;
 	ElementType* GetLast() noexcept;
+	const ElementType* GetLast() const noexcept;
 
 	// Reserve / Resize / Reset
 	// -------------------------------------------------------------------------
@@ -416,18 +419,18 @@ public:
 	// true, or null if not found.
 	// Note: not marked noexcept; functor exception behavior is unknown.
 	template<typename Functor>
-	const ElementType* FindByFunc(Functor&& func) const;
+	ElementType* FindByFunc(Functor&& func);
 
 	template<typename Functor>
-	ElementType* FindByFunc(Functor&& func);
+	const ElementType* FindByFunc(Functor&& func) const;
 
 	// Returns a pointer to the first element whose key matches `key`,
 	// or null if not found.
 	template<typename KeyType>
-	const ElementType* FindByKey(KeyType key) const noexcept;
+	ElementType* FindByKey(KeyType key) noexcept;
 
 	template<typename KeyType>
-	ElementType* FindByKey(KeyType key) noexcept;
+	const ElementType* FindByKey(KeyType key) const noexcept;
 
 	// Contains
 	// -------------------------------------------------------------------------
@@ -464,6 +467,9 @@ private:
 
 	// Number of reserved elements (size of _data buffer)
 	SizeType _reservedNum;
+
+	// Implementation friend
+	friend Internal::Array::SFriend;
 };
 
 #include "Kor/Inl/Array.inl"

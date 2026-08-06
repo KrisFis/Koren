@@ -204,21 +204,21 @@ KOR_FORCEINLINE void* SMemoryOps::Copy(void* dest, const void* src, uint64 size)
 }
 
 template<typename T>
-KOR_FORCEINLINE void SMemoryOps::CopyAs(T* to, const T* from, uint64 num) noexcept
+KOR_FORCEINLINE void SMemoryOps::CopyAs(T* dest, const T* src, uint64 num) noexcept
 {
 	if constexpr (!TIsTriviallyCopyConstructible<T>::Value)
 	{
 		while (num-- > 0)
 		{
-			::new((void*) to) T(*from);
+			::new((void*) dest) T(*src);
 
-			++to;
-			++from;
+			++dest;
+			++src;
 		}
 	} 
 	else
 	{
-		Copy(to, from, sizeof(T) * num);
+		Copy(dest, src, sizeof(T) * num);
 	}
 }
 
@@ -228,15 +228,21 @@ KOR_FORCEINLINE void* SMemoryOps::Move(void* dest, const void* src, uint64 size)
 }
 
 template<typename T>
-KOR_FORCEINLINE void SMemoryOps::MoveAs(T* to, T* from) noexcept
+KOR_FORCEINLINE void SMemoryOps::MoveAs(T* dest, T* src, uint64 num) noexcept
 {
 	if constexpr (!TIsTriviallyMoveConstructible<T>::Value)
 	{
-		::new((void*) to) T(::Move(*from));
+		while(num-- > 0)
+		{
+			::new((void*) dest) T(::Move(*src));
+
+			++dest;
+			++src;
+		}
 	} 
 	else
 	{
-		Move(to, from, sizeof(T));
+		Move(dest, src, sizeof(T) * num);
 	}
 }
 

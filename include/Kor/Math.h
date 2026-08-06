@@ -29,6 +29,9 @@ struct SMath
 	template <typename T>
 	KOR_FORCEINLINE static constexpr bool IsWithin(T Value, T Min, T Max) noexcept { return !(Value > Max || Value < Min); }
 
+	template <typename T>
+	KOR_FORCEINLINE static constexpr bool IsWithinExclusive(T Value, T Min, T Max) noexcept { return Value < Max && Value > Min; }
+
 	template<typename T>
 	KOR_FORCEINLINE static constexpr T Min(T ValueA, T ValueB) noexcept { return ValueA > ValueB ? ValueB : ValueA; }
 

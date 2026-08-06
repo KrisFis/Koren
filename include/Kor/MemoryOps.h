@@ -80,20 +80,21 @@ struct SMemoryOps
 
 	// Copy / CopyAs
 	// Copies elements from src to dest. CopyAs invokes copy construction for non-bitwise-copyable types.
-	// * Ranges must not overlap; use Move/MoveAs for overlapping regions
+	// * Ranges must not overlap; Use Move instead
+	// * CopyAs invokes copy construction for non-bitwise-copyable types
 	// -------------------------------------------------------------------------
 
 	static void* Copy(void* dest, const void* src, uint64 size) noexcept;
-	template<typename T> static void CopyAs(T* to, const T* from, uint64 num = 1) noexcept;
+	template<typename T> static void CopyAs(T* dest, const T* src, uint64 num = 1) noexcept;
 
 	// Move / MoveAs
 	// Moves a single element from src to dest.
-	// * MoveAs invokes move construction for non-bitwise-movable types.
-	// * MoveAs operates on a single element; use CopyAs for ranges
+	// * MoveAs ranges must not overlap for non-bitwise-movable types
+	// * MoveAs invokes move construction for non-bitwise-movable types
 	// -------------------------------------------------------------------------
 
 	static void* Move(void* dest, const void* src, uint64 size) noexcept;
-	template<typename T> static void MoveAs(T* to, T* from) noexcept;
+	template<typename T> static void MoveAs(T* dest, T* src, uint64 num = 1) noexcept;
 
 	// Fill / FillAs
 	// Fills memory with a repeated value.
@@ -114,6 +115,7 @@ struct SMemoryOps
 
 	// Swap
 	// Swaps values between lhs and rhs.
+	// * Ranges must not overlap
 	// * SwapAs invokes default construction for non-bitwise-movable types.
 	// -------------------------------------------------------------------------
 
@@ -122,6 +124,7 @@ struct SMemoryOps
 
 	// Compare / CompareAs
 	// Compares two memory regions. Returns negative, zero, or positive like memcmp.
+	// * Ranges must not overlap
 	// * CompareAs compares element-by-element; ordering uses operator< for non-bitwise-comparable types
 	// -------------------------------------------------------------------------
 
@@ -130,6 +133,7 @@ struct SMemoryOps
 
 	// IsEqual / IsEqualAs
 	// Returns true if both memory regions are identical.
+	// * Ranges must not overlap
 	// * IsEqualAs uses operator== for non-bitwise-comparable types
 	// -------------------------------------------------------------------------
 

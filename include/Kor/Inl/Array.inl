@@ -51,6 +51,7 @@ KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::IsValidIndex(SizeType idx) co
 	return idx >= 0 && idx < _num;
 }
 
+#include "Kor/Inl/ArrayPrivate.inl"
 #include "Kor/Inl/ArrayConstructors.inl"
 #include "Kor/Inl/ArrayOperators.inl"
 #include "Kor/Inl/ArrayQuery.inl"

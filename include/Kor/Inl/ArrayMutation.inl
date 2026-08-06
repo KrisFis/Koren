@@ -195,9 +195,23 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::Replace(TArray&& other) noexcept
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::Swap(SizeType firstIdx, SizeType secondIdx) noexcept
 {
+	using namespace Internal::Array;
+
+	KOR_ASSERT(firstIdx < secondIdx);
+	KOR_ASSERT(SMath::IsWithin(firstIdx, 0, _num));
+	KOR_ASSERT(SMath::IsWithin(secondIdx, 0, _num));
+
+	SMemoryOps::SwapAs(_data + firstIdx, _data + secondIdx);
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::SwapRange(SizeType firstIdx, SizeType secondIdx, SizeType num) noexcept
 {
+	using namespace Internal::Array;
+
+	KOR_ASSERT(firstIdx < secondIdx);
+	KOR_ASSERT(SMath::IsWithin(firstIdx, 0, _num) && SMath::IsWithin(firstIdx + num, 0, _num));
+	KOR_ASSERT(SMath::IsWithin(secondIdx, 0, _num) && SMath::IsWithin(secondIdx + num, 0, _num));
+
+	SMemoryOps::SwapAs(_data + firstIdx, _data + secondIdx, num);
 }
