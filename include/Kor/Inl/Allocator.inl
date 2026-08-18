@@ -27,19 +27,19 @@ KOR_FORCEINLINE const AllocatorT* TTypedAllocator<AllocatorT, ElementT>::operato
 	return this;
 }
 
-KOR_FORCEINLINE void* CAllocator::Allocate(SizeType bytes, SizeType alignment) noexcept
+KOR_FORCEINLINE void* CAllocator::Allocate(SizeType bytes, uint32 alignment) noexcept
 {
 	KOR_ASSERT_DEBUG(bytes > 0);
 	return SMemoryOps::Malloc(bytes, alignment);
 }
 
-KOR_FORCEINLINE void* CAllocator::Reallocate(void* ptr, SizeType bytes, SizeType alignment) noexcept
+KOR_FORCEINLINE void* CAllocator::Reallocate(void* ptr, SizeType bytes, uint32 alignment) noexcept
 {
 	KOR_ASSERT_DEBUG(bytes > 0);
 	return SMemoryOps::Realloc(ptr, bytes, alignment);
 }
 
-KOR_FORCEINLINE void CAllocator::Deallocate(void* ptr, SizeType alignment) noexcept
+KOR_FORCEINLINE void CAllocator::Deallocate(void* ptr, uint32 alignment) noexcept
 {
 	return SMemoryOps::Free(ptr, alignment);
 }
@@ -63,7 +63,7 @@ KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Allocate(SizeTy
 }
 
 template<typename AllocatorT, typename ElementT>
-KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Allocate(SizeType num, SizeType alignment) noexcept
+KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Allocate(SizeType num, uint32 alignment) noexcept
 {
 	using Traits = TAllocatorTraits<AllocatorT>;
 
@@ -84,7 +84,7 @@ KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Reallocate(Elem
 }
 
 template<typename AllocatorT, typename ElementT>
-KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Reallocate(ElementType* ptr, SizeType num, SizeType alignment) noexcept
+KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Reallocate(ElementType* ptr, SizeType num, uint32 alignment) noexcept
 {
 	using Traits = TAllocatorTraits<AllocatorT>;
 
@@ -109,7 +109,7 @@ KOR_FORCEINLINE void TTypedAllocator<AllocatorT, ElementT>::Deallocate(ElementTy
 }
 
 template<typename AllocatorT, typename ElementT>
-KOR_FORCEINLINE void TTypedAllocator<AllocatorT, ElementT>::Deallocate(ElementType* ptr, SizeType alignment) noexcept
+KOR_FORCEINLINE void TTypedAllocator<AllocatorT, ElementT>::Deallocate(ElementType* ptr, uint32 alignment) noexcept
 {
 	using Traits = TAllocatorTraits<AllocatorT>;
 

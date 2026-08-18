@@ -44,7 +44,7 @@ struct SMemoryOps
 	// -------------------------------------------------------------------------
 
 	static void Free(void* ptr) noexcept;
-	static void Free(void* ptr, uint64 alignment) noexcept;
+	static void Free(void* ptr, uint32 alignment) noexcept;
 
 	// Malloc / MallocAs
 	// Allocates uninitialized memory. MallocAs takes an element count; Malloc takes a byte size.
@@ -53,9 +53,9 @@ struct SMemoryOps
 	// -------------------------------------------------------------------------
 
 	static void* Malloc(uint64 size) noexcept;
-	static void* Malloc(uint64 size, uint64 alignment) noexcept;
+	static void* Malloc(uint64 size, uint32 alignment) noexcept;
 	template<typename T> static T* MallocAs(uint64 num = 1) noexcept;
-	template<typename T> static T* MallocAs(uint64 num, uint64 alignment) noexcept;
+	template<typename T> static T* MallocAs(uint64 num, uint32 alignment) noexcept;
 
 	// Calloc / CallocAs
 	// Allocates zero-initialized memory. CallocAs takes an element count; Calloc takes a byte size.
@@ -64,9 +64,9 @@ struct SMemoryOps
 	// -------------------------------------------------------------------------
 
 	static void* Calloc(uint64 size) noexcept;
-	static void* Calloc(uint64 size, uint64 alignment) noexcept;
+	static void* Calloc(uint64 size, uint32 alignment) noexcept;
 	template<typename T> static T* CallocAs(uint64 num = 1) noexcept;
-	template<typename T> static T* CallocAs(uint64 num, uint64 alignment) noexcept;
+	template<typename T> static T* CallocAs(uint64 num, uint32 alignment) noexcept;
 
 	// Realloc / ReallocAs
 	// Resizes a previously allocated block. ReallocAs takes an element count; Realloc takes a byte size.
@@ -74,49 +74,56 @@ struct SMemoryOps
 	// -------------------------------------------------------------------------
 
 	static void* Realloc(void* ptr, uint64 size) noexcept;
-	static void* Realloc(void* ptr, uint64 size, uint64 alignment) noexcept;
+	static void* Realloc(void* ptr, uint64 size, uint32 alignment) noexcept;
 	template<typename T> static T* ReallocAs(T* ptr, uint64 num = 1) noexcept;
-	template<typename T> static T* ReallocAs(T* ptr, uint64 num, uint64 alignment) noexcept;
+	template<typename T> static T* ReallocAs(T* ptr, uint64 num, uint32 alignment) noexcept;
 
 	// Copy / CopyAs
-	// Copies elements from src to dest. CopyAs invokes copy construction for non-bitwise-copyable types.
+	// Copies elements from src to dest.
 	// * Ranges must not overlap; Use Move instead
-	// * CopyAs invokes copy construction for non-bitwise-copyable types
+	// * CopyAs invokes copy assignment operator for non-bitwise-copyable types
+	// * CopyAsUnitialized invokes copy construction for non-bitwise-copyable types
 	// -------------------------------------------------------------------------
 
 	static void* Copy(void* dest, const void* src, uint64 size) noexcept;
 	template<typename T> static void CopyAs(T* dest, const T* src, uint64 num = 1) noexcept;
+	template<typename T> static void CopyAsUnitialized(T* dest, const T* src, uint64 num = 1) noexcept;
 
 	// Move / MoveAs
 	// Moves a single element from src to dest.
-	// * MoveAs ranges must not overlap for non-bitwise-movable types
-	// * MoveAs invokes move construction for non-bitwise-movable types
+	// * MoveAs invokes move assignment operator for non-bitwise-movable types
+	// * MoveAsUnitialized invokes move construction for non-bitwise-movable types
 	// -------------------------------------------------------------------------
 
 	static void* Move(void* dest, const void* src, uint64 size) noexcept;
 	template<typename T> static void MoveAs(T* dest, T* src, uint64 num = 1) noexcept;
+	template<typename T> static void MoveAsUnitialized(T* dest, T* src, uint64 num = 1) noexcept;
 
 	// Fill / FillAs
 	// Fills memory with a repeated value.
-	// * FillAs invokes copy construction for non-bitwise-copyable types.
 	// * Fill sets each byte to val (same semantics as memset)
+	// * FillAs invokes copy assignment operator for non-bitwise-copyable types.
+	// * FillAsUnitialized invokes copy construction for non-bitwise-copyable types.
 	// -------------------------------------------------------------------------
 
 	static void* Fill(void* dest, int32 val, uint64 size) noexcept;
 	template<typename T> static void FillAs(const T* dst, T val, uint64 num = 1) noexcept;
+	template<typename T> static void FillAsUnitialized(const T* dst, T val, uint64 num = 1) noexcept;
 
 	// Zero / ZeroAs
 	// Zeroes memory.
-	// * ZeroAs invokes default construction for non-bitwise-copyable types.
+	// * ZeroAs invokes assignment operator for non-bitwise-copyable types.
+	// * ZeroAsUnitialized invokes construction for non-bitwise-copyable types.
 	// -------------------------------------------------------------------------
 
 	static void* Zero(void* dest, uint64 size) noexcept;
 	template<typename T> static void ZeroAs(const T* dst, uint64 num = 1) noexcept;
+	template<typename T> static void ZeroAsUnitialized(const T* dst, uint64 num = 1) noexcept;
 
 	// Swap
 	// Swaps values between lhs and rhs.
 	// * Ranges must not overlap
-	// * SwapAs invokes default construction for non-bitwise-movable types.
+	// * SwapAs invokes move construction for non-bitwise-movable types.
 	// -------------------------------------------------------------------------
 
 	static void Swap(void* lhs, void* rhs, uint64 size) noexcept;

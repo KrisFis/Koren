@@ -16,12 +16,12 @@ namespace Internal::Memory
 		uint64 Size = 0;
 	};
 
-	KOR_FORCEINLINE uint64 GetAlignedSize(uint64 size, uint64 alignment) noexcept
+	KOR_FORCEINLINE uint64 GetAlignedSize(uint64 size, uint32 alignment) noexcept
 	{
 		return size + alignment - 1 + sizeof(SAlignHeader);
 	}
 
-	KOR_FORCEINLINE void* GetAlignedPtr(void* ptr, uint64 alignment) noexcept
+	KOR_FORCEINLINE void* GetAlignedPtr(void* ptr, uint32 alignment) noexcept
 	{
 		const uintptr afterHeader = (uintptr)ptr + sizeof(SAlignHeader);
 		const uintptr alignedAddr = (afterHeader + alignment - 1) & ~((uintptr)alignment - 1);
@@ -42,7 +42,7 @@ KOR_FORCEINLINE void SMemoryOps::Free(void* ptr) noexcept
 	return SPlatformMemoryOps::Free(ptr);
 }
 
-KOR_INLINE void SMemoryOps::Free(void* ptr, uint64 alignment) noexcept
+KOR_INLINE void SMemoryOps::Free(void* ptr, uint32 alignment) noexcept
 {
 	using namespace Internal::Memory;
 
@@ -64,7 +64,7 @@ KOR_FORCEINLINE void* SMemoryOps::Malloc(uint64 size) noexcept
 	return SPlatformMemoryOps::Malloc(size);
 }
 
-KOR_INLINE void* SMemoryOps::Malloc(uint64 size, uint64 alignment) noexcept
+KOR_INLINE void* SMemoryOps::Malloc(uint64 size, uint32 alignment) noexcept
 {
 	using namespace Internal::Memory;
 
@@ -92,7 +92,7 @@ KOR_FORCEINLINE T* SMemoryOps::MallocAs(uint64 num) noexcept
 }
 
 template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::MallocAs(uint64 num, uint64 alignment) noexcept
+KOR_FORCEINLINE T* SMemoryOps::MallocAs(uint64 num, uint32 alignment) noexcept
 {
 	return (T*)Malloc(num * sizeof(T), alignment);
 }
@@ -102,7 +102,7 @@ KOR_FORCEINLINE void* SMemoryOps::Calloc(uint64 size) noexcept
 	return SPlatformMemoryOps::Calloc(size);
 }
 
-KOR_INLINE void* SMemoryOps::Calloc(uint64 size, uint64 alignment) noexcept
+KOR_INLINE void* SMemoryOps::Calloc(uint64 size, uint32 alignment) noexcept
 {
 	using namespace Internal::Memory;
 
@@ -130,7 +130,7 @@ KOR_FORCEINLINE T* SMemoryOps::CallocAs(uint64 num) noexcept
 }
 
 template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::CallocAs(uint64 num, uint64 alignment) noexcept
+KOR_FORCEINLINE T* SMemoryOps::CallocAs(uint64 num, uint32 alignment) noexcept
 {
 	return (T*)Calloc(num * sizeof(T), alignment);
 }
@@ -140,7 +140,7 @@ KOR_FORCEINLINE void* SMemoryOps::Realloc(void* ptr, uint64 size) noexcept
 	return SPlatformMemoryOps::Realloc(ptr, size);
 }
 
-KOR_INLINE void* SMemoryOps::Realloc(void* ptr, uint64 size, uint64 alignment) noexcept
+KOR_INLINE void* SMemoryOps::Realloc(void* ptr, uint64 size, uint32 alignment) noexcept
 {
 	using namespace Internal::Memory;
 
@@ -193,7 +193,7 @@ KOR_FORCEINLINE T* SMemoryOps::ReallocAs(T* ptr, uint64 num) noexcept
 }
 
 template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::ReallocAs(T* ptr, uint64 num, uint64 alignment) noexcept
+KOR_FORCEINLINE T* SMemoryOps::ReallocAs(T* ptr, uint64 num, uint32 alignment) noexcept
 {
 	return (T*)SPlatformMemoryOps::Realloc(ptr, num * sizeof(T), alignment);
 }
@@ -222,6 +222,24 @@ KOR_FORCEINLINE void SMemoryOps::CopyAs(T* dest, const T* src, uint64 num) noexc
 	}
 }
 
+template<typename T>
+KOR_FORCEINLINE void SMemoryOps::CopyAsAssign(T* dest, const T* src, uint64 num) noexcept
+{
+	if constexpr (!TIsTriviallyCopyAssignable<T>::Value)
+	{
+		while (num-- > 0)
+		{
+			*dest = ::Move(*src);
+			++dest;
+			++src;
+		}
+	} 
+	else
+	{
+		Copy(dest, src, sizeof(T) * num);
+	}
+}
+
 KOR_FORCEINLINE void* SMemoryOps::Move(void* dest, const void* src, uint64 size) noexcept
 {
 	return SPlatformMemoryOps::Move(dest, src, size);
@@ -232,12 +250,59 @@ KOR_FORCEINLINE void SMemoryOps::MoveAs(T* dest, T* src, uint64 num) noexcept
 {
 	if constexpr (!TIsTriviallyMoveConstructible<T>::Value)
 	{
-		while(num-- > 0)
+		if (dest < src)
 		{
-			::new((void*) dest) T(::Move(*src));
+			while (num-- > 0)
+			{
+				::new ((void*)dest) T(::Move(*src));
+				++dest;
+				++src;
+			}
+		}
+		else if (dest > src)
+		{
+			dest += num;
+			src += num;
 
-			++dest;
-			++src;
+			while (num-- > 0)
+			{
+				--dest;
+				--src;
+				::new ((void*)dest) T(::Move(*src));
+			}
+		}
+	} 
+	else
+	{
+		Move(dest, src, sizeof(T) * num);
+	}
+}
+
+template<typename T>
+KOR_FORCEINLINE void SMemoryOps::MoveAsAssign(T* dest, T* src, uint64 num) noexcept
+{
+	if constexpr (!TIsTriviallyMoveAssignable<T>::Value)
+	{
+		if (dest < src)
+		{
+			while (num-- > 0)
+			{
+				*dest = ::Move(*src);
+				++dest;
+				++src;
+			}
+		}
+		else if (dest > src)
+		{
+			dest += num;
+			src += num;
+
+			while (num-- > 0)
+			{
+				--dest;
+				--src;
+				*dest = ::Move(*src);
+			}
 		}
 	} 
 	else

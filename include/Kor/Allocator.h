@@ -13,25 +13,25 @@ KOR_NAMESPACE_BEGIN
 class CAllocator
 {
 public:
-	using SizeType = int64;
+	using SizeType = int32;
 
 	// Allocates a raw, untyped memory block.
 	// @param bytes - Number of bytes to allocate.
 	// @param alignment - Required alignment of the returned block, in bytes.
 	// @return Pointer to the allocated block, or nullptr on failure.
-	void* Allocate(SizeType bytes, SizeType alignment) noexcept;
+	void* Allocate(SizeType bytes, uint32 alignment) noexcept;
 
 	// Resizes a previously allocated block, possibly moving it.
 	// @param ptr - Block previously returned by Allocate/Reallocate.
 	// @param bytes - New size of the block, in bytes.
 	// @param alignment - Required alignment of the returned block, in bytes.
 	// @return Pointer to the (possibly relocated) block, or nullptr on failure.
-	void* Reallocate(void* ptr, SizeType bytes, SizeType alignment) noexcept;
+	void* Reallocate(void* ptr, SizeType bytes, uint32 alignment) noexcept;
 
 	// Frees a block previously returned by Allocate/Reallocate.
 	// @param ptr - Block to free.
 	// @param alignment - Alignment the block was originally allocated with.
-	void Deallocate(void* ptr, SizeType alignment) noexcept;
+	void Deallocate(void* ptr, uint32 alignment) noexcept;
 };
 
 template<>
@@ -101,7 +101,7 @@ public:
 	// @return Pointer to the allocated elements, or nullptr on failure.
 
 	ElementType* Allocate(SizeType num = 1) noexcept;
-	ElementType* Allocate(SizeType num, SizeType alignment) noexcept;
+	ElementType* Allocate(SizeType num, uint32 alignment) noexcept;
 
 	// Reallocate
 	// @param ptr - Block previously returned by Allocate/Reallocate.
@@ -110,7 +110,7 @@ public:
 	// @return Pointer to the (possibly relocated) elements, or nullptr on failure.
 
 	ElementType* Reallocate(ElementType* ptr, SizeType num) noexcept;
-	ElementType* Reallocate(ElementType* ptr, SizeType num, SizeType alignment) noexcept;
+	ElementType* Reallocate(ElementType* ptr, SizeType num, uint32 alignment) noexcept;
 
 	// Free
 	// Frees a block previously returned by Allocate/Reallocate, using ElementType's natural alignment.
@@ -118,7 +118,7 @@ public:
 	// @param alignment - Alignment the block was originally allocated with.
 
 	void Deallocate(ElementType* ptr) noexcept;
-	void Deallocate(ElementType* ptr, SizeType alignment) noexcept;
+	void Deallocate(ElementType* ptr, uint32 alignment) noexcept;
 };
 
 #include "Kor/Inl/Allocator.inl"

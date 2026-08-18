@@ -12,8 +12,8 @@ KOR_FORCEINLINE TString<CharT> TString<CharT>::Copy() const noexcept
 template<typename CharT>
 KOR_INLINE void TString<CharT>::Fill(SizeType length, CharType val) noexcept
 {
-	_data.Resize(length + 1);
-	SMemoryOps::FillAs(_data.GetData(), val, length);
+	_data.ResizeUnitialized(length + 1);
+	SMemoryOps::FillAsUnitialized(*_data, val, length);
 	_data[length] = Constant::Null;
 }
 

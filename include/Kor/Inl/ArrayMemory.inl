@@ -6,16 +6,29 @@
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::Reserve(SizeType num) noexcept
 {
-}
+	KOR_ASSERT(num >= 0);
+	if (num <= _reservedNum) return;
 
-template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::SetNum(SizeType num) noexcept
-{
+	using namespace Internal::Array;
+	SFriend::ReallocateExact(*this, num);
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::Resize(SizeType num) noexcept
 {
+
+}
+
+template<typename ElementT, typename AllocatorT>
+KOR_INLINE void TArray<ElementT, AllocatorT>::ResizeZeroed(SizeType num) noexcept
+{
+
+}
+
+template<typename ElementT, typename AllocatorT>
+KOR_INLINE void TArray<ElementT, AllocatorT>::ResizeUnitialized(SizeType num) noexcept
+{
+
 }
 
 template<typename ElementT, typename AllocatorT>

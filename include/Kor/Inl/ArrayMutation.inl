@@ -4,23 +4,31 @@
 #pragma once // silence tooling
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Add(const ElementType& val) noexcept
+template<typename ValueType>
+KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Add(ValueType&& val) noexcept
 {
+
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Add(ElementType&& val) noexcept
+template<typename ValueType>
+KOR_INLINE ElementT& TArray<ElementT, AllocatorT>::Add_GetRef(ValueType&& val) noexcept
 {
+
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE ElementT& TArray<ElementT, AllocatorT>::Add_GetRef(const ElementType& val) noexcept
+template<typename ValueType>
+KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::AddUnique(ValueType&& val) noexcept
 {
+	
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE ElementT& TArray<ElementT, AllocatorT>::Add_GetRef(ElementType&& val) noexcept
+template<typename ValueType>
+KOR_INLINE ElementT& TArray<ElementT, AllocatorT>::AddUnique_GetRef(ValueType&& val) noexcept
 {
+
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -31,6 +39,18 @@ KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, Allo
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE ElementT& TArray<ElementT, AllocatorT>::AddDefaulted_GetRef() noexcept
 {
+}
+
+template<typename ElementT, typename AllocatorT>
+KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::AddZeroed(SizeType num) noexcept
+{
+
+}
+
+template<typename ElementT, typename AllocatorT>
+KOR_INLINE ElementT& TArray<ElementT, AllocatorT>::AddZeroed_GetRef() noexcept
+{
+
 }
 
 template<typename ElementT, typename AllocatorT>

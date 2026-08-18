@@ -180,11 +180,15 @@ public:
 
 	// Sets the element count to `num`. New elements are default-constructed;
 	// excess elements are destroyed. Does not release memory if shrinking.
-	void SetNum(SizeType num) noexcept;
-
-	// Alias for SetNum. Sets element count to `num`, constructing or
-	// destroying elements as needed.
 	void Resize(SizeType num) noexcept;
+
+	// Sets the element count to `num`. New elements are zero-constructed;
+	// excess elements are destroyed. Does not release memory if shrinking.
+	void ResizeZeroed(SizeType num) noexcept;
+
+	// Sets the element count to `num`. New elements are unitialized;
+	// excess elements are destroyed. Does not release memory if shrinking.
+	void ResizeUnitialized(SizeType num) noexcept;
 
 	// Releases excess capacity so that reserved == num.
 	void ShrinkToFit() noexcept;
@@ -199,37 +203,46 @@ public:
 	// Add
 	// -------------------------------------------------------------------------
 
-	// Appends a copy of `val` to the end. Returns the index of the added element.
-	SizeType Add(const ElementType& val) noexcept;
-
-	// Appends `val` to the end via move. Returns the index of the added element.
-	SizeType Add(ElementType&& val) noexcept;
+	// Appends a copy of `val` to the end
+	// Returns the index of the added element.
+	template<typename ValueType>
+	SizeType Add(ValueType&& val) noexcept;
 
 	// Appends a copy of `val` and returns a reference to the newly added element.
-	ElementType& Add_GetRef(const ElementType& val) noexcept;
+	template<typename ValueType>
+	ElementType& Add_GetRef(ValueType&& val) noexcept;
 
-	// Appends `val` via move and returns a reference to the newly added element.
-	ElementType& Add_GetRef(ElementType&& val) noexcept;
+	// Appends a copy of `val` only if no element equal to it already exists.
+	// Returns the index of the existing or newly added element.
+	template<typename ValueType>
+	SizeType AddUnique(ValueType&& val) noexcept;
 
-	// Appends `num` default-constructed elements. Returns the index of the
-	// first added element.
+	// Appends `val` if no element equal to it already exists and returns a reference to the newly added element.
+	template<typename ValueType>
+	ElementType& AddUnique_GetRef(ValueType&& val) noexcept;
+
+	// Appends `num` default-constructed elements. 
+	// Returns the index of the first added element.
 	SizeType AddDefaulted(SizeType num = 1) noexcept;
 
 	// Appends a single default-constructed element and returns a reference to it.
 	ElementType& AddDefaulted_GetRef() noexcept;
 
-	// Appends `num` elements with uninitialized memory. Returns the index of
-	// the first added element. Caller must initialize all added elements before
-	// reading.
+	// Appends `num` zero-constructed elements. 
+	// Returns the index of the first added element.
+	SizeType AddZeroed(SizeType num = 1) noexcept;
+
+	// Appends a single zero-constructed element and returns a reference to it.
+	ElementType& AddZeroed_GetRef() noexcept;
+
+	// Appends `num` elements with uninitialized memory. 
+	// Returns the index of the first added element. 
+	// Caller must initialize all added elements before reading.
 	SizeType AddUninitialized(SizeType num = 1) noexcept;
 
 	// Appends a single uninitialized element and returns a reference to it.
 	// Caller must initialize before reading.
 	ElementType& AddUninitialized_GetRef() noexcept;
-
-	// Appends a copy of `val` only if no element equal to it already exists.
-	// Returns the index of the existing or newly added element.
-	SizeType AddUnique(const ElementType& val) noexcept;
 
 	// Push/Pop aliases for stack-style usage.
 	void Push(const ElementType& val) noexcept;
