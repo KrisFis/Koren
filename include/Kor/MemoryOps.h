@@ -78,47 +78,55 @@ struct SMemoryOps
 	template<typename T> static T* ReallocAs(T* ptr, uint64 num = 1) noexcept;
 	template<typename T> static T* ReallocAs(T* ptr, uint64 num, uint32 alignment) noexcept;
 
-	// Copy / CopyAs
+	// Copy / CopyConstruct / CopyAssign
 	// Copies elements from src to dest.
-	// * Ranges must not overlap; Use Move instead
-	// * CopyAs invokes copy assignment operator for non-bitwise-copyable types
-	// * CopyAsUnitialized invokes copy construction for non-bitwise-copyable types
+	// * Ranges must not overlap; use Move instead if they might.
+	// * CopyConstruct: dest is RAW/UNINITIALIZED memory (placement copy-construct).
+	// * CopyAssign: dest holds ALREADY-LIVE objects (copy assignment operator).
+	// * Both bitwise-copy when T is trivially copyable.
 	// -------------------------------------------------------------------------
-
 	static void* Copy(void* dest, const void* src, uint64 size) noexcept;
-	template<typename T> static void CopyAs(T* dest, const T* src, uint64 num = 1) noexcept;
-	template<typename T> static void CopyAsUnitialized(T* dest, const T* src, uint64 num = 1) noexcept;
+	template<typename T> static void CopyConstruct(T* dest, const T* src, uint64 num = 1) noexcept;
+	template<typename T> static void CopyAssign(T* dest, const T* src, uint64 num = 1) noexcept;
 
-	// Move / MoveAs
-	// Moves a single element from src to dest.
-	// * MoveAs invokes move assignment operator for non-bitwise-movable types
-	// * MoveAsUnitialized invokes move construction for non-bitwise-movable types
+	// Move / MoveConstruct / MoveAssign
+	// Moves elements from src to dest.
+	// * MoveConstruct: dest is RAW/UNINITIALIZED memory (placement move-construct).
+	//   Ranges must not overlap. Source is left unchanged (NOT destructed) — caller owns that lifetime.
+	// * MoveAssign: dest holds ALREADY-LIVE objects (move assignment operator).
+	//   Overlap-safe and direction-aware — correct for both a shift-left erase and
+	//   a shift-right insert in the same call. Source is left in a valid-but-moved-from
+	//   state and still needs an explicit Destruct if its lifetime is ending.
+	// * Both bitwise-copy when T is trivially movable.
 	// -------------------------------------------------------------------------
-
 	static void* Move(void* dest, const void* src, uint64 size) noexcept;
-	template<typename T> static void MoveAs(T* dest, T* src, uint64 num = 1) noexcept;
-	template<typename T> static void MoveAsUnitialized(T* dest, T* src, uint64 num = 1) noexcept;
+	template<typename T> static void MoveConstruct(T* dest, T* src, uint64 num = 1) noexcept;
+	template<typename T> static void MoveAssign(T* dest, T* src, uint64 num = 1) noexcept;
 
-	// Fill / FillAs
-	// Fills memory with a repeated value.
-	// * Fill sets each byte to val (same semantics as memset)
-	// * FillAs invokes copy assignment operator for non-bitwise-copyable types.
-	// * FillAsUnitialized invokes copy construction for non-bitwise-copyable types.
+	// Fill / FillConstruct / FillAssign
+	// Fills memory with `num` copies of val.
+	// * Fill sets each byte to val (memset semantics) — bit pattern only, not element-aware.
+	// * FillConstruct: dest is RAW/UNINITIALIZED memory (placement copy-construct per element).
+	// * FillAssign: dest holds ALREADY-LIVE objects (copy assignment operator per element).
+	// * Neither falls back to the byte-level Fill — val may not be a single repeated byte,
+	//   so both always construct/assign element-by-element for correctness.
 	// -------------------------------------------------------------------------
+	static void* Fill(void* ptr, int32 val, uint64 size) noexcept;
+	template<typename T> static void FillConstruct(T* ptr, const T& val, uint64 num = 1) noexcept;
+	template<typename T> static void FillAssign(T* ptr, const T& val, uint64 num = 1) noexcept;
 
-	static void* Fill(void* dest, int32 val, uint64 size) noexcept;
-	template<typename T> static void FillAs(const T* dst, T val, uint64 num = 1) noexcept;
-	template<typename T> static void FillAsUnitialized(const T* dst, T val, uint64 num = 1) noexcept;
-
-	// Zero / ZeroAs
-	// Zeroes memory.
-	// * ZeroAs invokes assignment operator for non-bitwise-copyable types.
-	// * ZeroAsUnitialized invokes construction for non-bitwise-copyable types.
+	// Zero / ZeroConstruct / ZeroAssign
+	// Force-zeros the underlying bytes of `num` elements at ptr.
+	// * Zero sets each byte to 0 (memset semantics).
+	// * ZeroConstruct: dest is RAW/UNINITIALIZED memory — bypasses T's constructor entirely.
+	// * ZeroAssign: dest holds ALREADY-LIVE objects — bypasses T's assignment operator AND
+	//   does not run its destructor first.
+	// * Only valid for types where an all-zero bit pattern is a legal state; for ZeroAssign,
+	//   also only valid where skipping the old value's destructor is safe (no owned resources).
 	// -------------------------------------------------------------------------
-
-	static void* Zero(void* dest, uint64 size) noexcept;
-	template<typename T> static void ZeroAs(const T* dst, uint64 num = 1) noexcept;
-	template<typename T> static void ZeroAsUnitialized(const T* dst, uint64 num = 1) noexcept;
+	static void* Zero(void* ptr, uint64 size) noexcept;
+	template<typename T> static void ZeroConstruct(T* ptr, uint64 num = 1) noexcept;
+	template<typename T> static void ZeroAssign(T* ptr, uint64 num = 1) noexcept;
 
 	// Swap
 	// Swaps values between lhs and rhs.
@@ -162,24 +170,6 @@ struct SMemoryOps
 
 	template<typename T>
 	static void DefaultConstruct(T* ptr, uint64 num = 1) noexcept;
-
-	// CopyConstruct
-	// Copy-constructs `num` elements at dest, one-to-one from src.
-	// * Bitwise-copies when T == R and trivially copy-constructible.
-	// * Ranges must not overlap.
-	// -------------------------------------------------------------------------
-
-	template<typename T, typename R>
-	static void CopyConstruct(T* dest, const R* src, uint64 num = 1) noexcept;
-
-	// MoveConstruct
-	// Move-constructs `num` elements at dest, one-to-one from src.
-	// * Bitwise-copies (src left unchanged) when T == R and trivially move-constructible.
-	// * Ranges must not overlap.
-	// -------------------------------------------------------------------------
-
-	template<typename T, typename R>
-	static void MoveConstruct(T* dest, R* src, uint64 num = 1) noexcept;
 
 	// Destruct
 	// Invokes the destructor of T at ptr, for `num` elements. No-op if trivially destructible.

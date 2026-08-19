@@ -97,13 +97,13 @@ private:
 	void FillToEmpty(const ElementType& InValue)
 	{
 		_data = SMemoryOps::MallocAs<ElementType>();
-		SMemoryOps::CopyAsUnitialized(_data, &InValue);
+		SMemoryOps::CopyConstruct(_data, &InValue);
 	}
 
 	void FillToEmpty(ElementType&& InValue)
 	{
 		_data = SMemoryOps::MallocAs<ElementType>();
-		SMemoryOps::MoveAsUnitialized(_data, &InValue);
+		SMemoryOps::MoveConstruct(_data, &InValue);
 	}
 
 	KOR_FORCEINLINE void FillToEmpty(const TOptional& other)

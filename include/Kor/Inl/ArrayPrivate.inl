@@ -76,7 +76,7 @@ namespace Internal::Array
 
 				if (arr._num > 0)
 				{
-					SMemoryOps::MoveAsUnitialized(newData, arr._data, arr._num);
+					SMemoryOps::MoveConstruct(newData, arr._data, arr._num);
 					arr._allocator.Deallocate(arr._data);
 				}
 
@@ -144,11 +144,51 @@ namespace Internal::Array
 			}
 			else if constexpr (TIsSame<InitType, Init::SZero>::Value)
 			{
-				SMemoryOps::ZeroAs(arr._data, num);
+				SMemoryOps::ZeroAsUnitialized(arr._data, num);
 			}
 
 			arr._num = num;
 			arr._reservedNum = allocationSize;
+		}
+
+		template<typename InitType, typename ArrayT>
+		static void Resize(
+			ArrayT& arr,
+			typename ArrayT::SizeType num)
+		{
+			static_assert(
+				TIsSame<InitType, Init::SNoInit>::Value ||
+				TIsSame<InitType, Init::SDefault>::Value ||
+				TIsSame<InitType, Init::SZero>::Value,
+				"Resize: unsupported InitType"
+			);
+
+			if (num > arr._num)
+			{
+				if (num > arr._reservedNum)
+				{
+					ReallocateExact(arr, num);
+				}
+
+				const auto dataStart = arr._data + arr_num;
+				const auto numDiff = num - arr._num;
+
+				if constexpr (TIsSame<InitType, Init::SDefault>::Value)
+				{
+					SMemoryOps::DefaultConstruct(dataStart, numDiff);
+				}
+				else if constexpr (TIsSame<InitType, Init::SZero>::Value)
+				{
+					SMemoryOps::ZeroAsUnitialized(dataStart, numDiff);
+				}
+			}
+			else if (num < arr._num)
+			{
+				const auto dataStart = arr._data + num;
+				const auto numDiff = arr._num - num;
+
+				SMemoryOps::Destruct(dataStart, numDiff);
+			}
 		}
 
 		// Expects arr to not be empty
@@ -190,7 +230,7 @@ namespace Internal::Array
 			arr._data = arr._allocator.Allocate(allocationSize);
 			KOR_ASSERT(arr._data);
 
-			SMemoryOps::CopyAsUnitialized(arr._data, data, num);
+			SMemoryOps::CopyConstruct(arr._data, data, num);
 
 			arr._num = num;
 			arr._reservedNum = allocationSize;

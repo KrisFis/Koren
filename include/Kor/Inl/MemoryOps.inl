@@ -203,8 +203,8 @@ KOR_FORCEINLINE void* SMemoryOps::Copy(void* dest, const void* src, uint64 size)
 	return SPlatformMemoryOps::Copy(dest, src, size);
 }
 
-template<typename T>
-KOR_FORCEINLINE void SMemoryOps::CopyAs(T* dest, const T* src, uint64 num) noexcept
+template<typename T> 
+KOR_FORCEINLINE void SMemoryOps::CopyConstruct(T* dest, const T* src, uint64 num) noexcept
 {
 	if constexpr (!TIsTriviallyCopyConstructible<T>::Value)
 	{
@@ -218,12 +218,12 @@ KOR_FORCEINLINE void SMemoryOps::CopyAs(T* dest, const T* src, uint64 num) noexc
 	} 
 	else
 	{
-		Copy(dest, src, sizeof(T) * num);
+		SPlatformMemoryOps::Copy(dest, src, sizeof(T) * num);
 	}
 }
 
-template<typename T>
-KOR_FORCEINLINE void SMemoryOps::CopyAsAssign(T* dest, const T* src, uint64 num) noexcept
+template<typename T> 
+KOR_FORCEINLINE void SMemoryOps::CopyAssign(T* dest, const T* src, uint64 num) noexcept
 {
 	if constexpr (!TIsTriviallyCopyAssignable<T>::Value)
 	{
@@ -236,7 +236,7 @@ KOR_FORCEINLINE void SMemoryOps::CopyAsAssign(T* dest, const T* src, uint64 num)
 	} 
 	else
 	{
-		Copy(dest, src, sizeof(T) * num);
+		SPlatformMemoryOps::Copy(dest, src, sizeof(T) * num);
 	}
 }
 
@@ -245,8 +245,8 @@ KOR_FORCEINLINE void* SMemoryOps::Move(void* dest, const void* src, uint64 size)
 	return SPlatformMemoryOps::Move(dest, src, size);
 }
 
-template<typename T>
-KOR_FORCEINLINE void SMemoryOps::MoveAs(T* dest, T* src, uint64 num) noexcept
+template<typename T> 
+KOR_FORCEINLINE void SMemoryOps::MoveConstruct(T* dest, T* src, uint64 num) noexcept
 {
 	if constexpr (!TIsTriviallyMoveConstructible<T>::Value)
 	{
@@ -274,14 +274,14 @@ KOR_FORCEINLINE void SMemoryOps::MoveAs(T* dest, T* src, uint64 num) noexcept
 	} 
 	else
 	{
-		Move(dest, src, sizeof(T) * num);
+		SPlatformMemoryOps::Move(dest, src, sizeof(T) * num);
 	}
 }
 
-template<typename T>
-KOR_FORCEINLINE void SMemoryOps::MoveAsAssign(T* dest, T* src, uint64 num) noexcept
+template<typename T> 
+KOR_FORCEINLINE void SMemoryOps::MoveAssign(T* dest, T* src, uint64 num) noexcept
 {
-	if constexpr (!TIsTriviallyMoveAssignable<T>::Value)
+if constexpr (!TIsTriviallyMoveAssignable<T>::Value)
 	{
 		if (dest < src)
 		{
@@ -307,55 +307,91 @@ KOR_FORCEINLINE void SMemoryOps::MoveAsAssign(T* dest, T* src, uint64 num) noexc
 	} 
 	else
 	{
-		Move(dest, src, sizeof(T) * num);
+		SPlatformMemoryOps::Move(dest, src, sizeof(T) * num);
 	}
 }
 
-KOR_FORCEINLINE void* SMemoryOps::Fill(void* dest, int32 val, uint64 size) noexcept
+KOR_FORCEINLINE void* SMemoryOps::Fill(void* ptr, int32 val, uint64 size) noexcept
 {
-	return SPlatformMemoryOps::Fill(dest, val, size);
+	return SPlatformMemoryOps::Fill(ptr, val, size);
 }
 
-template<typename T>
-KOR_FORCEINLINE void SMemoryOps::FillAs(const T* dst, T val, uint64 num) noexcept
+template<typename T> 
+KOR_FORCEINLINE void SMemoryOps::FillConstruct(T* ptr, const T& val, uint64 num) noexcept
 {
-	if constexpr (!TIsTriviallyCopyConstructible<T>::Value)
+	// Bitwise-fill can only take 1 byte (although Win and POSIX api takes 4 bytes)
+	if constexpr (!(TIsTriviallyCopyConstructible<T>::Value && sizeof(T) == 1))
 	{
 		while (num-- > 0)
 		{
-			::new((void*) dst) T(val);
-			++dst;
+			*ptr = val;
+			++ptr;
 		}
 	} 
 	else
 	{
-		Fill(dst, val, sizeof(T) * num);
+		SPlatformMemoryOps::Fill(ptr, (int32)*(uint8*)&val, sizeof(T) * num);
 	}
 }
 
-KOR_FORCEINLINE void* SMemoryOps::Zero(void* dest, uint64 size) noexcept
+template<typename T> 
+KOR_FORCEINLINE void SMemoryOps::FillAssign(T* ptr, const T& val, uint64 num) noexcept
+{
+	// Bitwise-fill can only take 1 byte (although Win and POSIX api takes 4 bytes)
+	if constexpr (!(TIsTriviallyCopyConstructible<T>::Value && sizeof(T) == 1))
+	{
+		while (num-- > 0)
+		{
+			*ptr = val;
+			++ptr;
+		}
+	} 
+	else
+	{
+		SPlatformMemoryOps::Fill(ptr, (int32)*(uint8*)&val, sizeof(T) * num);
+	}
+}
+
+KOR_FORCEINLINE void* SMemoryOps::Zero(void* ptr, uint64 size) noexcept
 {
 	return SPlatformMemoryOps::Zero(dest, size);
 }
 
-template<typename T>
-KOR_FORCEINLINE void SMemoryOps::ZeroAs(const T* dst, uint64 num) noexcept
+template<typename T> 
+KOR_FORCEINLINE void SMemoryOps::ZeroConstruct(T* ptr, uint64 num) noexcept
 {
 	if constexpr (!TIsTriviallyConstructible<T>::Value)
 	{
 		while (num-- > 0)
 		{
-			::new((void*) dst) T();
-			++dst;
+			::new((void*) ptr) T();
+			++ptr;
 		}
 	} 
 	else
 	{
-		Zero(dst, sizeof(T) * num);
+		SPlatformMemoryOps::Zero(ptr, sizeof(T) * num);
 	}
 }
 
-KOR_INLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcept
+template<typename T> 
+KOR_FORCEINLINE void SMemoryOps::ZeroAssign(T* ptr, uint64 num) noexcept
+{
+	if constexpr (!TIsTriviallyConstructible<T>::Value)
+	{
+		while (num-- > 0)
+		{
+			*ptr = T();
+			++ptr;
+		}
+	} 
+	else
+	{
+		SPlatformMemoryOps::Zero(ptr, sizeof(T) * num);
+	}
+}
+
+KOR_FORCEINLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcept
 {
 	uint8 temp[KOR_BUFFER_SIZE_SMALL];
 
@@ -503,44 +539,6 @@ KOR_FORCEINLINE void SMemoryOps::DefaultConstruct(T* ptr, uint64 num) noexcept
 	else
 	{
 		SPlatformMemoryOps::Zero(ptr, num * sizeof(T));
-	}
-}
-
-template<typename T, typename R>
-KOR_FORCEINLINE void SMemoryOps::CopyConstruct(T* dest, const R* src, uint64 num) noexcept
-{
-	if constexpr (!TIsSame<T, R>::Value || !TIsTriviallyCopyConstructible<T>::Value)
-	{
-		while (num-- > 0)
-		{
-			::new((void*) dest) T(*src);
-
-			++dest;
-			++src;
-		}
-	}
-	else
-	{
-		SPlatformMemoryOps::Copy(dest, src, num * sizeof(T));
-	}
-}
-
-template<typename T, typename R>
-KOR_FORCEINLINE void SMemoryOps::MoveConstruct(T* dest, R* src, uint64 num) noexcept
-{
-	if constexpr (!TIsSame<T, R>::Value || !TIsTriviallyMoveConstructible<T>::Value)
-	{
-		while (num-- > 0)
-		{
-			::new((void*) dest) T(::Move(*src));
-
-			++dest;
-			++src;
-		}
-	}
-	else
-	{
-		SPlatformMemoryOps::Move(dest, src, num * sizeof(T));
 	}
 }
 
