@@ -34,7 +34,7 @@ struct SWin32MemoryOps
 	KOR_FORCEINLINE static void* Move(void* dest, const void* src, uint64 size) noexcept { return MoveMemory(dest, src, size); }
 
 	// Fills block of memory with specific value
-	KOR_FORCEINLINE static void* Fill(void* dest, int32 val, uint64 size) noexcept { return FillMemory(dest, size, val); }
+	KOR_FORCEINLINE static void* Fill(void* dest, uint8 val, uint64 size) noexcept { return FillMemory(dest, size, val); }
 
 	// Fills block of memory with zero value
 	KOR_FORCEINLINE static void* Zero(void* dest, uint64 size) noexcept { return ZeroMemory(dest, size); }

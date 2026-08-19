@@ -206,7 +206,7 @@ KOR_FORCEINLINE void* SMemoryOps::Copy(void* dest, const void* src, uint64 size)
 template<typename T> 
 KOR_FORCEINLINE void SMemoryOps::CopyConstruct(T* dest, const T* src, uint64 num) noexcept
 {
-	if constexpr (!TIsTriviallyCopyConstructible<T>::Value)
+	if constexpr (!TIsTriviallyCopyable<T>::Value)
 	{
 		while (num-- > 0)
 		{
@@ -225,7 +225,7 @@ KOR_FORCEINLINE void SMemoryOps::CopyConstruct(T* dest, const T* src, uint64 num
 template<typename T> 
 KOR_FORCEINLINE void SMemoryOps::CopyAssign(T* dest, const T* src, uint64 num) noexcept
 {
-	if constexpr (!TIsTriviallyCopyAssignable<T>::Value)
+	if constexpr (!TIsTriviallyCopyable<T>::Value)
 	{
 		while (num-- > 0)
 		{
@@ -248,7 +248,7 @@ KOR_FORCEINLINE void* SMemoryOps::Move(void* dest, const void* src, uint64 size)
 template<typename T> 
 KOR_FORCEINLINE void SMemoryOps::MoveConstruct(T* dest, T* src, uint64 num) noexcept
 {
-	if constexpr (!TIsTriviallyMoveConstructible<T>::Value)
+	if constexpr (!TIsTriviallyMovable<T>::Value)
 	{
 		if (dest < src)
 		{
@@ -281,7 +281,7 @@ KOR_FORCEINLINE void SMemoryOps::MoveConstruct(T* dest, T* src, uint64 num) noex
 template<typename T> 
 KOR_FORCEINLINE void SMemoryOps::MoveAssign(T* dest, T* src, uint64 num) noexcept
 {
-if constexpr (!TIsTriviallyMoveAssignable<T>::Value)
+if constexpr (!TIsTriviallyMovable<T>::Value)
 	{
 		if (dest < src)
 		{
@@ -311,16 +311,21 @@ if constexpr (!TIsTriviallyMoveAssignable<T>::Value)
 	}
 }
 
-KOR_FORCEINLINE void* SMemoryOps::Fill(void* ptr, int32 val, uint64 size) noexcept
+KOR_FORCEINLINE void* SMemoryOps::Fill(void* ptr, uint8 val, uint64 size) noexcept
 {
 	return SPlatformMemoryOps::Fill(ptr, val, size);
+}
+
+KOR_FORCEINLINE void* SMemoryOps::Fill(void* ptr, int8 val, uint64 size) noexcept
+{
+	return SPlatformMemoryOps::Fill(ptr, *(uint8*)&val, size);
 }
 
 template<typename T> 
 KOR_FORCEINLINE void SMemoryOps::FillConstruct(T* ptr, const T& val, uint64 num) noexcept
 {
 	// Bitwise-fill can only take 1 byte (although Win and POSIX api takes 4 bytes)
-	if constexpr (!(TIsTriviallyCopyConstructible<T>::Value && sizeof(T) == 1))
+	if constexpr (!(TIsTriviallyCopyable<T>::Value && sizeof(T) == 1))
 	{
 		while (num-- > 0)
 		{
@@ -330,7 +335,7 @@ KOR_FORCEINLINE void SMemoryOps::FillConstruct(T* ptr, const T& val, uint64 num)
 	} 
 	else
 	{
-		SPlatformMemoryOps::Fill(ptr, (int32)*(uint8*)&val, sizeof(T) * num);
+		SPlatformMemoryOps::Fill(ptr, *(uint8*)&val, sizeof(T) * num);
 	}
 }
 
@@ -338,7 +343,7 @@ template<typename T>
 KOR_FORCEINLINE void SMemoryOps::FillAssign(T* ptr, const T& val, uint64 num) noexcept
 {
 	// Bitwise-fill can only take 1 byte (although Win and POSIX api takes 4 bytes)
-	if constexpr (!(TIsTriviallyCopyConstructible<T>::Value && sizeof(T) == 1))
+	if constexpr (!(TIsTriviallyCopyable<T>::Value && sizeof(T) == 1))
 	{
 		while (num-- > 0)
 		{
@@ -360,7 +365,7 @@ KOR_FORCEINLINE void* SMemoryOps::Zero(void* ptr, uint64 size) noexcept
 template<typename T> 
 KOR_FORCEINLINE void SMemoryOps::ZeroConstruct(T* ptr, uint64 num) noexcept
 {
-	if constexpr (!TIsTriviallyConstructible<T>::Value)
+	if constexpr (!TIsTriviallyDefaultConstructible<T>::Value)
 	{
 		while (num-- > 0)
 		{
@@ -377,7 +382,7 @@ KOR_FORCEINLINE void SMemoryOps::ZeroConstruct(T* ptr, uint64 num) noexcept
 template<typename T> 
 KOR_FORCEINLINE void SMemoryOps::ZeroAssign(T* ptr, uint64 num) noexcept
 {
-	if constexpr (!TIsTriviallyConstructible<T>::Value)
+	if constexpr (!TIsTriviallyDefaultConstructible<T>::Value)
 	{
 		while (num-- > 0)
 		{
@@ -414,7 +419,7 @@ KOR_FORCEINLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcep
 template<typename T>
 KOR_FORCEINLINE void SMemoryOps::SwapAs(T* lhs, T* rhs, uint64 num) noexcept
 {	
-	if constexpr (!TIsTriviallyMoveConstructible<T>::Value || !TIsTriviallyMoveAssignable<T>::Value)
+	if constexpr (!TIsTriviallyMovable<T>::Value)
 	{
 		while (num-- > 0)
 		{
@@ -488,7 +493,7 @@ KOR_FORCEINLINE void SMemoryOps::Construct(T* ptr, ArgsT&&... Args) noexcept
 {
 	if constexpr (sizeof...(ArgsT) == 0)
 	{
-		if constexpr (!TIsTriviallyConstructible<T>::Value)
+		if constexpr (!TIsTriviallyDefaultConstructible<T>::Value)
 		{
 			::new((void*) ptr) T();
 		}
@@ -507,13 +512,13 @@ KOR_FORCEINLINE void SMemoryOps::Construct(T* ptr, ArgsT&&... Args) noexcept
 		if constexpr (sizeof...(ArgsT) == 1 &&
 			IsSameAsT &&
 			IsRValueArg &&
-			TIsTriviallyMoveConstructible<T>::Value)
+			TIsTriviallyMovable<T>::Value)
 		{
 			SPlatformMemoryOps::Move(ptr, (const void*)&Args..., sizeof(T));
 		}
 		else if constexpr (sizeof...(ArgsT) == 1 &&
 			IsSameAsT &&
-			TIsTriviallyCopyConstructible<T>::Value)
+			TIsTriviallyCopyable<T>::Value)
 		{
 			SPlatformMemoryOps::Copy(ptr, (const void*)&Args..., sizeof(T));
 		}
@@ -528,7 +533,7 @@ KOR_FORCEINLINE void SMemoryOps::Construct(T* ptr, ArgsT&&... Args) noexcept
 template<typename T>
 KOR_FORCEINLINE void SMemoryOps::DefaultConstruct(T* ptr, uint64 num) noexcept
 {
-	if constexpr (!TIsTriviallyConstructible<T>::Value)
+	if constexpr (!TIsTriviallyDefaultConstructible<T>::Value)
 	{
 		while(num-- > 0)
 		{
