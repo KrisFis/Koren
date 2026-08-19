@@ -144,7 +144,7 @@ namespace Internal::Array
 			}
 			else if constexpr (TIsSame<InitType, Init::SZero>::Value)
 			{
-				SMemoryOps::ZeroAsUnitialized(arr._data, num);
+				SMemoryOps::ZeroConstruct(arr._data, num);
 			}
 
 			arr._num = num;
@@ -179,7 +179,7 @@ namespace Internal::Array
 				}
 				else if constexpr (TIsSame<InitType, Init::SZero>::Value)
 				{
-					SMemoryOps::ZeroAsUnitialized(dataStart, numDiff);
+					SMemoryOps::ZeroConstruct(dataStart, numDiff);
 				}
 			}
 			else if (num < arr._num)
@@ -325,7 +325,7 @@ namespace Internal::Array
 		{
 			const auto numAfterHole = arr._num - (idx + count);
 
-			SMemoryOps::MoveAs(
+			SMemoryOps::MoveAssign(
 				arr._data + idx,
 				arr._data + idx + count,
 				numAfterHole
@@ -350,7 +350,7 @@ namespace Internal::Array
 			const auto numAfterHole = arr._num - (idx + count);
 			const auto numToMove = SMath::Min(count, numAfterHole);
 
-			SMemoryOps::MoveAs(
+			SMemoryOps::MoveAssign(
 				arr._data + idx,
 				arr._data + arr._num - numToMove,
 				numToMove

@@ -74,7 +74,7 @@ namespace Internal
 		const int32 result = KOR_PTR_DIFF(int32, end, cur);
 		if (cur != str)
 		{
-			SMemoryOps::CopyAs(str, cur, result);
+			SMemoryOps::CopyAssign(str, cur, result);
 		}
 
 		str[result] = TCharConstant<CharT>::Null;
@@ -165,7 +165,7 @@ KOR_INLINE int32 TStringOps<CharType>::Convert(ToCharType* dest, const CharType*
 	// -------------------------------------------------------------------------
 	if constexpr (TIsCharacterCompatible<CharType, ToCharType>::Value)
 	{
-		SMemoryOps::CopyAs(dest, src, srcLen + 1);
+		SMemoryOps::CopyAssign(dest, src, srcLen + 1);
 		return srcLen;
 	}
 	// 2) Fixed -> Fixed (upcast, no data loss possible)
