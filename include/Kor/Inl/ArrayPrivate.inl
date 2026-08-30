@@ -170,7 +170,7 @@ namespace Internal::Array
 					ReallocateExact(arr, num);
 				}
 
-				const auto dataStart = arr._data + arr_num;
+				const auto dataStart = arr._data + arr._num;
 				const auto numDiff = num - arr._num;
 
 				if constexpr (TIsSame<InitType, Init::SDefault>::Value)

@@ -121,7 +121,7 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::Append(TArray&& other) noexcept
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Append(const ElementType& val, SizeType numToAdd) noexcept
+KOR_INLINE void TArray<ElementT, AllocatorT>::Append(const ElementType& val, SizeType num) noexcept
 {
 }
 

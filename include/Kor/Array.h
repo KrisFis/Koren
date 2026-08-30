@@ -197,8 +197,7 @@ public:
 	void Reset() noexcept;
 
 	// Destroys all elements and optionally re-reserves `newNum` slots.
-	// Equivalent to Reset() + Reserve(newNum).
-	void Empty(SizeType newNum = 0) noexcept;
+	void Empty(SizeType num = 0) noexcept;
 
 	// Add
 	// -------------------------------------------------------------------------
@@ -285,11 +284,11 @@ public:
 	void Append(const TArray& other) noexcept;
 	void Append(TArray&& other) noexcept;
 
-	// Appends `numToAdd` copies of `val`.
-	void Append(const ElementType& val, SizeType numToAdd) noexcept;
-
 	// Appends all elements from `list`.
 	void Append(const ILType& list) noexcept;
+
+	// Appends `numToAdd` copies of `val`.
+	void Append(const ElementType& val, SizeType num) noexcept;
 
 	// Appends `num` elements from `data`. `data` must not be null.
 	void Append(const ElementType* data, SizeType num) noexcept;
