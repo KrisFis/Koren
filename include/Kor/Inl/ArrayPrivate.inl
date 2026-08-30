@@ -181,6 +181,8 @@ namespace Internal::Array
 				{
 					SMemoryOps::ZeroConstruct(dataStart, numDiff);
 				}
+
+				arr._num = num;
 			}
 			else if (num < arr._num)
 			{
@@ -188,6 +190,7 @@ namespace Internal::Array
 				const auto numDiff = arr._num - num;
 
 				SMemoryOps::Destruct(dataStart, numDiff);
+				arr._num = num;
 			}
 		}
 

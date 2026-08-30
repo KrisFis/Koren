@@ -83,17 +83,25 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::Fill(const ElementType& val) noexc
 {
 	if (_num <= 0) return;
 
-	SMemoryOps::FillAssign(_data, val, num);
+	SMemoryOps::FillAssign(_data, val, _num);
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::Assign(const ElementType& val, SizeType num) noexcept
 {
 	KOR_ASSERT(num > 0);
+
+	using namespace Internal::Array;
+	SFriend::Resize<Init::SNoInit>(*this, num);
+	SMemoryOps::FillConstruct(_data, val, num);
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::Assign(const ElementType* data, SizeType num) noexcept
 {
 	KOR_ASSERT(data && num > 0);
+
+	using namespace Internal::Array;
+	SFriend::Resize<Init::SNoInit>(*this, num);
+	SMemoryOps::CopyConstruct(_data, data, num);
 }

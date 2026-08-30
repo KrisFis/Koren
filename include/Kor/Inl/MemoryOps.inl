@@ -342,7 +342,7 @@ KOR_FORCEINLINE void SMemoryOps::FillConstruct(T* ptr, const T& val, uint64 num)
 template<typename T> 
 KOR_FORCEINLINE void SMemoryOps::FillAssign(T* ptr, const T& val, uint64 num) noexcept
 {
-	// Bitwise-fill can only take 1 byte (although Win and POSIX api takes 4 bytes)
+	// Bitwise-fill can only take 1 byte (as int32)
 	if constexpr (!(TIsTriviallyCopyable<T>::Value && sizeof(T) == 1))
 	{
 		while (num-- > 0)
