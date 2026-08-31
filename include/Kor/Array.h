@@ -480,8 +480,11 @@ private:
 	// Number of reserved elements (size of _data buffer)
 	SizeType _reservedNum;
 
-	// Implementation friend
-	friend Internal::Array::SFriend;
+	// Friend
+	// -------------------------------------------------------------------------
+
+	using SFriend = Internal::Array::TFriend<TArray>;
+	friend SFriend;
 };
 
 #include "Kor/Inl/Array.inl"

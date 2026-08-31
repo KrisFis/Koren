@@ -44,34 +44,44 @@ namespace Internal::Array
 		}
 	};
 
-	// TArray<...> friend
-	struct SFriend
+	template<typename ArrayT>
+	struct TFriend
 	{
-		// Range check
-		template<typename ArrayT>
-		static void CheckRange(
-			ArrayT& arr, 
-			typename ArrayT::SizeType idx) noexcept
+		using ArrayType = ArrayT;
+		using SizeType = typename ArrayType::SizeType;
+		using ElementType = typename ArrayType::ElementType;
+
+		// Checks
+		// -------------------------------------------------------------------------
+
+		static void CheckRange(ArrayType& arr, SizeType idx) noexcept
 		{
 			KOR_ASSERT(SMath::IsWithin(idx, 0, arr._num));
 		}
 
-		// Resizes allocation to exactly `num` elements (num * sizeof(element) bytes)
-		// * Does NOT use allocation strategy
-		// * Expects `num` to be already sanitized
-		template<typename ArrayT>
-		static void ReallocateExact(
-			ArrayT& arr, 
-			typename ArrayT::SizeType num) noexcept
+		static void CheckPointer(const void* ptr) noexcept
 		{
-			if constexpr (TAllocatorTraits<ArrayT::AllocatorType>::HasReallocate)
+			KOR_ASSERT(ptr);
+		}
+
+		// Memory
+		// -------------------------------------------------------------------------
+
+		static void ReallocateRaw(ArrayType& arr, SizeType num) noexcept
+		{
+			KOR_ASSERT(
+				num > 0 &&
+				arr._reservedNum != num
+			);
+
+			if constexpr (TAllocatorTraits<ArrayType::AllocatorType>::HasReallocate)
 			{
 				arr._data = arr._allocator.Reallocate(arr._data, num);
 				KOR_ASSERT(arr._data);
 			}
 			else
 			{
-				ArrayT::ElementType* newData = arr._allocator.Allocate(num);
+				ArrayType::ElementType* newData = arr._allocator.Allocate(num);
 				KOR_ASSERT(newData);
 
 				if (arr._num > 0)
@@ -86,13 +96,67 @@ namespace Internal::Array
 			arr._reservedNum = num;
 		}
 
-		// * Expects `num` to be already sanitized
-		template<typename ArrayT>
-		static void Grow(
-			ArrayT& arr, 
-			typename ArrayT::SizeType num) noexcept
+		static void Reallocate(ArrayType& arr, SizeType num) noexcept
 		{
-			const auto newNum = TDefaultAllocationPolicy<ArrayT::ElementType>::CalculateGrow(
+			if (arr._num > num)
+			{
+				SMemoryOps::Destruct(arr._data + num, arr._num - num);
+				arr._num = num;
+			}
+
+			ReallocateRaw(arr, num);
+		}
+
+		template<typename InitType = Init::SNoInit>
+		static void Resize(ArrayType& arr, SizeType num)
+		{
+			KOR_ASSERT(
+				num > 0 && 
+				arr._num != num
+			);
+
+			static_assert(
+				TIsSame<InitType, Init::SNoInit>::Value ||
+				TIsSame<InitType, Init::SDefault>::Value ||
+				TIsSame<InitType, Init::SZero>::Value,
+				"Resize: unsupported InitType"
+			);
+
+			if (num > arr._num)
+			{
+				if (num > arr._reservedNum)
+				{
+					ReallocateRaw(arr, num);
+				}
+
+				const SizeType dataStart = arr._data + arr._num;
+				const SizeType numDiff = num - arr._num;
+
+				if constexpr (TIsSame<InitType, Init::SDefault>::Value)
+				{
+					SMemoryOps::DefaultConstruct(dataStart, numDiff);
+				}
+				else if constexpr (TIsSame<InitType, Init::SZero>::Value)
+				{
+					SMemoryOps::ZeroConstruct(dataStart, numDiff);
+				}
+			}
+			else if (num < arr._num)
+			{
+				const SizeType dataStart = arr._data + num;
+				const SizeType numDiff = arr._num - num;
+
+				SMemoryOps::Destruct(dataStart, numDiff);
+			}
+
+			arr._num = num;
+		}
+
+		static void Grow(ArrayType& arr, SizeType num) noexcept
+		{
+			KOR_ASSERT(num > 0);
+
+			const SizeType newNum = TDefaultAllocationPolicy<ArrayType::ElementType>::CalculateGrow(
 				num, 
 				arr._reservedNum
 			);
@@ -100,32 +164,38 @@ namespace Internal::Array
 			if (newNum < num) newNum = num;
 			if (newNum <= arr._reservedNum) return;
 
-			ReallocateExact(arr, newNum);
+			Reallocate(arr, newNum);
 		}
 
-		template<typename ArrayT>
-		static void Shrink(
-			ArrayT& arr,
-			typename ArrayT::SizeType num) noexcept
+		static void Shrink(ArrayType& arr, SizeType num) noexcept
 		{
-			const typename ArrayT::SizeType newNum = SDefaultAllocationPolicy::CalculateShrink(
+			KOR_ASSERT(num > 0);
+
+			const SizeType newNum = SDefaultAllocationPolicy::CalculateShrink(
 				num, 
 				arr._reservedNum
 			);
 
-			if (newNum == arr._reservedNum ||
-				!SMath::IsWithin(newNum, arr._num, num)) return;
+			if (newNum == arr._reservedNum) return;
+			else if (!SMath::IsWithin(newNum, arr._num, num)) return;
 
-			ReallocateExact(arr, newNum);
+			Reallocate(arr, newNum);
 		}
 
-		// Expects `num` and `slack` to be already sanitized
-		template<typename InitType, typename ArrayT>
+		// Construct From Empty
+		// -------------------------------------------------------------------------
+
+		template<typename InitType = Init::SNoInit>
 		static void InitFromEmpty(
-			ArrayT& arr, 
-			typename ArrayT::SizeType num, 
-			typename ArrayT::SizeType slack) noexcept
+			ArrayType& arr, 
+			SizeType num, 
+			SizeType slack) noexcept
 		{
+			KOR_ASSERT(
+				num > 0 && 
+				arr._num == 0
+			);
+
 			static_assert(
 				TIsSame<InitType, Init::SNoInit>::Value ||
 				TIsSame<InitType, Init::SDefault>::Value ||
@@ -133,7 +203,7 @@ namespace Internal::Array
 				"InitFromEmpty: unsupported InitType"
 			);
 
-			const auto allocationSize = num + slack;
+			const SizeType allocationSize = num + slack;
 
 			arr._data = arr._allocator.Allocate(allocationSize);
 			KOR_ASSERT(arr._data);
@@ -151,84 +221,45 @@ namespace Internal::Array
 			arr._reservedNum = allocationSize;
 		}
 
-		template<typename InitType, typename ArrayT>
-		static void Resize(
-			ArrayT& arr,
-			typename ArrayT::SizeType num)
+		static void Empty(ArrayType& arr) noexcept
 		{
-			static_assert(
-				TIsSame<InitType, Init::SNoInit>::Value ||
-				TIsSame<InitType, Init::SDefault>::Value ||
-				TIsSame<InitType, Init::SZero>::Value,
-				"Resize: unsupported InitType"
-			);
+			if (!arr._data) return;
 
-			if (num > arr._num)
+			if (arr._num > 0)
 			{
-				if (num > arr._reservedNum)
-				{
-					ReallocateExact(arr, num);
-				}
-
-				const auto dataStart = arr._data + arr._num;
-				const auto numDiff = num - arr._num;
-
-				if constexpr (TIsSame<InitType, Init::SDefault>::Value)
-				{
-					SMemoryOps::DefaultConstruct(dataStart, numDiff);
-				}
-				else if constexpr (TIsSame<InitType, Init::SZero>::Value)
-				{
-					SMemoryOps::ZeroConstruct(dataStart, numDiff);
-				}
-
-				arr._num = num;
+				SMemoryOps::Destruct(arr._data, arr._num);
 			}
-			else if (num < arr._num)
-			{
-				const auto dataStart = arr._data + num;
-				const auto numDiff = arr._num - num;
 
-				SMemoryOps::Destruct(dataStart, numDiff);
-				arr._num = num;
-			}
-		}
-
-		// Expects arr to not be empty
-		template<typename ArrayT>
-		static void Empty(ArrayT& arr) noexcept
-		{
-			SMemoryOps::Destruct(arr._data, arr._num);
 			_allocator.Deallocate(arr._data);
-
 			arr._data = nullptr;
 			arr._num = 0;
 			arr._reservedNum = 0;
 		}
 
-		// Frees the underlying allocation, if any and resets `_data`/`_reservedNum`
-		// * Does NOT destruct elements, caller must ensure `_num == 0` first
-		template<typename ArrayT>
-		static void Release(ArrayT& arr) noexcept
+		static void Release(ArrayType& arr) noexcept
 		{
 			if (!arr._data) return;
 
 			arr._allocator.Deallocate(arr._data);
+
 			arr._data = nullptr;
 			arr._reservedNum = 0;
 		}
 
-		// Expects:
-		// - `num` and `slack` to be already sanitized
-		// - arr is empty
-		template<typename ArrayT>
 		static void CopyToEmpty(
-			ArrayT& arr, 
-			const ArrayT::ElementType* data, 
-			typename ArrayT::SizeType num, 
-			typename ArrayT::SizeType slack = 0) noexcept
+			ArrayType& arr, 
+			const ElementType* data, 
+			SizeType num, 
+			SizeType slack = 0) noexcept
 		{
-			const auto allocationSize = num + slack;
+			KOR_ASSERT(
+				!!arr._data &&
+				!!data &&
+				num >= 0 && 
+				slack >= 0
+			);
+
+			const SizeType allocationSize = num + slack;
 
 			arr._data = arr._allocator.Allocate(allocationSize);
 			KOR_ASSERT(arr._data);
@@ -239,11 +270,7 @@ namespace Internal::Array
 			arr._reservedNum = allocationSize;
 		}
 
-		// Expects:
-		// - dest is empty
-		// - source is not empty
-		template<typename ArrayT>
-		static void CopyToEmpty(ArrayT& dest, const ArrayT& source) noexcept
+		static void CopyToEmpty(ArrayType& dest, const ArrayType& source) noexcept
 		{
 			if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
 			{
@@ -253,8 +280,7 @@ namespace Internal::Array
 			CopyToEmpty(dest, source._data, source._num);
 		}
 
-		template<typename ArrayT>
-		static void MoveToEmpty(ArrayT& dest, ArrayT&& source) noexcept
+		static void MoveToEmpty(ArrayType& dest, ArrayType&& source) noexcept
 		{
 			if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
 			{
@@ -273,16 +299,12 @@ namespace Internal::Array
 		// Mutation Helpers
 		// -------------------------------------------------------------------------
 
-		// Bumps `_num` by `count`, growing capacity first if needed
-		// * Expects `count > 0`
-		// * Returns the index of the first newly-added (uninitialized) slot
-		template<typename ArrayT>
-		static typename ArrayT::SizeType AddUninitialized(
-			ArrayT& arr,
-			typename ArrayT::SizeType count) noexcept
+		static SizeType AddUninitialized(ArrayType& arr, SizeType num) noexcept
 		{
-			const typename ArrayT::SizeType idx = arr._num;
-			const typename ArrayT::SizeType newNum = idx + num;
+			KOR_ASSERT(num > 0);
+
+			const SizeType idx = arr._num;
+			const SizeType newNum = idx + num;
 
 			if (newNum > arr._reservedNum)
 			{
@@ -294,16 +316,14 @@ namespace Internal::Array
 		}
 
 		// Opens an unitialized gap of `count` elements at `idx`, growing capacity first if needed
-		// * Expects `count > 0` and `idx` in [0, arr._num]
 		// * Existing elements at and after `idx` are relocated past the gap
 		// ** the gap itself is left uninitialized for the caller to construct into
-		template<typename ArrayT>
-		static void InsertUninitialized(
-			ArrayT& arr,
-			typename ArrayT::SizeType idx,
-			typename ArrayT::SizeType count) noexcept
+		static void InsertUninitialized(ArrayType& arr, SizeType idx, SizeType num) noexcept
 		{
-			using SizeType = typename ArrayT::SizeType;
+			KOR_ASSERT(
+				num > 0 && 
+				SMath::IsWithin(idx, 0, arr._num)
+			);
 
 			const SizeType oldNum = arr._num;
 			const SizeType newNum = oldNum + count;
@@ -320,38 +340,41 @@ namespace Internal::Array
 
 		// Removes `count` elements at `idx`, shifting the tail left to close the gap (stable order)
 		// * Expects `count > 0` and [idx, idx + count) to be a valid range
-		template<typename ArrayT>
-		static void RemoveAtShift(
-			ArrayT& arr,
-			typename ArrayT::SizeType idx,
-			typename ArrayT::SizeType count) noexcept
+		static void RemoveAtShift(ArrayType& arr, SizeType idx,	SizeType num) noexcept
 		{
-			const auto numAfterHole = arr._num - (idx + count);
+			KOR_ASSERT(
+				num > 0 && 
+				SMath::IsWithin(idx, 0, arr._num) &&
+				(idx + num) < arr._num
+			);
+
+			const SizeType numAfterHole = arr._num - (idx + num);
 
 			SMemoryOps::MoveAssign(
 				arr._data + idx,
-				arr._data + idx + count,
+				arr._data + idx + num,
 				numAfterHole
 			);
 
 			SMemoryOps::Destruct(
-				arr._data + (arr._num - count),
-				count
+				arr._data + (arr._num - num),
+				num
 			);
 
-			arr._num -= count;
+			arr._num -= num;
 		}
 
 		// Removes `vount` elements at `idx` by swapping in elemnets from the tail (order not preserved)
-		// * Expects `count > 0` and [idx, idx + count) to be a valid range
-		template<typename ArrayT>
-		static void RemoveAtSwapShift(
-			ArrayT& arr,
-			typename ArrayT::SizeType idx,
-			typename ArrayT::SizeType count) noexcept
+		static void RemoveAtSwapShift(ArrayType& arr, SizeType idx, SizeType count) noexcept
 		{
-			const auto numAfterHole = arr._num - (idx + count);
-			const auto numToMove = SMath::Min(count, numAfterHole);
+			KOR_ASSERT(
+				num > 0 && 
+				SMath::IsWithin(idx, 0, arr._num) &&
+				(idx + num) < arr._num
+			);
+
+			const SizeType numAfterHole = arr._num - (idx + count);
+			const SizeType numToMove = SMath::Min(count, numAfterHole);
 
 			SMemoryOps::MoveAssign(
 				arr._data + idx,

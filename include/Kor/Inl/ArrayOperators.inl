@@ -8,13 +8,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::oper
 {
 	if (this == &other) return;
 
-	using namespace Internal::Array;
-
-	if (_num > 0)
-	{
-		SFriend::Empty(*this);
-	}
-
+	SFriend::Empty(*this);
 	if (other._num > 0)
 	{
 		SFriend::CopyToEmpty(*this, other);
@@ -26,13 +20,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::oper
 {
 	if (this == &other) return;
 
-	using namespace Internal::Array;
-
-	if (_num > 0)
-	{
-		SFriend::Empty(*this);
-	}
-
+	SFriend::Empty(*this);
 	if (other._num > 0)
 	{
 		SFriend::MoveToEmpty(*this, other);
@@ -40,13 +28,9 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::oper
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::operator=(const ILType& list) noexcept
+KOR_INLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::operator=(const ILType& list) noexcept
 {
-	if (_num > 0)
-	{
-		SFriend::Empty(*this);
-	}
-
+	SFriend::Empty(*this);
 	if (const SizeType newNum = (SizeType)list.size(); newNum > 0)
 	{
 		SFriend::CopyToEmpty(*this, list.begin(), newNum);
@@ -82,17 +66,13 @@ KOR_FORCEINLINE const typename ElementT* TArray<ElementT, AllocatorT>::operator*
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::operator[](SizeType idx) noexcept
 {
-	using namespace Internal::Array;
 	SFriend::CheckRange(*this, idx);
-
 	return _data[idx];
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE const ElementT& TArray<ElementT, AllocatorT>::operator[](SizeType idx) const noexcept
 {
-	using namespace Internal::Array;
 	SFriend::CheckRange(*this, idx);
-
 	return _data[idx];
 }
