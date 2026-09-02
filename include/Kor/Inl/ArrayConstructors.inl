@@ -49,7 +49,6 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ElementType* data, Si
 	: TArray()
 {
 	if (num <= 0) return;
-
 	SFriend::CopyToEmpty(*this, data, num);
 }
 
@@ -58,7 +57,6 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SNoInit
 	: TArray()
 {
 	if (num <= 0) return;
-
 	SFriend::InitFromEmpty<Init::SNoInit>(*this, 0, num);
 }
 
@@ -67,7 +65,6 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SDefaul
 	: TArray()
 {
 	if (num <= 0) return;
-
 	SFriend::InitFromEmpty<Init::SDefault>(*this, num, 0);
 }
 
@@ -76,7 +73,6 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SZero) 
 	: TArray()
 {
 	if (num <= 0) return;
-
 	SFriend::InitFromEmpty<Init::SZero>(*this, num, 0);
 }
 
@@ -87,11 +83,7 @@ KOR_INLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, const ElementType&
 	if (num <= 0) return;
 
 	SFriend::InitFromEmpty<Init::SNoInit>(*this, 0, num);
-
-	for (SizeType i = 0; i < num; ++i)
-	{
-		SMemoryOps::Construct(&_data[i], value);
-	}
+	SMemoryOps::FillConstruct(_data, value, num);
 }
 
 template<typename ElementT, typename AllocatorT>

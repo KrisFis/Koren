@@ -44,6 +44,16 @@ namespace Internal::Array
 		}
 	};
 
+	static void CheckValidIndex(SizeType idx, SizeType max) noexcept
+	{
+		KOR_ASSERT(SMath::IsWithin(idx, 0, max));
+	}
+
+	static void CheckValidPointer(const void* ptr) noexcept
+	{
+		KOR_ASSERT(ptr);
+	}
+
 	template<typename ArrayT>
 	struct TFriend
 	{
@@ -51,112 +61,170 @@ namespace Internal::Array
 		using SizeType = typename ArrayType::SizeType;
 		using ElementType = typename ArrayType::ElementType;
 
-		// Checks
-		// -------------------------------------------------------------------------
-
-		static void CheckRange(ArrayType& arr, SizeType idx) noexcept
-		{
-			KOR_ASSERT(SMath::IsWithin(idx, 0, arr._num));
-		}
-
-		static void CheckPointer(const void* ptr) noexcept
-		{
-			KOR_ASSERT(ptr);
-		}
-
 		// Memory
 		// -------------------------------------------------------------------------
 
-		static void ReallocateRaw(ArrayType& arr, SizeType num) noexcept
+		// Reallocates underlying array memory
+		// * i.e. sets "arr._reservedNum" to specific value of `num`
+		//
+		// @param HasAllocation - Handles array with existing allocation (ReservedNum > 0)
+		// @param HasItems - Handles array with already existing items (Num > 0)
+		// @param arr - Array/this pointer
+		// @param num - exact number of elements that final arr._data be able to hold
+		//
+		template<bool HasAllocation = true, bool HasItems = true>
+		static void Reallocate(ArrayType& arr, SizeType num) noexcept
 		{
-			KOR_ASSERT(
-				num > 0 &&
-				arr._reservedNum != num
-			);
-
-			if constexpr (TAllocatorTraits<ArrayType::AllocatorType>::HasReallocate)
+			if constexpr (HasAllocation)
 			{
-				arr._data = arr._allocator.Reallocate(arr._data, num);
-				KOR_ASSERT(arr._data);
+				KOR_ASSERT(
+					num > 0 &&
+					arr._reservedNum != num
+				);
+			}
+
+			if constexpr (HasItems)
+			{
+				if (arr._num > num)
+				{
+					SMemoryOps::Destruct(
+						arr._data + num, 
+						arr._num - num
+					);
+
+					arr._num = num;
+				}
+			}
+
+			if constexpr (HasAllocation)
+			{
+				if (arr._reservedNum == 0)
+				{
+					arr._data = arr._allocator.Allocate(num);
+					KOR_ASSERT(arr._data);
+				}
+				else
+				{
+					if constexpr (TAllocatorTraits<ArrayType::AllocatorType>::HasReallocate)
+					{
+						arr._data = arr._allocator.Reallocate(arr._data, num);
+						KOR_ASSERT(arr._data);
+					}
+					else
+					{
+						ArrayType::ElementType* newData = arr._allocator.Allocate(num);
+						KOR_ASSERT(newData);
+
+						if (arr._num > 0)
+						{
+							SMemoryOps::MoveConstruct(newData, arr._data, arr._num);
+							arr._allocator.Deallocate(arr._data);
+						}
+
+						arr._data = newData;
+					}
+				}
 			}
 			else
 			{
-				ArrayType::ElementType* newData = arr._allocator.Allocate(num);
-				KOR_ASSERT(newData);
+				KOR_ASSERT(
+					num > 0 &&
+					arr._reservedNum == 0
+				);
 
-				if (arr._num > 0)
-				{
-					SMemoryOps::MoveConstruct(newData, arr._data, arr._num);
-					arr._allocator.Deallocate(arr._data);
-				}
-
-				arr._data = newData;
+				arr._data = arr._allocator.Allocate(num);
+				KOR_ASSERT(arr._data);
 			}
 
 			arr._reservedNum = num;
 		}
 
-		static void Reallocate(ArrayType& arr, SizeType num) noexcept
-		{
-			if (arr._num > num)
-			{
-				SMemoryOps::Destruct(arr._data + num, arr._num - num);
-				arr._num = num;
-			}
-
-			ReallocateRaw(arr, num);
-		}
-
-		template<typename InitType = Init::SNoInit>
-		static void Resize(ArrayType& arr, SizeType num)
+		// Resizes underlying array memory
+		// * i.e. sets "arr._num" to specific value of `num`
+		//
+		// @param HasAllocation - Handles array with existing allocation (ReservedNum > 0)
+		// @param HasItems - Handles array with already existing items (Num > 0)
+		// @param arr - Array/this pointer
+		// @param num - exact number of elements that final arr._data be able to hold
+		//
+		template<bool HasAllocation = true, bool HasItems = true>
+		static void Resize(ArrayType& arr, SizeType num) noexcept
 		{
 			KOR_ASSERT(
 				num > 0 && 
 				arr._num != num
 			);
 
-			static_assert(
-				TIsSame<InitType, Init::SNoInit>::Value ||
-				TIsSame<InitType, Init::SDefault>::Value ||
-				TIsSame<InitType, Init::SZero>::Value,
-				"Resize: unsupported InitType"
-			);
-
-			if (num > arr._num)
+			if (arr._reservedNum != num)
 			{
-				if (num > arr._reservedNum)
-				{
-					ReallocateRaw(arr, num);
-				}
-
-				const SizeType dataStart = arr._data + arr._num;
-				const SizeType numDiff = num - arr._num;
-
-				if constexpr (TIsSame<InitType, Init::SDefault>::Value)
-				{
-					SMemoryOps::DefaultConstruct(dataStart, numDiff);
-				}
-				else if constexpr (TIsSame<InitType, Init::SZero>::Value)
-				{
-					SMemoryOps::ZeroConstruct(dataStart, numDiff);
-				}
-			}
-			else if (num < arr._num)
-			{
-				const SizeType dataStart = arr._data + num;
-				const SizeType numDiff = arr._num - num;
-
-				SMemoryOps::Destruct(dataStart, numDiff);
+				Reallocate<HasAllocation, HasItems>(arr, num);
 			}
 
 			arr._num = num;
 		}
 
+		// Helper to combine Resize + ZeroConstruct if needed
+		template<bool HasAllocation = true, bool HasItems = true>
+		static void ResizeZeroed(ArrayType& arr, SizeType num) noexcept
+		{
+			const SizeType oldNum = arr._num;
+			Resize<HasAllocation, HasItems>(arr, num);
+
+			if (oldNum < num)
+			{
+				SMemoryOps::ZeroConstruct(arr._data + oldNum, num - oldNum);
+			}
+		}
+
+		// Helper to combine Resize + ZeroConstruct if needed
+		template<bool HasAllocation = true, bool HasItems = true>
+		static void ResizeFill(ArrayType& arr, const ElementType& val, SizeType num) noexcept
+		{
+			const SizeType oldNum = arr._num;
+			Resize<HasAllocation, HasItems>(arr, num);
+
+			if (oldNum < num)
+			{
+				SMemoryOps::FillConstruct(arr._data + oldNum, val, num - oldNum);
+			}
+		}
+
+		// Helper to combine Resize + ZeroConstruct if needed
+		template<bool HasAllocation = true, bool HasItems = true>
+		static void ResizeCopy(ArrayType& arr, const ElementType* buffer, SizeType num) noexcept
+		{
+			KOR_ASSERT(buffer);
+
+			const SizeType oldNum = arr._num;
+			Resize<HasAllocation, HasItems>(arr, num);
+
+			if (oldNum < num)
+			{
+				SMemoryOps::CopyConstruct(arr._data + oldNum, buffer, num - oldNum);
+			}
+		}
+
+		// Helper to combine Resize + ZeroConstruct if needed
+		template<bool HasAllocation = true, bool HasItems = true>
+		static void ResizeMove(ArrayType& arr, ElementType* buffer, SizeType num) noexcept
+		{
+			KOR_ASSERT(buffer);
+
+			const SizeType oldNum = arr._num;
+			Resize<HasAllocation, HasItems>(arr, num);
+
+			if (oldNum < num)
+			{
+				SMemoryOps::MoveConstruct(arr._data + oldNum, buffer, num - oldNum);
+			}
+		}
+
+		// Grows underlying memory using allocation policy
 		static void Grow(ArrayType& arr, SizeType num) noexcept
 		{
 			KOR_ASSERT(num > 0);
 
-			const SizeType newNum = TDefaultAllocationPolicy<ArrayType::ElementType>::CalculateGrow(
+			const SizeType newNum = TDefaultAllocationPolicy<ElementType>::CalculateGrow(
 				num, 
 				arr._reservedNum
 			);
@@ -167,11 +235,12 @@ namespace Internal::Array
 			Reallocate(arr, newNum);
 		}
 
+		// Shrinks underlying memory using allocation policy
 		static void Shrink(ArrayType& arr, SizeType num) noexcept
 		{
 			KOR_ASSERT(num > 0);
 
-			const SizeType newNum = SDefaultAllocationPolicy::CalculateShrink(
+			const SizeType newNum = TDefaultAllocationPolicy<ElementType>::CalculateShrink(
 				num, 
 				arr._reservedNum
 			);
@@ -182,48 +251,14 @@ namespace Internal::Array
 			Reallocate(arr, newNum);
 		}
 
-		// Construct From Empty
-		// -------------------------------------------------------------------------
-
-		template<typename InitType = Init::SNoInit>
-		static void InitFromEmpty(
-			ArrayType& arr, 
-			SizeType num, 
-			SizeType slack) noexcept
+		static void Reset(ArrayType& arr) noexcept
 		{
-			KOR_ASSERT(
-				num > 0 && 
-				arr._num == 0
-			);
-
-			static_assert(
-				TIsSame<InitType, Init::SNoInit>::Value ||
-				TIsSame<InitType, Init::SDefault>::Value ||
-				TIsSame<InitType, Init::SZero>::Value,
-				"InitFromEmpty: unsupported InitType"
-			);
-
-			const SizeType allocationSize = num + slack;
-
-			arr._data = arr._allocator.Allocate(allocationSize);
-			KOR_ASSERT(arr._data);
-
-			if constexpr (TIsSame<InitType, Init::SDefault>::Value)
-			{
-				SMemoryOps::DefaultConstruct(arr._data, num);
-			}
-			else if constexpr (TIsSame<InitType, Init::SZero>::Value)
-			{
-				SMemoryOps::ZeroConstruct(arr._data, num);
-			}
-
-			arr._num = num;
-			arr._reservedNum = allocationSize;
+			// TODO
 		}
 
 		static void Empty(ArrayType& arr) noexcept
 		{
-			if (!arr._data) return;
+			KOR_ASSERT(arr._reservedNum > 0);
 
 			if (arr._num > 0)
 			{
@@ -236,52 +271,48 @@ namespace Internal::Array
 			arr._reservedNum = 0;
 		}
 
-		static void Release(ArrayType& arr) noexcept
+		template<bool HasItems = true>
+		static void CopyFromOther(ArrayType& dest, const ArrayType& source) noexcept
 		{
-			if (!arr._data) return;
+			// TODO: Support different array type copy
+			// For example:
+			// * TArray<uint8> <-> TArray<uint16> is possible fairly safely if both are binary buffers,
+			// * Although consumer can just read two bytes at the time, its convenience to be able to cast if allocators allow that
 
-			arr._allocator.Deallocate(arr._data);
+			// TODO_2: Maybe we can reuse allocation ?
 
-			arr._data = nullptr;
-			arr._reservedNum = 0;
-		}
+			if constexpr (HasItems)
+			{
+				if (arr._reservedNum > 0) 
+				{
+					Empty(arr);
+				}
+			}
 
-		static void CopyToEmpty(
-			ArrayType& arr, 
-			const ElementType* data, 
-			SizeType num, 
-			SizeType slack = 0) noexcept
-		{
-			KOR_ASSERT(
-				!!arr._data &&
-				!!data &&
-				num >= 0 && 
-				slack >= 0
-			);
-
-			const SizeType allocationSize = num + slack;
-
-			arr._data = arr._allocator.Allocate(allocationSize);
-			KOR_ASSERT(arr._data);
-
-			SMemoryOps::CopyConstruct(arr._data, data, num);
-
-			arr._num = num;
-			arr._reservedNum = allocationSize;
-		}
-
-		static void CopyToEmpty(ArrayType& dest, const ArrayType& source) noexcept
-		{
 			if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
 			{
 				dest._allocator = source._allocator;
 			}
 
-			CopyToEmpty(dest, source._data, source._num);
+			ResizeCopy<false, false>(arr, source._data, source._num);
 		}
 
-		static void MoveToEmpty(ArrayType& dest, ArrayType&& source) noexcept
+		template<bool HasItems = true>
+		static void MoveFromOther(ArrayType& dest, ArrayType&& source) noexcept
 		{
+			// TODO: Support different array type move
+			// For example:
+			// * TArray<uint8> <-> TArray<uint16> is possible fairly safely swap if both are binary buffers,
+			// * Although consumer can just read two bytes at the time, its convenience to be able to cast if allocators allow that
+
+			if constexpr (HasItems)
+			{
+				if (arr._reservedNum > 0) 
+				{
+					Empty(arr);
+				}
+			}
+
 			if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
 			{
 				dest._allocator = Move(source._allocator);
@@ -296,7 +327,7 @@ namespace Internal::Array
 			source._reservedNum = 0;
 		}
 
-		// Mutation Helpers
+		// Mutations
 		// -------------------------------------------------------------------------
 
 		static SizeType AddUninitialized(ArrayType& arr, SizeType num) noexcept

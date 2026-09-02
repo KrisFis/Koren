@@ -321,15 +321,15 @@ KOR_FORCEINLINE void* SMemoryOps::Fill(void* ptr, int8 val, uint64 size) noexcep
 	return SPlatformMemoryOps::Fill(ptr, *(uint8*)&val, size);
 }
 
-template<typename T> 
-KOR_FORCEINLINE void SMemoryOps::FillConstruct(T* ptr, const T& val, uint64 num) noexcept
+template<typename T, typename R>
+KOR_FORCEINLINE void SMemoryOps::FillConstruct(T* ptr, const R& val, uint64 num) noexcept
 {
 	// Bitwise-fill can only take 1 byte (although Win and POSIX api takes 4 bytes)
-	if constexpr (!(TIsTriviallyCopyable<T>::Value && sizeof(T) == 1))
+	if constexpr (!(TIsTriviallyCopyable<T>::Value && sizeof(R) == 1))
 	{
 		while (num-- > 0)
 		{
-			*ptr = val;
+			::new((void*) ptr) T(val);
 			++ptr;
 		}
 	} 
@@ -339,18 +339,18 @@ KOR_FORCEINLINE void SMemoryOps::FillConstruct(T* ptr, const T& val, uint64 num)
 	}
 }
 
-template<typename T> 
-KOR_FORCEINLINE void SMemoryOps::FillAssign(T* ptr, const T& val, uint64 num) noexcept
+template<typename T, typename R>
+KOR_FORCEINLINE void SMemoryOps::FillAssign(T* ptr, const R& val, uint64 num) noexcept
 {
-	// Bitwise-fill can only take 1 byte (as int32)
-	if constexpr (!(TIsTriviallyCopyable<T>::Value && sizeof(T) == 1))
+	// Bitwise-fill can only take 1 byte (although Win and POSIX api takes 4 bytes)
+	if constexpr (!(TIsTriviallyCopyable<T>::Value && sizeof(R) == 1))
 	{
 		while (num-- > 0)
 		{
 			*ptr = val;
 			++ptr;
 		}
-	} 
+	}
 	else
 	{
 		SPlatformMemoryOps::Fill(ptr, (int32)*(uint8*)&val, sizeof(T) * num);

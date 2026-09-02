@@ -113,8 +113,8 @@ struct SMemoryOps
 	// -------------------------------------------------------------------------
 	static void* Fill(void* ptr, uint8 val, uint64 size) noexcept;
 	static void* Fill(void* ptr, int8 val, uint64 size) noexcept;
-	template<typename T> static void FillConstruct(T* ptr, const T& val, uint64 num = 1) noexcept;
-	template<typename T> static void FillAssign(T* ptr, const T& val, uint64 num = 1) noexcept;
+	template<typename T, typename R = T> static void FillConstruct(T* ptr, const R& val, uint64 num = 1) noexcept;
+	template<typename T, typename R = T> static void FillAssign(T* ptr, const R& val, uint64 num = 1) noexcept;
 
 	// Zero / ZeroConstruct / ZeroAssign
 	// Force-zeros the underlying bytes of `num` elements at ptr.
