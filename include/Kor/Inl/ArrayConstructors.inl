@@ -19,7 +19,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const TArray& other) noexce
 	: TArray()
 {
 	if (other._num <= 0) return;
-	SFriend::CopyToEmpty(*this, other);
+	SFriend::CopyFromOther<false>(*this, other);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -27,7 +27,7 @@ KOR_FORCEINLINE constexpr TArray<ElementT, AllocatorT>::TArray(TArray&& other) n
 	: TArray()
 {
 	if (other._num <= 0) return;
-	SFriend::MoveToEmpty(*this, Move(other));
+	SFriend::MoveFromOther<false>(*this, Move(other));
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -40,8 +40,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ILType& list) noexcep
 
 	const SizeType newNum = (SizeType)list.size();
 	if (newNum <= 0) return;
-
-	SFriend::CopyToEmpty(*this, list.begin(), newNum);
+	SFriend::ResizeCopy<false>(*this, list.begin(), newNum);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -49,7 +48,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ElementType* data, Si
 	: TArray()
 {
 	if (num <= 0) return;
-	SFriend::CopyToEmpty(*this, data, num);
+	SFriend::ResizeCopy<false>(*this, data, num);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -57,7 +56,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SNoInit
 	: TArray()
 {
 	if (num <= 0) return;
-	SFriend::InitFromEmpty<Init::SNoInit>(*this, 0, num);
+	SFriend::Resize<false>(*this, num);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -65,7 +64,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SDefaul
 	: TArray()
 {
 	if (num <= 0) return;
-	SFriend::InitFromEmpty<Init::SDefault>(*this, num, 0);
+	SFriend::ResizeDefault<false>(*this, num);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -73,21 +72,20 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SZero) 
 	: TArray()
 {
 	if (num <= 0) return;
-	SFriend::InitFromEmpty<Init::SZero>(*this, num, 0);
+	SFriend::ResizeZero<false>(*this, num);
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, const ElementType& value) noexcept
+KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, const ElementType& value) noexcept
 	: TArray()
 {
 	if (num <= 0) return;
-
-	SFriend::InitFromEmpty<Init::SNoInit>(*this, 0, num);
-	SMemoryOps::FillConstruct(_data, value, num);
+	SFriend::ResizeFill<false>(*this, value, num);
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE TArray<ElementT, AllocatorT>::~TArray() noexcept
 {
+	if (arr._reservedNum <= 0) return;
 	SFriend::Empty(*this);
 }
