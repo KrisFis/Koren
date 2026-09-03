@@ -384,8 +384,8 @@ namespace Internal::Array
 			// ex. HELO\0 -> HE[unitialized]LO
 		}
 
-		// Removes `count` elements at `idx`, shifting the tail left to close the gap (stable order)
-		// * Expects `count > 0` and [idx, idx + count) to be a valid range
+		// Removes `num` elements at `idx`, shifting the tail left to close the gap (stable order)
+		// * Expects `num > 0` and [idx, idx + num) to be a valid range
 		static void RemoveAtShift(ArrayType& arr, SizeType idx,	SizeType num) noexcept
 		{
 			KOR_ASSERT(
@@ -410,8 +410,8 @@ namespace Internal::Array
 			arr._num -= num;
 		}
 
-		// Removes `vount` elements at `idx` by swapping in elemnets from the tail (order not preserved)
-		static void RemoveAtSwapShift(ArrayType& arr, SizeType idx, SizeType count) noexcept
+		// Removes `num` elements at `idx` by swapping in elemnets from the tail (order not preserved)
+		static void RemoveAtSwapShift(ArrayType& arr, SizeType idx, SizeType num) noexcept
 		{
 			KOR_ASSERT(
 				num > 0 && 
@@ -419,8 +419,8 @@ namespace Internal::Array
 				(idx + num) < arr._num
 			);
 
-			const SizeType numAfterHole = arr._num - (idx + count);
-			const SizeType numToMove = SMath::Min(count, numAfterHole);
+			const SizeType numAfterHole = arr._num - (idx + num);
+			const SizeType numToMove = SMath::Min(num, numAfterHole);
 
 			SMemoryOps::MoveAssign(
 				arr._data + idx,
@@ -429,11 +429,11 @@ namespace Internal::Array
 			);
 
 			SMemoryOps::Destruct(
-				arr._data + (arr._num - count),
-				count
+				arr._data + (arr._num - num),
+				num
 			);
 
-			arr._num -= count;
+			arr._num -= num;
 		}
 	};
 }
