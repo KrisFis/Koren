@@ -43,7 +43,7 @@ struct TAllocatorTraits<CAllocator> : TAllocatorTraitsBase<CAllocator>
 	{
 		NeedsAlignment = true,
 		HasReallocate = true,
-	}
+	};
 };
 
 // TTypedAllocator
@@ -100,8 +100,10 @@ public:
 	// @param alignment - Required alignment of the returned block, in bytes.
 	// @return Pointer to the allocated elements, or nullptr on failure.
 
-	ElementType* Allocate(SizeType num = 1) noexcept;
-	ElementType* Allocate(SizeType num, uint32 alignment) noexcept;
+	ElementType* Allocate(
+		SizeType num = 1, 
+		uint32 alignment = alignof(ElementType)
+	) noexcept;
 
 	// Reallocate
 	// @param ptr - Block previously returned by Allocate/Reallocate.
@@ -109,16 +111,21 @@ public:
 	// @param alignment - Required alignment of the returned block, in bytes.
 	// @return Pointer to the (possibly relocated) elements, or nullptr on failure.
 
-	ElementType* Reallocate(ElementType* ptr, SizeType num) noexcept;
-	ElementType* Reallocate(ElementType* ptr, SizeType num, uint32 alignment) noexcept;
+	ElementType* Reallocate(
+		ElementType* ptr,
+		SizeType num, 
+		uint32 alignment = alignof(ElementType)
+	) noexcept;
 
 	// Free
 	// Frees a block previously returned by Allocate/Reallocate, using ElementType's natural alignment.
 	// @param ptr - Block to free.
 	// @param alignment - Alignment the block was originally allocated with.
 
-	void Deallocate(ElementType* ptr) noexcept;
-	void Deallocate(ElementType* ptr, uint32 alignment) noexcept;
+	void Deallocate(
+		ElementType* ptr, 
+		uint32 alignment = alignof(ElementType)
+	) noexcept;
 };
 
 #include "Kor/Inl/Allocator.inl"

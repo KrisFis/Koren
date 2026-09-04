@@ -8,12 +8,12 @@
 KOR_NAMESPACE_BEGIN
 
 // [Size]
-// * Gets size type without need of std (equivalent of std::size_t)
+// * Size type without need of std (equivalent of std::size_t)
 
 typedef decltype(sizeof(0)) TSize;
 
 // [Nullptr]
-// * Gets nullptr type without need of std (equivalent of std::nullptr_t)
+// * Nullptr type without need of std (equivalent of std::nullptr_t)
 
 typedef decltype(nullptr) TNullptr;
 
@@ -323,13 +323,13 @@ template<> struct TInt<8> { typedef int64 Signed; typedef uint64 Unsigned; };
 // * Example: TMakeUnsigned<int32>::Type → uint32
 
 template<typename T>
-struct TMakeUnsigned { typedef typename TInt<sizeof(T)>::Unsigned Type; };
+struct TMakeUnsigned : TType<typename TInt<sizeof(T)>::Unsigned> {};
 
 // [TMakeSigned]
 // * Convenience wrapper around TInt - resolves to signed integer of given size
 // * Example: TMakeSigned<uint32>::Type → int32
 
 template<typename T>
-struct TMakeSigned { typedef typename TInt<sizeof(T)>::Signed Type; };
+struct TMakeSigned : TType<typename TInt<sizeof(T)>::Signed> {};
 
 KOR_NAMESPACE_END

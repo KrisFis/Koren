@@ -44,9 +44,22 @@ struct TAllocatorTraitsBase
 template<typename T>
 struct TAllocatorTraits;
 
+// [Typed Allocator]
+// Adapter of AllocatorT for ElementT
+template<typename ElementT, typename AllocatorT>
+struct TTypedAllocator;
+
 // [Is Allocator]
 // * Checks whether specific type is an allocator (defines TAllocatorTraits)
 template<typename T>
 struct TIsAllocator : TBoolValue<TIsComplete<TAllocatorTraits<T>>::Value> {};
+
+// [Is Typed Allocator]
+// * Checks whether specific type is a typed allocator type
+
+template<typename T> struct TIsTypedAllocator : TFalseValue {};
+
+template<typename AllocatorT, typename ElementT>
+struct TIsTypedAllocator<TTypedAllocator<AllocatorT, ElementT>> : TTrueValue {};
 
 KOR_NAMESPACE_END

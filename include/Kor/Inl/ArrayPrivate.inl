@@ -49,45 +49,17 @@ namespace Internal::Array
 		KOR_ASSERT(SMath::IsWithin(idx, 0, max));
 	}
 
-	static void CheckValidPointer(const void* ptr) noexcept
-	{
-		KOR_ASSERT(ptr);
-	}
-
 	template<typename ArrayT>
 	struct TFriend
 	{
 		using ArrayType = ArrayT;
 		using SizeType = typename ArrayType::SizeType;
 		using ElementType = typename ArrayType::ElementType;
+		using AllocatorType = typename ArrayType::AllocatorType;
+		using ElementAllocatorType = typename ArrayType::ElementAllocatorType;
 
 		// Memory
 		// -------------------------------------------------------------------------
-
-		// Destructs all items, but keeps array allocation
-		static void Reset(ArrayType& arr) noexcept
-		{
-			KOR_ASSERT(arr._num > 0);
-
-			SMemoryOps::Destruct(arr._data, arr._num);
-			arr._num = 0;
-		}
-
-		// Destruct all items, releases array memory
-		static void Empty(ArrayType& arr) noexcept
-		{
-			KOR_ASSERT(arr._reservedNum > 0);
-
-			if (arr._num > 0)
-			{
-				SMemoryOps::Destruct(arr._data, arr._num);
-				arr._num = 0;
-			}
-
-			_allocator.Deallocate(arr._data);
-			arr._data = nullptr;
-			arr._reservedNum = 0;
-		}
 
 		// Reallocates array memory
 		// * i.e. sets "arr._reservedNum" to specific value of `num`
@@ -100,6 +72,10 @@ namespace Internal::Array
 		template<bool HasItems = true>
 		static void Reallocate(ArrayType& arr, SizeType num) noexcept
 		{
+			// We can introduce another compile-time optimization, where we won't even try to destruct/move "items"
+			// * This would be beneficial for callsites that call "Reset" beforehand or equivalent
+			// * For now we trust branch prediction to catch that
+
 			if constexpr (HasItems)
 			{
 				KOR_ASSERT(
@@ -124,7 +100,7 @@ namespace Internal::Array
 						arr._num = num;
 					}
 
-					if constexpr (TAllocatorTraits<ArrayType::AllocatorType>::HasReallocate)
+					if constexpr (TAllocatorTraits<AllocatorType>::HasReallocate)
 					{
 						arr._data = arr._allocator.Reallocate(arr._data, num);
 						KOR_ASSERT(arr._data);
@@ -156,6 +132,65 @@ namespace Internal::Array
 			}
 
 			arr._reservedNum = num;
+		}
+
+		// Helper to empty and reallocate while reusing buffer region if possible
+		static void ReallocateToEmpty(ArrayType& arr, SizeType num) noexcept
+		{
+			KOR_ASSERT(num > 0);
+
+			if (arr._reservedNum > 0)
+			{
+				if (arr._num > 0)
+				{
+					SMemoryOps::Destruct(arr._data, arr._num);
+					arr._num = 0;
+				}
+
+				if (arr._reservedNum == num) return;
+
+				if constexpr (TAllocatorTraits<AllocatorType>::HasReallocate)
+				{
+					arr._data = arr._allocator.Reallocate(arr._data, num);
+					KOR_ASSERT(arr._data);
+				}
+				else
+				{
+					arr._allocator.Deallocate(arr._data);
+					arr._data = arr._allocator.Allocate(num);
+					KOR_ASSERT(arr._data);
+				}
+			}
+			else
+			{
+				arr._data = arr._allocator.Allocate(num);
+				arr._reservedNum = num;
+			}
+		}
+
+		// Destructs all items, but keeps array allocation
+		static void Reset(ArrayType& arr) noexcept
+		{
+			KOR_ASSERT(arr._num > 0);
+
+			SMemoryOps::Destruct(arr._data, arr._num);
+			arr._num = 0;
+		}
+
+		// Destruct all items, releases array memory
+		static void Empty(ArrayType& arr) noexcept
+		{
+			KOR_ASSERT(arr._reservedNum > 0);
+
+			if (arr._num > 0)
+			{
+				SMemoryOps::Destruct(arr._data, arr._num);
+				arr._num = 0;
+			}
+
+			_allocator.Deallocate(arr._data);
+			arr._data = nullptr;
+			arr._reservedNum = 0;
 		}
 
 		// Resizes array memory

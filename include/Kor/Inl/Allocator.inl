@@ -57,12 +57,6 @@ KOR_FORCEINLINE const AllocatorT& TTypedAllocator<AllocatorT, ElementT>::Get() c
 }
 
 template<typename AllocatorT, typename ElementT>
-KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Allocate(SizeType num) noexcept
-{
-	return Allocate(num, alignof(ElementType));
-}
-
-template<typename AllocatorT, typename ElementT>
 KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Allocate(SizeType num, uint32 alignment) noexcept
 {
 	using Traits = TAllocatorTraits<AllocatorT>;
@@ -75,12 +69,6 @@ KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Allocate(SizeTy
 	{
 		return (ElementType*)AllocatorType::Allocate(num * sizeof(ElementType));
 	}
-}
-
-template<typename AllocatorT, typename ElementT>
-KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Reallocate(ElementType* ptr, SizeType num) noexcept
-{
-	return Reallocate(ptr, num, alignof(ElementType));
 }
 
 template<typename AllocatorT, typename ElementT>
@@ -100,12 +88,6 @@ KOR_FORCEINLINE ElementT* TTypedAllocator<AllocatorT, ElementT>::Reallocate(Elem
 	{
 		return (ElementType*)AllocatorType::Reallocate(ptr, num * sizeof(ElementType));
 	}
-}
-
-template<typename AllocatorT, typename ElementT>
-KOR_FORCEINLINE void TTypedAllocator<AllocatorT, ElementT>::Deallocate(ElementType* ptr) noexcept
-{
-	Deallocate(ptr, alignof(ElementType));
 }
 
 template<typename AllocatorT, typename ElementT>
