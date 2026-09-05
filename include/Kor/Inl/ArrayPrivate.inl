@@ -44,11 +44,6 @@ namespace Internal::Array
 		}
 	};
 
-	static void CheckValidIndex(SizeType idx, SizeType max) noexcept
-	{
-		KOR_ASSERT(SMath::IsWithin(idx, 0, max));
-	}
-
 	template<typename ArrayT>
 	struct TFriend
 	{
@@ -61,21 +56,9 @@ namespace Internal::Array
 		// Memory
 		// -------------------------------------------------------------------------
 
-		// Reallocates array memory
-		// * i.e. sets "arr._reservedNum" to specific value of `num`
-		// * optionally calls destructor on items
-		//
-		// @param HasItems - Handles array with already existing items (Num > 0)
-		// @param arr - Array/this pointer
-		// @param num - exact number of elements that final arr._data be able to hold
-		//
-		template<bool HasItems = true>
+		template<typename HasItems = true>
 		static void Reallocate(ArrayType& arr, SizeType num) noexcept
 		{
-			// We can introduce another compile-time optimization, where we won't even try to destruct/move "items"
-			// * This would be beneficial for callsites that call "Reset" beforehand or equivalent
-			// * For now we trust branch prediction to catch that
-
 			if constexpr (HasItems)
 			{
 				KOR_ASSERT(
@@ -134,8 +117,40 @@ namespace Internal::Array
 			arr._reservedNum = num;
 		}
 
-		// Helper to empty and reallocate while reusing buffer region if possible
-		static void ReallocateToEmpty(ArrayType& arr, SizeType num) noexcept
+		static void Deallocate(ArrayType& arr) noexcept
+		{
+			KOR_ASSERT(arr._reservedNum > 0);
+
+			if (arr._num > 0)
+			{
+				SMemoryOps::Destruct(arr._data, arr._num);
+				arr._num = 0;
+			}
+
+			_allocator.Deallocate(arr._data);
+			arr._data = nullptr;
+			arr._reservedNum = 0;
+		}
+
+		template<bool HasItems = true>
+		static void Resize(ArrayType& arr, SizeType num) noexcept
+		{
+			// Check done at Reallocate
+			// KOR_ASSERT(num > 0);
+
+			if constexpr (HasItems)
+			{
+				Reallocate<true>(arr, num);
+			}
+			else if (arr._reservedNum != num)
+			{
+				Reallocate<false>(arr, num);
+			}
+
+			arr._num = num;
+		}
+
+		static void EmptyAndReallocate(ArrayType& arr, SizeType num) noexcept
 		{
 			KOR_ASSERT(num > 0);
 
@@ -168,6 +183,12 @@ namespace Internal::Array
 			}
 		}
 
+		static void EmptyAndResize(ArrayType& arr, SizeType num) noexcept
+		{
+			EmptyAndReallocate(arr, num);
+			arr._num = num;
+		}
+
 		// Destructs all items, but keeps array allocation
 		static void Reset(ArrayType& arr) noexcept
 		{
@@ -177,117 +198,8 @@ namespace Internal::Array
 			arr._num = 0;
 		}
 
-		// Destruct all items, releases array memory
-		static void Empty(ArrayType& arr) noexcept
-		{
-			KOR_ASSERT(arr._reservedNum > 0);
-
-			if (arr._num > 0)
-			{
-				SMemoryOps::Destruct(arr._data, arr._num);
-				arr._num = 0;
-			}
-
-			_allocator.Deallocate(arr._data);
-			arr._data = nullptr;
-			arr._reservedNum = 0;
-		}
-
-		// Resizes array memory
-		// * i.e. sets "arr._num" to specific value of `num`
-		//
-		// @param HasItems - Handles array with already existing items (Num > 0)
-		// @param arr - Array/this pointer
-		// @param num - exact number of elements that final arr._data be able to hold
-		//
-		template<bool HasItems = true>
-		static void Resize(ArrayType& arr, SizeType num) noexcept
-		{
-			KOR_ASSERT(
-				num > 0 && 
-				arr._num != num
-			);
-
-			if (arr._reservedNum != num)
-			{
-				Reallocate<HasItems>(arr, num);
-			}
-
-			arr._num = num;
-		}
-
-		// Helper to combine Resize + DefaultConstruct if needed
-		template<bool HasItems = true>
-		static void ResizeDefault(ArrayType& arr, SizeType num) noexcept
-		{
-			const SizeType oldNum = arr._num;
-			Resize<HasItems>(arr, num);
-
-			if (oldNum < num)
-			{
-				SMemoryOps::DefaultConstruct(arr._data + oldNum, num - oldNum);
-			}
-		}
-
-		// Helper to combine Resize + ZeroConstruct if needed
-		template<bool HasItems = true>
-		static void ResizeZero(ArrayType& arr, SizeType num) noexcept
-		{
-			const SizeType oldNum = arr._num;
-			Resize<HasItems>(arr, num);
-
-			if (oldNum < num)
-			{
-				SMemoryOps::ZeroConstruct(arr._data + oldNum, num - oldNum);
-			}
-		}
-
-		// Helper to combine Resize + ZeroConstruct if needed
-		template<bool HasItems = true>
-		static void ResizeFill(ArrayType& arr, const ElementType& val, SizeType num) noexcept
-		{
-			const SizeType oldNum = arr._num;
-			Resize<HasItems>(arr, num);
-
-			if (oldNum < num)
-			{
-				SMemoryOps::FillConstruct(arr._data + oldNum, val, num - oldNum);
-			}
-		}
-
-		// Helper to combine Resize + ZeroConstruct if needed
-		template<bool HasItems = true>
-		static void ResizeCopy(ArrayType& arr, const ElementType* buffer, SizeType num) noexcept
-		{
-			KOR_ASSERT(buffer);
-
-			const SizeType oldNum = arr._num;
-			Resize<HasItems>(arr, num);
-
-			if (oldNum < num)
-			{
-				SMemoryOps::CopyConstruct(arr._data + oldNum, buffer, num - oldNum);
-			}
-		}
-
-		// Helper to combine Resize + ZeroConstruct if needed
-		template<bool HasItems = true>
-		static void ResizeMove(ArrayType& arr, ElementType* buffer, SizeType num) noexcept
-		{
-			KOR_ASSERT(buffer);
-
-			const SizeType oldNum = arr._num;
-			Resize<HasItems>(arr, num);
-
-			if (oldNum < num)
-			{
-				SMemoryOps::MoveConstruct(arr._data + oldNum, buffer, num - oldNum);
-			}
-		}
-
-		// Grows array memory using allocation policy
-		template<bool HasItems = true>
-		static void Grow(ArrayType& arr, SizeType num) noexcept
+		// Calculates `num` for `Allocate`, using allocation policy for growth
+		static SizeType CalculateGrow(ArrayType& arr, SizeType num) noexcept
 		{
 			KOR_ASSERT(num > 0);
 
@@ -296,15 +208,21 @@ namespace Internal::Array
 				arr._reservedNum
 			);
 
-			if (newNum < num) newNum = num;
-			if (newNum <= arr._reservedNum) return;
-
-			Reallocate<HasItems>(arr, newNum);
+			// Return value that is at least as big as provided num
+			return SMath::Max(newNum, num);
 		}
 
-		// Shrinks array memory using allocation policy
-		template<bool HasItems = true>
-		static void Shrink(ArrayType& arr, SizeType num) noexcept
+		static void Grow(ArrayType& arr, SizeType num) noexcept
+		{
+			num = CalculateGrow(arr, num);
+			if (num > arr._reservedNum)
+			{
+				Reallocate(arr, num);
+			}
+		}
+
+		// Calculates `num` for `Allocate`, using allocation policy for shrink
+		static SizeType CalculateShrink(ArrayType& arr, SizeType num) noexcept
 		{
 			KOR_ASSERT(num > 0);
 
@@ -313,10 +231,28 @@ namespace Internal::Array
 				arr._reservedNum
 			);
 
-			if (newNum == arr._reservedNum) return;
-			else if (!SMath::IsWithin(newNum, arr._num, num)) return;
+			// Return value that is at most as provided num
+			return SMath::Min(newNum, num);
+		}
 
-			Reallocate<HasItems>(arr, newNum);
+		template<bool AllowDestroy = false>
+		static void Shrink(ArrayType& arr, SizeType num) noexcept
+		{
+			num = CalculateShrink(arr, num);
+
+			if constexpr (!AllowDestroy)
+			{
+				if (num < arr._num) return;
+			}
+
+			if (num > 0)
+			{
+				Reallocate(arr, num);
+			}
+			else if (num == 0 && arr._reservedNum > 0)
+			{
+				Deallocate(arr);
+			}
 		}
 
 		// Copies array memory and items from source array to dest array
@@ -328,22 +264,29 @@ namespace Internal::Array
 			// * TArray<uint8> <-> TArray<uint16> is possible fairly safely if both are binary buffers,
 			// * Although consumer can just read two bytes at the time, its convenience to be able to cast if allocators allow that
 
-			// TODO_2: Maybe we can reuse allocation ?
-
-			if constexpr (HasItems)
-			{
-				if (arr._reservedNum > 0) 
-				{
-					Empty(arr);
-				}
-			}
-
 			if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
 			{
+				if constexpr (HasItems)
+				{
+					if (dest._reservedNum > 0)
+					{
+						Empty(dest);
+					}
+				}
+
 				dest._allocator = source._allocator;
+				Resize<false>(dest, source._num);
+			}
+			else if constexpr (HasItems)
+			{
+				EmptyAndResize(dest, source._num);
+			}
+			else
+			{
+				Resize<false>(dest, source._num);
 			}
 
-			ResizeCopy<false>(arr, source._data, source._num);
+			SMemoryOps::CopyConstruct(dest._data, source._data, source._num);
 		}
 
 		// Moves array memory and items from source array to dest array
@@ -380,12 +323,11 @@ namespace Internal::Array
 		// Mutations
 		// -------------------------------------------------------------------------
 
-		static SizeType AddUninitialized(ArrayType& arr, SizeType num) noexcept
+		static void Add(ArrayType& arr, SizeType num = 1) noexcept
 		{
 			KOR_ASSERT(num > 0);
 
-			const SizeType idx = arr._num;
-			const SizeType newNum = idx + num;
+			const SizeType newNum = arr._num + num;
 
 			if (newNum > arr._reservedNum)
 			{
@@ -393,30 +335,50 @@ namespace Internal::Array
 			}
 
 			arr._num = newNum;
-			return idx;
 		}
 
-		// Opens an unitialized gap of `count` elements at `idx`, growing capacity first if needed
+		// Opens an unitialized gap of `num` elements at `idx`, growing capacity first if needed
 		// * Existing elements at and after `idx` are relocated past the gap
 		// ** the gap itself is left uninitialized for the caller to construct into
-		static void InsertUninitialized(ArrayType& arr, SizeType idx, SizeType num) noexcept
+		static void Insert(ArrayType& arr, SizeType idx, SizeType num = 1) noexcept
 		{
 			KOR_ASSERT(
-				num > 0 && 
+				num > 0 &&
 				SMath::IsWithin(idx, 0, arr._num)
 			);
 
 			const SizeType oldNum = arr._num;
-			const SizeType newNum = oldNum + count;
-
+			const SizeType newNum = oldNum + num;
 			if (newNum > arr._reservedNum)
 			{
 				Grow(arr, newNum);
 			}
 
-			// TODO: Move buffer
-			// We might move over already live objects
-			// ex. HELO\0 -> HE[unitialized]LO
+			ElementType* const data = arr._data;
+			const SizeType numToMove = oldNum - idx;
+
+			// Elements landing past oldNum hit raw memory; the rest land on still-live slots
+			const SizeType numIntoRaw = (num < numToMove) ? num : numToMove;
+			const SizeType numIntoLive = numToMove - numIntoRaw;
+
+			// Relocate tail into raw memory
+			if (numIntoRaw > 0)
+			{
+				SMemoryOps::MoveConstruct(data + oldNum + num - numIntoRaw, data + oldNum - numIntoRaw, numIntoRaw);
+			}
+
+			// Relocate overlap onto live slots
+			if (numIntoLive > 0)
+			{
+				SMemoryOps::MoveAssign(data + idx + num, data + idx, numIntoLive);
+			}
+
+			// Retire vacated source
+			// * [idx, idx + numIntoRaw) held the elements that were moved-from and never
+			//   overwritten by a destination write — those are the only ones needing destruction
+			SMemoryOps::Destruct(data + idx, numIntoRaw);
+
+			arr._num = newNum;
 		}
 
 		// Removes `num` elements at `idx`, shifting the tail left to close the gap (stable order)
@@ -424,9 +386,9 @@ namespace Internal::Array
 		static void RemoveAtShift(ArrayType& arr, SizeType idx,	SizeType num) noexcept
 		{
 			KOR_ASSERT(
-				num > 0 && 
+				num > 0 &&
 				SMath::IsWithin(idx, 0, arr._num) &&
-				(idx + num) < arr._num
+				(idx + num) <= arr._num
 			);
 
 			const SizeType numAfterHole = arr._num - (idx + num);
@@ -445,13 +407,13 @@ namespace Internal::Array
 			arr._num -= num;
 		}
 
-		// Removes `num` elements at `idx` by swapping in elemnets from the tail (order not preserved)
+		// Removes `num` elements at `idx` by swapping in elements from the tail (order not preserved)
 		static void RemoveAtSwapShift(ArrayType& arr, SizeType idx, SizeType num) noexcept
 		{
 			KOR_ASSERT(
 				num > 0 && 
 				SMath::IsWithin(idx, 0, arr._num) &&
-				(idx + num) < arr._num
+				(idx + num) <= arr._num
 			);
 
 			const SizeType numAfterHole = arr._num - (idx + num);

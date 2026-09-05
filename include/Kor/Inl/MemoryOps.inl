@@ -179,7 +179,7 @@ KOR_INLINE void* SMemoryOps::Realloc(void* ptr, uint64 size, uint32 alignment) n
 		SPlatformMemoryOps::Move(newAlignedPtr, oldDataInNewBlock, bytesToMove);
 	}
 
-	// Header must be written LAST — the move above can overlap the
+	// Header must be written LAST - the move above can overlap the
 	// header's own memory region until data lands in its final spot.
 	InitAlignHeader(newAlignedPtr, newRawPtr, size);
 
@@ -281,7 +281,7 @@ KOR_FORCEINLINE void SMemoryOps::MoveConstruct(T* dest, T* src, uint64 num) noex
 template<typename T> 
 KOR_FORCEINLINE void SMemoryOps::MoveAssign(T* dest, T* src, uint64 num) noexcept
 {
-if constexpr (!TIsTriviallyMovable<T>::Value)
+	if constexpr (!TIsTriviallyMovable<T>::Value)
 	{
 		if (dest < src)
 		{

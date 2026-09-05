@@ -18,17 +18,9 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::oper
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::operator=(const ILType& list) noexcept
+KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::operator=(const ILType& list) noexcept
 {
-	if (const SizeType newNum = (SizeType)list.size(); newNum > 0)
-	{
-		SFriend::ReallocateToEmpty(*this, newNum);
-		SMemoryOps::CopyConstruct(*this, list.begin(), newNum);
-	}
-	else if (_reservedNum > 0)
-	{
-		SFriend::Empty(*this);
-	}
+	Assign(list.begin(), list.size());
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -46,13 +38,13 @@ KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::operator!=(const TArray& othe
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE typename ElementT* TArray<ElementT, AllocatorT>::operator*() noexcept
+KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorT>::operator*() noexcept
 {
 	return _data;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE const typename ElementT* TArray<ElementT, AllocatorT>::operator*() const noexcept
+KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::operator*() const noexcept
 {
 	return _data;
 }
@@ -60,13 +52,11 @@ KOR_FORCEINLINE const typename ElementT* TArray<ElementT, AllocatorT>::operator*
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::operator[](SizeType idx) noexcept
 {
-	Internal::Array::CheckValidIndex(*this, idx);
-	return _data[idx];
+	return *GetAt(idx);
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE const ElementT& TArray<ElementT, AllocatorT>::operator[](SizeType idx) const noexcept
 {
-	Internal::Array::CheckValidIndex(*this, idx);
-	return _data[idx];
+	return *GetAt(idx);
 }

@@ -12,7 +12,7 @@
 KOR_NAMESPACE_BEGIN
 
 // Forward declare for private array friend
-namespace Internal::Array { struct SFriend; }
+namespace Internal::Array { template<typename T> struct TFriend; }
 
 // [TArray]
 // A dynamically-sized, heap-allocated array container.
@@ -20,10 +20,17 @@ namespace Internal::Array { struct SFriend; }
 // Contract:
 // - ElementType must be a non-void, non-reference type
 // - AllocatorType must expose a signed SizeType
-// - All index parameters are bounds-checked via assert
 // - Ownership is exclusive; copying performs a deep copy, moving transfers ownership
 // - Iterators and pointers into the array are invalidated by any operation that
 //   modifies capacity (Reserve, Add, Remove, Resize, etc.)
+//
+// Value contract:
+// - num parameters are 0-safe; negative values assert.
+// - Asserts fire in all build configs, not just debug.
+// - A data+num pair only needs a non-null pointer when num > 0.
+// - GetAt/GetFirst/GetLast never crash on bad input: they assert and return
+//   nullptr. operator[] and Pop have no fallback - treat them as unchecked.
+// - Find/Contains never assert, even on an empty array.
 template<typename ElementT, typename AllocatorT>
 class TArray
 {
@@ -55,43 +62,42 @@ public:
 	// Constructors
 	// -------------------------------------------------------------------------
 
-	// Default-constructs an empty array with no allocation.
+	// Empty array, no allocation.
 	constexpr TArray() noexcept;
 
-	// Copy-constructs from another array. Performs a deep copy of all elements.
-	// The new array's capacity is exactly Num of `other`; slack is not preserved.
+	// Deep copy. Capacity becomes exactly Num of `other`; slack is not preserved.
 	TArray(const TArray& other) noexcept;
 
-	// Move-constructs from another array. Buffer, Num, and capacity are stolen
-	// as-is. Source is left in a valid, empty state (Data=nullptr, Num=0, Max=0).
+	// Steals buffer/Num/capacity from `other`. `other` is left empty
+	// (Data=nullptr, Num=0, Max=0).
 	constexpr TArray(TArray&& other) noexcept;
-
-	// Constructs from an initializer list. Performs a deep copy of all elements.
+	
+	// Deep copy from an initializer list. `{}` is valid and yields an empty array.
 	TArray(const ILType& list) noexcept;
 
-	// Constructs by copying `num` elements from a raw pointer. Pointer must not
-	// be null and must point to at least `num` valid elements.
-	explicit TArray(const ElementType* data, SizeType num) noexcept;
-
-	// Constructs without initializing internal state. Caller is responsible for
-	// ensuring valid state before use.
+	// Leaves internal state uninitialized. Caller must bring it to a valid
+	// state before any other use.
 	explicit constexpr TArray(Init::SNoInit) noexcept;
 
-	// Reserves capacity for `num` elements. Num remains 0; no elements are
-	// constructed.
+	// Reserves `num` elements without constructing any. Num stays 0.
+	// `num == 0` is valid (no allocation).
 	explicit TArray(SizeType num, Init::SNoInit) noexcept;
 
-	// Reserves capacity for `num` elements and default-constructs each one.
-	// Num becomes `num`.
+	// Reserves and default-constructs `num` elements. Num becomes `num`.
+	// `num == 0` is valid (empty result).
 	explicit TArray(SizeType num, Init::SDefault) noexcept;
 
-	// Reserves capacity for `num` elements and zero-initializes the buffer.
-	// Num becomes `num`. Only valid for trivially-constructible ElementType.
+	// Reserves `num` elements and zero-fills them. Num becomes `num`.
+	// `num == 0` is valid. Only for trivially-constructible ElementType.
 	explicit TArray(SizeType num, Init::SZero) noexcept;
 
-	// Reserves capacity for `num` elements, each copy-constructed from `value`.
-	// Num becomes `num`.
-	explicit TArray(SizeType num, const ElementType& value) noexcept;
+	// Copies `num` elements from `data`. `data` may be null only if `num == 0`;
+	// otherwise it must point to at least `num` valid elements.
+	explicit TArray(const ElementType* data, SizeType num) noexcept;
+	
+	// Reserves `num` elements, each copy-constructed from `value`. Num becomes `num`.
+	// `num == 0` is valid (empty result).
+	explicit TArray(const ElementType& value, SizeType num) noexcept;
 
 	// Destructor
 	// -------------------------------------------------------------------------
@@ -108,356 +114,359 @@ public:
 	// Compare Operators
 	// -------------------------------------------------------------------------
 
-	// Element-wise equality. Both size and content must match.
+	// Element-wise equality; both size and content must match. Two empty
+	// arrays are equal.
 	bool operator==(const TArray& other) const noexcept;
 	bool operator!=(const TArray& other) const noexcept;
 
 	// Dereference Operators
 	// -------------------------------------------------------------------------
 
-	// Returns a raw pointer to the underlying data buffer. May be null if the
-	// array has never allocated (i.e. empty with no reserve).
+	// Raw pointer to the data buffer. Null if empty and never allocated.
+	// Safe to call on an empty array (it's a query, not a read).
 	ElementType* operator*() noexcept;
 	const ElementType* operator*() const noexcept;
 
 	// Index Operators
 	// -------------------------------------------------------------------------
 
-	// Asserts that `idx` is a valid index.
+	// Unsafe access. Requires 0 <= idx < GetNum(). Asserts on a bad
+	// index or an empty array; undefined behavior in release.
 	ElementType& operator[](SizeType idx) noexcept;
 	const ElementType& operator[](SizeType idx) const noexcept;
 
 	// Property Getters
 	// -------------------------------------------------------------------------
 
-	// Returns allocator instance used for allocating elements
 	ElementAllocatorType& GetAllocator() noexcept;
 	const ElementAllocatorType& GetAllocator() const noexcept;
 
-	// Returns a pointer to the underlying data buffer. May be null if empty
-	// and no allocation has been made.
+	// Pointer to the data buffer. Null if empty and never allocated.
 	ElementType* GetData() noexcept;
 	const ElementType* GetData() const noexcept;
 
-	// Returns the number of elements currently stored.
+	// Number of elements currently stored.
 	SizeType GetNum() const noexcept;
 
-	// Returns the total number of elements the array can hold before
-	// reallocating.
+	// Number of elements storable before the next reallocation.
 	SizeType GetReservedNum() const noexcept;
 
 	// Validation
 	// -------------------------------------------------------------------------
 
-	// Returns true if the array contains no elements.
 	bool IsEmpty() const noexcept;
 
-	// Returns true if `idx` is within [0, GetNum()).
+	// True if idx is in [0, GetNum()). Never asserts -- the standard guard to
+	// use before operator[]/Insert/RemoveAt.
 	bool IsValidIndex(SizeType idx) const noexcept;
 
 	// Get
 	// -------------------------------------------------------------------------
 
-	// Returns a pointer to the element at `idx`. Asserts.
-	// Returns null if `idx` is out of range in release builds.
+	// Safe access. Requires 0 <= idx < GetNum() to read a real element.
+	// Asserts on a bad index, but unlike operator[] it never reads out
+	// of bounds: release builds return nullptr instead.
 	ElementType* GetAt(SizeType idx) noexcept;
 	const ElementType* GetAt(SizeType idx) const noexcept;
 
-	// Returns a pointer to the first element, or null if empty.
+	// Pointer to the first element, or null if empty. Never asserts.
 	ElementType* GetFirst() noexcept;
 	const ElementType* GetFirst() const noexcept;
 
-	// Returns a pointer to the last element, or null if empty.
+	// Pointer to the last element, or null if empty. Never asserts.
 	ElementType* GetLast() noexcept;
 	const ElementType* GetLast() const noexcept;
 
 	// Reserve / Resize / Reset
 	// -------------------------------------------------------------------------
 
-	// Ensures capacity for at least `num` elements without changing Num.
-	// No-op if current capacity already satisfies the request.
+	// Ensures capacity for at least `num` elements; Num is unchanged.
+	// No-op if capacity already satisfies the request. `num == 0` is valid.
 	void Reserve(SizeType num) noexcept;
 
-	// Sets the element count to `num`. New elements are default-constructed;
-	// excess elements are destroyed. Does not release memory if shrinking.
+	// Sets Num to `num`. Grown elements are default-constructed; shrunk
+	// elements are destroyed. Never releases memory. `num == 0` empties the
+	// array without freeing capacity.
 	void Resize(SizeType num) noexcept;
 
-	// Sets the element count to `num`. New elements are zero-constructed;
-	// excess elements are destroyed. Does not release memory if shrinking.
+	// Same as Resize, but grown elements are zero-constructed.
 	void ResizeZeroed(SizeType num) noexcept;
 
-	// Sets the element count to `num`. New elements are unitialized;
-	// excess elements are destroyed. Does not release memory if shrinking.
-	void ResizeUnitialized(SizeType num) noexcept;
+	// Same as Resize, but grown elements are left uninitialized. Caller must
+	// initialize them before reading. Intended for trivially-constructible
+	// ElementType.
+	void ResizeUninitialized(SizeType num) noexcept;
 
-	// Releases excess capacity so that reserved == num.
+	// Frees excess capacity so GetReservedNum() == GetNum(). No-op if already
+	// tight or empty.
 	void ShrinkToFit() noexcept;
 
-	// Destroys all elements. Num becomes 0. Capacity is unchanged.
+	// Destroys all elements. Num becomes 0. Capacity is unchanged. No-op if
+	// already empty.
 	void Reset() noexcept;
 
-	// Destroys all elements and optionally re-reserves `newNum` slots.
+	// Destroys all elements, then reserves `num` slots (default 0). `num == 0`
+	// on an already-empty array is a no-op.
 	void Empty(SizeType num = 0) noexcept;
 
 	// Add
 	// -------------------------------------------------------------------------
 
-	// Appends a copy of `val` to the end
-	// Returns the index of the added element.
-	template<typename ValueType>
-	SizeType Add(ValueType&& val) noexcept;
+	// Appends a copy of `val`. Returns its index.
+	SizeType Add(const ElementType& val) noexcept;
+	SizeType Add(ElementType&& val) noexcept;
 
-	// Appends a copy of `val` and returns a reference to the newly added element.
-	template<typename ValueType>
-	ElementType& Add_GetRef(ValueType&& val) noexcept;
+	// Appends a copy of `val`. Returns a reference to it.
+	ElementType& Add_GetRef(const ElementType& val) noexcept;
+	ElementType& Add_GetRef(ElementType&& val) noexcept;
 
-	// Appends a copy of `val` only if no element equal to it already exists.
-	// Returns the index of the existing or newly added element.
-	template<typename ValueType>
-	SizeType AddUnique(ValueType&& val) noexcept;
+	// Appends `val` only if no equal element already exists (requires
+	// operator==). Returns the index of the existing or newly added element.
+	// No-op (beyond the lookup) if an equal element is already present.
+	SizeType AddUnique(const ElementType& val) noexcept;
+	SizeType AddUnique(ElementType&& val) noexcept;
 
-	// Appends `val` if no element equal to it already exists and returns a reference to the newly added element.
-	template<typename ValueType>
-	ElementType& AddUnique_GetRef(ValueType&& val) noexcept;
+	// Same as AddUnique, but returns a reference to the existing/new element.
+	ElementType& AddUnique_GetRef(const ElementType& val) noexcept;
+	ElementType& AddUnique_GetRef(ElementType&& val) noexcept;
 
-	// Appends `num` default-constructed elements. 
-	// Returns the index of the first added element.
+	// Appends `num` default-constructed elements. Returns the index of the
+	// first one added. `num == 0` is a no-op.
 	SizeType AddDefaulted(SizeType num = 1) noexcept;
 
-	// Appends a single default-constructed element and returns a reference to it.
+	// Appends one default-constructed element. Returns a reference to it.
 	ElementType& AddDefaulted_GetRef() noexcept;
 
-	// Appends `num` zero-constructed elements. 
-	// Returns the index of the first added element.
+	// Appends `num` zero-constructed elements. Returns the index of the
+	// first one added. `num == 0` is a no-op.
 	SizeType AddZeroed(SizeType num = 1) noexcept;
 
-	// Appends a single zero-constructed element and returns a reference to it.
+	// Appends one zero-constructed element. Returns a reference to it.
 	ElementType& AddZeroed_GetRef() noexcept;
 
-	// Appends `num` elements with uninitialized memory. 
-	// Returns the index of the first added element. 
-	// Caller must initialize all added elements before reading.
+	// Appends `num` uninitialized elements. Returns the index of the first
+	// one added. `num == 0` is a no-op. Caller must initialize each added
+	// element before reading it.
 	SizeType AddUninitialized(SizeType num = 1) noexcept;
 
-	// Appends a single uninitialized element and returns a reference to it.
-	// Caller must initialize before reading.
+	// Appends one uninitialized element. Returns a reference to it. Caller
+	// must initialize it before reading.
 	ElementType& AddUninitialized_GetRef() noexcept;
 
-	// Push/Pop aliases for stack-style usage.
+	// Push/Pop aliases for stack-style usage. Push behaves like Add.
 	void Push(const ElementType& val) noexcept;
 	void Push(ElementType&& val) noexcept;
 
 	// Emplace
 	// -------------------------------------------------------------------------
 
-	// Constructs an element in-place at the end from `args`. Returns its index.
+	// Constructs an element in place at the end from `args`. Returns its index.
 	template<typename... ArgTypes>
 	SizeType Emplace(ArgTypes&&... args) noexcept;
 
-	// Constructs an element in-place at the end from `args` and returns a
-	// reference to it.
+	// Same as Emplace, but returns a reference to the new element.
 	template<typename... ArgTypes>
 	ElementType& Emplace_GetRef(ArgTypes&&... args) noexcept;
 
 	// Insert
 	// -------------------------------------------------------------------------
 
-	// Inserts a copy of `val` at `idx`, shifting subsequent elements right.
-	// Asserts that `idx` is in [0, GetNum()].
+	// Inserts a copy of `val` at `idx`, shifting elements at/after `idx` right.
+	// Requires 0 <= idx <= GetNum(); idx == GetNum() behaves like Add.
 	void Insert(SizeType idx, const ElementType& val) noexcept;
-
-	// Inserts `val` via move at `idx`, shifting subsequent elements right.
 	void Insert(SizeType idx, ElementType&& val) noexcept;
 
-	// Inserts `num` elements from `data` at `idx`, shifting subsequent elements
-	// right. `data` must not be null and must point to at least `num` elements.
+	// Inserts `num` elements from `data` at `idx`. Requires
+	// 0 <= idx <= GetNum(). `data` may be null only if `num == 0`; otherwise
+	// it must point to at least `num` elements. `num == 0` is a no-op.
 	void Insert(SizeType idx, const ElementType* data, SizeType num) noexcept;
 
-	// Inserts all elements from `list` at `idx`, shifting subsequent elements
-	// right.
+	// Inserts all elements from `list` at `idx`. Requires 0 <= idx <= GetNum().
+	// An empty list is a no-op.
 	void Insert(SizeType idx, const ILType& list) noexcept;
 
 	// Append
 	// -------------------------------------------------------------------------
 
-	// Appends all elements from `other` to the end.
+	// Appends all elements from `other`. An empty `other` is a no-op.
 	void Append(const TArray& other) noexcept;
 	void Append(TArray&& other) noexcept;
 
-	// Appends all elements from `list`.
+	// Appends all elements from `list`. An empty list is a no-op.
 	void Append(const ILType& list) noexcept;
 
-	// Appends `numToAdd` copies of `val`.
+	// Appends `num` copies of `val`. `num == 0` is a no-op.
 	void Append(const ElementType& val, SizeType num) noexcept;
 
-	// Appends `num` elements from `data`. `data` must not be null.
+	// Appends `num` elements from `data`. `data` may be null only if
+	// `num == 0`; otherwise it must point to at least `num` elements.
 	void Append(const ElementType* data, SizeType num) noexcept;
 
-	// Appends `numToAdd` elements with uninitialized memory. Caller must
-	// initialize before reading.
+	// Appends `numToAdd` uninitialized elements. `numToAdd == 0` is a no-op.
+	// Caller must initialize each one before reading it.
 	void AppendUninitialized(SizeType numToAdd) noexcept;
 
 	// Remove
 	// -------------------------------------------------------------------------
 
-	// Removes all elements equal to `val`, preserving order of remaining
-	// elements. Returns the number of elements removed.
-	// Optionally shrinks capacity if `allowShrink` is true.
+	// Removes every element equal to `val` (requires operator==), preserving
+	// order. Returns the number removed; 0 if none matched or the array is
+	// empty. Optionally shrinks capacity afterward.
 	SizeType Remove(const ElementType& val, bool allowShrink = true) noexcept;
 
-	// Removes all elements equal to `val` using swap-with-last (does not
-	// preserve order). Returns the number of elements removed.
+	// Same as Remove, but uses swap-with-last and does not preserve order.
 	SizeType RemoveSwap(const ElementType& val, bool allowShrink = true) noexcept;
 
-	// Removes all elements for which `predicate(element)` returns true,
-	// preserving order. Returns the number of elements removed.
-	// Note: not marked noexcept; predicate exception behavior is unknown.
+	// Removes every element for which `predicate(element)` is true, preserving
+	// order. Returns the number removed; 0 if none matched or the array is
+	// empty. Not noexcept: predicate may throw.
 	template<typename Predicate>
 	SizeType RemoveByPredicate(Predicate&& predicate, bool allowShrink = true);
 
-	// Removes all elements for which `predicate(element)` returns true using
-	// swap-with-last (does not preserve order). Returns the number removed.
-	// Note: not marked noexcept; predicate exception behavior is unknown.
+	// Same as RemoveByPredicate, but uses swap-with-last and does not
+	// preserve order. Not noexcept: predicate may throw.
 	template<typename Predicate>
 	SizeType RemoveSwapByPredicate(Predicate&& predicate, bool allowShrink = true);
 
-	// Removes the first element equal to `val`, preserving order.
-	// Returns its former index, or KOR_INDEX_NONE if not found.
+	// Removes the first element equal to `val`, preserving order. Returns its
+	// former index, or KOR_INDEX_NONE if not found (array unchanged).
 	SizeType RemoveFirst(const ElementType& val) noexcept;
 
-	// Removes the first element equal to `val` using swap-with-last.
-	// Returns its former index, or KOR_INDEX_NONE if not found.
+	// Same as RemoveFirst, but uses swap-with-last and does not preserve order.
 	SizeType RemoveSwapFirst(const ElementType& val) noexcept;
 
-	// Removes the element at `idx`, shifting subsequent elements left.
+	// Removes the element at `idx`, shifting later elements left. Requires
+	// 0 <= idx < GetNum(); asserts otherwise, including on an empty array.
 	void RemoveAt(SizeType idx) noexcept;
 
-	// Removes `count` elements starting at `idx`, shifting subsequent elements
-	// left.
-	void RemoveAt(SizeType idx, SizeType count) noexcept;
+	// Removes `num` elements starting at `idx`, shifting later elements
+	// left. Requires 0 <= idx, idx + num <= GetNum(), num >= 0.
+	// `num == 0` is a no-op.
+	void RemoveAt(SizeType idx, SizeType num) noexcept;
 
-	// Removes the element at `idx` using swap-with-last (does not preserve
-	// order). Faster than RemoveAt for large arrays.
+	// Removes the element at `idx` via swap-with-last (order not preserved;
+	// faster than RemoveAt for large arrays). Requires 0 <= idx < GetNum().
 	void RemoveAtSwap(SizeType idx) noexcept;
 
-	// Removes the element at `idx`, shifts remaining elements, and returns a
-	// copy of the removed element.
+	// Same as RemoveAt(idx), but returns a copy of the removed element.
 	ElementType RemoveAt_GetCopy(SizeType idx) noexcept;
 
-	// Removes the element at `idx` using swap-with-last and returns a copy of
-	// the removed element.
+	// Same as RemoveAtSwap(idx), but returns a copy of the removed element.
 	ElementType RemoveAtSwap_GetCopy(SizeType idx) noexcept;
 
-	// Removes and returns the last element. Array must not be empty.
+	// Removes and returns the last element. Requires GetNum() > 0; asserts on
+	// an empty array (no safe-empty fallback, unlike GetLast()).
 	ElementType Pop() noexcept;
 
 	// Replace
 	// -------------------------------------------------------------------------
 
-	// Replaces the contents of this array with `other` via copy.
+	// Replaces this array's contents with a copy of `other`.
 	void Replace(const TArray& other) noexcept;
 
-	// Replaces the contents of this array with `other` via move. `other` is
-	// left in a valid empty state.
+	// Replaces this array's contents by taking `other`'s. `other` is left empty.
 	void Replace(TArray&& other) noexcept;
 
 	// Swap
 	// -------------------------------------------------------------------------
 
-	// Swaps the elements at `firstIdx` and `secondIdx`.
+	// Swaps the elements at `firstIdx` and `secondIdx`. Both must be in
+	// [0, GetNum()). `firstIdx == secondIdx` is a no-op.
 	void Swap(SizeType firstIdx, SizeType secondIdx) noexcept;
 
-	// Swaps `num` contiguous elements starting at `firstIdx` with those
-	// starting at `secondIdx`. Ranges must not overlap.
+	// Swaps `num` contiguous elements starting at `firstIdx` with `num`
+	// starting at `secondIdx`. Both ranges must lie within [0, GetNum()) and
+	// must not overlap. `num == 0` is a no-op.
 	void SwapRange(SizeType firstIdx, SizeType secondIdx, SizeType num = 1) noexcept;
 
 	// Fill / Assign
 	// -------------------------------------------------------------------------
 
-	// Sets all existing elements to a copy of `val`. Does not change Num.
+	// Overwrites every existing element with a copy of `val`. Num is
+	// unchanged. No-op on an empty array.
 	void Fill(const ElementType& val) noexcept;
 
 	// Replaces the contents with `num` copies of `val`. Equivalent to
-	// Reset() + Append(val, num).
+	// Reset() + Append(val, num). `num == 0` empties the array.
 	void Assign(const ElementType& val, SizeType num) noexcept;
 
-	// Replaces the contents by copying `num` elements from `data`. `data`
-	// must not be null and must point to at least `num` valid elements.
+	// Replaces the contents by copying `num` elements from `data`. `data` may
+	// be null only if `num == 0`; otherwise it must point to at least `num`
+	// valid elements.
 	void Assign(const ElementType* data, SizeType num) noexcept;
 
 	// Sort
 	// -------------------------------------------------------------------------
 
-	// Sorts elements in ascending order using the default less-than operator.
+	// Ascending sort using operator<. No-op on an empty or single-element array.
 	void Sort() noexcept;
 
-	// Sorts elements using `predicate(a, b)` returning true if `a` should come
-	// before `b`.
-	// Note: not marked noexcept; predicate exception behavior is unknown.
+	// Sorts using predicate(a, b) == true if `a` belongs before `b`. No-op on
+	// an empty or single-element array. Not noexcept: predicate may throw.
 	template<typename Predicate>
 	void Sort(Predicate&& predicate);
 
-	// Stable sort: preserves relative order of equivalent elements.
+	// Stable sort: equal elements keep their relative order. No-op on an
+	// empty or single-element array.
 	void StableSort() noexcept;
 
-	// Note: not marked noexcept; predicate exception behavior is unknown.
+	// Not noexcept: predicate may throw.
 	template<typename Predicate>
 	void StableSort(Predicate&& predicate);
 
-	// Reverses the order of all elements in-place.
+	// Reverses element order in place. No-op on an empty or single-element array.
 	void Reverse() noexcept;
 
 	// Find Index
 	// -------------------------------------------------------------------------
 
-	// Returns the index of the first element equal to `val`, or KOR_INDEX_NONE.
+	// Index of the first element equal to `val`, or KOR_INDEX_NONE. Never
+	// asserts; safe on an empty array.
 	SizeType FindIndex(const ElementType& val) const noexcept;
 
-	// Returns the index of the first element for which `func(element)` returns
-	// true, or KOR_INDEX_NONE.
-	// Note: not marked noexcept; functor exception behavior is unknown.
+	// Index of the first element for which func(element) is true, or
+	// KOR_INDEX_NONE. Never asserts. Not noexcept: functor may throw.
 	template<typename Functor>
 	SizeType FindIndexByFunc(Functor&& func) const;
 
-	// Returns the index of the first element whose key matches `key`,
-	// or KOR_INDEX_NONE.
+	// Index of the first element whose key matches `key`, or KOR_INDEX_NONE.
+	// Never asserts.
 	template<typename KeyType>
-	SizeType FindIndexByKey(KeyType key) const noexcept;
+	SizeType FindIndexByKey(const KeyType& key) const noexcept;
 
 	// Find Element
 	// -------------------------------------------------------------------------
 
-	// Returns a pointer to the first element for which `func(element)` returns
-	// true, or null if not found.
-	// Note: not marked noexcept; functor exception behavior is unknown.
+	// Pointer to the first element for which func(element) is true, or
+	// nullptr. Never asserts. Not noexcept: functor may throw.
 	template<typename Functor>
 	ElementType* FindByFunc(Functor&& func);
 
 	template<typename Functor>
 	const ElementType* FindByFunc(Functor&& func) const;
 
-	// Returns a pointer to the first element whose key matches `key`,
-	// or null if not found.
+	// Pointer to the first element whose key matches `key`, or nullptr.
+	// Never asserts.
 	template<typename KeyType>
-	ElementType* FindByKey(KeyType key) noexcept;
+	ElementType* FindByKey(const KeyType& key) noexcept;
 
 	template<typename KeyType>
-	const ElementType* FindByKey(KeyType key) const noexcept;
+	const ElementType* FindByKey(const KeyType& key) const noexcept;
 
 	// Contains
 	// -------------------------------------------------------------------------
 
-	// Returns true if any element is equal to `val`.
+	// True if any element equals `val`. Never asserts; false on an empty array.
 	bool Contains(const ElementType& val) const noexcept;
 
-	// Returns true if any element satisfies `func(element)`.
-	// Note: not marked noexcept; functor exception behavior is unknown.
+	// True if any element satisfies func(element). Never asserts. Not
+	// noexcept: functor may throw.
 	template<typename Functor>
 	bool ContainsByFunc(Functor&& func) const;
 
-	// Returns true if any element's key matches `key`.
+	// True if any element's key matches `key`. Never asserts.
 	template<typename KeyType>
-	bool ContainsByKey(KeyType key) const noexcept;
+	bool ContainsByKey(const KeyType& key) const noexcept;
 
 	// Iterators
 	// -------------------------------------------------------------------------

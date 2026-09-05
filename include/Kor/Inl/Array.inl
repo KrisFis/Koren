@@ -10,7 +10,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::ElementAllocatorType& TArray<Eleme
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE const TArray<ElementT, AllocatorT>::ElementAllocatorType& TArray<ElementT, AllocatorT>GetAllocator() const noexcept
+KOR_FORCEINLINE const TArray<ElementT, AllocatorT>::ElementAllocatorType& TArray<ElementT, AllocatorT>::GetAllocator() const noexcept
 {
 	return _allocator;
 }
@@ -48,17 +48,17 @@ KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::IsEmpty() const noexcept
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::IsValidIndex(SizeType idx) const noexcept
 {
-	return idx >= 0 && idx < _num;
+	return SMemoryOps::IsWithin(idx, 0, _num);
 }
 
 #include "Kor/Inl/ArrayPrivate.inl"
 #include "Kor/Inl/ArrayConstructors.inl"
-#include "Kor/Inl/ArrayOperators.inl"
 #include "Kor/Inl/ArrayQuery.inl"
 #include "Kor/Inl/ArrayMemory.inl"
 #include "Kor/Inl/ArrayMutation.inl"
 #include "Kor/Inl/ArraySort.inl"
 #include "Kor/Inl/ArrayIterators.inl"
+#include "Kor/Inl/ArrayOperators.inl"
 
 // Container traits
 // -------------------------------------------------------------------------

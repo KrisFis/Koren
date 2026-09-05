@@ -4,39 +4,41 @@
 #pragma once // silence tooling
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE typename ElementT* TArray<ElementT, AllocatorT>::GetAt(SizeType idx) noexcept
+KOR_FORCEINLINE_DEBUG ElementT* TArray<ElementT, AllocatorT>::GetAt(SizeType idx) noexcept
 {
-	return operator[](idx);
+	KOR_ASSERT_DEBUG(SMath::IsWithin(idx, 0, arr._num));
+	return _data + idx;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE const typename ElementT* TArray<ElementT, AllocatorT>::GetAt(SizeType idx) const noexcept
+KOR_FORCEINLINE_DEBUG const ElementT* TArray<ElementT, AllocatorT>::GetAt(SizeType idx) const noexcept
 {
-	return operator[](idx);
+	KOR_ASSERT_DEBUG(SMath::IsWithin(idx, 0, arr._num));
+	return _data + idx;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE typename ElementT* TArray<ElementT, AllocatorT>::GetFirst() noexcept
+KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorT>::GetFirst() noexcept
 {
-	return operator[](0);
+	return _num > 0 ? _data : nullptr;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE const typename ElementT* TArray<ElementT, AllocatorT>::GetFirst() const noexcept
+KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::GetFirst() const noexcept
 {
-	return operator[](0);
+	return _num > 0 ? _data : nullptr;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE typename ElementT* TArray<ElementT, AllocatorT>::GetLast() noexcept
+KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorT>::GetLast() noexcept
 {
-	return operator[](_num - 1);
+	return _num > 0 ? _data + (_num - 1) : nullptr;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE const typename ElementT* TArray<ElementT, AllocatorT>::GetLast() const noexcept
+KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::GetLast() const noexcept
 {
-	return operator[](_num - 1);
+	return _num > 0 ? _data + (_num - 1) : nullptr;
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -45,7 +47,7 @@ KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, Allo
 	const ElementType* end = _data + _num;
 	for (const ElementType* curr = _data; curr != end; ++curr)
 	{
-		if (SMemoryOps::IsEqual(curr, &val))
+		if (SMemoryOps::IsEqualAs(curr, &val))
 		{
 			return KOR_PTR_TYPED_DIFF(SizeType, curr, _data);
 		}
@@ -73,7 +75,7 @@ KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, Allo
 
 template<typename ElementT, typename AllocatorT>
 template<typename KeyType>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::FindIndexByKey(KeyType key) const noexcept
+KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::FindIndexByKey(const KeyType& key) const noexcept
 {
 	const ElementType* end = _data + _num;
 	for (const ElementType* curr = _data; curr != end; ++curr)
@@ -113,7 +115,7 @@ KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::FindByFunc(Functor
 
 template<typename ElementT, typename AllocatorT>
 template<typename KeyType>
-KOR_INLINE ElementT* TArray<ElementT, AllocatorT>::FindByKey(KeyType key) noexcept
+KOR_INLINE ElementT* TArray<ElementT, AllocatorT>::FindByKey(const KeyType& key) noexcept
 {
 	const ElementType* end = _data + _num;
 	for (const ElementType* curr = _data; curr != end; ++curr)
@@ -129,7 +131,7 @@ KOR_INLINE ElementT* TArray<ElementT, AllocatorT>::FindByKey(KeyType key) noexce
 
 template<typename ElementT, typename AllocatorT>
 template<typename KeyType>
-KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::FindByKey(KeyType key) const noexcept
+KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::FindByKey(const KeyType& key) const noexcept
 {
 	return const_cast<TArray*>(this)->FindByKey(key);
 }
@@ -149,7 +151,7 @@ KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::ContainsByFunc(Functor&& func
 
 template<typename ElementT, typename AllocatorT>
 template<typename KeyType>
-KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::ContainsByKey(KeyType key) const noexcept
+KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::ContainsByKey(const KeyType& key) const noexcept
 {
 	return !!FindByKey(key);
 }
