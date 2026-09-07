@@ -42,98 +42,71 @@ KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::GetLast() const no
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::FindIndex(const ElementType& val) const noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::FindIndex(const ElementType& val) const noexcept
 {
-	const ElementType* end = _data + _num;
-	for (const ElementType* curr = _data; curr != end; ++curr)
-	{
-		if (SMemoryOps::IsEqualAs(curr, &val))
+	return SFriend::FindIndexByFunc(*this, 
+		[&val](const ElementType& el) noexcept -> bool
 		{
-			return KOR_PTR_TYPED_DIFF(SizeType, curr, _data);
+			return SMemoryOps::IsEqualAs(&el, &val);
 		}
-	}
-
-	return KOR_INDEX_NONE;
+	);
 }
 
 template<typename ElementT, typename AllocatorT>
-template<typename Functor>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::FindIndexByFunc(Functor&& func) const
+template<typename FunctorT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::FindIndexByFunc(FunctorT&& func) const
 {
-	const ElementType* end = _data + _num;
-	for (const ElementType* curr = _data; curr != end; ++curr)
-	{
-		// TODO: Implement Invoke (std::invoke)
-		if (func(*curr))
-		{
-			return KOR_PTR_TYPED_DIFF(SizeType, curr, _data);
-		}
-	}
-
-	return KOR_INDEX_NONE;
+	return SFriend::FindIndexByFunc(*this, Forward<FunctorT>(func));
 }
 
 template<typename ElementT, typename AllocatorT>
 template<typename KeyType>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::FindIndexByKey(const KeyType& key) const noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::FindIndexByKey(const KeyType& key) const noexcept
 {
-	const ElementType* end = _data + _num;
-	for (const ElementType* curr = _data; curr != end; ++curr)
-	{
-		if (*curr == key)
+	return SFriend::FindIndexByFunc(*this, 
+		[&key](const ElementType& el) noexcept -> bool
 		{
-			return KOR_PTR_TYPED_DIFF(SizeType, curr, _data);
+			return SMemoryOps::IsEqualAs(&el, &key);
 		}
-	}
-
-	return KOR_INDEX_NONE;
+	);
 }
 
 template<typename ElementT, typename AllocatorT>
-template<typename Functor>
-KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorT>::FindByFunc(Functor&& func)
+template<typename FunctorT>
+KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorT>::FindByFunc(FunctorT&& func)
 {
-	const ElementType* end = _data + _num;
-	for (const ElementType* curr = _data; curr != end; ++curr)
-	{
-		// TODO: Implement Invoke (std::invoke)
-		if (func(*curr))
-		{
-			return curr;
-		}
-	}
-
-	return nullptr;
+	return SFriend::FindByFunc(*this, Forward<FunctorT>(func));
 }
 
 template<typename ElementT, typename AllocatorT>
-template<typename Functor>
-KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::FindByFunc(Functor&& func) const
+template<typename FunctorT>
+KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::FindByFunc(FunctorT&& func) const
 {
-	return const_cast<TArray*>(this)->FindByFunc(Forward<Functor>(func));
+	return SFriend::FindByFunc(*this, Forward<FunctorT>(func));
 }
 
 template<typename ElementT, typename AllocatorT>
 template<typename KeyType>
-KOR_INLINE ElementT* TArray<ElementT, AllocatorT>::FindByKey(const KeyType& key) noexcept
+KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorT>::FindByKey(const KeyType& key) noexcept
 {
-	const ElementType* end = _data + _num;
-	for (const ElementType* curr = _data; curr != end; ++curr)
-	{
-		if (*curr == key)
+	return SFriend::FindByFunc(*this, 
+		[&key](const ElementType& el) noexcept -> bool
 		{
-			return curr;
+			return SMemoryOps::IsEqualAs(&el, &key);
 		}
-	}
-
-	return nullptr;
+	);
 }
 
 template<typename ElementT, typename AllocatorT>
 template<typename KeyType>
 KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::FindByKey(const KeyType& key) const noexcept
 {
-	return const_cast<TArray*>(this)->FindByKey(key);
+	return SFriend::FindByFunc(*this, 
+		[&key](const ElementType& el) noexcept -> bool
+		{
+			return SMemoryOps::IsEqualAs(&el, &key);
+		}
+	);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -143,8 +116,8 @@ KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::Contains(const ElementT& val)
 }
 
 template<typename ElementT, typename AllocatorT>
-template<typename Functor>
-KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::ContainsByFunc(Functor&& func) const
+template<typename FunctorT>
+KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::ContainsByFunc(FunctorT&& func) const
 {
 	return !!FindByFunc(Forward<Functor>(func));
 }

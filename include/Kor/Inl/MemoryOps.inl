@@ -416,8 +416,8 @@ KOR_FORCEINLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcep
 	}
 }
 
-template<typename T>
-KOR_FORCEINLINE void SMemoryOps::SwapAs(T* lhs, T* rhs, uint64 num) noexcept
+template<typename T, typename R>
+KOR_FORCEINLINE void SMemoryOps::SwapAs(T* lhs, R* rhs, uint64 num) noexcept
 {	
 	if constexpr (!TIsTriviallyMovable<T>::Value)
 	{
@@ -442,8 +442,8 @@ KOR_FORCEINLINE int32 SMemoryOps::Compare(const void* lhs, const void* rhs, uint
 	return SPlatformMemoryOps::Compare(lhs, rhs, size);
 }
 
-template<typename T>
-KOR_FORCEINLINE int32 SMemoryOps::CompareAs(const T* lhs, const T* rhs, uint64 num) noexcept
+template<typename T, typename R>
+KOR_FORCEINLINE int32 SMemoryOps::CompareAs(const T* lhs, const R* rhs, uint64 num) noexcept
 {
 	if constexpr (!TIsFundamental<T>::Value && !TIsEnum<T>::Value)
 	{
@@ -467,8 +467,8 @@ KOR_FORCEINLINE bool SMemoryOps::IsEqual(const void* lhs, const void* rhs, uint6
 	return SPlatformMemoryOps::Compare(lhs, rhs, size) == 0;
 }
 
-template<typename T>
-KOR_FORCEINLINE bool SMemoryOps::IsEqualAs(const T* lhs, const T* rhs, uint64 num) noexcept
+template<typename T, typename R>
+KOR_FORCEINLINE bool SMemoryOps::IsEqualAs(const T* lhs, const R* rhs, uint64 num) noexcept
 {
 	if constexpr (!TIsFundamental<T>::Value && !TIsEnum<T>::Value)
 	{

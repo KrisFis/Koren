@@ -136,7 +136,7 @@ struct SMemoryOps
 	// -------------------------------------------------------------------------
 
 	static void Swap(void* lhs, void* rhs, uint64 size) noexcept;
-	template<typename T> static void SwapAs(T* lhs, T* rhs, uint64 num = 1) noexcept;
+	template<typename T, typename R> static void SwapAs(T* lhs, R* rhs, uint64 num = 1) noexcept;
 
 	// Compare / CompareAs
 	// Compares two memory regions. Returns negative, zero, or positive like memcmp.
@@ -145,7 +145,7 @@ struct SMemoryOps
 	// -------------------------------------------------------------------------
 
 	static int32 Compare(const void* lhs, const void* rhs, uint64 size) noexcept;
-	template<typename T> static int32 CompareAs(const T* lhs, const T* rhs, uint64 num = 1) noexcept;
+	template<typename T, typename R> static int32 CompareAs(const T* lhs, const R* rhs, uint64 num = 1) noexcept;
 
 	// IsEqual / IsEqualAs
 	// Returns true if both memory regions are identical.
@@ -154,7 +154,7 @@ struct SMemoryOps
 	// -------------------------------------------------------------------------
 
 	static bool IsEqual(const void* lhs, const void* rhs, uint64 size) noexcept;
-	template<typename T> static bool IsEqualAs(const T* lhs, const T* rhs, uint64 num = 1) noexcept;
+	template<typename T, typename R> static bool IsEqualAs(const T* lhs, const R* rhs, uint64 num = 1) noexcept;
 
 	// Construct
 	// Constructs a T in-place from arbitrary args. Single element only.

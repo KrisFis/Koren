@@ -84,7 +84,7 @@ template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::Reset() noexcept
 {
 	if (_num == 0) return;
-	SFriend::Reset(*this);
+	SFriend::Destruct(*this);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -99,6 +99,20 @@ KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::Fill(const ElementType& val) 
 {
 	if (_num == 0) return;
 	SMemoryOps::FillAssign(_data, val, _num);
+}
+
+template<typename ElementT, typename AllocatorT>
+KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::Assign(const TArray& other) noexcept
+{
+	if (this == &other) return;
+	SFriend::CopyFromOther(*this, other);
+}
+
+template<typename ElementT, typename AllocatorT>
+KOR_INLINE void TArray<ElementT, AllocatorT>::Assign(TArray&& other) noexcept
+{
+	if (this == &other) return;
+	SFriend::MoveFromOther(*this, other);
 }
 
 template<typename ElementT, typename AllocatorT>

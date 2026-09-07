@@ -127,7 +127,7 @@ namespace Internal::Array
 				arr._num = 0;
 			}
 
-			_allocator.Deallocate(arr._data);
+			arr._allocator.Deallocate(arr._data);
 			arr._data = nullptr;
 			arr._reservedNum = 0;
 		}
@@ -135,9 +135,6 @@ namespace Internal::Array
 		template<bool HasItems = true>
 		static void Resize(ArrayType& arr, SizeType num) noexcept
 		{
-			// Check done at Reallocate
-			// KOR_ASSERT(num > 0);
-
 			if constexpr (HasItems)
 			{
 				Reallocate<true>(arr, num);
@@ -190,7 +187,7 @@ namespace Internal::Array
 		}
 
 		// Destructs all items, but keeps array allocation
-		static void Reset(ArrayType& arr) noexcept
+		static void Destruct(ArrayType& arr) noexcept
 		{
 			KOR_ASSERT(arr._num > 0);
 
@@ -201,8 +198,6 @@ namespace Internal::Array
 		// Calculates `num` for `Allocate`, using allocation policy for growth
 		static SizeType CalculateGrow(ArrayType& arr, SizeType num) noexcept
 		{
-			KOR_ASSERT(num > 0);
-
 			const SizeType newNum = TDefaultAllocationPolicy<ElementType>::CalculateGrow(
 				num, 
 				arr._reservedNum
@@ -224,8 +219,6 @@ namespace Internal::Array
 		// Calculates `num` for `Allocate`, using allocation policy for shrink
 		static SizeType CalculateShrink(ArrayType& arr, SizeType num) noexcept
 		{
-			KOR_ASSERT(num > 0);
-
 			const SizeType newNum = TDefaultAllocationPolicy<ElementType>::CalculateShrink(
 				num, 
 				arr._reservedNum
@@ -235,12 +228,12 @@ namespace Internal::Array
 			return SMath::Min(newNum, num);
 		}
 
-		template<bool AllowDestroy = false>
+		template<bool LimitToInitialized = true>
 		static void Shrink(ArrayType& arr, SizeType num) noexcept
 		{
 			num = CalculateShrink(arr, num);
 
-			if constexpr (!AllowDestroy)
+			if constexpr (LimitToUnitialized)
 			{
 				if (num < arr._num) return;
 			}
@@ -251,7 +244,7 @@ namespace Internal::Array
 			}
 			else if (num == 0 && arr._reservedNum > 0)
 			{
-				Deallocate(arr);
+				Empty(arr);
 			}
 		}
 
@@ -316,8 +309,54 @@ namespace Internal::Array
 			dest._reservedNum = source._reservedNum;
 
 			source._data = nullptr;
-			source._num = 0;
 			source._reservedNum = 0;
+			source._num = 0;
+		}
+
+		// Query
+		// -------------------------------------------------------------------------
+
+		template<typename FunctorT>
+		static SizeType FindIndexByFunc(const ArrayType& arr, FunctorT&& func) 
+			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
+		{
+			// TODO check invocable
+			const ElementType* const end = _data + _num;
+			for (const ElementType* curr = _data; curr != end; ++curr)
+			{
+				// TODO: Implement Invoke (std::invoke)
+				if (func(*curr))
+				{
+					return KOR_PTR_TYPED_DIFF(SizeType, curr, _data);
+				}
+			}
+
+			return KOR_INDEX_NONE;
+		}
+
+		template<typename FunctorT>
+		static const ElementType* FindByFunc(const ArrayType& arr, FunctorT&& func) 
+			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
+		{
+			// TODO check invocable
+			const ElementType* const end = _data + _num;
+			for (const ElementType* curr = _data; curr != end; ++curr)
+			{
+				// TODO: Implement Invoke (std::invoke)
+				if (func(*curr))
+				{
+					return curr;
+				}
+			}
+
+			return nullptr;
+		}
+
+		template<typename FunctorT>
+		KOR_FORCEINLINE static ElementType* FindByFunc(ArrayType& arr, FunctorT&& func) 
+			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
+		{
+			return const_cast<ElementType*>(FindByFunc(arr, Forward<FunctorT>(func)));
 		}
 
 		// Mutations
@@ -335,6 +374,35 @@ namespace Internal::Array
 			}
 
 			arr._num = newNum;
+		}
+
+		static void AppendFromOther(ArrayType& dest, const ArrayType& source) noexcept
+		{
+			KOR_ASSERT(&dest != &source);
+
+			SFriend::Add(dest, source._num);
+			SMemoryOps::CopyConstruct(
+				dest._data + (dest._num - source._num), 
+				source._data, 
+				source._num
+			);
+		}
+
+		static void AppendFromOther(ArrayType& dest, ArrayType&& source) noexcept
+		{
+			KOR_ASSERT(&dest != &source);
+
+			SFriend::Add(dest, source._num);
+			SMemoryOps::MoveConstruct(
+				dest._data + (dest._num - source._num),
+				source._data,
+				source._num
+			);
+
+			source._allocator.Deallocate(source._data);
+			source._data = nullptr;
+			source._reservedNum = 0;
+			source._num = 0;
 		}
 
 		// Opens an unitialized gap of `num` elements at `idx`, growing capacity first if needed
@@ -383,7 +451,7 @@ namespace Internal::Array
 
 		// Removes `num` elements at `idx`, shifting the tail left to close the gap (stable order)
 		// * Expects `num > 0` and [idx, idx + num) to be a valid range
-		static void RemoveAtShift(ArrayType& arr, SizeType idx,	SizeType num) noexcept
+		static void RemoveAt(ArrayType& arr, SizeType idx,	SizeType num = 1) noexcept
 		{
 			KOR_ASSERT(
 				num > 0 &&
@@ -408,7 +476,7 @@ namespace Internal::Array
 		}
 
 		// Removes `num` elements at `idx` by swapping in elements from the tail (order not preserved)
-		static void RemoveAtSwapShift(ArrayType& arr, SizeType idx, SizeType num) noexcept
+		static void RemoveAtSwap(ArrayType& arr, SizeType idx, SizeType num = 1) noexcept
 		{
 			KOR_ASSERT(
 				num > 0 && 
@@ -431,6 +499,101 @@ namespace Internal::Array
 			);
 
 			arr._num -= num;
+		}
+
+		static void RemoveFromBack(ArrayType& arr, SizeType num = 1) noexcept
+		{
+			KOR_ASSERT(arr._num > 0);
+
+			arr._num -= num;
+			SMemoryOps::Destruct(arr._data + arr._num, num);
+		}
+
+		// [RemoveByFunc]
+		// Removes every element for which func(*ptr) is true, preserving order via a
+		// single forward compaction pass. Each surviving element moves at most once;
+		// contiguous survivor runs are batched into one MoveAssign call.
+		// * Func: bool(const ElementType*)
+		template<typename FunctorT>
+		static SizeType RemoveByFunc(ArrayType& arr, FunctorT&& func)
+			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
+		{
+			// TODO check invocable
+
+			ElementType* const oldEnd = arr._data + arr._num;
+			ElementType* dst = arr._data;
+			ElementType* src = arr._data;
+
+			while (src != oldEnd)
+			{
+				if (func(*(const ElementType*)src))
+				{
+					++src;
+				}
+				else
+				{
+					ElementType* const runStart = src;
+					do
+					{
+						++src;
+					} while (src != oldEnd && !func(*(const ElementType*)src));
+
+					const SizeType runLen = KOR_PTR_TYPED_DIFF(SizeType, src, runStart);
+					if (dst != runStart)
+					{
+						SMemoryOps::MoveAssign(dst, runStart, runLen);
+					}
+					dst += runLen;
+				}
+			}
+
+			const SizeType newNum = KOR_PTR_TYPED_DIFF(SizeType, dst, arr._data);
+			const SizeType totalRemoved = arr._num - newNum;
+			if (totalRemoved > 0)
+			{
+				SMemoryOps::Destruct(dst, totalRemoved);
+				arr._num = newNum;
+			}
+			return totalRemoved;
+		}
+
+		// [RemoveSwapByFunc]
+		// Removes every element for which func(ptr) is true via swap-from-tail;
+		// order not preserved. Reverse scan batches contiguous match-runs into one
+		// RemoveAtSwap call each. Safe because RemoveAtSwap only mutates addresses
+		// >= idx, which the reverse scan has already visited and compared.
+		// * Func: bool(const ElementType*)
+		template<typename FunctorT>
+		static SizeType RemoveSwapByFunc(ArrayType& arr, FunctorT&& func)
+			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
+		{
+			// TODO check invocable
+
+			SizeType totalRemoved = 0;
+			SizeType num = 0;
+			const ElementType* const begin = arr._data;
+			const ElementType* curr = arr._data + arr._num;
+
+			while (curr != begin)
+			{
+				--curr;
+				if (func(*curr))
+				{
+					++num;
+				}
+				else if (num > 0)
+				{
+					RemoveAtSwap(arr, KOR_PTR_TYPED_DIFF(SizeType, curr, begin) + 1, num);
+					totalRemoved += num;
+					num = 0;
+				}
+			}
+			if (num > 0)
+			{
+				RemoveAtSwap(arr, 0, num);
+				totalRemoved += num;
+			}
+			return totalRemoved;
 		}
 	};
 }

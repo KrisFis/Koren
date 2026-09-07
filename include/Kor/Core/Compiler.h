@@ -43,7 +43,8 @@
 #endif
 
 // Conditionally noexcept if expr is noexcept.
-#define KOR_NOEXCEPT_EXPR(expr) noexcept(noexcept(expr))
+#define KOR_NOEXCEPT_EXPR(...) noexcept(noexcept(__VA_ARGS__))
 
 // Same + deduced return type from expr.
-#define KOR_NOEXCEPT_RET(expr) noexcept(noexcept(expr)) -> decltype(expr)
+// * NOTE: Invokes body deduction twice, which can drastically increase compile time if overused
+#define KOR_NOEXCEPT_RET(...) noexcept(noexcept(__VA_ARGS__)) -> decltype(__VA_ARGS__)

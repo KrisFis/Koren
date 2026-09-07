@@ -6,7 +6,8 @@
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Add(const ElementType& val) noexcept
 {
-	const SizeType idx = SFriend::Add(*this);
+	const SizeType idx = _num;
+	SFriend::Add(*this);
 	SMemoryOps::CopyConstruct(_data + idx, &val);
 	return idx;
 }
@@ -14,23 +15,22 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Add(ElementType&& val) noexcept
 {
-	const SizeType idx = SFriend::Add(*this);
-	SMemoryOps::MoveConstruct(_data + idx, &val);
+	const SizeType idx = _num;
+	SFriend::Add(*this);
+	SMemoryOps::MoveConstruct(_data + (_num - 1), &val);
 	return idx;
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::Add_GetRef(const ElementType& val) noexcept
 {
-	const SizeType idx = Add(val);
-	return _data[idx];
+	return _data[Add(val)];
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::Add_GetRef(ElementType&& val) noexcept
 {
-	const SizeType idx = Add(Move(val));
-	return _data[idx];
+	return _data[Add(Move(val))];
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -58,21 +58,20 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::AddUnique_GetRef(const ElementType& val) noexcept
 {
-	const int32 idx = AddUnique(val);
-	return _data[idx];
+	return _data[AddUnique(val)];
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::AddUnique_GetRef(ElementType&& val) noexcept
 {
-	const int32 idx = AddUnique(Move(val));
-	return _data[idx];
+	return _data[AddUnique(Move(val))];
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::AddDefaulted(SizeType num) noexcept
 {
-	const SizeType idx = SFriend::Add(*this, num);
+	const SizeType idx = _num;
+	SFriend::Add(*this, num);
 	SMemoryOps::DefaultConstruct(_data + idx, num);
 	return idx;
 }
@@ -80,14 +79,14 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::AddDefaulted_GetRef() noexcept
 {
-	const int32 idx = AddDefaulted(num);
-	return _data[idx];
+	return _data[AddDefaulted(num)];
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::AddZeroed(SizeType num) noexcept
 {
-	const SizeType idx = SFriend::Add(*this, num);
+	const SizeType idx = _num;
+	SFriend::Add(*this, num);
 	SMemoryOps::ZeroConstruct(_data + idx, num);
 	return idx;
 }
@@ -95,21 +94,21 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::AddZeroed_GetRef() noexcept
 {
-	const int32 idx = AddZeroed(num);
-	return _data[idx];
+	return _data[AddZeroed()];
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::AddUninitialized(SizeType num) noexcept
 {
-	return SFriend::Add(*this, num);
+	const SizeType idx = _num;
+	SFriend::Add(*this, num);
+	return idx;
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::AddUninitialized_GetRef() noexcept
 {
-	const SizeType idx = SFriend::Add(*this);
-	return _data[idx];
+	return _data[AddUninitialized()];
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -128,7 +127,8 @@ template<typename ElementT, typename AllocatorT>
 template<typename ... ArgTypes>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Emplace(ArgTypes&&... args) noexcept
 {
-	const SizeType idx = SFriend::Add(*this);
+	const SizeType idx = _num;
+	SFriend::Add(*this);
 	SMemoryOps::Construct(_data + idx, Forward<ArgTypes>(args)...);
 	return idx;
 }
@@ -137,8 +137,7 @@ template<typename ElementT, typename AllocatorT>
 template<typename ... ArgTypes>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::Emplace_GetRef(ArgTypes&&... args) noexcept
 {
-	const SizeType idx = Emplace(Forward<ArgTypes>(args)...);
-	return _data[idx];
+	return _data[Emplace(Forward<ArgTypes>(args)...)];
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -169,125 +168,211 @@ KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::Insert(SizeType idx, const IL
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Append(const TArray& other) noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Append(const TArray& other) noexcept
 {
-	TODO_IMPLEMENT()
+	if (other._num == 0) return KOR_INDEX_NONE;
+
+	const SizeType idx = _num;
+	SFriend::AppendFromOther(*this, other);
+	return idx;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Append(TArray&& other) noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Append(TArray&& other) noexcept
 {
-	TODO_IMPLEMENT()
+	if (other._num == 0) return KOR_INDEX_NONE;
+
+	const SizeType idx = _num;
+	SFriend::AppendFromOther(*this, other);
+	return idx;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Append(const ElementType& val, SizeType num) noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Append(const ILType& list) noexcept
 {
-	TODO_IMPLEMENT()
+	const SizeType num = (SizeType)list.size();
+	if (num == 0) return KOR_INDEX_NONE;
+
+	const SizeType idx = num;
+	SFriend::Add(*this, num);
+	SMemoryOps::CopyConstruct(_data + idx, list.begin(), num);
+	return idx;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Append(const ILType& list) noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Append(const ElementType& val, SizeType num) noexcept
 {
-	TODO_IMPLEMENT()
+	if (num == 0) return KOR_INDEX_NONE;
+
+	const SizeType idx = _num;
+	SFriend::Add(*this, num);
+	SMemoryOps::FillConstruct(_data + idx, val, num);
+	return idx;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Append(const ElementType* data, SizeType num) noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Append(const ElementType* data, SizeType num) noexcept
 {
-	TODO_IMPLEMENT()
+	if (num == 0) return KOR_INDEX_NONE;
+
+	KOR_ASSERT(data);
+
+	const SizeType idx = _num;
+	SFriend::Add(*this, num);
+	SMemoryOps::CopyConstruct(_data + idx, data, num);
+	return idx;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::AppendUninitialized(SizeType numToAdd) noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Remove(const ElementType& val, bool allowShrink) noexcept
 {
-	TODO_IMPLEMENT()
+	const SizeType totalRemoved = SFriend::RemoveByFunc(*this,
+		[&val](const ElementType& el) noexcept -> bool
+		{
+			return SMemoryOps::IsEqualAs(&el, &val);
+		}
+	);
+
+	if (allowShrink && totalRemoved > 0)
+	{
+		SFriend::Shrink(*this, _num - totalRemoved);
+	}
+
+	return totalRemoved;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::Remove(const ElementType& val, bool allowShrink) noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSingle(const ElementType& val) noexcept
 {
-	TODO_IMPLEMENT()
+	const SizeType idx = SFriend::FindIndexByFunc(*this,
+		[&val](const ElementType& el) noexcept -> bool
+		{
+			return SMemoryOps::IsEqualAs(&el, &val);
+		}
+	);
+
+	if (idx == KOR_INDEX_NONE) return 0;
+
+	SFriend::RemoveAt(*this, idx);
+	return 1;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSwap(const ElementType& val, bool allowShrink) noexcept
+template<typename FunctorT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveByFunc(FunctorT&& functor, bool allowShrink)
 {
-	TODO_IMPLEMENT()
+	const SizeType totalRemoved = SFriend::RemoveByFunc(*this, Forward<FunctorT>(func));
+	if (allowShrink && totalRemoved > 0)
+	{
+		SFriend::Shrink(*this, _num - totalRemoved);
+	}
+	return totalRemoved;
 }
 
 template<typename ElementT, typename AllocatorT>
-template<typename Predicate>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveByPredicate(Predicate&& predicate, bool allowShrink)
+template<typename FunctorT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSingleByFunc(FunctorT&& functor)
 {
-	TODO_IMPLEMENT()
+	const SizeType idx = SFriend::FindIndexByFunc(*this, Forward<FunctorT>(func));
+	if (idx == KOR_INDEX_NONE) return 0;
+
+	SFriend::RemoveAt(*this, idx);
+	return 1;
 }
 
 template<typename ElementT, typename AllocatorT>
-template<typename Predicate>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSwapByPredicate(Predicate&& predicate, bool allowShrink)
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSwap(const ElementType& val, bool allowShrink) noexcept
 {
-	TODO_IMPLEMENT()
+	const SizeType totalRemoved = SFriend::RemoveSwapByFunc(*this,
+		[&val](const ElementType& el) noexcept -> bool
+		{
+			return SMemoryOps::IsEqualAs(&el, &val);
+		}
+	);
+
+	if (allowShrink && totalRemoved > 0)
+	{
+		SFriend::Shrink(*this, _num - totalRemoved);
+	}
+
+	return totalRemoved;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveFirst(const ElementType& val) noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSwapSingle(const ElementType& val) noexcept
 {
-	TODO_IMPLEMENT()
+	const SizeType idx = SFriend::FindIndexByFunc(*this,
+		[&val](const ElementType& el) noexcept -> bool
+		{
+			return SMemoryOps::IsEqualAs(&el, &val);
+		}
+	);
+
+	if (idx == KOR_INDEX_NONE) return 0;
+
+	SFriend::RemoveAtSwap(*this, idx);
+	return 1;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSwapFirst(const ElementType& val) noexcept
+template<typename FunctorT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSwapByFunc(FunctorT&& functor, bool allowShrink)
 {
-	TODO_IMPLEMENT()
+	const SizeType totalRemoved = SFriend::RemoveSwapByFunc(*this, Forward<FunctorT>(func));
+
+	if (allowShrink && totalRemoved > 0)
+	{
+		SFriend::Shrink(*this, _num - totalRemoved);
+	}
+
+	return totalRemoved;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::RemoveAt(SizeType idx) noexcept
+template<typename FunctorT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSwapSingleByFunc(FunctorT&& functor)
 {
-	TODO_IMPLEMENT()
+	const SizeType idx = SFriend::FindIndexByFunc(*this, Forward<FunctorT>(func));
+	if (idx == KOR_INDEX_NONE) return 0;
+
+	SFriend::RemoveAtSwap(*this, idx);
+	return 1;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::RemoveAt(SizeType idx, SizeType count) noexcept
+KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::RemoveAt(SizeType idx, SizeType num) noexcept
 {
-	TODO_IMPLEMENT()
+	SFriend::RemoveAt(*this, idx, num);
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::RemoveAtSwap(SizeType idx) noexcept
+KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::RemoveAtSwap(SizeType idx) noexcept
 {
-	TODO_IMPLEMENT()
+	SFriend::RemoveAtSwap(*this, idx, num);
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE ElementT TArray<ElementT, AllocatorT>::RemoveAt_GetCopy(SizeType idx) noexcept
+KOR_FORCEINLINE ElementT TArray<ElementT, AllocatorT>::RemoveAt_GetCopy(SizeType idx) noexcept
 {
-	TODO_IMPLEMENT()
+	ElementT copy = *GetAt(idx);
+	SFriend::RemoveAt(*this, idx);
+	return copy;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE ElementT TArray<ElementT, AllocatorT>::RemoveAtSwap_GetCopy(SizeType idx) noexcept
+KOR_FORCEINLINE ElementT TArray<ElementT, AllocatorT>::RemoveAtSwap_GetCopy(SizeType idx) noexcept
 {
-	TODO_IMPLEMENT()
+	ElementT copy = *GetAt(idx);
+	SFriend::RemoveAtSwap(*this, idx);
+	return copy;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE ElementT TArray<ElementT, AllocatorT>::Pop() noexcept
+KOR_FORCEINLINE ElementT TArray<ElementT, AllocatorT>::Pop() noexcept
 {
-	TODO_IMPLEMENT()
-}
-
-template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Replace(const TArray& other) noexcept
-{
-	TODO_IMPLEMENT()
-}
-
-template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Replace(TArray&& other) noexcept
-{
-	TODO_IMPLEMENT()
+	ElementT copy = *GetLast();
+	SFriend::RemoveFromBack(*this);
+	return copy;
 }
 
 template<typename ElementT, typename AllocatorT>

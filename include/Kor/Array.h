@@ -289,64 +289,56 @@ public:
 	// -------------------------------------------------------------------------
 
 	// Appends all elements from `other`. An empty `other` is a no-op.
-	void Append(const TArray& other) noexcept;
-	void Append(TArray&& other) noexcept;
+	SizeType Append(const TArray& other) noexcept;
+	SizeType Append(TArray&& other) noexcept;
 
 	// Appends all elements from `list`. An empty list is a no-op.
-	void Append(const ILType& list) noexcept;
+	SizeType Append(const ILType& list) noexcept;
 
 	// Appends `num` copies of `val`. `num == 0` is a no-op.
-	void Append(const ElementType& val, SizeType num) noexcept;
+	SizeType Append(const ElementType& val, SizeType num) noexcept;
 
 	// Appends `num` elements from `data`. `data` may be null only if
 	// `num == 0`; otherwise it must point to at least `num` elements.
-	void Append(const ElementType* data, SizeType num) noexcept;
-
-	// Appends `numToAdd` uninitialized elements. `numToAdd == 0` is a no-op.
-	// Caller must initialize each one before reading it.
-	void AppendUninitialized(SizeType numToAdd) noexcept;
+	SizeType Append(const ElementType* data, SizeType num) noexcept;
 
 	// Remove
 	// -------------------------------------------------------------------------
 
-	// Removes every element equal to `val` (requires operator==), preserving
+	// Removes every/single element equal to `val` (requires operator==), preserving
 	// order. Returns the number removed; 0 if none matched or the array is
 	// empty. Optionally shrinks capacity afterward.
 	SizeType Remove(const ElementType& val, bool allowShrink = true) noexcept;
+	SizeType RemoveSingle(const ElementType& val) noexcept;
+
+	// Removes every/single element for which `func(element)` is true, preserving
+	// order. Returns the number removed; 0 if none matched or the array is
+	// empty. Not noexcept: func may throw.
+	template<typename FunctorT>
+	SizeType RemoveByFunc(FunctorT&& functor, bool allowShrink = true);
+
+	template<typename FunctorT>
+	SizeType RemoveSingleByFunc(FunctorT&& functor);
 
 	// Same as Remove, but uses swap-with-last and does not preserve order.
 	SizeType RemoveSwap(const ElementType& val, bool allowShrink = true) noexcept;
+	SizeType RemoveSwapSingle(const ElementType& val) noexcept;
 
-	// Removes every element for which `predicate(element)` is true, preserving
-	// order. Returns the number removed; 0 if none matched or the array is
-	// empty. Not noexcept: predicate may throw.
-	template<typename Predicate>
-	SizeType RemoveByPredicate(Predicate&& predicate, bool allowShrink = true);
+	// Same as RemoveByFunc, but uses swap-with-last and does not preserve order.
+	template<typename FunctorT>
+	SizeType RemoveSwapByFunc(FunctorT&& functor, bool allowShrink = true);
 
-	// Same as RemoveByPredicate, but uses swap-with-last and does not
-	// preserve order. Not noexcept: predicate may throw.
-	template<typename Predicate>
-	SizeType RemoveSwapByPredicate(Predicate&& predicate, bool allowShrink = true);
+	template<typename FunctorT>
+	SizeType RemoveSwapSingleByFunc(FunctorT&& functor);
 
-	// Removes the first element equal to `val`, preserving order. Returns its
-	// former index, or KOR_INDEX_NONE if not found (array unchanged).
-	SizeType RemoveFirst(const ElementType& val) noexcept;
+	// Removes `num` elements starting at `idx`, shifting later elements left.
+	// Requires: 0 <= idx, idx + num <= GetNum(), num >= 0
+	void RemoveAt(SizeType idx, SizeType num = 1) noexcept;
 
-	// Same as RemoveFirst, but uses swap-with-last and does not preserve order.
-	SizeType RemoveSwapFirst(const ElementType& val) noexcept;
-
-	// Removes the element at `idx`, shifting later elements left. Requires
-	// 0 <= idx < GetNum(); asserts otherwise, including on an empty array.
-	void RemoveAt(SizeType idx) noexcept;
-
-	// Removes `num` elements starting at `idx`, shifting later elements
-	// left. Requires 0 <= idx, idx + num <= GetNum(), num >= 0.
-	// `num == 0` is a no-op.
-	void RemoveAt(SizeType idx, SizeType num) noexcept;
-
-	// Removes the element at `idx` via swap-with-last (order not preserved;
-	// faster than RemoveAt for large arrays). Requires 0 <= idx < GetNum().
-	void RemoveAtSwap(SizeType idx) noexcept;
+	// Removes the element at `idx` via swap-with-last (order not preserved; 
+	// faster than RemoveAt for large arrays).
+	// Requires: 0 <= idx, idx + num <= GetNum(), num >= 0
+	void RemoveAtSwap(SizeType idx, SizeType num = 1) noexcept;
 
 	// Same as RemoveAt(idx), but returns a copy of the removed element.
 	ElementType RemoveAt_GetCopy(SizeType idx) noexcept;
@@ -357,15 +349,6 @@ public:
 	// Removes and returns the last element. Requires GetNum() > 0; asserts on
 	// an empty array (no safe-empty fallback, unlike GetLast()).
 	ElementType Pop() noexcept;
-
-	// Replace
-	// -------------------------------------------------------------------------
-
-	// Replaces this array's contents with a copy of `other`.
-	void Replace(const TArray& other) noexcept;
-
-	// Replaces this array's contents by taking `other`'s. `other` is left empty.
-	void Replace(TArray&& other) noexcept;
 
 	// Swap
 	// -------------------------------------------------------------------------
@@ -385,6 +368,12 @@ public:
 	// Overwrites every existing element with a copy of `val`. Num is
 	// unchanged. No-op on an empty array.
 	void Fill(const ElementType& val) noexcept;
+
+	// Replaces this array's contents with a copy of `other`.
+	void Assign(const TArray& other) noexcept;
+
+	// Replaces this array's contents by taking `other`'s. `other` is left empty.
+	void Assign(TArray&& other) noexcept;
 
 	// Replaces the contents with `num` copies of `val`. Equivalent to
 	// Reset() + Append(val, num). `num == 0` empties the array.
@@ -426,8 +415,8 @@ public:
 
 	// Index of the first element for which func(element) is true, or
 	// KOR_INDEX_NONE. Never asserts. Not noexcept: functor may throw.
-	template<typename Functor>
-	SizeType FindIndexByFunc(Functor&& func) const;
+	template<typename FunctorT>
+	SizeType FindIndexByFunc(FunctorT&& func) const;
 
 	// Index of the first element whose key matches `key`, or KOR_INDEX_NONE.
 	// Never asserts.
@@ -439,11 +428,11 @@ public:
 
 	// Pointer to the first element for which func(element) is true, or
 	// nullptr. Never asserts. Not noexcept: functor may throw.
-	template<typename Functor>
-	ElementType* FindByFunc(Functor&& func);
+	template<typename FunctorT>
+	ElementType* FindByFunc(FunctorT&& func);
 
-	template<typename Functor>
-	const ElementType* FindByFunc(Functor&& func) const;
+	template<typename FunctorT>
+	const ElementType* FindByFunc(FunctorT&& func) const;
 
 	// Pointer to the first element whose key matches `key`, or nullptr.
 	// Never asserts.
@@ -461,8 +450,8 @@ public:
 
 	// True if any element satisfies func(element). Never asserts. Not
 	// noexcept: functor may throw.
-	template<typename Functor>
-	bool ContainsByFunc(Functor&& func) const;
+	template<typename FunctorT>
+	bool ContainsByFunc(FunctorT&& func) const;
 
 	// True if any element's key matches `key`. Never asserts.
 	template<typename KeyType>
