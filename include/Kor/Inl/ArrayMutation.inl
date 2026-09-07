@@ -316,7 +316,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 
 template<typename ElementT, typename AllocatorT>
 template<typename FunctorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSwapByFunc(FunctorT&& functor, bool allowShrink)
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSwapByFunc(FunctorT&& func, bool allowShrink)
 {
 	const SizeType totalRemoved = SFriend::RemoveSwapByFunc(*this, Forward<FunctorT>(func));
 
@@ -330,7 +330,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 
 template<typename ElementT, typename AllocatorT>
 template<typename FunctorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSwapSingleByFunc(FunctorT&& functor)
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSwapSingleByFunc(FunctorT&& func)
 {
 	const SizeType idx = SFriend::FindIndexByFunc(*this, Forward<FunctorT>(func));
 	if (idx == KOR_INDEX_NONE) return 0;

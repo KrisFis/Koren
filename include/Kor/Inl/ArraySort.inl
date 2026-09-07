@@ -6,27 +6,27 @@
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::Sort() noexcept
 {
-	KOR_ASSERT(false);
+	TODO_IMPLEMENT()
 }
 
 template<typename ElementT, typename AllocatorT>
-template<typename Predicate>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Sort(Predicate&& predicate)
+template<typename FunctorT>
+KOR_INLINE void TArray<ElementT, AllocatorT>::SortByFunc(FunctorT&& func)
 {
-	KOR_ASSERT(false);
+	TODO_IMPLEMENT()
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::StableSort() noexcept
 {
-	KOR_ASSERT(false);
+	TODO_IMPLEMENT()
 }
 
 template<typename ElementT, typename AllocatorT>
-template<typename Predicate>
-KOR_INLINE void TArray<ElementT, AllocatorT>::StableSort(Predicate&& predicate)
+template<typename FunctorT>
+KOR_INLINE void TArray<ElementT, AllocatorT>::StableSortByFunc(FunctorT&& func)
 {
-	KOR_ASSERT(false);
+	TODO_IMPLEMENT()
 }
 
 template<typename ElementT, typename AllocatorT>

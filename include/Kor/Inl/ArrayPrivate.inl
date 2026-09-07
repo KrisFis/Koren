@@ -320,12 +320,12 @@ namespace Internal::Array
 		static SizeType FindIndexByFunc(const ArrayType& arr, FunctorT&& func) 
 			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
 		{
-			// TODO check invocable
+			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)")
+
 			const ElementType* const end = _data + _num;
 			for (const ElementType* curr = _data; curr != end; ++curr)
 			{
-				// TODO: Implement Invoke (std::invoke)
-				if (func(*curr))
+				if (Invoke(func, *curr))
 				{
 					return KOR_PTR_TYPED_DIFF(SizeType, curr, _data);
 				}
@@ -338,12 +338,12 @@ namespace Internal::Array
 		static const ElementType* FindByFunc(const ArrayType& arr, FunctorT&& func) 
 			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
 		{
-			// TODO check invocable
+			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)")
+
 			const ElementType* const end = _data + _num;
 			for (const ElementType* curr = _data; curr != end; ++curr)
 			{
-				// TODO: Implement Invoke (std::invoke)
-				if (func(*curr))
+				if (Invoke(func, *curr))
 				{
 					return curr;
 				}
@@ -518,7 +518,7 @@ namespace Internal::Array
 		static SizeType RemoveByFunc(ArrayType& arr, FunctorT&& func)
 			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
 		{
-			// TODO check invocable
+			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)")
 
 			ElementType* const oldEnd = arr._data + arr._num;
 			ElementType* dst = arr._data;
@@ -526,7 +526,7 @@ namespace Internal::Array
 
 			while (src != oldEnd)
 			{
-				if (func(*(const ElementType*)src))
+				if (Invoke(func, *(const ElementType*)src))
 				{
 					++src;
 				}
@@ -536,7 +536,7 @@ namespace Internal::Array
 					do
 					{
 						++src;
-					} while (src != oldEnd && !func(*(const ElementType*)src));
+					} while (src != oldEnd && !Invoke(func, *(const ElementType*)src));
 
 					const SizeType runLen = KOR_PTR_TYPED_DIFF(SizeType, src, runStart);
 					if (dst != runStart)
@@ -567,7 +567,7 @@ namespace Internal::Array
 		static SizeType RemoveSwapByFunc(ArrayType& arr, FunctorT&& func)
 			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
 		{
-			// TODO check invocable
+			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)")
 
 			SizeType totalRemoved = 0;
 			SizeType num = 0;
@@ -577,7 +577,7 @@ namespace Internal::Array
 			while (curr != begin)
 			{
 				--curr;
-				if (func(*curr))
+				if (Invoke(func, *curr))
 				{
 					++num;
 				}

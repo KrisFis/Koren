@@ -315,10 +315,10 @@ public:
 	// order. Returns the number removed; 0 if none matched or the array is
 	// empty. Not noexcept: func may throw.
 	template<typename FunctorT>
-	SizeType RemoveByFunc(FunctorT&& functor, bool allowShrink = true);
+	SizeType RemoveByFunc(FunctorT&& func, bool allowShrink = true);
 
 	template<typename FunctorT>
-	SizeType RemoveSingleByFunc(FunctorT&& functor);
+	SizeType RemoveSingleByFunc(FunctorT&& func);
 
 	// Same as Remove, but uses swap-with-last and does not preserve order.
 	SizeType RemoveSwap(const ElementType& val, bool allowShrink = true) noexcept;
@@ -326,10 +326,10 @@ public:
 
 	// Same as RemoveByFunc, but uses swap-with-last and does not preserve order.
 	template<typename FunctorT>
-	SizeType RemoveSwapByFunc(FunctorT&& functor, bool allowShrink = true);
+	SizeType RemoveSwapByFunc(FunctorT&& func, bool allowShrink = true);
 
 	template<typename FunctorT>
-	SizeType RemoveSwapSingleByFunc(FunctorT&& functor);
+	SizeType RemoveSwapSingleByFunc(FunctorT&& func);
 
 	// Removes `num` elements starting at `idx`, shifting later elements left.
 	// Requires: 0 <= idx, idx + num <= GetNum(), num >= 0
@@ -390,18 +390,18 @@ public:
 	// Ascending sort using operator<. No-op on an empty or single-element array.
 	void Sort() noexcept;
 
-	// Sorts using predicate(a, b) == true if `a` belongs before `b`. No-op on
-	// an empty or single-element array. Not noexcept: predicate may throw.
-	template<typename Predicate>
-	void Sort(Predicate&& predicate);
+	// Sorts using functor(a, b) == true if `a` belongs before `b`. No-op on
+	// an empty or single-element array. Not noexcept: functor may throw.
+	template<typename FunctorT>
+	void SortByFunc(FunctorT&& func);
 
 	// Stable sort: equal elements keep their relative order. No-op on an
 	// empty or single-element array.
 	void StableSort() noexcept;
 
-	// Not noexcept: predicate may throw.
-	template<typename Predicate>
-	void StableSort(Predicate&& predicate);
+	// Not noexcept: functor may throw.
+	template<typename FunctorT>
+	void StableSortByFunc(FunctorT&& func);
 
 	// Reverses element order in place. No-op on an empty or single-element array.
 	void Reverse() noexcept;

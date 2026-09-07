@@ -9,10 +9,12 @@
 #include "Kor/Internal/TypeTraitsContainers.h"
 #include "Kor/Internal/TypeTraitsAllocators.h"
 #include "Kor/Internal/TypeTraitsCore.h"
-#include "Kor/Internal/TypeTraitsDecayHelper.h"
+#include "Kor/Internal/TypeTraitsDecay.h"
 #include "Kor/Internal/TypeTraitsForward.h"
 #include "Kor/Internal/TypeTraitsString.h"
 #include "Kor/Internal/TypeTraitsType.h"
+#include "Kor/Internal/TypeTraitsInvoke.h"
+#include "Kor/Internal/TypeTraitsBaseOf.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -30,65 +32,11 @@ template<bool Value, typename TrueTrait, typename FalseTrait> struct TChooseDela
 template<typename TrueTrait, typename FalseTrait> struct TChooseDelayed<true, TrueTrait, FalseTrait> { typedef typename TrueTrait::Type Type; };
 template<typename TrueTrait, typename FalseTrait> struct TChooseDelayed<false, TrueTrait, FalseTrait> { typedef typename FalseTrait::Type Type; };
 
-// [Is Derived From]
-// * Checks whether specific type is derived from other type
-
-template<typename DerivedType, typename BaseType>
-struct TIsDerivedFrom
-{
-
-private: // Typedefs
-
-	typedef char No[1];
-	typedef char Yes[2];
-
-private: // Testing
-
-	static Yes& Test(BaseType*);
-	static No& Test(...);
-
-	static DerivedType* ChildPtr() { return nullptr; }
-
-public: // Value
-
-	enum { Value = sizeof(Test(ChildPtr())) == sizeof(Yes) };
-};
-
-// [Is Base Of]
-// * Checks whether specific type is base of other type
-
-template<typename BaseType, typename DerivedType>
-struct TIsBaseOf : TIsDerivedFrom<DerivedType, BaseType> {};
-
 // [Is Castable]
 // * Checks whether specific types could be casted to each other
 
 template<typename T, typename R>
 struct TIsCastable { enum { Value = TIsDerivedFrom<T, R>::Value || TIsBaseOf<T, R>::Value }; };
-
-// [Decay]
-// * Returns the decayed type
-// * ie. applies array-to-pointer and function-to-pointer conversions
-
-template<typename T>
-struct TDecay : TType<
-		typename Internals::TDecayHelper<
-		typename TClean<T>::Type
-	>::Type>
-{};
-
-// [Clean]
-// * Removes const, volatile and reference from provided type
-// * Essentially stripping all qualifiers related to template passing
-
-template<typename T>
-struct TClean : TType<typename TRemoveConst<typename TRemoveReference<T>::Type>::Type> {};
-
-// [Is Clean]
-// * Checks if type is clean type (no qualifiers)
-
-template<typename T>
-struct TIsClean : TBoolValue<TIsSame<typename TClean<T>::Type, T>::Value> {};
 
 // [Pure]
 // * Removes all qualifiers

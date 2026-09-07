@@ -43,7 +43,7 @@ typedef TBoolValue<false> TFalseValue;
 template<typename T, typename R> struct TIsSame : TFalseValue {};
 template<typename T> struct TIsSame<T, T> : TTrueValue {};
 
-// [Get Nth arg]
+// [Nth arg]
 // * Gets Nth arg type from parameter pack
 
 template<TSize N, typename T, typename... ArgsT> struct TNthArg : TType<typename TNthArg<N - 1, ArgsT...>::Type> {};
@@ -81,9 +81,9 @@ template<typename T> struct TIsRValue<T&&> : TTrueValue {};
 // [Remove reference]
 // * Removes reference from type
 
-template<typename T> struct TRemoveReference { typedef T Type; };
-template<typename T> struct TRemoveReference<T& > { typedef T Type; };
-template<typename T> struct TRemoveReference<T&&> { typedef T Type; };
+template<typename T> struct TRemoveReference : TType<T> {};
+template<typename T> struct TRemoveReference<T& > : TType<T> {};
+template<typename T> struct TRemoveReference<T&&> : TType<T> {};
 
 // [Is Const]
 // * Checks whether provided type is const, volatile or both
@@ -96,23 +96,35 @@ template<typename T> struct TIsConst<const volatile T> : TTrueValue {};
 // [Remove Const]
 // * Removes "const" and "volatile" from type
 
-template<typename T> struct TRemoveConst { typedef T Type; };
-template<typename T> struct TRemoveConst<const T> { typedef T Type; };
-template<typename T> struct TRemoveConst<volatile T> { typedef T Type; };
-template<typename T> struct TRemoveConst<const volatile T> { typedef T Type; };
+template<typename T> struct TRemoveConst : TType<T> {};
+template<typename T> struct TRemoveConst<const T> : TType<T> {};
+template<typename T> struct TRemoveConst<volatile T> : TType<T> {};
+template<typename T> struct TRemoveConst<const volatile T> : TType<T> {};
 
 // [Remove Extent]
 // * Removes extent '[]' from the type
 
 template<typename T> struct TRemoveExtent : TType<T> {};
 template<typename T, TSize N> struct TRemoveExtent<T[N]> : TType<T> {};
-template<typename T> struct TRemoveExtent<T[]> { typedef T Type; };
+template<typename T> struct TRemoveExtent<T[]> : TType<T> {};
 
 // [Is Pointer]
 // * Checks whether provided type is pointer
 
 template<typename T> struct TIsPointer : TFalseValue {};
 template<typename T> struct TIsPointer<T*> : TTrueValue {};
+
+// [Member Pointer Outer]
+// * Gets member pointer outer from provided member pointer
+
+template<typename T> struct TMemberPointer : TType<T> {};
+template<typename T, typename C> struct TMemberPointer<T C::*> : TType<T> {};
+
+// [Member Pointer Outer]
+// * Gets member pointer base/outer from provided member pointer
+
+template<typename T> struct TMemberPointerBase : TType<void> {};
+template<typename T, typename C> struct TMemberPointerBase<T C::*> : TType<C> {};
 
 // [Is Member Pointer]
 // * Checks whether provided type is a member pointer
@@ -193,6 +205,21 @@ template<> struct TIsInteger<uint8> : TTrueValue {};
 template<> struct TIsInteger<uint16> : TTrueValue {};
 template<> struct TIsInteger<uint32> : TTrueValue {};
 template<> struct TIsInteger<uint64> : TTrueValue {};
+
+// [Clean]
+// * Removes const, volatile and reference from provided type
+// * Essentially stripping all qualifiers related to template passing
+
+template<typename T> struct TClean 
+	: TType<typename TRemoveConst<typename TRemoveReference<T>::Type>::Type> 
+{};
+
+// [Is Clean]
+// * Checks if type is clean type (no qualifiers)
+
+template<typename T> struct TIsClean 
+	: TBoolValue<TIsSame<typename TClean<T>::Type, T>::Value> 
+{};
 
 // [Is empty type]
 // * Checks whether specific type is empty
