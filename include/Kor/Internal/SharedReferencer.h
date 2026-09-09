@@ -5,9 +5,7 @@
 
 #include "Kor/Core/Build.h"
 #include "Kor/Assert.h"
-
-// TODO(jkfisera): REIMPLEMENT Invoke
-#include <functional>
+#include "Kor/Internal/TypeTraitsInvoke.h"
 
 namespace KOR_NAMESPACE Internal
 {
@@ -106,7 +104,7 @@ namespace KOR_NAMESPACE Internal
 		{
 			if(_object)
 			{
-				std::invoke(_deleter, _object);
+				Invoke(_deleter, _object);
 				_object = nullptr;
 			}
 		}
