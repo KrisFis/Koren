@@ -57,9 +57,8 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::ResizeZeroed(SizeType num) noexcep
 		SFriend::Empty(*this);
 	}
 }
-
 template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::ResizeUnitialized(SizeType num) noexcept
+KOR_INLINE void TArray<ElementT, AllocatorT>::ResizeUninitialized(SizeType num) noexcept
 {
 	if (num == _num) return;
 

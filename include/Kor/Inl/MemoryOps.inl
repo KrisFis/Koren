@@ -229,7 +229,7 @@ KOR_FORCEINLINE void SMemoryOps::CopyAssign(T* dest, const T* src, uint64 num) n
 	{
 		while (num-- > 0)
 		{
-			*dest = ::Move(*src);
+			*dest = Move(*src);
 			++dest;
 			++src;
 		}
@@ -254,7 +254,7 @@ KOR_FORCEINLINE void SMemoryOps::MoveConstruct(T* dest, T* src, uint64 num) noex
 		{
 			while (num-- > 0)
 			{
-				::new ((void*)dest) T(::Move(*src));
+				::new ((void*)dest) T(Move(*src));
 				++dest;
 				++src;
 			}
@@ -268,7 +268,7 @@ KOR_FORCEINLINE void SMemoryOps::MoveConstruct(T* dest, T* src, uint64 num) noex
 			{
 				--dest;
 				--src;
-				::new ((void*)dest) T(::Move(*src));
+				::new ((void*)dest) T(Move(*src));
 			}
 		}
 	} 
@@ -287,7 +287,7 @@ KOR_FORCEINLINE void SMemoryOps::MoveAssign(T* dest, T* src, uint64 num) noexcep
 		{
 			while (num-- > 0)
 			{
-				*dest = ::Move(*src);
+				*dest = Move(*src);
 				++dest;
 				++src;
 			}
@@ -301,7 +301,7 @@ KOR_FORCEINLINE void SMemoryOps::MoveAssign(T* dest, T* src, uint64 num) noexcep
 			{
 				--dest;
 				--src;
-				*dest = ::Move(*src);
+				*dest = Move(*src);
 			}
 		}
 	} 
@@ -359,7 +359,7 @@ KOR_FORCEINLINE void SMemoryOps::FillAssign(T* ptr, const R& val, uint64 num) no
 
 KOR_FORCEINLINE void* SMemoryOps::Zero(void* ptr, uint64 size) noexcept
 {
-	return SPlatformMemoryOps::Zero(dest, size);
+	return SPlatformMemoryOps::Zero(ptr, size);
 }
 
 template<typename T> 
@@ -423,9 +423,9 @@ KOR_FORCEINLINE void SMemoryOps::SwapAs(T* lhs, R* rhs, uint64 num) noexcept
 	{
 		while (num-- > 0)
 		{
-			T tmp(::Move(*lhs));
-			*lhs = ::Move(*rhs);
-			*rhs = ::Move(tmp);
+			T tmp(Move(*lhs));
+			*lhs = Move(*rhs);
+			*rhs = Move(tmp);
 
 			++lhs;
 			++rhs;

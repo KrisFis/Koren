@@ -8,7 +8,6 @@
 #include "Kor/CharOps.h"
 #include "Kor/StringOps.h"
 
-#include "Kor/Assert.h"
 #include "Kor/Archive.h"
 #include "Kor/Array.h"
 

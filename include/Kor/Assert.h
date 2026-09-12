@@ -3,12 +3,7 @@
 
 #pragma once
 
-#include "Kor/Core/Build.h"
-
-#include "Kor/StringOps.h"
-#include "Kor/Misc.h"
-
-// TODO: Decouple assert from logging and let user provide function pointer that will be called on assert
+#include "Kor/Core/Platform.h"
 
 // KOR_ASSERT(statement)
 // - Fatal
@@ -57,19 +52,20 @@
 
 		static void LogFailed(const achar* Expression, const achar* File, int32 Line) noexcept
 		{
-			thread_local achar LOG_BUFFER[KOR_BUFFER_SIZE_LARGE];
-			const int32 result = TStringOps<achar>::Format(
-				LOG_BUFFER,
-				KOR_TEXT_ANSI("ASSERT: '%s' at '%s:%d'\n"),
-				Expression,
-				File,
-				Line
-			);
-
-			if (result > 1) // > '\0'
-			{
-				SMisc::WriteToStdout(LOG_BUFFER, sizeof(achar) * result);
-			}
+			// TODO: Implement log without including non-minimal features
+			// thread_local achar LOG_BUFFER[KOR_BUFFER_SIZE_LARGE];
+			// const int32 result = TStringOps<achar>::Format(
+			// 	LOG_BUFFER,
+			// 	KOR_TEXT_ANSI("ASSERT: '%s' at '%s:%d'\n"),
+			// 	Expression,
+			// 	File,
+			// 	Line
+			// );
+			//
+			// if (result > 1) // > '\0'
+			// {
+			// 	SMisc::WriteToStdout(LOG_BUFFER, sizeof(achar) * result);
+			// }
 		}
 	}
 

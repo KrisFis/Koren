@@ -46,8 +46,8 @@ struct TAllocatorTraits;
 
 // [Typed Allocator]
 // Adapter of AllocatorT for ElementT
-template<typename ElementT, typename AllocatorT>
-struct TTypedAllocator;
+template<typename AllocatorT, typename ElementT>
+class TTypedAllocator;
 
 // [Is Allocator]
 // * Checks whether specific type is an allocator (defines TAllocatorTraits)

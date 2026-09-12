@@ -100,7 +100,7 @@ struct TIsTriviallyCopyable : TBoolValue<__is_trivially_copyable(T)> {};
 template<typename T>
 struct TIsTriviallyMovable : TBoolValue<
 #if KOR_COMPILER_CLANG
-	__is_trivially_relocatable(T)
+	__builtin_is_cpp_trivially_relocatable(T)
 #else
 	TIsTriviallyDestructible<T>::Value && 
 	TIsTriviallyMoveConstructible<T>::Value && 

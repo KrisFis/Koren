@@ -3,9 +3,7 @@
 
 #pragma once
 
-#include "Kor/Core/Build.h"
-#include "Kor/Assert.h"
-#include "Kor/Internal/TypeTraitsInvoke.h"
+#include "Kor/KorMinimal.h"
 
 namespace KOR_NAMESPACE Internal
 {

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Kor/Core/Build.h"
+#include "Kor/Internal/TypeTraitsCore.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -52,8 +53,8 @@ template<> struct TIsCharacterCompatible<achar, char8> : TTrueValue {};
 #endif
 
 #if KOR_WCHAR_BYTES == 4
-template<> struct TIsCharacterCompatible<wchar, char32> : TTrueType {};
-template<> struct TIsCharacterCompatible<char32, wchar> : TTrueType {};
+template<> struct TIsCharacterCompatible<wchar, char32> : TTrueValue {};
+template<> struct TIsCharacterCompatible<char32, wchar> : TTrueValue {};
 #elif KOR_WCHAR_BYTES == 2
 template<> struct TIsCharacterCompatible<wchar, char16> : TTrueValue {};
 template<> struct TIsCharacterCompatible<char16, wchar> : TTrueValue {};

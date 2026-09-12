@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
+
 #include "Kor/Archive.h"
 #include "Kor/Array.h"
 

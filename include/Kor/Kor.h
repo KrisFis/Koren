@@ -24,7 +24,7 @@
 
 // ALLOCATORS
 #include "Kor/Allocator.h"
-#include "Kor/FixedArrayAllocator.h"
+#include "Kor/FixedAllocator.h"
 #include "Kor/QueueAllocator.h"
 
 // STRINGS
@@ -34,10 +34,6 @@
 
 // SHARED
 #include "Kor/Shared.h"
-
-// Assert
-#include "Kor/Assert.h"
-#include "Kor/IsValid.h"
 
 // EXTRAS -> ARCHIVE
 #include "Kor/Archive.h"

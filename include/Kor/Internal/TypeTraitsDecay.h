@@ -52,4 +52,34 @@ struct TDecay : TType<
 	>::Type>
 {};
 
+// [Get type]
+// * Gets type variations
+
+template<typename T>
+struct TGetType
+{
+	typedef typename TClean<T>::Type Value;
+
+	typedef Value& Reference;
+	typedef const Value& ConstReference;
+
+	typedef Value* Pointer;
+	typedef const Value* ConstPointer;
+};
+
+// [Call traits]
+// * Determines which type will be used for call
+// * Similar to boost's call_traits, ie. having info about optimizations of which type is used
+
+template <typename T>
+struct TCallTraits : TGetType<T>
+{
+private:
+	enum { IsSmallType = ((sizeof(T) <= sizeof(void*)) && TIsPOD<T>::Value ) || TIsArithmetic<T>::Value };
+
+public:
+	typedef typename Internal::TCallTraitsHelper<T, IsSmallType>::Type Param;
+	typedef typename Internal::TCallTraitsHelper<T, IsSmallType>::ConstType ConstParam;
+};
+
 KOR_NAMESPACE_END

@@ -299,7 +299,7 @@ struct TIsFundamental
 // * Compound type is any type that is NOT fundamental to cpp
 
 template<typename T> struct TIsCompound 
-	: TBoolValue<!TIsFundamental<T>> 
+	: TBoolValue<!TIsFundamental<T>::Value>
 {};
 
 // [Is Scalar]

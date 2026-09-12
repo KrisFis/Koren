@@ -3,6 +3,10 @@
 
 #pragma once
 
+#include "Kor/Internal/TypeTraitsCore.h"
+
+KOR_NAMESPACE_BEGIN
+
 // [Is Base Of]
 // * Checks whether specific type is base of other type
 
@@ -15,3 +19,5 @@ struct TIsBaseOf : TBoolValue<__is_base_of(BaseT, DerivedT)> {};
 
 template<typename DerivedT, typename BaseT>
 struct TIsDerivedFrom : TIsBaseOf<BaseT, DerivedT> {};
+
+KOR_NAMESPACE_END

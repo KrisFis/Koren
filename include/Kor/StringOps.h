@@ -3,7 +3,9 @@
 
 #pragma once
 
-#include "Kor/Core/Platform.h"
+#include "Kor/KorMinimal.h"
+
+#include "Kor/MemoryOps.h"
 #include "Kor/CharOps.h"
 
 #include KOR_PLATFORM_HEADER_FROM(Kor/Core, String)

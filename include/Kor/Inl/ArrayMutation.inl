@@ -79,7 +79,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::AddDefaulted_GetRef() noexcept
 {
-	return _data[AddDefaulted(num)];
+	return _data[AddDefaulted()];
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -151,7 +151,7 @@ template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::Insert(SizeType idx, ElementType&& val) noexcept
 {
 	SFriend::Insert(*this, idx);
-	SMemoryOps::MoveConstruct(data + idx, &val);
+	SMemoryOps::MoveConstruct(_data + idx, &val);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -259,7 +259,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 
 template<typename ElementT, typename AllocatorT>
 template<typename FunctorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveByFunc(FunctorT&& functor, bool allowShrink)
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveByFunc(FunctorT&& func, bool allowShrink)
 {
 	const SizeType totalRemoved = SFriend::RemoveByFunc(*this, Forward<FunctorT>(func));
 	if (allowShrink && totalRemoved > 0)
@@ -271,7 +271,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 
 template<typename ElementT, typename AllocatorT>
 template<typename FunctorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSingleByFunc(FunctorT&& functor)
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT, AllocatorT>::RemoveSingleByFunc(FunctorT&& func)
 {
 	const SizeType idx = SFriend::FindIndexByFunc(*this, Forward<FunctorT>(func));
 	if (idx == KOR_INDEX_NONE) return 0;
@@ -346,7 +346,7 @@ KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::RemoveAt(SizeType idx, SizeTy
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::RemoveAtSwap(SizeType idx) noexcept
+KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::RemoveAtSwap(SizeType idx, SizeType num) noexcept
 {
 	SFriend::RemoveAtSwap(*this, idx, num);
 }

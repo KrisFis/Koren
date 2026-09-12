@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
+
 #include "Kor/MemoryOps.h"
 
 KOR_NAMESPACE_BEGIN

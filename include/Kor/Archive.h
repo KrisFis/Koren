@@ -282,7 +282,7 @@ KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, SArchive& otherA
 template<typename ContainerT>
 inline static typename TEnableIf<TIsContainer<ContainerT>::Value, SArchive&>::Type operator<<(SArchive& ar, const ContainerT& container)
 {
-	if constexpr (TContainerTypeTraits<ContainerT>::InlineMemory)
+	if constexpr (TContainerTraits<ContainerT>::InlineMemory)
 	{
 		ar.Write(container.Begin(), container.GetNum());
 	}
@@ -300,6 +300,7 @@ inline static typename TEnableIf<TIsContainer<ContainerT>::Value, SArchive&>::Ty
 template<typename ContainerT>
 inline static typename TEnableIf<TIsContainer<ContainerT>::Value, SArchive&>::Type operator>>(SArchive& ar, ContainerT& container)
 {
+	using ContainerTT = TContainerTraits<ContainerT>;
 	container.Resize(ar.GetRemainingOffset<typename ContainerTT::ElementType>());
 
 	if constexpr (ContainerTT::InlineMemory)

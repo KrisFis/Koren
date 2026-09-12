@@ -56,7 +56,7 @@ namespace Internal::Array
 		// Memory
 		// -------------------------------------------------------------------------
 
-		template<typename HasItems = true>
+		template<bool HasItems = true>
 		static void Reallocate(ArrayType& arr, SizeType num) noexcept
 		{
 			if constexpr (HasItems)
@@ -90,7 +90,7 @@ namespace Internal::Array
 					}
 					else
 					{
-						ArrayType::ElementType* newData = arr._allocator.Allocate(num);
+						ElementType* newData = arr._allocator.Allocate(num);
 						KOR_ASSERT(newData);
 
 						if (arr._num > 0)
@@ -233,7 +233,7 @@ namespace Internal::Array
 		{
 			num = CalculateShrink(arr, num);
 
-			if constexpr (LimitToUnitialized)
+			if constexpr (LimitToInitialized)
 			{
 				if (num < arr._num) return;
 			}
@@ -293,9 +293,9 @@ namespace Internal::Array
 
 			if constexpr (HasItems)
 			{
-				if (arr._reservedNum > 0) 
+				if (dest._reservedNum > 0)
 				{
-					Empty(arr);
+					Empty(dest);
 				}
 			}
 
@@ -320,14 +320,14 @@ namespace Internal::Array
 		static SizeType FindIndexByFunc(const ArrayType& arr, FunctorT&& func) 
 			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
 		{
-			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)")
+			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)");
 
-			const ElementType* const end = _data + _num;
-			for (const ElementType* curr = _data; curr != end; ++curr)
+			const ElementType* const end = arr._data + arr._num;
+			for (const ElementType* curr = arr._data; curr != end; ++curr)
 			{
 				if (Invoke(func, *curr))
 				{
-					return KOR_PTR_TYPED_DIFF(SizeType, curr, _data);
+					return KOR_PTR_TYPED_DIFF(SizeType, curr, arr._data);
 				}
 			}
 
@@ -338,10 +338,10 @@ namespace Internal::Array
 		static const ElementType* FindByFunc(const ArrayType& arr, FunctorT&& func) 
 			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
 		{
-			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)")
+			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)");
 
-			const ElementType* const end = _data + _num;
-			for (const ElementType* curr = _data; curr != end; ++curr)
+			const ElementType* const end = arr._data + arr._num;
+			for (const ElementType* curr = arr._data; curr != end; ++curr)
 			{
 				if (Invoke(func, *curr))
 				{
@@ -380,7 +380,7 @@ namespace Internal::Array
 		{
 			KOR_ASSERT(&dest != &source);
 
-			SFriend::Add(dest, source._num);
+			Add(dest, source._num);
 			SMemoryOps::CopyConstruct(
 				dest._data + (dest._num - source._num), 
 				source._data, 
@@ -392,7 +392,7 @@ namespace Internal::Array
 		{
 			KOR_ASSERT(&dest != &source);
 
-			SFriend::Add(dest, source._num);
+			Add(dest, source._num);
 			SMemoryOps::MoveConstruct(
 				dest._data + (dest._num - source._num),
 				source._data,
@@ -405,7 +405,7 @@ namespace Internal::Array
 			source._num = 0;
 		}
 
-		// Opens an unitialized gap of `num` elements at `idx`, growing capacity first if needed
+		// Opens an un-initialized gap of `num` elements at `idx`, growing capacity first if needed
 		// * Existing elements at and after `idx` are relocated past the gap
 		// ** the gap itself is left uninitialized for the caller to construct into
 		static void Insert(ArrayType& arr, SizeType idx, SizeType num = 1) noexcept
@@ -518,7 +518,7 @@ namespace Internal::Array
 		static SizeType RemoveByFunc(ArrayType& arr, FunctorT&& func)
 			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
 		{
-			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)")
+			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)");
 
 			ElementType* const oldEnd = arr._data + arr._num;
 			ElementType* dst = arr._data;
@@ -567,7 +567,7 @@ namespace Internal::Array
 		static SizeType RemoveSwapByFunc(ArrayType& arr, FunctorT&& func)
 			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
 		{
-			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)")
+			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)");
 
 			SizeType totalRemoved = 0;
 			SizeType num = 0;

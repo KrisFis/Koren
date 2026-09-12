@@ -18,7 +18,7 @@ namespace Internal
 	struct TIsInvocableHelper : TFalseValue {};
 
 	template<typename FunctorT, typename... ArgsT>
-	struct TIsInvocableHelper
+	struct TIsInvocableHelper<
 		TVoid<decltype(DeclVal<FunctorT>()(DeclVal<ArgsT>()...))>,
 		FunctorT,
 		ArgsT...> : TTrueValue {};
@@ -80,7 +80,7 @@ KOR_FORCEINLINE constexpr auto Invoke(RetT BaseT::*memFunc, TargetT&& target)
 	return Internal::DereferenceIfNotRelated<BaseT>(Forward<TargetT>(target)).*memFunc;
 }
 
-template
+template<
 	typename MemberFunctorT,
 	typename TargetT,
 	typename... ArgsT,

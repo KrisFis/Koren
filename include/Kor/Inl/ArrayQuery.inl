@@ -6,14 +6,14 @@
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE_DEBUG ElementT* TArray<ElementT, AllocatorT>::GetAt(SizeType idx) noexcept
 {
-	KOR_ASSERT_DEBUG(SMath::IsWithin(idx, 0, arr._num));
+	KOR_ASSERT_DEBUG(SMath::IsWithin(idx, 0, _num));
 	return _data + idx;
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE_DEBUG const ElementT* TArray<ElementT, AllocatorT>::GetAt(SizeType idx) const noexcept
 {
-	KOR_ASSERT_DEBUG(SMath::IsWithin(idx, 0, arr._num));
+	KOR_ASSERT_DEBUG(SMath::IsWithin(idx, 0, _num));
 	return _data + idx;
 }
 
@@ -119,7 +119,7 @@ template<typename ElementT, typename AllocatorT>
 template<typename FunctorT>
 KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::ContainsByFunc(FunctorT&& func) const
 {
-	return !!FindByFunc(Forward<Functor>(func));
+	return !!FindByFunc(Forward<FunctorT>(func));
 }
 
 template<typename ElementT, typename AllocatorT>

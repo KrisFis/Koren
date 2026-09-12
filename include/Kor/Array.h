@@ -4,10 +4,10 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
-#include "Kor/Math.h"
-#include "Kor/MemoryOps.h"
 
 #include "Kor/Allocator.h"
+#include "Kor/Math.h"
+#include "Kor/MemoryOps.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -32,7 +32,7 @@ public:
 	// -------------------------------------------------------------------------
 
 	static_assert(
-		!TIsVoid<ElementT>::Value && TIsPure<ElementT>::Value,
+		!TIsVoid<ElementT>::Value && TIsClean<ElementT>::Value,
 		"ElementType must be a non-void and pure type");
 
 	static_assert(TIsAllocator<AllocatorT>::Value,
@@ -88,7 +88,7 @@ public:
 	explicit TArray(const ElementType* data, SizeType num) noexcept;
 
 	// Reserves `num` elements, each copy-constructed from `value`. Num becomes `num`.
-	explicit TArray(const ElementType& value, SizeType num) noexcept;
+	explicit TArray(const ElementType& val, SizeType num) noexcept;
 
 	// Destructor
 	// -------------------------------------------------------------------------

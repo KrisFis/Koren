@@ -51,7 +51,7 @@
 // * "Value" is true if the given expression is well-formed for CheckType, false otherwise
 // * Detection uses the TVoid (void_t) SFINAE idiom: the specialization only matches
 //   when the tested expression compiles, falling back to the primary (false) template otherwise
-// * CheckType is decayed via TPure<CheckType>::Type before testing, so cv/ref-qualified
+// * CheckType is decayed via TClean<CheckType>::Type before testing, so cv/ref-qualified
 //   types are handled consistently
 // * @param1 -> Name of the generated trait
 // * @param2 -> Expression to test for validity (see per-macro notes below)
@@ -81,7 +81,7 @@
 	{																															\
 	private:																													\
 																																\
-		typedef typename TPure<CheckType>::Type PureType;																		\
+		typedef typename TClean<CheckType>::Type PureType;																		\
 																																\
 		template<class TestType, typename = void> struct FGetTestValue : TFalseValue {};										\
 		template<class TestType> struct FGetTestValue<TestType, TVoid<decltype(MethodCall())>> : TTrueValue {};					\
@@ -98,7 +98,7 @@
 	{																																\
 	private:																														\
 																																	\
-		typedef typename TPure<CheckType>::Type PureType;																			\
+		typedef typename TClean<CheckType>::Type PureType;																			\
 																																	\
 		template<class TestType, typename = void> struct FGetTestValue : TFalseValue {};											\
 		template<class TestType> struct FGetTestValue<TestType, TVoid<decltype(DeclVal<TestType>().MethodCall)>> : TTrueValue {};	\
@@ -114,7 +114,7 @@
 	{																																\
 	private:																														\
 																																	\
-		typedef typename TPure<CheckType>::Type PureType;																			\
+		typedef typename TClean<CheckType>::Type PureType;																			\
 																																	\
 		template<class TestType, typename = void> struct FGetTestValue : TFalseValue {};											\
 		template<class TestType> struct FGetTestValue<TestType, TVoid<decltype(&TestType::FieldName)>> : TTrueValue {};				\

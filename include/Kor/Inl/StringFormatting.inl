@@ -12,7 +12,7 @@ namespace Internal
 
 	private:
 		using RawFmtT = typename TClean<FmtT>::Type;
-		using PureFmt = typename TPure<FmtT>::Type;
+		using PureFmt = typename TClean<FmtT>::Type;
 
 	public:
 		enum

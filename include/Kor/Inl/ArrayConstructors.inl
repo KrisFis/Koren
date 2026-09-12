@@ -42,7 +42,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ILType& list) noexcep
 	if (num == 0) return;
 
 	SFriend::Resize<false>(*this, num);
-	SFriend::CopyConstruct(arr._data, list.begin(), num);
+	SFriend::CopyConstruct(_data, list.begin(), num);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -77,11 +77,11 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ElementType* data, Si
 {
 	if (num == 0) return;
 	SFriend::Resize<false>(*this, num);
-	SFriend::CopyConstruct(arr._data, data, num);
+	SFriend::CopyConstruct(_data, data, num);
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ElementType& value, SizeType num) noexcept
+KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ElementType& val, SizeType num) noexcept
 	: TArray()
 {
 	if (num == 0) return;
@@ -93,5 +93,5 @@ template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE TArray<ElementT, AllocatorT>::~TArray() noexcept
 {
 	if (_reservedNum == 0) return;
-	SFriend::Empty(*this);
+	SFriend::Deallocate(*this);
 }

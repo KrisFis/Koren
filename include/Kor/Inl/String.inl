@@ -90,7 +90,7 @@ template<typename T>
 struct TContainerTraits<TStringView<T>>
 	: TContainerTraitsBase<TStringView<T>>
 {
-	using ElementType = typename T;
+	using ElementType = T;
 	using AllocatorType = void;
 	using SizeType = int32;
 };
@@ -99,9 +99,9 @@ template<typename T>
 struct TContainerTraits<TString<T>>
 	: TContainerTraitsBase<TString<T>>
 {
-	using ElementType = typename T;
-	using AllocatorType = typename TContainerTraits<TString<T>::DataType>::AllocatorType;
-	using SizeType = TContainerTraits<TString<T>::DataType>::SizeType;
+	using ElementType = T;
+	using AllocatorType = typename TContainerTraits<typename TString<T>::DataType>::AllocatorType;
+	using SizeType = typename TContainerTraits<typename TString<T>::DataType>::SizeType;
 };
 
 // Archive operator<< && operator>>
