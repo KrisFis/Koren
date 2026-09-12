@@ -464,7 +464,7 @@ KOR_FORCEINLINE int32 SMemoryOps::CompareAs(const T* lhs, const R* rhs, uint64 n
 
 KOR_FORCEINLINE bool SMemoryOps::IsEqual(const void* lhs, const void* rhs, uint64 size) noexcept
 {
-	return SPlatformMemoryOps::Compare(lhs, rhs, size) == 0;
+	return SPlatformMemoryOps::IsEqual(lhs, rhs, size);
 }
 
 template<typename T, typename R>

@@ -50,7 +50,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SNoInit
 	: TArray()
 {
 	if (num <= 0) return;
-	SFriend::template Resize<false>(*this, num);
+	SFriend::template Reallocate<false>(*this, num);
 }
 
 template<typename ElementT, typename AllocatorT>

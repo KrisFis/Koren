@@ -40,6 +40,9 @@ struct SUnixMemoryOps
 
 	// Compares two blocks of memory
 	KOR_FORCEINLINE static int32 Compare(const void* lhs, const void* rhs, uint64 size) noexcept { return memcmp(lhs, rhs, size); }
+
+	// Compares two blocks of memory if they are equal
+	KOR_FORCEINLINE static int32 IsEqual(const void* lhs, const void* rhs, uint64 size) noexcept { return !memcmp(lhs, rhs, size); }
 };
 
 KOR_NAMESPACE_END

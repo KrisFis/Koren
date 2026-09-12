@@ -6,14 +6,14 @@
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE_DEBUG ElementT* TArray<ElementT, AllocatorT>::GetAt(SizeType idx) noexcept
 {
-	KOR_ASSERT_DEBUG(SMath::IsWithin(idx, 0, _num));
+	KOR_ASSERT_DEBUG(IsValidIndex(idx));
 	return _data + idx;
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE_DEBUG const ElementT* TArray<ElementT, AllocatorT>::GetAt(SizeType idx) const noexcept
 {
-	KOR_ASSERT_DEBUG(SMath::IsWithin(idx, 0, _num));
+	KOR_ASSERT_DEBUG(IsValidIndex(idx));
 	return _data + idx;
 }
 

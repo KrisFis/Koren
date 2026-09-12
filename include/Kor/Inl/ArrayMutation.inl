@@ -24,13 +24,15 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::Add_GetRef(const ElementType& val) noexcept
 {
-	return _data[Add(val)];
+	const SizeType idx = Add(val);
+	return _data[idx];
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::Add_GetRef(ElementType&& val) noexcept
 {
-	return _data[Add(Move(val))];
+	const SizeType idx = Add(Move(val));
+	return _data[idx];
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -58,13 +60,15 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::AddUnique_GetRef(const ElementType& val) noexcept
 {
-	return _data[AddUnique(val)];
+	const SizeType idx = AddUnique(val);
+	return _data[idx];
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::AddUnique_GetRef(ElementType&& val) noexcept
 {
-	return _data[AddUnique(Move(val))];
+	const SizeType idx = AddUnique(Move(val));
+	return _data[idx];
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -79,7 +83,8 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::AddDefaulted_GetRef() noexcept
 {
-	return _data[AddDefaulted()];
+	const SizeType idx = AddDefaulted();
+	return _data[idx];
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -94,7 +99,8 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::AddZeroed_GetRef() noexcept
 {
-	return _data[AddZeroed()];
+	const SizeType idx = AddZeroed();
+	return _data[idx];
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -108,7 +114,8 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::AddUninitialized_GetRef() noexcept
 {
-	return _data[AddUninitialized()];
+	const SizeType idx = AddUninitialized();
+	return _data[idx];
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -137,7 +144,8 @@ template<typename ElementT, typename AllocatorT>
 template<typename ... ArgTypes>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::Emplace_GetRef(ArgTypes&&... args) noexcept
 {
-	return _data[Emplace(Forward<ArgTypes>(args)...)];
+	const SizeType idx = Emplace(Forward<ArgTypes>(args)...);
+	return _data[idx];
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -157,6 +165,8 @@ KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::Insert(SizeType idx, ElementT
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::Insert(SizeType idx, const ElementType* data, SizeType num) noexcept
 {
+	if (num == 0) return;
+
 	SFriend::Insert(*this, idx, num);
 	SMemoryOps::CopyConstruct(_data + idx, data, num);
 }
@@ -378,9 +388,11 @@ KOR_FORCEINLINE ElementT TArray<ElementT, AllocatorT>::Pop() noexcept
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::Swap(SizeType firstIdx, SizeType secondIdx) noexcept
 {
+	if (firstIdx == secondIdx) return;
+
 	KOR_ASSERT(firstIdx < secondIdx);
-	KOR_ASSERT(SMath::IsWithin(firstIdx, 0, _num));
-	KOR_ASSERT(SMath::IsWithin(secondIdx, 0, _num));
+	KOR_ASSERT(IsValidIndex(firstIdx));
+	KOR_ASSERT(IsValidIndex(secondIdx));
 
 	SMemoryOps::SwapAs(_data + firstIdx, _data + secondIdx);
 }
@@ -388,9 +400,11 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::Swap(SizeType firstIdx, SizeType s
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::SwapRange(SizeType firstIdx, SizeType secondIdx, SizeType num) noexcept
 {
+	if (firstIdx == secondIdx) return;
+
 	KOR_ASSERT(firstIdx < secondIdx);
-	KOR_ASSERT(SMath::IsWithin(firstIdx, 0, _num) && SMath::IsWithin(firstIdx + num, 0, _num));
-	KOR_ASSERT(SMath::IsWithin(secondIdx, 0, _num) && SMath::IsWithin(secondIdx + num, 0, _num));
+	KOR_ASSERT(0 <= firstIdx && firstIdx + (num - 1) <= _num - 1);
+	KOR_ASSERT(0 <= secondIdx && secondIdx + (num - 1) <= _num - 1);
 
 	SMemoryOps::SwapAs(_data + firstIdx, _data + secondIdx, num);
 }

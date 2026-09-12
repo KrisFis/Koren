@@ -172,6 +172,8 @@ namespace Internal::Array
 					arr._data = arr._allocator.Allocate(num);
 					KOR_ASSERT(arr._data);
 				}
+
+				arr._reservedNum = num;
 			}
 			else
 			{
@@ -455,7 +457,7 @@ namespace Internal::Array
 		{
 			KOR_ASSERT(
 				num > 0 &&
-				SMath::IsWithin(idx, 0, arr._num) &&
+				SMath::IsWithin(idx, 0, arr._num - 1) &&
 				(idx + num) <= arr._num
 			);
 
@@ -480,7 +482,7 @@ namespace Internal::Array
 		{
 			KOR_ASSERT(
 				num > 0 && 
-				SMath::IsWithin(idx, 0, arr._num) &&
+				SMath::IsWithin(idx, 0, arr._num - 1) &&
 				(idx + num) <= arr._num
 			);
 

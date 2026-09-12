@@ -186,7 +186,6 @@ public:
 
 	// Same as Resize, but grown elements are left uninitialized.
 	// * Caller must initialize them before reading.
-	// * Intended for trivially-constructible ElementType.
 	void ResizeUninitialized(SizeType num) noexcept;
 
 	// Frees excess capacity so GetReservedNum() == GetNum().
