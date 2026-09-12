@@ -42,7 +42,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ILType& list) noexcep
 	if (num == 0) return;
 
 	SFriend::template Resize<false>(*this, num);
-	SFriend::CopyConstruct(_data, list.begin(), num);
+	SMemoryOps::CopyConstruct(_data, list.begin(), num);
 }
 
 template<typename ElementT, typename AllocatorT>

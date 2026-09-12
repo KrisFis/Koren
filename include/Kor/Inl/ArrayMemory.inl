@@ -111,7 +111,7 @@ template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::Assign(TArray&& other) noexcept
 {
 	if (this == &other) return;
-	SFriend::MoveFromOther(*this, other);
+	SFriend::MoveFromOther(*this, Move(other));
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -124,7 +124,7 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::Assign(const ElementType& val, Siz
 	}
 	else if (_reservedNum > 0)
 	{
-		SFriend::Empty(*this);
+		SFriend::Deallocate(*this);
 	}
 }
 
@@ -136,10 +136,10 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::Assign(const ElementType* data, Si
 		KOR_ASSERT(data);
 
 		SFriend::EmptyAndReallocate(*this, num);
-		SMemoryOps::FillConstruct(_data, data, num);
+		SMemoryOps::CopyConstruct(_data, data, num);
 	}
 	else if (_reservedNum > 0)
 	{
-		SFriend::Empty(*this);
+		SFriend::Deallocate(*this);
 	}
 }

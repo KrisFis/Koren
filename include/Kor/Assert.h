@@ -15,7 +15,6 @@
 // - returns evaluated expression
 
 #if KOR_USE_ASSERT
-
 	#define KOR_ASSERT(statement)														\
 		if (!(statement)) [[ unlikely ]]												\
 		{																				\
@@ -73,15 +72,15 @@
 	#define KOR_ASSERT_DEBUG(statement) KOR_ASSERT(statement)
 	#define KOR_EXPECT_DEBUG(statement) KOR_EXPECT(statement)
 #else
-	#define KOR_ASSERT_DEBUG(statement) (statement)
+	#define KOR_ASSERT_DEBUG(statement)
 	#define KOR_EXPECT_DEBUG(expression) (!!(expression))
 #endif
 
 #else
-	#define KOR_ASSERT(statement) (statement)
+	#define KOR_ASSERT(statement)
 	#define KOR_EXPECT(expression) (!!(expression))
 
-	#define KOR_ASSERT_DEBUG(statement) (statement)
+	#define KOR_ASSERT_DEBUG(statement)
 	#define KOR_EXPECT_DEBUG(expression) (!!(expression))
 #endif
 

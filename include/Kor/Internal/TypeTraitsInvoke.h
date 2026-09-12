@@ -28,17 +28,17 @@ namespace Internal
 	// * Otherwise assumes target is a (possibly smart) pointer and dereferences it.
 	// * Lets Invoke's member-pointer overloads accept objects and pointers uniformly.
 	template<typename BaseT, typename TargetT>
-	KOR_FORCEINLINE constexpr decltype(auto) DereferenceIfNotRelated(TargetT&& target)
+	constexpr auto DereferenceIfNotRelated(TargetT&& target)
+		-> TEnableIf<TIsBaseOf<BaseT, typename TRemoveReference<TargetT>::Type>::Value, TargetT&&>::Type
 	{
-		if constexpr (TIsBaseOf<BaseT, typename TRemoveReference<TargetT>::Type>::Value)
-		{
-			return Forward<TargetT>(target);
-		}
-		else
-		{
-			static_assert(THasDereferenceOperator<TargetT>::Value, "Invoke call is malformed");
-			return *Forward<TargetT>(target);
-		}
+		return Forward<TargetT>(target);
+	}
+
+	template<typename BaseT, typename TargetT>
+	constexpr auto DereferenceIfNotRelated(TargetT&& target)
+		-> TEnableIf<!TIsBaseOf<BaseT, typename TRemoveReference<TargetT>::Type>::Value, decltype(*Forward<TargetT>(target))>::Type
+	{
+		return *Forward<TargetT>(target);
 	}
 }
 
@@ -47,15 +47,13 @@ namespace Internal
 //   expected. Needed for overloaded functions or ones with default arguments, since
 //   you can't take their address without a target type to resolve against - this
 //   defers name lookup until the call, using the real argument types.
-// * Example: Algo::SortByFunc(range, KOR_LIFT(toString));
 #define KOR_LIFT(FuncName) \
 	[](auto&&... args) -> decltype(auto) { return FuncName((decltype(args)&&)args...); }
 
 // [ LIFT_MEMBER ]
-// * Wraps a named member function of Class into a callable taking the object as its
+// * Wraps a named member function of `Class` into a callable taking the object as its
 //   first argument, so overloaded/defaulted member functions can be passed like KOR_LIFT.
-// * Accepts either an object or a (possibly smart) pointer to Class as the first argument.
-// * Example: Algo::SortByFunc(range, KOR_LIFT_MEMBER(UObject, GetFullName));
+// * Accepts either an object or a (possibly smart) pointer to `Class` as the first argument.
 #define KOR_LIFT_MEMBER(Class, FuncName) \
 	[](auto&& obj, auto&&... args) -> decltype(auto) \
 	{ \
@@ -63,14 +61,39 @@ namespace Internal
 	}
 
 // [ Invoke ]
-// * Invokes a callable, a pointer to a data member, or a pointer to a member function
-//   with a set of arguments, uniformly.
+// Invokes a callable
+// Gets pointer to a data member
+// Gets pointer to a member function with a set of arguments, uniformly.
 // * Member overloads accept either an object reference or a (possibly smart) pointer.
+//
+// Examples:
+//
+// Plain callable (function pointer, lambda, functor)
+// * int32 Square(int32 x) { return x * x; }
+// * Invoke(Square, 5);
+// * Invoke(KOR_LIFT(Square), 5);
+// * Invoke([](int32 x) { return x + 1; }, 5);
+//
+// Pointer to data member - object, raw pointer, or smart pointer
+// * struct FPoint { int32 x; };
+// * FPoint p{1};
+// * FPoint* pp = &p;
+// * Invoke(&FPoint::x, p); // -> p.x
+// * Invoke(&FPoint::x, pp); // -> pp->x
+//
+// Pointer to member function - object, raw pointer, or smart pointer
+// * struct FWidget { FString GetName() const { return name; } FString name; };
+// * FWidget w{"Button"};
+// * FWidget* pw = &w;
+// * Invoke(&FWidget::GetName, w); // -> w.GetName()
+// * Invoke(&FWidget::GetName, pw); // -> pw->GetName()
+// * Invoke(KOR_LIFT(FWidget, GetName), pw); // -> pw->GetName()
+//
 template<typename FunctorT, typename... ArgsT>
 KOR_FORCEINLINE constexpr auto Invoke(FunctorT&& func, ArgsT&&... args)
-	-> decltype(((FunctorT&&)func)(Forward<ArgsT>(args)...))
+	-> decltype(Forward<FunctorT>(func)(Forward<ArgsT>(args)...))
 {
-	return ((FunctorT&&)func)(Forward<ArgsT>(args)...);
+	return Forward<FunctorT>(func)(Forward<ArgsT>(args)...);
 }
 
 template<typename RetT, typename BaseT, typename TargetT>

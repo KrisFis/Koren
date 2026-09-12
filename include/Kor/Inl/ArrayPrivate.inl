@@ -244,7 +244,7 @@ namespace Internal::Array
 			}
 			else if (num == 0 && arr._reservedNum > 0)
 			{
-				Empty(arr);
+				Deallocate(arr);
 			}
 		}
 
@@ -356,7 +356,7 @@ namespace Internal::Array
 		KOR_FORCEINLINE static ElementType* FindByFunc(ArrayType& arr, FunctorT&& func) 
 			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
 		{
-			return const_cast<ElementType*>(FindByFunc(arr, Forward<FunctorT>(func)));
+			return const_cast<ElementType*>(FindByFunc((const ArrayType&)arr, Forward<FunctorT>(func)));
 		}
 
 		// Mutations
