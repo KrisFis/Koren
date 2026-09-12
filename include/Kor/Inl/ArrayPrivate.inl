@@ -254,11 +254,6 @@ namespace Internal::Array
 		template<bool HasItems = true>
 		static void CopyFromOther(ArrayType& dest, const ArrayType& source) noexcept
 		{
-			// TODO: Support different array type copy
-			// For example:
-			// * TArray<uint8> <-> TArray<uint16> is possible fairly safely if both are binary buffers,
-			// * Although consumer can just read two bytes at the time, its convenience to be able to cast if allocators allow that
-
 			if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
 			{
 				if constexpr (HasItems)
@@ -288,11 +283,6 @@ namespace Internal::Array
 		template<bool HasItems = true>
 		static void MoveFromOther(ArrayType& dest, ArrayType&& source) noexcept
 		{
-			// TODO: Support different array type move
-			// For example:
-			// * TArray<uint8> <-> TArray<uint16> is possible fairly safely swap if both are binary buffers,
-			// * Although consumer can just read two bytes at the time, its convenience to be able to cast if allocators allow that
-
 			if constexpr (HasItems)
 			{
 				if (dest._reservedNum > 0)

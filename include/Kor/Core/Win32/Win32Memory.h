@@ -7,8 +7,6 @@
 
 KOR_NAMESPACE_BEGIN
 
-// TODO(krisfis): Virtual memory allocations
-// * see: https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc
 struct SWin32MemoryOps
 {
 	// Gets cached handle to process heap

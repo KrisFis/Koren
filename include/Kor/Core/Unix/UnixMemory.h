@@ -10,8 +10,6 @@
 
 KOR_NAMESPACE_BEGIN
 
-// TODO(krisfis): Virtual memory allocations
-// * see: https://linux.die.net/man/2/mmap
 struct SUnixMemoryOps
 {
 	// Allocates new memory
