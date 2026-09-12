@@ -24,7 +24,7 @@
 #define KOR_FORCEINLINE inline __attribute__((always_inline))
 #define KOR_FORCENOINLINE __attribute__((noinline))
 
-#define KOR_UNREACHABLE_CODE() __builtin_unreachable()
+#define KOR_UNREACHABLE() __builtin_unreachable()
 
 #define KOR_DLL_EXPORT
 #define KOR_DLL_IMPORT

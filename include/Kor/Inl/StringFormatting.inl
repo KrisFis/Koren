@@ -11,8 +11,8 @@ namespace Internal
 		static_assert(TIsCharacter<CharT>::Value, "CharT must be character type");
 
 	private:
-		using RawFmtT = typename TRemoveConstReference<FmtT>::Type;
-		using PureFmt = typename TPure<FmtT>::Type;
+		using RawFmtT = typename TClean<FmtT>::Type;
+		using PureFmt = typename TClean<FmtT>::Type;
 
 	public:
 		enum
@@ -29,7 +29,7 @@ namespace Internal
 
 template<typename CharT>
 template<typename FmtT, typename ... VarTypes>
-TString<CharT> TString<CharT>::Format(const FmtT& fmt, const VarTypes&... args) noexcept
+KOR_INLINE TString<CharT> TString<CharT>::Format(const FmtT& fmt, const VarTypes&... args) noexcept
 {
 	using StringTraits = Internal::TTStringFormatTraits<CharT, FmtT>;
 	static_assert(sizeof...(VarTypes) > 0, "No arguments provided. Use construction from fmt directly instead");

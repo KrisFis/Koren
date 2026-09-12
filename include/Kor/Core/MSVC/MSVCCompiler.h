@@ -24,7 +24,7 @@
 #define KOR_FORCEINLINE __forceinline
 #define KOR_FORCENOINLINE __declspec(noinline)
 
-#define KOR_UNREACHABLE_CODE() __assume(false)
+#define KOR_UNREACHABLE() __assume(false)
 
 #define KOR_DEBUG_BREAK() __debugbreak()
 

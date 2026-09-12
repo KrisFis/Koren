@@ -14,7 +14,7 @@
 
 // UTILITIES
 #include "Kor/Math.h"
-#include "Kor/Memory.h"
+#include "Kor/MemoryOps.h"
 #include "Kor/Misc.h"
 
 // CONTAINERS
@@ -23,8 +23,8 @@
 #include "Kor/Queue.h"
 
 // ALLOCATORS
-#include "Kor/ArrayAllocator.h"
-#include "Kor/FixedArrayAllocator.h"
+#include "Kor/Allocator.h"
+#include "Kor/FixedAllocator.h"
 #include "Kor/QueueAllocator.h"
 
 // STRINGS
@@ -34,10 +34,6 @@
 
 // SHARED
 #include "Kor/Shared.h"
-
-// Assert
-#include "Kor/Assert.h"
-#include "Kor/IsValid.h"
 
 // EXTRAS -> ARCHIVE
 #include "Kor/Archive.h"

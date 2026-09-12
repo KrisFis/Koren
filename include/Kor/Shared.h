@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Kor/KorMinimal.h"
+
 #include "Kor/Internal/SharedReferencer.h"
 #include "Kor/Internal/SharedTypeTraits.h"
 

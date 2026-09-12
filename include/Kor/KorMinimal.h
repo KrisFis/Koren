@@ -7,7 +7,7 @@
 // * Should include minimal features
 /////////////////////////////////////////
 
-// Look at "Build.h" to see defines that affects features provided
+// Look at "Build.h" to see defines that affect features provided
 
 // CORE
 #include "Kor/Core/Build.h"
@@ -17,9 +17,15 @@
 // INITIALIZATION
 #include "Kor/Internal/InitTags.h"
 
-// FORWARDS
-#include "Kor/Internal/TypeFowards.h"
-
 // TYPE MANIPULATION/GENERATION/SFINAE
 #include "Kor/TypeTraits.h"
 #include "Kor/TypeTraitsMacros.h"
+
+// FORWARDS
+#include "Kor/Internal/TypeFowards.h"
+
+// ASSERT
+#include "Kor/Assert.h"
+
+// IS VALID
+#include "Kor/IsValid.h"

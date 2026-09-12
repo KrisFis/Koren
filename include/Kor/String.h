@@ -5,23 +5,23 @@
 
 #include "Kor/KorMinimal.h"
 
-#include "Kor/CharOps.h"
-#include "Kor/StringOps.h"
-
-#include "Kor/Assert.h"
 #include "Kor/Archive.h"
 #include "Kor/Array.h"
+#include "Kor/CharOps.h"
+#include "Kor/Math.h"
+#include "Kor/StringOps.h"
 
 KOR_NAMESPACE_BEGIN
 
-// [ String View ]
+// [ TStringView ]
 // Non-owning, read-only view into a character buffer.
 // * CharType must satisfy TIsCharacter
 // * Does not own the buffer; lifetime is the caller's responsibility
-// * Not guaranteed to be null-terminated unless constructed from a
-//   null-terminated source and not sliced via Sub/Left/Right
 // * Trivially copyable; prefer passing by value over const ref
-// * Split produces views into the same buffer, same lifetime rules apply
+//
+// Example:
+//   void Log(TStringView<char> msg);
+//   Log(myString.View());
 template<typename CharT>
 class TStringView
 {
@@ -39,33 +39,33 @@ public:
 
 	// TODO: Replace with TArrayView once implemented
 	using DataType = const CharT*;
-	using SizeType = TArray<CharT, TArrayAllocator<CharT>>::SizeType;
+	using SizeType = int32;
 
 	using IteratorType = const CharType*;
 	using ConstIteratorType = const CharType*;
 
-	// Constructors - Default, Copy, Move
-	// View is trivially copyable, no move needed.
+	// Constructors
 	// -------------------------------------------------------------------------
 
 	constexpr TStringView() noexcept;
+
+	// Copy and move
 	constexpr TStringView(const TStringView& other) noexcept = default;
-	TStringView& operator=(const TStringView& other) noexcept = default;
+	constexpr TStringView(TStringView&& other) noexcept = default;
 
-	// Constructors - From raw pointer
-	// -------------------------------------------------------------------------
+	// Completely uninitialized view (not even '\0')
+	explicit constexpr TStringView(Init::SNoInit) noexcept;
 
+	// From literal text, optionally cut at 'length'
 	TStringView(const CharType* text) noexcept;
 	TStringView(const CharType* text, SizeType length) noexcept;
+	template<TSize N> TStringView(const CharType (&text)[N]) noexcept;
 
-	template<TSize N>
-	TStringView(const CharType (&text)[N]) noexcept;
-
-	// Constructors - Special/Forced
+	// Assignment operators
 	// -------------------------------------------------------------------------
 
-	explicit constexpr TStringView(Init::SZero) noexcept;
-	explicit constexpr TStringView(Init::SNoInit) noexcept;
+	TStringView& operator=(const TStringView& other) noexcept = default;
+	TStringView& operator=(TStringView&& other) noexcept = default;
 
 	// Comparison operators
 	// Performs case-sensitive comparison.
@@ -212,15 +212,16 @@ private:
 	SizeType _len = 0;
 };
 
-// [ String ]
-// Owning, null-terminated, mutable string.
+// [ TString ]
+// Owning, null-terminated, mutable character buffer.
 // * CharType must satisfy TIsCharacter
-// * Always null-terminated; GetChars() is safe to pass to C APIs
-// * Backed by TArray; all mutation operations may reallocate
-// * Views (View, SubView, LeftView, RightView) are valid only while
-//   the string is alive and unmodified — any mutation invalidates them
-// * Split produces owned copies; SplitToArray returns TArray<TString>
-// * Format/AppendFormat use printf-style syntax
+// * Backed by TArray; may reallocate on mutation
+// * Always null-terminated; safe to pass to C APIs
+//
+// Example:
+//   TString name = KOR_TEXT("Hello");
+//   name.Append(" World");
+//
 template<typename CharT>
 class TString
 {
@@ -235,40 +236,38 @@ class TString
 
 public:
 	using CharType = CharT;
-	using DataType = TArray<CharT, TArrayAllocator<CharT>>;
+	using DataType = TArray<CharT>;
 
-	using SizeType = typename DataType::SizeType;
+	using SizeType = typename TContainerTraits<DataType>::SizeType;
 
 	using IteratorType = CharType*;
 	using ConstIteratorType = const CharType*;
 
-	// Constructors - Default, Copy, Move
+	// Constructors
 	// -------------------------------------------------------------------------
 
 	constexpr TString() noexcept;
+
+	// Copy and move
 	TString(const TString& other) noexcept = default;
 	TString(TString&& other) noexcept = default;
 
-	// Constructors - From literal
-	// -------------------------------------------------------------------------
+	// Empty string and no allocation (not even '\0')
+	explicit constexpr TString(Init::SNoInit) noexcept;
 
+	// String of 'length' characters, all zeroed
+	explicit TString(SizeType length, Init::SNoInit) noexcept;
+
+	// String of 'length' characters, all zeroed
+	explicit TString(SizeType length, Init::SZero) noexcept;
+
+	// From literal text, optionally cut at 'length'
 	TString(const CharType* text) noexcept;
 	TString(const CharType* text, SizeType length) noexcept;
+	template<TSize N> TString(const CharType (&text)[N]) noexcept;
 
-	template<TSize N>
-	TString(const CharType (&text)[N]) noexcept;
-
-	// Constructor - Fill
-	// Constructs a string of `length` characters, all set to `val`.
-	// -------------------------------------------------------------------------
-
+	// String of `length` characters, all set to `val`.
 	explicit TString(SizeType length, CharType val = Constant::Null) noexcept;
-
-	// Constructors - Special/Forced
-	// -------------------------------------------------------------------------
-
-	explicit constexpr TString(Init::SZero) noexcept;
-	explicit constexpr TString(Init::SNoInit) noexcept;
 
 	// Constants
 	// -------------------------------------------------------------------------
@@ -565,14 +564,14 @@ private:
 // [ Is TString ]
 // Checks if type is TString type
 
-template<typename T> struct TIsTString : TFalseType {};
-template<typename CharT> struct TIsTString<TString<CharT>> : TTrueType {};
+template<typename T> struct TIsTString : TFalseValue {};
+template<typename CharT> struct TIsTString<TString<CharT>> : TTrueValue {};
 
 // [ Is TString View ]
 // Checks if type is TStringView type
 
-template<typename T> struct TIsTStringView : TFalseType {};
-template<typename CharT> struct TIsTStringView<TStringView<CharT>> : TTrueType {};
+template<typename T> struct TIsTStringView : TFalseValue {};
+template<typename CharT> struct TIsTStringView<TStringView<CharT>> : TTrueValue {};
 
 #include "Kor/Inl/String.inl"
 

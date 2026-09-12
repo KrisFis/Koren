@@ -4,57 +4,45 @@
 #pragma once
 
 #include "Kor/Core/Build.h"
+#include "Kor/Internal/TypeTraitsAllocators.h"
 
 KOR_NAMESPACE_BEGIN
 
+// [Container Traits Base]
+// * Shared defaults for container trait specializations.
+// * Specializations of TContainerTraits should inherit from this and override as needed.
+
 template<typename T>
-struct TContainerTypeTraits
+struct TContainerTraitsBase
 {
-	// Internal element type
 	using ElementType = void;
-
-	// Internal allocator type
 	using AllocatorType = void;
+	using SizeType = void;
 
-	// Flags
 	enum
 	{
-		IsContainer = false,
-		IsDynamic = false,
-		InlineMemory = false
+		InlineMemory = false,
 	};
 };
 
+// [Container Traits]
+// * Defines meta about a container type.
+// * Is intentionally left as forward declare
+//
+// Example Declaration:
+//
+// template<>
+// struct TContainerTraits<MyContainer> : TContainerTraitsBase<MyContainer>
+// {
+//    using AllocatorType = typename MyContainer::AllocatorType;
+//    enum { InlineMemory = true }
+// }
+template<typename T>
+struct TContainerTraits;
+
 // [Is Container]
-// * Checks whether specific type is container type
-
+// * Checks whether specific type is a container (defines TContainerTraits)
 template<typename T>
-struct TIsContainer { enum { Value = TContainerTypeTraits<T>::IsContainer }; };
-
-// [Is Dynamic Container]
-// * Checks whether specific type is container and can do dynamic allocations
-
-template<typename T>
-struct TIsDynamicContainer
-{
-private:
-	typedef TContainerTypeTraits<T> ContainerT;
-
-public:
-	enum { Value = ContainerT::IsContainer && ContainerT::IsDynamic };
-};
-
-// [Is Fixed Container]
-// * Checks whether specific type is container and cannot do dynamic allocations
-
-template<typename T>
-struct TIsFixedContainer
-{
-private:
-	typedef TContainerTypeTraits<T> ContainerT;
-
-public:
-	enum { Value = ContainerT::IsContainer && !ContainerT::IsDynamic };
-};
+struct TIsContainer : TBoolValue<TIsComplete<TContainerTraits<T>>::Value> {};
 
 KOR_NAMESPACE_END

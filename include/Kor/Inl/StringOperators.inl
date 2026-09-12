@@ -61,7 +61,7 @@ KOR_FORCEINLINE_DEBUG CharT TString<CharT>::operator[](SizeType idx) const noexc
 template<typename CharT>
 KOR_FORCEINLINE TString<CharT>& TString<CharT>::operator=(const TString& other) noexcept
 {
-	if (this != &other)
+	if (this != &other) [[ likely ]]
 	{
 		_data = other._data;
 	}
@@ -71,7 +71,7 @@ KOR_FORCEINLINE TString<CharT>& TString<CharT>::operator=(const TString& other) 
 template<typename CharT>
 KOR_FORCEINLINE TString<CharT>& TString<CharT>::operator=(TString&& other) noexcept
 {
-	if (this != &other)
+	if (this != &other) [[ likely ]]
 	{
 		_data = Move(other._data);
 	}
@@ -79,13 +79,13 @@ KOR_FORCEINLINE TString<CharT>& TString<CharT>::operator=(TString&& other) noexc
 }
 
 template<typename CharT>
-TString<CharT> TString<CharT>::operator+(const TString& other) const noexcept
+KOR_INLINE TString<CharT> TString<CharT>::operator+(const TString& other) const noexcept
 {
-	TString result(Init::Zero);
 	const int32 thisLen = _data.GetNum() - 1;
 	const int32 otherLen = other._data.GetNum() - 1;
 
-	result._data.Resize(thisLen + otherLen + 1);
+	TString result(thisLen + otherLen + 1, Init::NoInit);
+
 	SOps::Copy(*result._data, *_data, thisLen);
 	SOps::Copy(*result._data + thisLen, *other._data, otherLen);
 	result._data[thisLen + otherLen] = Constant::Null;
@@ -100,12 +100,12 @@ KOR_FORCEINLINE TString<CharT> TString<CharT>::operator+(TString&& other) const 
 }
 
 template<typename CharT>
-TString<CharT>& TString<CharT>::operator+=(const TString& other) noexcept
+KOR_INLINE TString<CharT>& TString<CharT>::operator+=(const TString& other) noexcept
 {
 	const int32 thisLen = _data.GetNum() - 1;
 	const int32 otherLen = other._data.GetNum() - 1;
 
-	_data.Resize(thisLen + otherLen + 1);
+	_data.ResizeUninitialized(thisLen + otherLen + 1);
 	SOps::Copy(*_data + thisLen, *other._data, otherLen);
 	_data[thisLen + otherLen] = Constant::Null;
 
@@ -119,13 +119,12 @@ KOR_FORCEINLINE TString<CharT>& TString<CharT>::operator+=(TString&& other) noex
 }
 
 template<typename CharT>
-TString<CharT> TString<CharT>::operator/(const TString& other) const noexcept
+KOR_INLINE TString<CharT> TString<CharT>::operator/(const TString& other) const noexcept
 {
 	const int32 thisLen = _data.GetNum() - 1;
 	const int32 otherLen = other._data.GetNum() - 1;
 
-	TString result(Init::Zero);
-	result._data.Resize(thisLen + 1 + otherLen + 1);
+	TString result(thisLen + 1 + otherLen + 1, Init::NoInit);
 
 	SOps::Copy(*result._data, *_data, thisLen);
 	result._data[thisLen] = Constant::Slash;
@@ -137,7 +136,7 @@ TString<CharT> TString<CharT>::operator/(const TString& other) const noexcept
 }
 
 template<typename CharT>
-TString<CharT>& TString<CharT>::operator/=(const TString& other) noexcept
+KOR_INLINE TString<CharT>& TString<CharT>::operator/=(const TString& other) noexcept
 {
 	const int32 thisLen = _data.GetNum() - 1;
 	const int32 otherLen = other._data.GetNum() - 1;

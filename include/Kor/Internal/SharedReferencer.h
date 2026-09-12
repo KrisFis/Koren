@@ -3,13 +3,9 @@
 
 #pragma once
 
-#include "Kor/Core/Build.h"
-#include "Kor/Assert.h"
+#include "Kor/KorMinimal.h"
 
-// TODO(jkfisera): REIMPLEMENT Invoke
-#include <functional>
-
-namespace KOR_NAMESPACE Internal
+namespace KOR_NAMESPACE::Internal
 {
 	struct SNullType {};
 
@@ -106,7 +102,7 @@ namespace KOR_NAMESPACE Internal
 		{
 			if(_object)
 			{
-				std::invoke(_deleter, _object);
+				Invoke(_deleter, _object);
 				_object = nullptr;
 			}
 		}

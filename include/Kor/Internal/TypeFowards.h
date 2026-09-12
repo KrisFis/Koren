@@ -13,6 +13,7 @@ KOR_NAMESPACE_BEGIN
 // SIMPLE TYPES
 /////////////////////////////////
 
+class CAllocator;
 struct SArchive;
 
 // TEMPLATED TYPES
@@ -21,10 +22,7 @@ struct SArchive;
 template<typename T>
 class TString;
 
-template<typename ElementT>
-class TArrayAllocator;
-
-template<typename ElementT, typename AllocatorT = TArrayAllocator<ElementT>>
+template<typename ElementT, typename AllocatorT = CAllocator>
 class TArray;
 
 template<typename ElementT>

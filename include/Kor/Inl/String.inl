@@ -87,35 +87,25 @@ KOR_FORCEINLINE const typename TString<CharT>::DataType& TString<CharT>::GetData
 // -------------------------------------------------------------------------
 
 template<typename T>
-struct TContainerTypeTraits<TStringView<T>> : TContainerTypeTraits<void>
+struct TContainerTraits<TStringView<T>>
+	: TContainerTraitsBase<TStringView<T>>
 {
-	using Type = TStringView<T>; // optional
-
-	using ElementType = typename Type::CharType;
+	using ElementType = T;
 	using AllocatorType = void;
+	using SizeType = int32;
 
-	enum
-	{
-		IsContainer = true,
-		IsDynamic = false,
-		InlineMemory = true
-	};
+	enum { InlineMemory = true };
 };
 
 template<typename T>
-struct TContainerTypeTraits<TString<T>> : TContainerTypeTraits<void>
+struct TContainerTraits<TString<T>>
+	: TContainerTraitsBase<TString<T>>
 {
-	using Type = TString<T>; // optional
+	using ElementType = T;
+	using AllocatorType = typename TContainerTraits<typename TString<T>::DataType>::AllocatorType;
+	using SizeType = typename TContainerTraits<typename TString<T>::DataType>::SizeType;
 
-	using ElementType = typename Type::CharType;
-	using AllocatorType = typename Type::DataType::AllocatorType;
-
-	enum
-	{
-		IsContainer = true,
-		IsDynamic = true,
-		InlineMemory = true
-	};
+	enum { InlineMemory = true };
 };
 
 // Archive operator<< && operator>>

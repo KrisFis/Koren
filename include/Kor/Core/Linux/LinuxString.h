@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include "Kor/Core/Unix/UnixStringOps.h"
+#include "Kor/Core/Unix/UnixString.h"
 
 KOR_NAMESPACE_BEGIN
 
 template<typename CharType>
-using TAppleStringOps = TUnixStringOps<CharType>;
+using TLinuxStringOps = TUnixStringOps<CharType>;
 
 KOR_NAMESPACE_END

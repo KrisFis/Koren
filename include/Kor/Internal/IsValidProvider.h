@@ -6,7 +6,7 @@
 #include "Kor/TypeTraits.h"
 #include "Kor/TypeTraitsMacros.h"
 
-namespace KOR_NAMESPACE Internal
+namespace KOR_NAMESPACE::Internal
 {
 	KOR_GENERATE_HAS_FIELD_TRAIT(THasValidateField, Validate)
 	KOR_GENERATE_HAS_GLOBAL_METHOD_TRAIT(THasGlobalIsValid, IsValid(DeclVal<TestType>()))
@@ -36,7 +36,7 @@ namespace KOR_NAMESPACE Internal
 		}
 	};
 
-	// Reference and is HAS valid method
+	// Reference and HAS valid method
 	template<typename T>
 	struct TValidProvider<T, typename TEnableIf<TIsReference<T>::Value && THasIsInstanceValidMethod<T>::Value>::Type>
 	{
@@ -49,13 +49,10 @@ namespace KOR_NAMESPACE Internal
 	template<typename T>
 	struct TValidFinder
 	{
-
 	private:
-
-		typedef typename TRemoveConstReference<T>::Type ClearType;
+		typedef typename TClean<T>::Type ClearType;
 
 	public:
-
 		typedef typename TChoose<
 			TIsPointer<ClearType>::Value,
 			typename TGetType<ClearType>::ConstPointer,

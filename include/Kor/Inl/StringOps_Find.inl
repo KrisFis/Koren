@@ -5,7 +5,7 @@
 
 template<typename CharType>
 template<ESearchCase Case, ESearchDir Dir>
-int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr) noexcept
 {
 	using namespace Internal;
 
@@ -45,7 +45,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr) no
 }
 
 template<typename CharType>
-int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, ESearchCase searchCase, ESearchDir searchDir) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, ESearchCase searchCase, ESearchDir searchDir) noexcept
 {
 	if (searchCase == ESearchCase::Sensitive)
 	{
@@ -63,7 +63,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, ES
 
 template<typename CharType>
 template<ESearchCase Case, ESearchDir Dir>
-int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, int32 strLen, int32 subLen) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, int32 strLen, int32 subLen) noexcept
 {
 	using namespace Internal;
 
@@ -100,7 +100,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, in
 }
 
 template<typename CharType>
-int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, int32 strLen, int32 subLen, ESearchCase searchCase, ESearchDir searchDir) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, int32 strLen, int32 subLen, ESearchCase searchCase, ESearchDir searchDir) noexcept
 {
 	if (searchCase == ESearchCase::Sensitive)
 	{
@@ -118,7 +118,7 @@ int32 TStringOps<CharType>::Find(const CharType* str, const CharType* substr, in
 
 template<typename CharType>
 template<ESearchCase Case, ESearchDir Dir>
-int32 TStringOps<CharType>::Find(const CharType* str, CharType c) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Find(const CharType* str, CharType c) noexcept
 {
 	using namespace Internal;
 
@@ -162,7 +162,7 @@ KOR_FORCEINLINE int32 TStringOps<CharType>::Find(const CharType* str, CharType c
 
 template<typename CharType>
 template<ESearchCase Case, ESearchDir Dir>
-int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 strLen) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Find(const CharType* str, CharType c, int32 strLen) noexcept
 {
 	using namespace Internal;
 

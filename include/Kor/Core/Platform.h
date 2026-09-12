@@ -54,7 +54,7 @@
 
 #include KOR_PLATFORM_HEADER_FROM(Kor/Core, Platform)
 
-// Type macros
+// Other macros
 ///////////////////////////////////////////////////////////////
 
 #ifndef KOR_WCHAR_BYTES
@@ -90,14 +90,28 @@
 #define KOR_INDEX_NONE -1
 
 // Pointer arithmetic helpers
-#define KOR_PTR_DIFF(RetType, Ptr1, Ptr2) static_cast<RetType>(Ptr1 - Ptr2)
+
+// Byte diff
+#define KOR_PTR_DIFF(RetType, Ptr1, Ptr2) (RetType)((uintptr)Ptr1 - (uintptr)Ptr2)
+
+// Typed diff
+#define KOR_PTR_TYPED_DIFF(RetType, Ptr1, Ptr2) (RetType)(Ptr1 - Ptr2)
+
+// Default heap alignment
+// * Heap Alignment guarantees alignment sufficient for the strictest fundamental type
+// * Strictest type is typically 2 pointer-widths
+#if KOR_ARCHITECTURE_64
+	#define KOR_DEFAULT_HEAP_ALIGNMENT 16
+#else
+	#define KOR_DEFAULT_HEAP_ALIGNMENT 8
+#endif
+
+// Types
+///////////////////////////////////////////////////////////////
 
 KOR_NAMESPACE_BEGIN
 
 typedef KOR_PLATFORM_STRUCT(Types) SPlatformTypes;
-
-// Integer types
-///////////////////////////////////////////////////////////////
 
 // An 8-bit unsigned integer.
 typedef SPlatformTypes::Int8	int8;
@@ -119,8 +133,11 @@ typedef SPlatformTypes::Uint64	uint64;
 // A 64-bit signed integer.
 typedef SPlatformTypes::Int64	int64;
 
-// Character types
-///////////////////////////////////////////////////////////////
+// Pointer type
+typedef SPlatformTypes::IntPtr intptr;
+
+// Unsigned pointer type
+typedef SPlatformTypes::UIntPtr uintptr;
 
 // An ANSI character
 typedef SPlatformTypes::Achar	achar;
@@ -140,6 +157,9 @@ typedef wchar tchar;
 #else
 typedef char tchar;
 #endif
+
+#define KOR_BUFFER_SIZE_SMALL (1024)
+#define KOR_BUFFER_SIZE_LARGE (4096)
 
 namespace Internal::TypeTests
 {

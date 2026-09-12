@@ -192,9 +192,11 @@ struct SArchive
 	// * Takes all data and copies to provided container
 	/////////////////////////
 
-	template<typename ContainerT, typename ContainerTT = TContainerTypeTraits<ContainerT>>
-	typename TEnableIf<ContainerTT::IsContainer, bool>::Type CopyToContainer(ContainerT& outContainer)
+	template<typename ContainerT>
+	bool CopyToContainer(ContainerT& outContainer)
 	{
+		static_assert(TIsContainer<ContainerT>::Value, "Invalid container type");
+
 		if (!AllowsRead()) return false;
 
 		const SizeType oldOffset = GetBytesOffset();
@@ -216,10 +218,10 @@ struct SArchive
 		else if (!IsString()) return nullptr;
 
 		// pooled pointer
-		thread_local tchar buffer[SMemory::BUFFER_SIZE_LARGE];
+		thread_local tchar buffer[KOR_BUFFER_SIZE_LARGE];
 
 		const SizeType oldOffset = ar.template GetOffset<tchar>();
-		const SizeType expectedReadNum = SMath::Min<SizeType>(SMemory::BUFFER_SIZE_LARGE, GetTotal<tchar>());
+		const SizeType expectedReadNum = SMath::Min<SizeType>(KOR_BUFFER_SIZE_LARGE, GetTotal<tchar>());
 
 		if (expectedReadNum <= 0) return nullptr;
 
@@ -259,12 +261,12 @@ static SArchive& operator<<(SArchive& ar, SArchive& otherAr)
 		const uint32 remainingBytes = (otherAr.GetTotalBytes() - otherAr.GetBytesOffset());
 		if (remainingBytes > 0)
 		{
-			uint8* buffer = SMemory::MallocTyped<uint8>(remainingBytes);
+			uint8* buffer = SMemoryOps::MallocAs<uint8>(remainingBytes);
 			{
 				otherAr.ReadBytes(buffer, remainingBytes);
 				ar.WriteBytes(buffer, remainingBytes);
 			}
-			SMemory::Free(buffer);
+			SMemoryOps::Free(buffer);
 		}
 	}
 
@@ -277,16 +279,17 @@ KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, SArchive& otherA
 	return ar;
 }
 
-template<typename ContainerT, typename ContainerTT = TContainerTypeTraits<ContainerT>>
-inline static typename TEnableIf<ContainerTT::IsContainer, SArchive&>::Type operator<<(SArchive& ar, const ContainerT& container)
+template<typename ContainerT>
+inline static typename TEnableIf<TIsContainer<ContainerT>::Value, SArchive&>::Type operator<<(SArchive& ar, const ContainerT& container)
 {
+	using ContainerTT = TContainerTraits<ContainerT>;
 	if constexpr (ContainerTT::InlineMemory)
 	{
-		ar.Write(container.Begin(), container.GetNum());
+		ar.Write(container.begin(), KOR_PTR_TYPED_DIFF(SArchive::SizeType, container.end(), container.begin()));
 	}
 	else
 	{
-		for (auto it = container.Begin(); it != container.End(); ++it)
+		for (auto it = container.begin(); it != container.end(); ++it)
 		{
 			ar << *it;
 		}
@@ -295,14 +298,15 @@ inline static typename TEnableIf<ContainerTT::IsContainer, SArchive&>::Type oper
 	return ar;
 }
 
-template<typename ContainerT, typename ContainerTT = TContainerTypeTraits<ContainerT>>
-inline static typename TEnableIf<ContainerTT::IsContainer, SArchive&>::Type operator>>(SArchive& ar, ContainerT& container)
+template<typename ContainerT>
+inline static typename TEnableIf<TIsContainer<ContainerT>::Value, SArchive&>::Type operator>>(SArchive& ar, ContainerT& container)
 {
+	using ContainerTT = TContainerTraits<ContainerT>;
 	container.Resize(ar.GetRemainingOffset<typename ContainerTT::ElementType>());
 
 	if constexpr (ContainerTT::InlineMemory)
 	{
-		ar.Read(container.begin(), container.GetNum());
+		ar.Read(container.begin(), KOR_PTR_TYPED_DIFF(SArchive::SizeType, container.end(), container.begin()));
 	}
 	else
 	{
@@ -323,8 +327,8 @@ static SArchive& operator<<(SArchive& ar, const int32 val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SMemory::BUFFER_SIZE_INT32_MAX];
-		if (SStringOps::FromInt(buffer, val, SMemory::BUFFER_SIZE_INT32_MAX, 10))
+		thread_local tchar buffer[SStringConstant::BufferSize_Int32];
+		if (SStringOps::FromInt(buffer, val, SStringConstant::BufferSize_Int32, 10))
 		{
 			ar.Write(buffer, SStringOps::Length(buffer));
 		}
@@ -363,8 +367,8 @@ static SArchive& operator<<(SArchive& ar, const int64 val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SMemory::BUFFER_SIZE_INT64_MAX];
-		if (SStringOps::FromInt(buffer, val, SMemory::BUFFER_SIZE_INT64_MAX, 10))
+		thread_local tchar buffer[SStringConstant::BufferSize_Int64];
+		if (SStringOps::FromInt(buffer, val, SStringConstant::BufferSize_Int64, 10))
 		{
 			ar.Write(buffer, SStringOps::Length(buffer));
 		}
@@ -403,8 +407,8 @@ static SArchive& operator<<(SArchive& ar, const double val)
 	}
 	else if (ar.IsString())
 	{
-		thread_local tchar buffer[SMemory::BUFFER_SIZE_DOUBLE_MAX + 1];
-		if (SStringOps::FromFloat(buffer, val, SMemory::BUFFER_SIZE_DOUBLE_MAX + 1, 4))
+		thread_local tchar buffer[SStringConstant::BufferSize_Double];
+		if (SStringOps::FromFloat(buffer, val, SStringConstant::BufferSize_Double, 4))
 		{
 			ar.Write(buffer, SStringOps::Length(buffer));
 		}

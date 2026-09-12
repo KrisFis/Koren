@@ -3,13 +3,7 @@
 
 #pragma once
 
-#include "Kor/Core/Build.h"
-
-#include "Kor/StringOps.h"
-#include "Kor/Memory.h"
-#include "Kor/Misc.h"
-
-// TODO: Decouple assert from logging and let user provide function pointer that will be called on assert
+#include "Kor/Core/Platform.h"
 
 // KOR_ASSERT(statement)
 // - Fatal
@@ -21,18 +15,17 @@
 // - returns evaluated expression
 
 #if KOR_USE_ASSERT
-
-	#define KOR_ASSERT(statement)													\
-		if (KOR_UNLIKELY(!(statement)))													\
+	#define KOR_ASSERT(statement)														\
+		if (!(statement)) [[ unlikely ]]												\
 		{																				\
-			KOR_NAMESPACE Internal::LogFailed(#statement, __FILE__, __LINE__);	\
-			KOR_NAMESPACE Internal::Crash();										\
+			KOR_NAMESPACE::Internal::LogFailed(#statement, __FILE__, __LINE__);			\
+			KOR_NAMESPACE::Internal::Crash();											\
 		}
 
-	#define KOR_EXPECT(expression)													\
+	#define KOR_EXPECT(expression)														\
 		(KOR_LIKELY(!!(expression)) || []()												\
 		{ 																				\
-			KOR_NAMESPACE Internal::LogFailed(#expression, __FILE__, __LINE__);	\
+			KOR_NAMESPACE::Internal::LogFailed(#expression, __FILE__, __LINE__);			\
 			static bool didBreak = false; 												\
 			if (!didBreak) 																\
 			{ 																			\
@@ -41,7 +34,7 @@
 			return false; 																\
 		}())
 
-	namespace KOR_NAMESPACE Internal
+	namespace KOR_NAMESPACE::Internal
 	{
 		KOR_DIAG_WARNINGS_PUSH()
 		KOR_DIAG_WARNINGS_SUPPRESS(KOR_DIAG_WARNING_NULL_DEREFERENCE)
@@ -50,7 +43,7 @@
 		KOR_FORCEINLINE static void Crash() noexcept
 		{
 			*((uint8*)0) = 0;
-			KOR_UNREACHABLE_CODE();
+			KOR_UNREACHABLE();
 		}
 
 		KOR_OPTIMIZATIONS_RESET();
@@ -58,19 +51,20 @@
 
 		static void LogFailed(const achar* Expression, const achar* File, int32 Line) noexcept
 		{
-			thread_local achar LOG_BUFFER[SMemory::BUFFER_SIZE_LARGE];
-			const int32 result = TStringOps<achar>::Format(
-				LOG_BUFFER,
-				KOR_TEXT_ANSI("ASSERT: '%s' at '%s:%d'\n"),
-				Expression,
-				File,
-				Line
-			);
-
-			if (result > 1) // > '\0'
-			{
-				SMisc::WriteToStdout(LOG_BUFFER, sizeof(achar) * result);
-			}
+			// TODO: Implement log without including non-minimal features
+			// thread_local achar LOG_BUFFER[KOR_BUFFER_SIZE_LARGE];
+			// const int32 result = TStringOps<achar>::Format(
+			// 	LOG_BUFFER,
+			// 	KOR_TEXT_ANSI("ASSERT: '%s' at '%s:%d'\n"),
+			// 	Expression,
+			// 	File,
+			// 	Line
+			// );
+			//
+			// if (result > 1) // > '\0'
+			// {
+			// 	SMisc::WriteToStdout(LOG_BUFFER, sizeof(achar) * result);
+			// }
 		}
 	}
 
@@ -78,15 +72,15 @@
 	#define KOR_ASSERT_DEBUG(statement) KOR_ASSERT(statement)
 	#define KOR_EXPECT_DEBUG(statement) KOR_EXPECT(statement)
 #else
-	#define KOR_ASSERT_DEBUG(statement) (statement)
+	#define KOR_ASSERT_DEBUG(statement)
 	#define KOR_EXPECT_DEBUG(expression) (!!(expression))
 #endif
 
 #else
-	#define KOR_ASSERT(statement) (statement)
+	#define KOR_ASSERT(statement)
 	#define KOR_EXPECT(expression) (!!(expression))
 
-	#define KOR_ASSERT_DEBUG(statement) (statement)
+	#define KOR_ASSERT_DEBUG(statement)
 	#define KOR_EXPECT_DEBUG(expression) (!!(expression))
 #endif
 

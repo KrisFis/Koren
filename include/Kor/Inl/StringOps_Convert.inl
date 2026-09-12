@@ -9,7 +9,7 @@ namespace Internal
 	static IntT Atoi(const CharT* str, const CharT** outEnd, int32 base) noexcept
 	{
 		// CRT version removes leading whitespaces
-		// while (CharOps::IsWhitespace(*str)) ++str;
+		// while (TCharOps<CharType>::IsWhitespace(*str)) ++str;
 
 		IntT result = 0;
 		bool negative = false;
@@ -74,7 +74,7 @@ namespace Internal
 		const int32 result = KOR_PTR_DIFF(int32, end, cur);
 		if (cur != str)
 		{
-			SMemory::CopyTyped(str, cur, result);
+			SMemoryOps::CopyAssign(str, cur, result);
 		}
 
 		str[result] = TCharConstant<CharT>::Null;
@@ -84,7 +84,7 @@ namespace Internal
 
 template<typename CharType>
 template<typename ToCharType>
-int32 TStringOps<CharType>::ConvertedLength(const CharType* str, int32 strLen) noexcept
+KOR_INLINE int32 TStringOps<CharType>::ConvertedLength(const CharType* str, int32 strLen) noexcept
 {
 	static_assert(TIsCharacter<ToCharType>::Value, "Destination Character Type is not a character type");
 
@@ -151,7 +151,7 @@ int32 TStringOps<CharType>::ConvertedLength(const CharType* str, int32 strLen) n
 
 template<typename CharType>
 template<typename ToCharType>
-int32 TStringOps<CharType>::Convert(ToCharType* dest, const CharType* src, int32 srcLen) noexcept
+KOR_INLINE int32 TStringOps<CharType>::Convert(ToCharType* dest, const CharType* src, int32 srcLen) noexcept
 {
 	static_assert(TIsCharacter<ToCharType>::Value, "Destination Character Type is not a character type");
 
@@ -165,7 +165,7 @@ int32 TStringOps<CharType>::Convert(ToCharType* dest, const CharType* src, int32
 	// -------------------------------------------------------------------------
 	if constexpr (TIsCharacterCompatible<CharType, ToCharType>::Value)
 	{
-		SMemory::CopyTyped(dest, src, srcLen + 1);
+		SMemoryOps::CopyAssign(dest, src, srcLen + 1);
 		return srcLen;
 	}
 	// 2) Fixed -> Fixed (upcast, no data loss possible)

@@ -5,4 +5,4 @@
 
 #include "Kor/Core/Unix/UnixMisc.h"
 
-typedef KOR_NAMESPACE SUnixMisc SAppleMisc;
+typedef KOR_NAMESPACE::SUnixMisc SAppleMisc;
