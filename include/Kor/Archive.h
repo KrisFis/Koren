@@ -282,13 +282,14 @@ KOR_FORCEINLINE_DEBUG static SArchive& operator>>(SArchive& ar, SArchive& otherA
 template<typename ContainerT>
 inline static typename TEnableIf<TIsContainer<ContainerT>::Value, SArchive&>::Type operator<<(SArchive& ar, const ContainerT& container)
 {
-	if constexpr (TContainerTraits<ContainerT>::InlineMemory)
+	using ContainerTT = TContainerTraits<ContainerT>;
+	if constexpr (ContainerTT::InlineMemory)
 	{
-		ar.Write(container.Begin(), container.GetNum());
+		ar.Write(container.begin(), KOR_PTR_TYPED_DIFF(SArchive::SizeType, container.end(), container.begin()));
 	}
 	else
 	{
-		for (auto it = container.Begin(); it != container.End(); ++it)
+		for (auto it = container.begin(); it != container.end(); ++it)
 		{
 			ar << *it;
 		}
@@ -305,7 +306,7 @@ inline static typename TEnableIf<TIsContainer<ContainerT>::Value, SArchive&>::Ty
 
 	if constexpr (ContainerTT::InlineMemory)
 	{
-		ar.Read(container.begin(), container.GetNum());
+		ar.Read(container.begin(), KOR_PTR_TYPED_DIFF(SArchive::SizeType, container.end(), container.begin()));
 	}
 	else
 	{

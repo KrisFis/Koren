@@ -93,6 +93,8 @@ struct TContainerTraits<TStringView<T>>
 	using ElementType = T;
 	using AllocatorType = void;
 	using SizeType = int32;
+
+	enum { InlineMemory = true };
 };
 
 template<typename T>
@@ -102,6 +104,8 @@ struct TContainerTraits<TString<T>>
 	using ElementType = T;
 	using AllocatorType = typename TContainerTraits<typename TString<T>::DataType>::AllocatorType;
 	using SizeType = typename TContainerTraits<typename TString<T>::DataType>::SizeType;
+
+	enum { InlineMemory = true };
 };
 
 // Archive operator<< && operator>>

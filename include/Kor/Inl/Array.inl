@@ -69,4 +69,6 @@ struct TContainerTraits<TArray<ElementT, AllocatorT>>
 	using ElementType = ElementT;
 	using AllocatorType = AllocatorT;
 	using SizeType = TAllocatorTraits<AllocatorT>::SizeType;
+
+	enum { InlineMemory = true };
 };

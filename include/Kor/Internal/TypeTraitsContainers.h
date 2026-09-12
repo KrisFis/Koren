@@ -18,6 +18,11 @@ struct TContainerTraitsBase
 	using ElementType = void;
 	using AllocatorType = void;
 	using SizeType = void;
+
+	enum
+	{
+		InlineMemory = false,
+	};
 };
 
 // [Container Traits]
@@ -30,7 +35,7 @@ struct TContainerTraitsBase
 // struct TContainerTraits<MyContainer> : TContainerTraitsBase<MyContainer>
 // {
 //    using AllocatorType = typename MyContainer::AllocatorType;
-//    enum { IsDynamic = true }
+//    enum { InlineMemory = true }
 // }
 template<typename T>
 struct TContainerTraits;

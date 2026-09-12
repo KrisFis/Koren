@@ -5,4 +5,4 @@
 
 #include "Kor/Core/Unix/UnixPlatform.h"
 
-typedef KOR_NAMESPACE SUnixTypes SLinuxTypes;
+typedef KOR_NAMESPACE::SUnixTypes SLinuxTypes;

@@ -5,7 +5,7 @@
 
 #include "Kor/TypeTraits.h"
 
-namespace KOR_NAMESPACE Internal
+namespace KOR_NAMESPACE::Internal
 {
 	template<typename T>
 	struct TIsSharedClassType

@@ -5,4 +5,4 @@
 
 #include "Kor/Core/Unix/UnixPlatform.h"
 
-typedef KOR_NAMESPACE SUnixTypes SAppleTypes;
+typedef KOR_NAMESPACE::SUnixTypes SAppleTypes;

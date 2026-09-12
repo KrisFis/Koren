@@ -6,7 +6,7 @@
 #include "Kor/TypeTraits.h"
 #include "Kor/TypeTraitsMacros.h"
 
-namespace KOR_NAMESPACE Internal
+namespace KOR_NAMESPACE::Internal
 {
 	KOR_GENERATE_HAS_FIELD_TRAIT(THasValidateField, Validate)
 	KOR_GENERATE_HAS_GLOBAL_METHOD_TRAIT(THasGlobalIsValid, IsValid(DeclVal<TestType>()))

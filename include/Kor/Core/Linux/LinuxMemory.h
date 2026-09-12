@@ -5,4 +5,4 @@
 
 #include "Kor/Core/Unix/UnixMemory.h"
 
-typedef KOR_NAMESPACE SUnixMemoryOps SLinuxMemoryOps;
+typedef KOR_NAMESPACE::SUnixMemoryOps SLinuxMemoryOps;

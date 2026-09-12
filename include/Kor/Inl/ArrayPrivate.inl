@@ -295,7 +295,7 @@ namespace Internal::Array
 			{
 				if (dest._reservedNum > 0)
 				{
-					Empty(dest);
+					Deallocate(dest);
 				}
 			}
 

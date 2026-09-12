@@ -5,7 +5,7 @@
 
 #include "Kor/KorMinimal.h"
 
-namespace KOR_NAMESPACE Internal
+namespace KOR_NAMESPACE::Internal
 {
 	struct SNullType {};
 

@@ -6,27 +6,34 @@
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::operator=(const TArray& other) noexcept
 {
-	if (this == &other) return;
-	SFriend::CopyFromOther(*this, other);
+	if (this != &other)
+	{
+		SFriend::CopyFromOther(*this, other);
+	}
+	return *this;
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::operator=(TArray&& other) noexcept
 {
-	if (this == &other) return;
-	SFriend::MoveFromOther(*this, other);
+	if (this != &other)
+	{
+		SFriend::MoveFromOther(*this, Move(other));
+	}
+	return *this;
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::operator=(const ILType& list) noexcept
 {
 	Assign(list.begin(), list.size());
+	return *this;
 }
 
 template<typename ElementT, typename AllocatorT>
 KOR_INLINE bool TArray<ElementT, AllocatorT>::operator==(const TArray& other) const noexcept
 {
-	return 
+	return
 		_num == other._num && 
 		SMemoryOps::IsEqualAs(_data, other._data, _num);
 }

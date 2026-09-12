@@ -19,7 +19,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const TArray& other) noexce
 	: TArray()
 {
 	if (other._num == 0) return;
-	SFriend::CopyFromOther<false>(*this, other);
+	SFriend::template CopyFromOther<false>(*this, other);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -27,7 +27,7 @@ KOR_FORCEINLINE constexpr TArray<ElementT, AllocatorT>::TArray(TArray&& other) n
 	: TArray()
 {
 	if (other._num == 0) return;
-	SFriend::MoveFromOther<false>(*this, Move(other));
+	SFriend::template MoveFromOther<false>(*this, Move(other));
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -41,7 +41,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ILType& list) noexcep
 	const SizeType num = (SizeType)list.size();
 	if (num == 0) return;
 
-	SFriend::Resize<false>(*this, num);
+	SFriend::template Resize<false>(*this, num);
 	SFriend::CopyConstruct(_data, list.begin(), num);
 }
 
@@ -50,7 +50,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SNoInit
 	: TArray()
 {
 	if (num <= 0) return;
-	SFriend::Resize<false>(*this, num);
+	SFriend::template Resize<false>(*this, num);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -58,7 +58,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SDefaul
 	: TArray()
 {
 	if (num == 0) return;
-	SFriend::Resize<false>(*this, num);
+	SFriend::template Resize<false>(*this, num);
 	SMemoryOps::DefaultConstruct(_data, num);
 }
 
@@ -67,7 +67,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(SizeType num, Init::SZero) 
 	: TArray()
 {
 	if (num == 0) return;
-	SFriend::Resize<false>(*this, num);
+	SFriend::template Resize<false>(*this, num);
 	SMemoryOps::ZeroConstruct(_data, num);
 }
 
@@ -76,8 +76,8 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ElementType* data, Si
 	: TArray()
 {
 	if (num == 0) return;
-	SFriend::Resize<false>(*this, num);
-	SFriend::CopyConstruct(_data, data, num);
+	SFriend::template Resize<false>(*this, num);
+	SMemoryOps::CopyConstruct(_data, data, num);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -85,7 +85,7 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>::TArray(const ElementType& val, Siz
 	: TArray()
 {
 	if (num == 0) return;
-	SFriend::Resize<false>(*this, num);
+	SFriend::template Resize<false>(*this, num);
 	SMemoryOps::FillConstruct(_data, val, num);
 }
 

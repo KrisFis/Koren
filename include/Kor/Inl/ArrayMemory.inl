@@ -30,7 +30,7 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::Resize(SizeType num) noexcept
 	}
 	else if (_reservedNum > 0)
 	{
-		SFriend::Empty(*this);
+		SFriend::Deallocate(*this);
 	}
 }
 
@@ -54,7 +54,7 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::ResizeZeroed(SizeType num) noexcep
 	}
 	else if (_reservedNum > 0)
 	{
-		SFriend::Empty(*this);
+		SFriend::Deallocate(*this);
 	}
 }
 template<typename ElementT, typename AllocatorT>
@@ -68,7 +68,7 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::ResizeUninitialized(SizeType num) 
 	}
 	else if (_reservedNum > 0)
 	{
-		SFriend::Empty(*this);
+		SFriend::Deallocate(*this);
 	}
 }
 

@@ -169,13 +169,13 @@
 ///////////////////////////////////////////////////////////////
 // Wraps library declarations in "Kor::" when KOR_USE_NAMESPACE=1.
 // Use KOR_NAMESPACE_BEGIN / KOR_NAMESPACE_END around declarations,
-// and KOR_NAMESPACE as a prefix in definitions.
+// and KOR_NAMESPACE::as a prefix in definitions.
 ///////////////////////////////////////////////////////////////
 
 #if KOR_USE_NAMESPACE
 #define KOR_NAMESPACE_BEGIN namespace Kor {
 #define KOR_NAMESPACE_END }
-#define KOR_NAMESPACE Kor::
+#define KOR_NAMESPACE Kor
 #else
 #define KOR_NAMESPACE_BEGIN
 #define KOR_NAMESPACE_END

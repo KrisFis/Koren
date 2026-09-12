@@ -5,11 +5,11 @@
 
 #include "Kor/KorMinimal.h"
 
-#include "Kor/CharOps.h"
-#include "Kor/StringOps.h"
-
 #include "Kor/Archive.h"
 #include "Kor/Array.h"
+#include "Kor/CharOps.h"
+#include "Kor/Math.h"
+#include "Kor/StringOps.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -44,28 +44,28 @@ public:
 	using IteratorType = const CharType*;
 	using ConstIteratorType = const CharType*;
 
-	// Constructors - Default, Copy, Move
-	// View is trivially copyable, no move needed.
+	// Constructors
 	// -------------------------------------------------------------------------
 
 	constexpr TStringView() noexcept;
+
+	// Copy and move
 	constexpr TStringView(const TStringView& other) noexcept = default;
-	TStringView& operator=(const TStringView& other) noexcept = default;
+	constexpr TStringView(TStringView&& other) noexcept = default;
 
-	// Constructors - From raw pointer
-	// -------------------------------------------------------------------------
+	// Completely uninitialized view (not even '\0')
+	explicit constexpr TStringView(Init::SNoInit) noexcept;
 
+	// From literal text, optionally cut at 'length'
 	TStringView(const CharType* text) noexcept;
 	TStringView(const CharType* text, SizeType length) noexcept;
+	template<TSize N> TStringView(const CharType (&text)[N]) noexcept;
 
-	template<TSize N>
-	TStringView(const CharType (&text)[N]) noexcept;
-
-	// Constructors - Special/Forced
+	// Assignment operators
 	// -------------------------------------------------------------------------
 
-	explicit constexpr TStringView(Init::SZero) noexcept;
-	explicit constexpr TStringView(Init::SNoInit) noexcept;
+	TStringView& operator=(const TStringView& other) noexcept = default;
+	TStringView& operator=(TStringView&& other) noexcept = default;
 
 	// Comparison operators
 	// Performs case-sensitive comparison.
@@ -243,33 +243,31 @@ public:
 	using IteratorType = CharType*;
 	using ConstIteratorType = const CharType*;
 
-	// Constructors - Default, Copy, Move
+	// Constructors
 	// -------------------------------------------------------------------------
 
 	constexpr TString() noexcept;
+
+	// Copy and move
 	TString(const TString& other) noexcept = default;
 	TString(TString&& other) noexcept = default;
 
-	// Constructors - From literal
-	// -------------------------------------------------------------------------
+	// Empty string and no allocation (not even '\0')
+	explicit constexpr TString(Init::SNoInit) noexcept;
 
+	// String of 'length' characters, all zeroed
+	explicit TString(SizeType length, Init::SNoInit) noexcept;
+
+	// String of 'length' characters, all zeroed
+	explicit TString(SizeType length, Init::SZero) noexcept;
+
+	// From literal text, optionally cut at 'length'
 	TString(const CharType* text) noexcept;
 	TString(const CharType* text, SizeType length) noexcept;
+	template<TSize N> TString(const CharType (&text)[N]) noexcept;
 
-	template<TSize N>
-	TString(const CharType (&text)[N]) noexcept;
-
-	// Constructor - Fill
-	// Constructs a string of `length` characters, all set to `val`.
-	// -------------------------------------------------------------------------
-
+	// String of `length` characters, all set to `val`.
 	explicit TString(SizeType length, CharType val = Constant::Null) noexcept;
-
-	// Constructors - Special/Forced
-	// -------------------------------------------------------------------------
-
-	explicit constexpr TString(Init::SZero) noexcept;
-	explicit constexpr TString(Init::SNoInit) noexcept;
 
 	// Constants
 	// -------------------------------------------------------------------------

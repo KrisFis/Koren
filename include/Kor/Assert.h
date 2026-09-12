@@ -19,14 +19,14 @@
 	#define KOR_ASSERT(statement)														\
 		if (!(statement)) [[ unlikely ]]												\
 		{																				\
-			KOR_NAMESPACE Internal::LogFailed(#statement, __FILE__, __LINE__);			\
-			KOR_NAMESPACE Internal::Crash();											\
+			KOR_NAMESPACE::Internal::LogFailed(#statement, __FILE__, __LINE__);			\
+			KOR_NAMESPACE::Internal::Crash();											\
 		}
 
 	#define KOR_EXPECT(expression)														\
 		(KOR_LIKELY(!!(expression)) || []()												\
 		{ 																				\
-			KOR_NAMESPACE Internal::LogFailed(#expression, __FILE__, __LINE__);			\
+			KOR_NAMESPACE::Internal::LogFailed(#expression, __FILE__, __LINE__);			\
 			static bool didBreak = false; 												\
 			if (!didBreak) 																\
 			{ 																			\
@@ -35,7 +35,7 @@
 			return false; 																\
 		}())
 
-	namespace KOR_NAMESPACE Internal
+	namespace KOR_NAMESPACE::Internal
 	{
 		KOR_DIAG_WARNINGS_PUSH()
 		KOR_DIAG_WARNINGS_SUPPRESS(KOR_DIAG_WARNING_NULL_DEREFERENCE)
