@@ -117,7 +117,7 @@ Full include - all features, declarations, and implementations.
 
 Each platform has its own folder, accessible via platform macros defined in `KorMinimal.h`. This keeps platform-specific code isolated without scattering `#ifdef` everywhere.
 
-**Example -** on Linux, `KOR_PLATFORM_HEADER_FROM(Kor/Core, Memory)` resolves to `Kor/Linux/LinuxMemory.h` automatically.
+**Example -** on Linux, `KOR_PLATFORM_HEADER_FROM(Kor/Core, Memory)` resolves to `Kor/Core/Linux/LinuxMemory.h`.
 
 ```cpp
 #include "Kor/KorMinimal.h"
