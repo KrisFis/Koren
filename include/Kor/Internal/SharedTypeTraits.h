@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/TypeTraits/Macros/HasFieldCheck.h"
+#include "Kor/TypeTrait/Macros/HasFieldCheck.h"
 
 namespace KOR_NAMESPACE::Internal
 {

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "Kor/TypeTraits/Minimal.h"
-#include "Kor/TypeTraits/Composite.h"
+#include "Kor/TypeTrait/Minimal.h"
+#include "Kor/TypeTrait/Composite.h"
 #include "Kor/Utility/Forward.h"
 
 KOR_NAMESPACE_BEGIN

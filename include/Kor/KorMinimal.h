@@ -17,5 +17,5 @@
 
 #include "Kor/Container/Minimal.h"
 #include "Kor/Memory/Minimal.h"
-#include "Kor/TypeTraits/Minimal.h"
+#include "Kor/TypeTrait/Minimal.h"
 #include "Kor/Utility/Minimal.h"

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/TypeTraits/Minimal.h"
+#include "Kor/TypeTrait/Minimal.h"
 
 KOR_NAMESPACE_BEGIN
 

@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "Kor/TypeTraits/Composite.h"
-#include "Kor/TypeTraits/Property.h"
-#include "Kor/TypeTraits/Qualifier.h"
+#include "Kor/TypeTrait/Composite.h"
+#include "Kor/TypeTrait/Property.h"
+#include "Kor/TypeTrait/Qualifier.h"
 
 KOR_NAMESPACE_BEGIN
 	// [Limits]

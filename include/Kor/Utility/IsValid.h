@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/TypeTraits/CallTraits.h"
+#include "Kor/TypeTrait/CallTraits.h"
 
 KOR_NAMESPACE_BEGIN
 	namespace Internal

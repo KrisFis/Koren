@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/TypeTraits/MemberPointer.h"
+#include "Kor/TypeTrait/MemberPointer.h"
 #include "Kor/Utility/Forward.h"
 
 KOR_NAMESPACE_BEGIN

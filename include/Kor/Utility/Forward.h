@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Kor/TypeTraits/Qualifier.h"
+#include "Kor/TypeTrait/Qualifier.h"
 
 KOR_NAMESPACE_BEGIN
 

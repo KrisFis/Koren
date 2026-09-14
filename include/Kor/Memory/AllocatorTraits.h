@@ -5,7 +5,7 @@
 
 #include "Kor/KorMinimal.h"
 
-#include "Kor/TypeTraits/Property.h"
+#include "Kor/TypeTrait/Property.h"
 
 KOR_NAMESPACE_BEGIN
 

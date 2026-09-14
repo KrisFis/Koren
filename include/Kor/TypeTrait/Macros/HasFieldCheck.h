@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/TypeTraits/Minimal.h"
+#include "Kor/TypeTrait/Minimal.h"
 
 // METHOD/FIELD CHECK TRAIT
 // * Generates a trait struct with a static constexpr bool "Value"

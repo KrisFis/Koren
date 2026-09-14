@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "Kor/TypeTraits/Minimal.h"
-#include "Kor/TypeTraits/Qualifier.h"
+#include "Kor/TypeTrait/Minimal.h"
+#include "Kor/TypeTrait/Qualifier.h"
 
 KOR_NAMESPACE_BEGIN
 
