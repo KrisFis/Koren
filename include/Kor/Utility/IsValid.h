@@ -6,7 +6,7 @@
 #include "Kor/TypeTrait/CallTraits.h"
 
 KOR_NAMESPACE_BEGIN
-	namespace Internal
+	namespace Detail
 {
 	KOR_DEFINE_HAS_FIELD_TRAIT(THasValidateField, Validate)
 	KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(THasGlobalIsValid, IsValid(DeclVal<TestType>()))
@@ -68,13 +68,13 @@ KOR_NAMESPACE_BEGIN
 	};
 }
 
-template<typename T, typename TEnableIf<Internal::TValidFinder<T>::HasBaseValid>::Type* = nullptr>
+template<typename T, typename TEnableIf<Detail::TValidFinder<T>::HasBaseValid>::Type* = nullptr>
 KOR_FORCEINLINE static constexpr bool IsValid(const T& obj)
 {
-	return Internal::TValidProvider<typename Internal::TValidFinder<T>::DesiredType>::Validate(obj);
+	return Detail::TValidProvider<typename Detail::TValidFinder<T>::DesiredType>::Validate(obj);
 }
 
-template<typename T, typename TEnableIf<!Internal::TValidFinder<T>::ValidProvided>::Type* = nullptr>
+template<typename T, typename TEnableIf<!Detail::TValidFinder<T>::ValidProvided>::Type* = nullptr>
 KOR_FORCEINLINE static constexpr bool IsValid(...)
 {
 	static_assert(sizeof(T) < 0, "IsValid() function overload for type is not implemented");

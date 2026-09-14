@@ -8,7 +8,7 @@
 
 KOR_NAMESPACE_BEGIN
 
-namespace Internal
+namespace Detail
 {
 	template<typename T>
 	struct TDecayHelper { typedef T Type; };
@@ -29,7 +29,7 @@ namespace Internal
 
 template<typename T>
 struct TDecay : TType<
-	typename Internal::TDecayHelper<
+	typename Detail::TDecayHelper<
 		typename TClean<T>::Type
 	>::Type>
 {};

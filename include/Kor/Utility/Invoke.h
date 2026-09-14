@@ -3,12 +3,16 @@
 
 #pragma once
 
-#include "Kor/TypeTrait/MemberPointer.h"
+#include "Kor/Core/Minimal.h"
+
 #include "Kor/Utility/Forward.h"
+
+#include "Kor/TypeTrait/MemberPointer.h"
+#include "Kor/TypeTrait/Relationship.h"
 
 KOR_NAMESPACE_BEGIN
 
-namespace Internal
+namespace Detail
 {
 	// [ TIsInvocableHelper ]
 	// * Detects whether FunctorT is callable with ArgsT via TVoid SFINAE.
@@ -57,7 +61,7 @@ namespace Internal
 #define KOR_LIFT_MEMBER(Class, FuncName) \
 	[](auto&& obj, auto&&... args) -> decltype(auto) \
 	{ \
-		return Internal::DereferenceIfNotRelated<Class>((decltype(obj)&&)obj).FuncName((decltype(args)&&)args...); \
+		return Detail::DereferenceIfNotRelated<Class>((decltype(obj)&&)obj).FuncName((decltype(args)&&)args...); \
 	}
 
 // [ Invoke ]
@@ -98,9 +102,9 @@ KOR_FORCEINLINE constexpr auto Invoke(FunctorT&& func, ArgsT&&... args)
 
 template<typename RetT, typename BaseT, typename TargetT>
 KOR_FORCEINLINE constexpr auto Invoke(RetT BaseT::*memFunc, TargetT&& target)
-	-> decltype(Internal::DereferenceIfNotRelated<BaseT>(Forward<TargetT>(target)).*memFunc)
+	-> decltype(Detail::DereferenceIfNotRelated<BaseT>(Forward<TargetT>(target)).*memFunc)
 {
-	return Internal::DereferenceIfNotRelated<BaseT>(Forward<TargetT>(target)).*memFunc;
+	return Detail::DereferenceIfNotRelated<BaseT>(Forward<TargetT>(target)).*memFunc;
 }
 
 template<
@@ -110,15 +114,15 @@ template<
 	typename BaseT = typename TMemberPointerBase<MemberFunctorT>::Type
 >
 KOR_FORCEINLINE constexpr auto Invoke(MemberFunctorT memFunc, TargetT&& target, ArgsT&&... args)
-	-> decltype((Internal::DereferenceIfNotRelated<BaseT>(Forward<TargetT>(target)).*memFunc)(Forward<ArgsT>(args)...))
+	-> decltype((Detail::DereferenceIfNotRelated<BaseT>(Forward<TargetT>(target)).*memFunc)(Forward<ArgsT>(args)...))
 {
-	return (Internal::DereferenceIfNotRelated<BaseT>(Forward<TargetT>(target)).*memFunc)(Forward<ArgsT>(args)...);
+	return (Detail::DereferenceIfNotRelated<BaseT>(Forward<TargetT>(target)).*memFunc)(Forward<ArgsT>(args)...);
 }
 
 // [ Is Invocable ]
 // * True if FunctorT can be called with ArgsT.
 template<typename FunctorT, typename... ArgsT>
-struct TIsInvocable : Internal::TIsInvocableHelper<void, FunctorT, ArgsT...>
+struct TIsInvocable : Detail::TIsInvocableHelper<void, FunctorT, ArgsT...>
 {};
 
 KOR_NAMESPACE_END

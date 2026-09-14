@@ -5,6 +5,8 @@
 
 #include "Kor/Core/Minimal.h"
 
+#include "Kor/Utility/Detail/AssertHandler.h"
+
 // KOR_ASSERT(statement)
 // - Fatal
 // - Hard requirement
@@ -18,14 +20,14 @@
 	#define KOR_ASSERT(statement)														\
 		if (!(statement)) [[ unlikely ]]												\
 		{																				\
-			KOR_NAMESPACE::Internal::LogFailed(#statement, __FILE__, __LINE__);			\
-			KOR_NAMESPACE::Internal::Crash();											\
+			KOR_DETAIL_NAMESPACE::LogFailed(#statement, __FILE__, __LINE__);			\
+			KOR_DETAIL_NAMESPACE::Crash();											\
 		}
 
 	#define KOR_EXPECT(expression)														\
 		(KOR_LIKELY(!!(expression)) || []()												\
 		{ 																				\
-			KOR_NAMESPACE::Internal::LogFailed(#expression, __FILE__, __LINE__);			\
+			KOR_DETAIL_NAMESPACE::LogFailed(#expression, __FILE__, __LINE__);			\
 			static bool didBreak = false; 												\
 			if (!didBreak) 																\
 			{ 																			\
@@ -33,40 +35,6 @@
 			}																			\
 			return false; 																\
 		}())
-
-	namespace KOR_NAMESPACE::Internal
-	{
-		KOR_DIAG_WARNINGS_PUSH()
-		KOR_DIAG_WARNINGS_SUPPRESS(KOR_DIAG_WARNING_NULL_DEREFERENCE)
-		KOR_OPTIMIZATIONS_DISABLE();
-
-		KOR_FORCEINLINE static void Crash() noexcept
-		{
-			*((uint8*)0) = 0;
-			KOR_UNREACHABLE();
-		}
-
-		KOR_OPTIMIZATIONS_RESET();
-		KOR_DIAG_WARNINGS_POP()
-
-		static void LogFailed(const achar* Expression, const achar* File, int32 Line) noexcept
-		{
-			// TODO: Implement log without including non-minimal features
-			// thread_local achar LOG_BUFFER[KOR_BUFFER_SIZE_LARGE];
-			// const int32 result = TStringOps<achar>::Format(
-			// 	LOG_BUFFER,
-			// 	KOR_TEXT_ANSI("ASSERT: '%s' at '%s:%d'\n"),
-			// 	Expression,
-			// 	File,
-			// 	Line
-			// );
-			//
-			// if (result > 1) // > '\0'
-			// {
-			// 	SMisc::WriteToStdout(LOG_BUFFER, sizeof(achar) * result);
-			// }
-		}
-	}
 
 #if KOR_BUILD_DEBUG
 	#define KOR_ASSERT_DEBUG(statement) KOR_ASSERT(statement)

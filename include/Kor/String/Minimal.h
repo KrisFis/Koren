@@ -5,10 +5,9 @@
 
 #include "Kor/Core/Minimal.h"
 
-#include "Kor/Utility/Assert.h"
-
 KOR_NAMESPACE_BEGIN
 
-template<typename ElementT> class TOptional;
+template<typename CharT> class TString;
+template<typename CharT> class TStringView;
 
 KOR_NAMESPACE_END

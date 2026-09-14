@@ -1,0 +1,101 @@
+// Copyright Jan Kristian Fisera. All Rights Reserved.
+// Licensed under the MIT License. See LICENSE in the repository root.
+
+#pragma once
+
+#include "Kor/KorMinimal.h"
+
+#include "Kor/Archive/ArrayArchive.h"
+#include "Kor/Container/Array.h"
+#include "Kor/IO/IOOps.h"
+
+KOR_NAMESPACE_BEGIN
+
+template<int32 FileNo, typename AllocatorT = typename TArray<tchar>::AllocatorType>
+struct TStdoutArchive : public TArrayArchive<tchar, AllocatorT>
+{
+	typedef TArrayArchive<tchar, AllocatorT> Super;
+	typedef typename Super::SizeType SizeType;
+
+	static_assert(FileNo == SIOOps::STDOUT_FILE_NO || FileNo == SIOOps::STDERR_FILE_NO, "Unsupported std output file no");
+
+	explicit TStdoutArchive(bool flushOnNewLine = true)
+		: Super(EArchiveType::String, EArchiveMode::Write)
+		, _flushOnNewLine(flushOnNewLine)
+	{}
+
+	virtual ~TStdoutArchive() override
+	{
+		TStdoutArchive::Flush();
+	}
+
+	// Getters / Setters
+	/////////////////////////
+
+	KOR_FORCEINLINE int32 GetFileNo() const { return FileNo; }
+
+	KOR_FORCEINLINE bool GetFlushOnNewLine() const { return _flushOnNewLine; }
+	KOR_FORCEINLINE void SetFlushOnNewLine(bool val) { _flushOnNewLine = val; }
+
+	// SArchive overrides
+	/////////////////////////////////
+
+	virtual void Flush() override
+	{
+		if (Super::AllowsWrite())
+		{
+			const auto& data = Super::GetData();
+			if (!data.IsEmpty())
+			{
+				SIOOps::WriteToFile(FileNo, data.GetData(), data.GetNum());
+			}
+		}
+
+		Super::Flush();
+	}
+
+	virtual SizeType WriteBytes(const void* ptr, SizeType size) override
+	{
+		if (!_flushOnNewLine)
+		{
+			return Super::WriteBytes(ptr, size);
+		}
+
+		if (!ptr || size < Super::ELEMENT_SIZE) return 0;
+		else if (!Super::AllowsWrite()) return 0;
+
+		const tchar* buffer = (tchar*)ptr;
+		SizeType length = size;
+
+		SizeType totalWrittenBytes = 0;
+		for (SizeType i = 0; i < length; ++i)
+		{
+			if (buffer[i] == KTEXT('\n') || buffer[i] == KTEXT('\r'))
+			{
+				totalWrittenBytes += Super::WriteBytes(buffer, i + 1);
+
+				buffer += i + 1;
+				length -= i + 1;
+				i = 0;
+
+				Flush();
+			}
+		}
+
+		if (length > 0)
+		{
+			totalWrittenBytes += Super::WriteBytes(buffer, length);
+		}
+
+		return totalWrittenBytes;
+	}
+
+private:
+
+	bool _flushOnNewLine = true;
+};
+
+using SStdoutArchive = TStdoutArchive<SIOOps::STDOUT_FILE_NO>;
+using SStderrArchive = TStdoutArchive<SIOOps::STDERR_FILE_NO>;
+
+KOR_NAMESPACE_END

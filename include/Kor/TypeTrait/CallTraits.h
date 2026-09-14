@@ -10,7 +10,7 @@
 
 KOR_NAMESPACE_BEGIN
 
-namespace Internal
+namespace Detail
 {
 	template<typename T, bool IsSmall>
 	struct TCallTraitsHelper
@@ -60,8 +60,8 @@ private:
 	enum { IsSmallType = ((sizeof(T) <= sizeof(void*)) && TIsPOD<T>::Value) || TIsArithmetic<T>::Value };
 
 public:
-	typedef typename Internal::TCallTraitsHelper<T, IsSmallType>::Type Param;
-	typedef typename Internal::TCallTraitsHelper<T, IsSmallType>::ConstType ConstParam;
+	typedef typename Detail::TCallTraitsHelper<T, IsSmallType>::Type Param;
+	typedef typename Detail::TCallTraitsHelper<T, IsSmallType>::ConstType ConstParam;
 };
 
 KOR_NAMESPACE_END

@@ -5,10 +5,11 @@
 
 #include "Kor/Core/Minimal.h"
 
-#include "Kor/Utility/Assert.h"
+// Required std include
+#include <initializer_list>
 
 KOR_NAMESPACE_BEGIN
 
-template<typename ElementT> class TOptional;
+struct SArchive;
 
 KOR_NAMESPACE_END

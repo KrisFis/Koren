@@ -15,7 +15,9 @@
 // Modules
 // * Each module can define "Minimal header", which should contain only minimal includes
 
+#include "Kor/Archive/Minimal.h"
 #include "Kor/Container/Minimal.h"
 #include "Kor/Memory/Minimal.h"
+#include "Kor/String/Minimal.h"
 #include "Kor/TypeTrait/Minimal.h"
 #include "Kor/Utility/Minimal.h"

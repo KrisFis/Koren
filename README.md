@@ -48,7 +48,7 @@ Kor::SString myStr = KOR_TEXT("Hello World!");
 | **Description**                | **Example**                               |
 |:-------------------------------|:------------------------------------------|
 | STL-like containers            | `TArray`, `TSharedPtr`                    |
-| Lightweight math library       | `SMath::Abs`, `SMath::Lerp`               |
+| Lightweight math library       | `SMathOps::Abs`, `SMathOps::Lerp`               |
 | Human-readable build macros    | `KOR_BUILD_RELEASE`, `PLATFORM_WINDOWS`   |
 | Extra utility types            | `TSharedClass`, `TAsync`                  |
 | Object-oriented string helpers | `SString::Split`                          |

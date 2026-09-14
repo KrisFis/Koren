@@ -5,6 +5,9 @@
 
 #include "Kor/Core/Minimal.h"
 
+// Required std include
+#include <new>
+
 KOR_NAMESPACE_BEGIN
 
 // Namespace containing tags for explicit initialization control.
@@ -24,8 +27,10 @@ namespace Init
 	inline constexpr SNoInit NoInit {};
 }
 
-// Forwards
-// -------------------------------------------------------------------------
+class CAllocator;
+
+template<typename AllocatorT, typename ElementT> class TTypedAllocator;
+template<typename ElementT> class TQueueAllocator;
 
 template<typename T> class TSharedClass;
 template<typename T> class TSharedPtr;
