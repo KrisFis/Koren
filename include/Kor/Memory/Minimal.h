@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/Core/Platform.h"
+#include "Kor/Core/Minimal.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -23,5 +23,12 @@ namespace Init
 	struct SNoInit {};
 	inline constexpr SNoInit NoInit {};
 }
+
+// Forwards
+// -------------------------------------------------------------------------
+
+template<typename T> class TSharedClass;
+template<typename T> class TSharedPtr;
+template<typename T> class TWeakPtr;
 
 KOR_NAMESPACE_END

@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include "Kor/Core/Build.h"
-#include "Kor/Internal/TypeTraitsType.h"
+#include "Kor/KorMinimal.h"
+
+#include "Kor/TypeTraits/Property.h"
 
 KOR_NAMESPACE_BEGIN
 

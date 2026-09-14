@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include "Kor/TypeTraits.h"
-#include "Kor/TypeTraitsMacros.h"
+#include "Kor/TypeTraits/CallTraits.h"
 
-namespace KOR_NAMESPACE::Internal
+KOR_NAMESPACE_BEGIN
+	namespace Internal
 {
-	KOR_GENERATE_HAS_FIELD_TRAIT(THasValidateField, Validate)
-	KOR_GENERATE_HAS_GLOBAL_METHOD_TRAIT(THasGlobalIsValid, IsValid(DeclVal<TestType>()))
-	KOR_GENERATE_HAS_METHOD_TRAIT(THasIsInstanceValidMethod, IsValid())
+	KOR_DEFINE_HAS_FIELD_TRAIT(THasValidateField, Validate)
+	KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(THasGlobalIsValid, IsValid(DeclVal<TestType>()))
+	KOR_DEFINE_HAS_METHOD_TRAIT(THasIsInstanceValidMethod, IsValid())
 
 	// Template definition for SFINAE
 	template<typename T, typename Enable = void>
@@ -67,3 +67,18 @@ namespace KOR_NAMESPACE::Internal
 		};
 	};
 }
+
+template<typename T, typename TEnableIf<Internal::TValidFinder<T>::HasBaseValid>::Type* = nullptr>
+KOR_FORCEINLINE static constexpr bool IsValid(const T& obj)
+{
+	return Internal::TValidProvider<typename Internal::TValidFinder<T>::DesiredType>::Validate(obj);
+}
+
+template<typename T, typename TEnableIf<!Internal::TValidFinder<T>::ValidProvided>::Type* = nullptr>
+KOR_FORCEINLINE static constexpr bool IsValid(...)
+{
+	static_assert(sizeof(T) < 0, "IsValid() function overload for type is not implemented");
+	return false;
+}
+
+KOR_NAMESPACE_END

@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Kor/Core/Build.h"
-#include "Kor/Internal/TypeTraitsAllocators.h"
+#include "AllocatorTraits.h"
 
 KOR_NAMESPACE_BEGIN
 

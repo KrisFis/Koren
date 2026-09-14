@@ -5,6 +5,7 @@
 
 #include "Kor/KorMinimal.h"
 
+#include "Kor/Memory/AllocatorTraits.h"
 #include "Kor/MemoryOps.h"
 
 KOR_NAMESPACE_BEGIN

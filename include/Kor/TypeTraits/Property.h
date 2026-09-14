@@ -3,10 +3,49 @@
 
 #pragma once
 
-#include "Kor/Internal/TypeTraitsCore.h"
-#include "Kor/Internal/TypeTraitsForward.h"
+#include "Kor/TypeTraits/Minimal.h"
+#include "Kor/TypeTraits/Composite.h"
+#include "Kor/Utility/Forward.h"
 
 KOR_NAMESPACE_BEGIN
+
+// [Is empty type]
+// * Checks whether specific type is empty
+// ** has no non-static members/fields and if so, then each is bit-fields of zero length
+// ** this check is applied to each base class, if everything passes with true, then result is true
+
+template<typename T>
+struct TIsEmpty : TBoolValue<__is_empty(T)> {};
+
+// [Is abstract type]
+// * Checks whether specific type is abstract
+
+template<typename T>
+struct TIsAbstract : TBoolValue<__is_abstract(T)> {};
+
+// [Is POD type]
+// * Checks whether specific type is POD (C-lang compatible type)
+
+template<typename T>
+struct TIsPOD : TBoolValue<__is_pod(T)> {};
+
+// [Is signed type]
+// * Checks whether specific type is signed type
+
+template<typename T> struct TIsSigned
+{
+	static_assert(TIsArithmetic<T>::Value, "TIsSigned is only valid for arithmetic types");
+	enum { Value = T(-1) < T(0) };
+};
+
+// [Is unsigned type]
+// * Checks whether specific type is unsigned type
+
+template<typename T> struct TIsUnsigned
+{
+	static_assert(TIsArithmetic<T>::Value, "TIsUnsigned is only valid for arithmetic types");
+	enum { Value = !TIsSigned<T>::Value };
+};
 
 // [Has virtual destructor]
 // * Checks whether specific type has virtual destructor

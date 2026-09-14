@@ -7,12 +7,38 @@
 // * Should include all features and functionality of Kor
 /////////////////////////////////////////
 
-// Look at "Build.h" to see defines that affects features provided
+// Look at "Build.h" to see defines that affect features provided
 
-// CORE
+// Minimal
 #include "Kor/KorMinimal.h"
 
-// UTILITIES
+// Type Traits
+#include "Kor/TypeTraits/CallTraits.h"
+#include "Kor/TypeTraits/Category.h"
+#include "Kor/TypeTraits/Composite.h"
+#include "Kor/TypeTraits/Construct.h"
+#include "Kor/TypeTraits/Decay.h"
+#include "Kor/TypeTraits/Integer.h"
+#include "Kor/TypeTraits/MemberPointer.h"
+#include "Kor/TypeTraits/Minimal.h"
+#include "Kor/TypeTraits/Pack.h"
+#include "Kor/TypeTraits/Property.h"
+#include "Kor/TypeTraits/Qualifier.h"
+#include "Kor/TypeTraits/Relationship.h"
+#include "Kor/TypeTraits/String.h"
+#include "Kor/TypeTraits/Macros/HasFieldCheck.h"
+#include "Kor/TypeTraits/Macros/VariadicIterator.h"
+
+// Memory
+#include "Kor/Memory/AllocatorTraits.h"
+#include "Kor/Memory/ContainerTraits.h"
+
+// Utility
+#include "Kor/Utility/Forward.h"
+#include "Kor/Utility/Invoke.h"
+#include "Kor/Utility/IsValid.h"
+
+// Ops
 #include "Kor/Math.h"
 #include "Kor/MemoryOps.h"
 #include "Kor/Misc.h"
@@ -29,8 +55,8 @@
 
 // STRINGS
 #include "Kor/CharOps.h"
-#include "Kor/StringOps.h"
 #include "Kor/String.h"
+#include "Kor/StringOps.h"
 
 // SHARED
 #include "Kor/Shared.h"

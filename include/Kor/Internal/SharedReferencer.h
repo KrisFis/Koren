@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/KorMinimal.h"
+#include "Kor/Core/Minimal.h"
 
 namespace KOR_NAMESPACE::Internal
 {
@@ -22,7 +22,7 @@ namespace KOR_NAMESPACE::Internal
 		KOR_FORCEINLINE uint16 GetWeakCount() const { return _weakCount; }
 
 		template<typename T>
-		KOR_FORCEINLINE T* GetObject() const { return reinterpret_cast<T*>(GetObjectImpl()); }
+		KOR_FORCEINLINE T* GetObject() const { return static_cast<T*>(GetObjectImpl()); }
 
 		KOR_FORCEINLINE bool HasObject() const { return GetObjectImpl() != nullptr; }
 

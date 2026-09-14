@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Kor/Internal/TypeTraitsCore.h"
+#include "Kor/TypeTraits/Qualifier.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -36,6 +36,6 @@ KOR_FORCEINLINE constexpr T&& Forward(typename TRemoveReference<T>::Type&& obj) 
 // * Converts to a reference type, making it possible to use member functions in decltype expressions without the need to go through constructors.
 
 template<typename T>
-T&& DeclVal();
+T&& DeclVal() noexcept;
 
 KOR_NAMESPACE_END

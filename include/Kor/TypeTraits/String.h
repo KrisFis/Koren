@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include "Kor/Core/Build.h"
-#include "Kor/Internal/TypeTraitsCore.h"
+#include "Kor/TypeTraits/Minimal.h"
+#include "Kor/TypeTraits/Category.h"
 
 KOR_NAMESPACE_BEGIN
 
 // [Is Character Unicode]
-// Character test whether type is unicode character type
+// * Character test whether type is unicode character type
 // * Unicode types are: char8, char16, char32 and wchar
 
 template<typename T>
@@ -21,8 +21,8 @@ template<> struct TIsCharacterUnicode<char16> : TTrueValue {};
 template<> struct TIsCharacterUnicode<char32> : TTrueValue {};
 template<> struct TIsCharacterUnicode<wchar> : TTrueValue {};
 
-// [ Is Character Fixed Width ]
-// Character test whether type is fixed-width type
+// [Is Character Fixed Width]
+// * Character test whether type is fixed-width type
 // * Fixed-Width types enforce characters to always within width
 
 template<typename T> struct TIsCharacterFixedWidth : TFalseValue {};
@@ -31,8 +31,8 @@ template<> struct TIsCharacterFixedWidth<wchar> : TTrueValue {};
 template<> struct TIsCharacterFixedWidth<char16> : TTrueValue {};
 template<> struct TIsCharacterFixedWidth<char32> : TTrueValue {};
 
-// [ Is Character Variable Width ]
-// Character tests whether type is variable-width type
+// [Is Character Variable Width]
+// * Character tests whether type is variable-width type
 // * Variable-Width types allow characters to go beyond width (normally UTF8 can go up to 4 bytes)
 
 template<typename T>
@@ -41,8 +41,8 @@ struct TIsCharacterVariableWidth
 	static constexpr bool Value = TIsCharacter<T>::Value && !TIsCharacterFixedWidth<T>::Value;
 };
 
-// [ Is Character Compatible ]
-// Character test whether source type is binary compatible with destination type
+// [Is Character Compatible]
+// * Character test whether source type is binary compatible with destination type
 // * Non-commutative
 
 template<typename SrcT, typename DestT> struct TIsCharacterCompatible : TFalseValue { };

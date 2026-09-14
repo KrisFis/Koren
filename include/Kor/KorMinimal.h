@@ -4,28 +4,18 @@
 #pragma once
 
 // Minimal PCH
-// * Should include minimal features
+// * Should include minimal features required for correct build
 /////////////////////////////////////////
 
-// Look at "Build.h" to see defines that affect features provided
+// Main include
+// * Look at "Build.h" to see defines that affect compilation
 
-// CORE
-#include "Kor/Core/Build.h"
-#include "Kor/Core/Compiler.h"
-#include "Kor/Core/Platform.h"
+#include "Kor/Core/Minimal.h"
 
-// INITIALIZATION
-#include "Kor/Internal/InitTags.h"
+// Modules
+// * Each module can define "Minimal header", which should contain only minimal includes
 
-// TYPE MANIPULATION/GENERATION/SFINAE
-#include "Kor/TypeTraits.h"
-#include "Kor/TypeTraitsMacros.h"
-
-// FORWARDS
-#include "Kor/Internal/TypeFowards.h"
-
-// ASSERT
-#include "Kor/Assert.h"
-
-// IS VALID
-#include "Kor/IsValid.h"
+#include "Kor/Container/Minimal.h"
+#include "Kor/Memory/Minimal.h"
+#include "Kor/TypeTraits/Minimal.h"
+#include "Kor/Utility/Minimal.h"

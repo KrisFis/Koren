@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "Kor/Internal/TypeTraitsCore.h"
+#include "Kor/TypeTraits/Minimal.h"
+#include "Kor/TypeTraits/Qualifier.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -102,8 +103,8 @@ struct TIsTriviallyMovable : TBoolValue<
 #if KOR_COMPILER_CLANG
 	__builtin_is_cpp_trivially_relocatable(T)
 #else
-	TIsTriviallyDestructible<T>::Value && 
-	TIsTriviallyMoveConstructible<T>::Value && 
+	TIsTriviallyDestructible<T>::Value &&
+	TIsTriviallyMoveConstructible<T>::Value &&
 	TIsTriviallyMoveAssignable<T>::Value
 #endif
 > {};

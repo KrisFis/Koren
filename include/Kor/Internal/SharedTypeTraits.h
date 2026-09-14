@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/TypeTraits.h"
+#include "Kor/TypeTraits/Macros/HasFieldCheck.h"
 
 namespace KOR_NAMESPACE::Internal
 {
@@ -11,8 +11,8 @@ namespace KOR_NAMESPACE::Internal
 	struct TIsSharedClassType
 	{
 	private:
-		KOR_GENERATE_HAS_METHOD_TRAIT(FGetHasSharedInitTest, IsSharedInitialized())
-		KOR_GENERATE_HAS_METHOD_TRAIT(FGetHasAsSharedTest, AsShared())
+		KOR_DEFINE_HAS_METHOD_TRAIT(FGetHasSharedInitTest, IsSharedInitialized())
+		KOR_DEFINE_HAS_METHOD_TRAIT(FGetHasAsSharedTest, AsShared())
 
 	public:
 		enum

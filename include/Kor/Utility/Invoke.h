@@ -1,10 +1,10 @@
 // Copyright Jan Kristian Fisera. All Rights Reserved.
 // Licensed under the MIT License. See LICENSE in the repository root.
+
 #pragma once
 
-#include "Kor/Internal/TypeTraitsCore.h"
-#include "Kor/Internal/TypeTraitsType.h"
-#include "Kor/Internal/TypeTraitsBaseOf.h"
+#include "Kor/TypeTraits/MemberPointer.h"
+#include "Kor/Utility/Forward.h"
 
 KOR_NAMESPACE_BEGIN
 

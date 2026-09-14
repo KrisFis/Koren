@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/Core/Platform.h"
+#include "Kor/Core/Minimal.h"
 
 // KOR_ASSERT(statement)
 // - Fatal
