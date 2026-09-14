@@ -5,23 +5,26 @@
 
 #include "Kor/TypeTrait/Macros/HasFieldCheck.h"
 
-KOR_DETAIL_NAMESPACE_BEGIN
+KOR_NAMESPACE_BEGIN
 
-template<typename T>
-struct TIsSharedClassType
+namespace Detail
 {
-private:
-	KOR_DEFINE_HAS_METHOD_TRAIT(FGetHasSharedInitTest, IsSharedInitialized())
-	KOR_DEFINE_HAS_METHOD_TRAIT(FGetHasAsSharedTest, AsShared())
-
-public:
-	enum
+	template<typename T>
+	struct TIsSharedClassType
 	{
-		HasSharedInit = FGetHasSharedInitTest<T>::Value,
-		HasAsShared = FGetHasAsSharedTest<T>::Value,
+	private:
+		KOR_DEFINE_HAS_METHOD_TRAIT(FGetHasSharedInitTest, IsSharedInitialized())
+		KOR_DEFINE_HAS_METHOD_TRAIT(FGetHasAsSharedTest, AsShared())
 
-		Value = HasSharedInit && HasAsShared
+	public:
+		enum
+		{
+			HasSharedInit = FGetHasSharedInitTest<T>::Value,
+			HasAsShared = FGetHasAsSharedTest<T>::Value,
+
+			Value = HasSharedInit && HasAsShared
+		};
 	};
-};
+}
 
-KOR_DETAIL_NAMESPACE_END
+KOR_NAMESPACE_END

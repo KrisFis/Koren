@@ -24,13 +24,13 @@
 // * KOR_GENERATE_HAS_METHOD_TRAIT(DeclareName, MethodCall)
 // ** Tests whether TestType has a member method matching MethodCall
 // ** MethodCall is appended to DeclVal<TestType>(), e.g. pass "Foo()" to test TestType::Foo()
-// ** Example: KOR_GENERATE_HAS_METHOD_TRAIT(FHasIsSharedInitialized, IsSharedInitialized())
-// **          FHasIsSharedInitialized<FMyType>::Value
+// ** Example: KOR_GENERATE_HAS_METHOD_TRAIT(THasIsSharedInitialized, IsSharedInitialized())
+// **          THasIsSharedInitialized<SMyType>::Value
 // *
 // * KOR_GENERATE_HAS_FIELD_TRAIT(DeclareName, FieldName)
 // ** Tests whether TestType has a member field/member named FieldName
-// ** Example: KOR_GENERATE_HAS_FIELD_TRAIT(FHasCount, Count)
-// **          FHasCount<FMyType>::Value
+// ** Example: KOR_GENERATE_HAS_FIELD_TRAIT(THasCount, Count)
+// **          THasCount<SMyType>::Value
 // -------------------------------------------------------------------------
 
 // In "MethodCall" parameter "TestType" can be used

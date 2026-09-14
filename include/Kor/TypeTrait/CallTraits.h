@@ -15,22 +15,22 @@ namespace Detail
 	template<typename T, bool IsSmall>
 	struct TCallTraitsHelper
 	{
-		typedef const T& Type;
-		typedef const T& ConstType;
+		using Type = const T&;
+		using ConstType = const T&;
 	};
 
 	template<typename T>
 	struct TCallTraitsHelper<T, true>
 	{
-		typedef const T Type;
-		typedef const T ConstType;
+		using Type = const T;
+		using ConstType = const T;
 	};
 
 	template<typename T>
 	struct TCallTraitsHelper<T*, true>
 	{
-		typedef T* Type;
-		typedef const T* ConstType;
+		using Type = T*;
+		using ConstType = const T*;
 	};
 }
 
@@ -38,15 +38,15 @@ namespace Detail
 // * Gets type variations
 
 template<typename T>
-struct TGetType
+struct TTypeVariants
 {
-	typedef typename TClean<T>::Type Value;
+	using Type = typename TClean<T>::Type;
 
-	typedef Value& Reference;
-	typedef const Value& ConstReference;
+	using Reference = Type&;
+	using ConstReference = const Type&;
 
-	typedef Value* Pointer;
-	typedef const Value* ConstPointer;
+	using Pointer = Type*;
+	using ConstPointer = const Type*;
 };
 
 // [Call traits]
@@ -54,14 +54,15 @@ struct TGetType
 // * Similar to boost's call_traits, ie. having info about optimizations of which type is used
 
 template<typename T>
-struct TCallTraits : TGetType<T>
+struct TCallTraits : TTypeVariants<T>
 {
 private:
-	enum { IsSmallType = ((sizeof(T) <= sizeof(void*)) && TIsPOD<T>::Value) || TIsArithmetic<T>::Value };
+	using Type = typename TTypeVariants<T>::Type;
+	enum { IsSmallType = ((sizeof(Type) <= sizeof(void*)) && TIsPOD<Type>::Value) || TIsArithmetic<Type>::Value };
 
 public:
-	typedef typename Detail::TCallTraitsHelper<T, IsSmallType>::Type Param;
-	typedef typename Detail::TCallTraitsHelper<T, IsSmallType>::ConstType ConstParam;
+	using Param = typename Detail::TCallTraitsHelper<Type, IsSmallType>::Type;
+	using ConstParam = typename Detail::TCallTraitsHelper<Type, IsSmallType>::ConstType;
 };
 
 KOR_NAMESPACE_END

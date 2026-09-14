@@ -6,7 +6,8 @@
 #include "Kor/TypeTrait/CallTraits.h"
 
 KOR_NAMESPACE_BEGIN
-	namespace Detail
+
+namespace Detail
 {
 	KOR_DEFINE_HAS_FIELD_TRAIT(THasValidateField, Validate)
 	KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(THasGlobalIsValid, IsValid(DeclVal<TestType>()))
@@ -26,9 +27,9 @@ KOR_NAMESPACE_BEGIN
 		}
 	};
 
-	// Pointer and is missing valid method (still supported)
+	// Pointer, no member IsValid(), no global IsValid(obj) - falls back to null check
 	template<typename T>
-	struct TValidProvider<T, typename TEnableIf<TIsPointer<T>::Value && !THasIsInstanceValidMethod<T>::Value>::Type>
+	struct TValidProvider<T, typename TEnableIf<TIsPointer<T>::Value && !THasIsInstanceValidMethod<T>::Value && !THasGlobalIsValid<T>::Value>::Type>
 	{
 		KOR_FORCEINLINE static constexpr bool Validate(T Object)
 		{
@@ -46,6 +47,26 @@ KOR_NAMESPACE_BEGIN
 		}
 	};
 
+	// Pointer, no member IsValid(), but has global IsValid(obj)
+	template<typename T>
+	struct TValidProvider<T, typename TEnableIf<TIsPointer<T>::Value && !THasIsInstanceValidMethod<T>::Value && THasGlobalIsValid<T>::Value>::Type>
+	{
+		KOR_FORCEINLINE static constexpr bool Validate(T Object)
+		{
+			return Object && IsValid(*Object); // or IsValid(Object), depending on desired semantics
+		}
+	};
+
+	// Reference, no member IsValid(), but has global IsValid(obj)
+	template<typename T>
+	struct TValidProvider<T, typename TEnableIf<TIsReference<T>::Value && !THasIsInstanceValidMethod<T>::Value && THasGlobalIsValid<T>::Value>::Type>
+	{
+		KOR_FORCEINLINE static constexpr bool Validate(T Object)
+		{
+			return IsValid(Object);
+		}
+	};
+
 	template<typename T>
 	struct TValidFinder
 	{
@@ -55,8 +76,8 @@ KOR_NAMESPACE_BEGIN
 	public:
 		typedef typename TChoose<
 			TIsPointer<ClearType>::Value,
-			typename TGetType<ClearType>::ConstPointer,
-			typename TGetType<ClearType>::ConstReference
+			typename TTypeVariants<ClearType>::ConstPointer,
+			typename TTypeVariants<ClearType>::ConstReference
 		>::Type DesiredType;
 
 		enum {
@@ -68,6 +89,16 @@ KOR_NAMESPACE_BEGIN
 	};
 }
 
+// [IsValid]
+// * Uniform validity check dispatched at compile-time based on what T provides, in priority order:
+//   - Pointer with an IsValid() method -> obj && obj->IsValid()
+//   - Pointer without an IsValid() method, with a global IsValid(obj) -> obj && IsValid(*obj)
+//   - Pointer without an IsValid() method, without a global IsValid(obj) -> obj != nullptr
+//   - Reference with an IsValid() method -> obj.IsValid()
+//   - Reference without an IsValid() method, with a global IsValid(obj) -> IsValid(obj)
+// * Lets calling code write IsValid(obj) uniformly regardless of which convention T follows
+// IMPORTANT: Fails to compile (via static_assert) if no compatible overload/member is found for T -
+//       add an IsValid() member or a free/global IsValid(obj) overload for T to resolve
 template<typename T, typename TEnableIf<Detail::TValidFinder<T>::HasBaseValid>::Type* = nullptr>
 KOR_FORCEINLINE static constexpr bool IsValid(const T& obj)
 {

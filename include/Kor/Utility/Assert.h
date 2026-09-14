@@ -20,14 +20,14 @@
 	#define KOR_ASSERT(statement)														\
 		if (!(statement)) [[ unlikely ]]												\
 		{																				\
-			KOR_DETAIL_NAMESPACE::LogFailed(#statement, __FILE__, __LINE__);			\
-			KOR_DETAIL_NAMESPACE::Crash();											\
+			Detail::LogFailed(#statement, __FILE__, __LINE__);							\
+			Detail::Crash();															\
 		}
 
 	#define KOR_EXPECT(expression)														\
 		(KOR_LIKELY(!!(expression)) || []()												\
 		{ 																				\
-			KOR_DETAIL_NAMESPACE::LogFailed(#expression, __FILE__, __LINE__);			\
+			Detail::LogFailed(#expression, __FILE__, __LINE__);							\
 			static bool didBreak = false; 												\
 			if (!didBreak) 																\
 			{ 																			\

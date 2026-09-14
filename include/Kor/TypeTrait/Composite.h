@@ -22,8 +22,7 @@ template<typename T> struct TIsIntegral
 // [Is Arithmetic]
 // * Checks whether specific type is arithmetic
 
-template<typename T>
-struct TIsArithmetic
+template<typename T> struct TIsArithmetic
 	: TBoolValue<
 		TIsIntegral<T>::Value ||
 		TIsFloating<T>::Value ||
@@ -35,8 +34,7 @@ struct TIsArithmetic
 // * Checks whether specific type is a fundamental type
 // * Fundamental type is any type that is fundamental to cpp (not user-defined)
 
-template<typename T>
-struct TIsFundamental
+template<typename T> struct TIsFundamental
 	: TBoolValue<
 		TIsVoid<T>::Value ||
 		TIsNullptr<T>::Value ||

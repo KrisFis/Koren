@@ -15,7 +15,7 @@ All library types live under the `Kor::` namespace. The name comes from *Koren* 
 ```cpp
 #include "Kor/Kor.h"
 
-Kor::TArray<int> myArray;
+Kor::TArray<int32> myArray;
 Kor::SString myStr = KOR_TEXT("Hello World!");
 ```
 
@@ -43,17 +43,35 @@ Kor::SString myStr = KOR_TEXT("Hello World!");
 
 ---
 
+## Libraries
+
+| Module         | Description                                                                                                                                                                            |
+|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Archive**    | Polymorphic serialization streams (`SArchive` etc.) unifying binary/string I/O behind a common read/write interface, with `<<`/`>>` operators for streaming primitives and containers. |
+| **Container**  | Core data structures (`TArray`, `TQueue`, etc.) with allocator-aware storage and STL-like mutation/iteration APIs.                                                                     |
+| **IO**         | Low-level input/output primitives. Currently minimal; may eventually merge with Archive under a unified serialization/streaming module.                                                |
+| **Math**       | Scalar and vector math operations (`SMathOps`, etc.).                                                                                                                                  |
+| **Memory**     | Memory management primitives, smart pointers (`TSharedPtr`, `TSharedClass`), typed memory operations (`SMemoryOps`), and platform allocation.                                          |
+| **String**     | Unicode-aware string types and operations (`TString`, `TStringView`, `SStringOps`, `SCharOps`).                                                                                        |
+| **TypeTraits** | Compile-time type introspection and metaprogramming traits.                                                                                                                            |
+| **Utility**    | General-purpose helpers, forwarding (`Forward`/`Move`), invocation (`Kor::Invoke`), assertions, and dispatch utilities like `IsValid`.                                                 |
+
+---
+
+---
+
 ## Features
 
-| **Description**                | **Example**                               |
-|:-------------------------------|:------------------------------------------|
-| STL-like containers            | `TArray`, `TSharedPtr`                    |
-| Lightweight math library       | `SMathOps::Abs`, `SMathOps::Lerp`               |
-| Human-readable build macros    | `KOR_BUILD_RELEASE`, `PLATFORM_WINDOWS`   |
-| Extra utility types            | `TSharedClass`, `TAsync`                  |
-| Object-oriented string helpers | `SString::Split`                          |
-| Character encoding             | `KOR_TEXT("myText")`, `KTEXT("myText")`   |
-| Debug assertions               | `KOR_DEMAND`, `KOR_EXPECT`, `KOR_REQUIRE` |
+| **Description**                | **Example**                                                                          |
+|:-------------------------------|:-------------------------------------------------------------------------------------|
+| STL-like containers            | `TArray`, `TSharedPtr`                                                               |
+| Lightweight math library       | `SMathOps::Abs`, `SMathOps::Lerp`                                                    |
+| Human-readable build macros    | `KOR_BUILD_RELEASE`, `KOR_PLATFORM_WINDOWS`                                          |
+| Extra utility types            | `TSharedClass`, `IsValid`                                                            |
+| Object-oriented string helpers | `SString::Split`                                                                     |
+| Character encoding             | `KOR_TEXT("myText")`, `KTEXT("myText")`                                              |
+| Debug assertions               | `KOR_ASSERT`, `KOR_EXPECT`                                                           |
+| Type Traits Generators         | `KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(THasGetNum, GetNum); THasGetNum<SMyType>::Value` |
 
 ---
 
@@ -93,23 +111,24 @@ if (KOR_EXPECT(index < size))       // non-fatal - recoverable expectation
 
 ## STL Equivalents
 
-| **Description**   |       **Koren**        |   **STL equivalent**   |
-|:------------------|:----------------------:|:----------------------:|
-| Smart pointers    | `TSharedPtr, TWeakPtr` | `shared_ptr, weak_ptr` |
-| Dynamic array     |        `TArray`        |        `vector`        |
-| Dynamic string    |  `TString<CharType>`   |   `string, wstring`    |
-| FIFO container    |        `TQueue`        |        `queue`         |
-| Optional value    |      `TOptional`       |       `optional`       |
+| **Description** |                **Koren**                 |      **STL equivalent**       |
+|:----------------|:----------------------------------------:|:-----------------------------:|
+| Smart pointers  |          `TSharedPtr, TWeakPtr`          |    `shared_ptr, weak_ptr`     |
+| Dynamic array   |                 `TArray`                 |           `vector`            |
+| Dynamic string  |     `TString<wchar>, TString<char8>`     |     `wstring, u8string, `     |
+| FIFO container  |                 `TQueue`                 |            `queue`            |
+| Optional value  |               `TOptional`                |          `optional`           |
+| String view     | `TStringView<wchar>, TStringView<char8>` | `wstring_view, u8string_view` |
 
 ---
 
 ## Includes
 
 ### `Kor/KorMinimal.h`
-Minimal include - macros, templates, forward declarations, and core platform code. Use this when you only need the foundations.
+Minimal include - macros, templates, forward declarations, and core platform code.
 
 ### `Kor/Kor.h`
-Full include - all features, declarations, and implementations.
+Full PCH-like include - all features, declarations, and implementations.
 
 ---
 

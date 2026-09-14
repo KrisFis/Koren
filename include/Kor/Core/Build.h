@@ -174,18 +174,13 @@
 
 #if KOR_USE_NAMESPACE
 #define KOR_NAMESPACE Kor
-#define KOR_DETAIL_NAMESPACE KOR_NAMESPACE::Detail
 #define KOR_NAMESPACE_BEGIN namespace KOR_NAMESPACE {
 #define KOR_NAMESPACE_END }
 #else
 #define KOR_NAMESPACE
-#define KOR_DETAIL_NAMESPACE Detail
 #define KOR_NAMESPACE_BEGIN
 #define KOR_NAMESPACE_END
 #endif
-
-#define KOR_DETAIL_NAMESPACE_BEGIN namespace KOR_DETAIL_NAMESPACE {
-#define KOR_DETAIL_NAMESPACE_END }
 
 // Macros
 ///////////////////////////////////////////////////////////////
