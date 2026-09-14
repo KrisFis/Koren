@@ -7,36 +7,59 @@
 // * Should include all features and functionality of Kor
 /////////////////////////////////////////
 
-// Look at "Build.h" to see defines that affects features provided
+// Look at "Build.h" to see defines that affect features provided
 
-// CORE
+// Minimal
 #include "Kor/KorMinimal.h"
 
-// UTILITIES
-#include "Kor/Math.h"
-#include "Kor/MemoryOps.h"
-#include "Kor/Misc.h"
+// Archive
+#include "Kor/Archive/Archive.h"
+#include "Kor/Archive/ArrayArchive.h"
+#include "Kor/Archive/FileArchive.h"
+#include "Kor/Archive/StdoutArchive.h"
 
-// CONTAINERS
-#include "Kor/Array.h"
-#include "Kor/Optional.h"
-#include "Kor/Queue.h"
+// Container
+#include "Kor/Container/Array.h"
+#include "Kor/Container/Queue.h"
 
-// ALLOCATORS
-#include "Kor/Allocator.h"
-#include "Kor/FixedAllocator.h"
-#include "Kor/QueueAllocator.h"
+// IO
+#include "Kor/IO/IOOps.h"
 
-// STRINGS
-#include "Kor/CharOps.h"
-#include "Kor/StringOps.h"
-#include "Kor/String.h"
+// Math
+#include "Kor/Math/MathOps.h"
 
-// SHARED
-#include "Kor/Shared.h"
+// Memory
+#include "Kor/Memory/Allocator.h"
+#include "Kor/Memory/AllocatorTraits.h"
+#include "Container/ContainerTraits.h"
+#include "Kor/Memory/FixedAllocator.h"
+#include "Kor/Memory/QueueAllocator.h"
+#include "Kor/Memory/Shared.h"
+#include "Kor/Memory/TypedAllocator.h"
 
-// EXTRAS -> ARCHIVE
-#include "Kor/Archive.h"
-#include "Kor/ArrayArchive.h"
-#include "Kor/FileArchive.h"
-#include "Kor/StdoutArchive.h"
+// String
+#include "Kor/String/CharOps.h"
+#include "Kor/String/String.h"
+#include "Kor/String/StringOps.h"
+
+// Type Traits
+#include "Kor/TypeTrait/CallTraits.h"
+#include "Kor/TypeTrait/Category.h"
+#include "Kor/TypeTrait/Composite.h"
+#include "Kor/TypeTrait/Construct.h"
+#include "Kor/TypeTrait/Decay.h"
+#include "Kor/TypeTrait/Integer.h"
+#include "Kor/TypeTrait/MemberPointer.h"
+#include "Kor/TypeTrait/Pack.h"
+#include "Kor/TypeTrait/Property.h"
+#include "Kor/TypeTrait/Qualifier.h"
+#include "Kor/TypeTrait/Relationship.h"
+#include "Kor/TypeTrait/String.h"
+#include "Kor/TypeTrait/Macros/HasFieldCheck.h"
+#include "Kor/TypeTrait/Macros/VariadicIterator.h"
+
+// Utility
+#include "Kor/Utility/Assert.h"
+#include "Kor/Utility/Forward.h"
+#include "Kor/Utility/Invoke.h"
+#include "Kor/Utility/IsValid.h"
