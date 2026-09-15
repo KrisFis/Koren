@@ -79,7 +79,7 @@ public:
 	// * Caller must bring it to a valid state before any other use.
 	explicit constexpr TArray(Init::SNoInit) noexcept;
 
-	// Reserves `num` elements without constructing any. Num stays 0.
+	// Reserves `num` elements without constructing any. Num becomes `num`.
 	explicit TArray(SizeType num, Init::SNoInit) noexcept;
 
 	// Reserves and default-constructs `num` elements. Num becomes `num`.
@@ -439,6 +439,12 @@ private:
 	using SFriend = Detail::Array::TFriend<TArray>;
 	friend SFriend;
 };
+
+// [ Is TArray ]
+// Checks if type is TArray type
+
+template<typename T> struct TIsTArray : TFalseValue {};
+template<typename ElementT, typename AllocatorT> struct TIsTArray<TArray<ElementT, AllocatorT>> : TTrueValue {};
 
 #include "Kor/Container/Detail/Array.inl"
 

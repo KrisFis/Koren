@@ -418,7 +418,7 @@ KOR_FORCEINLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcep
 
 template<typename T, typename R>
 KOR_FORCEINLINE void SMemoryOps::SwapAs(T* lhs, R* rhs, uint64 num) noexcept
-{	
+{
 	if constexpr (!TIsTriviallyMovable<T>::Value)
 	{
 		while (num-- > 0)
