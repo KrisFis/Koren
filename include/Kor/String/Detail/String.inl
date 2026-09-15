@@ -24,7 +24,7 @@ KOR_FORCEINLINE bool TStringView<CharT>::IsEmpty() const noexcept
 template<typename CharT>
 KOR_FORCEINLINE bool TString<CharT>::IsEmpty() const noexcept
 {
-	return _data.IsEmpty();
+	return _data.GetNum() <= 1;
 }
 
 template<typename CharT>
