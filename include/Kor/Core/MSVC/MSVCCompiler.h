@@ -6,7 +6,7 @@
 #include "Kor/Core/Build.h"
 
 // BUILD
-////////////////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #define KOR_DO_PRAGMA(command) __pragma(command)
 
@@ -36,7 +36,7 @@
 #define KOR_STDCALL __stdcall
 
 // DIAGNOSTICS
-////////////////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #define KOR_DIAG_WARNINGS_PUSH() KOR_DO_PRAGMA( warning( push ) )
 #define KOR_DIAG_WARNINGS_POP() KOR_DO_PRAGMA( warning( pop ) )
@@ -53,13 +53,13 @@
 #endif
 
 // Prediction
-////////////////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #define KOR_LIKELY(x) (x)
 #define KOR_UNLIKELY(x) (x)
 
 // OPTIMIZATIONS
-////////////////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #define KOR_OPTIMIZATIONS_DISABLE() KOR_DO_PRAGMA( optimize("", off) )
 #define KOR_OPTIMIZATIONS_RESET() KOR_DO_PRAGMA( optimize("", on) )

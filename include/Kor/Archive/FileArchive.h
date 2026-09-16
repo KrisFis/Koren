@@ -29,7 +29,7 @@ struct SCFileArchive : public SArchive
 	KOR_FORCEINLINE FILE* GetFile() const { return _file; }
 
 	// SArchive overrides
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE virtual bool IsValid() const override { return !!_file; }
 	KOR_FORCEINLINE virtual void Flush() override { fflush(_file); }

@@ -10,7 +10,7 @@ KOR_NAMESPACE_BEGIN
 namespace Detail
 {
 	KOR_DEFINE_HAS_FIELD_TRAIT(THasValidateField, Validate)
-	KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(THasGlobalIsValid, IsValid(DeclVal<TestType>()))
+	KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(THasGlobalIsValid, IsValid(DeclVal<T>()))
 	KOR_DEFINE_HAS_METHOD_TRAIT(THasIsInstanceValidMethod, IsValid())
 
 	// Template definition for SFINAE

@@ -9,18 +9,16 @@ KOR_NAMESPACE_BEGIN
 
 namespace Detail
 {
+	KOR_DEFINE_HAS_METHOD_TRAIT(THasSharedInit, IsSharedInitialized())
+	KOR_DEFINE_HAS_METHOD_TRAIT(THasAsShared, AsShared())
+
 	template<typename T>
 	struct TIsSharedClassType
 	{
-	private:
-		KOR_DEFINE_HAS_METHOD_TRAIT(FGetHasSharedInitTest, IsSharedInitialized())
-		KOR_DEFINE_HAS_METHOD_TRAIT(FGetHasAsSharedTest, AsShared())
-
-	public:
 		enum
 		{
-			HasSharedInit = FGetHasSharedInitTest<T>::Value,
-			HasAsShared = FGetHasAsSharedTest<T>::Value,
+			HasSharedInit = THasSharedInit<T>::Value,
+			HasAsShared = THasAsShared<T>::Value,
 
 			Value = HasSharedInit && HasAsShared
 		};

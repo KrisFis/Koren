@@ -15,17 +15,17 @@ class TOptional
 public:
 
 	// Typedefs
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	typedef ElementT ElementType;
 
 	// Asserts
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	static_assert(!TIsSame<ElementType, void>::Value && !TIsReference<ElementType>::Value, "Element type is not valid");
 
 	// Constructors
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TOptional() = default;
 	KOR_FORCEINLINE TOptional(const TOptional& other) { FillToEmpty(other); }
@@ -34,18 +34,18 @@ public:
 	KOR_FORCEINLINE TOptional(ElementType&& InValue) { FillToEmpty(Move(InValue)); }
 
 	// Destructor
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE ~TOptional() { Reset(); }
 
 	// Comparison operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool operator==(const TOptional& other) const { return ComparePrivate(*this, other); }
 	KOR_FORCEINLINE bool operator!=(const TOptional& other) const { return !ComparePrivate(*this, other); }
 
 	// Assign operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TOptional& operator=(const TOptional& other) { Reset(); FillToEmpty(other); return *this; }
 	KOR_FORCEINLINE TOptional& operator=(TOptional&& other) noexcept { Reset(); FillToEmpty(Move(other)); return *this; }
@@ -54,19 +54,19 @@ public:
 	KOR_FORCEINLINE TOptional& operator=(ElementType&& InValue) { Reset(); FillToEmpty(Move(InValue)); return *this; }
 
 	// Dereference operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE const ElementType* operator->() const { return _data; }
 	KOR_FORCEINLINE ElementType* operator->() { return _data; }
 
 	// Checks
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool IsValid() const { return !!_data; }
 	KOR_FORCEINLINE bool IsSet() const { return IsValid(); }
 
 	// Getters
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// Gets copy
 	KOR_FORCEINLINE ElementType Get(const ElementType& defaultValue) const { return IsSet() ? *_data : defaultValue; }
@@ -77,7 +77,7 @@ public:
 	KOR_FORCEINLINE ElementType& GetRef() { return *_data; }
 
 	// Manipulation
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE void Set(const ElementType& InValue) { Reset(); FillToEmpty(InValue); }
 	KOR_FORCEINLINE void Set(ElementType&& InValue) { Reset(); FillToEmpty(Move(InValue)); }
@@ -96,13 +96,13 @@ private:
 
 	void FillToEmpty(const ElementType& InValue)
 	{
-		_data = SMemoryOps::MallocAs<ElementType>();
+		_data = SMemoryOps::Malloc<ElementType>();
 		SMemoryOps::CopyConstruct(_data, &InValue);
 	}
 
 	void FillToEmpty(ElementType&& InValue)
 	{
-		_data = SMemoryOps::MallocAs<ElementType>();
+		_data = SMemoryOps::Malloc<ElementType>();
 		SMemoryOps::MoveConstruct(_data, &InValue);
 	}
 
@@ -140,7 +140,7 @@ private:
 	{
 		if(Lhs.IsSet() == Rhs.IsSet())
 		{
-			return Lhs.IsSet() && SMemoryOps::IsEqualAs(Lhs._data, Rhs._data) == 0;
+			return Lhs.IsSet() && SMemoryOps::IsEqual(Lhs._data, Rhs._data) == 0;
 		}
 
 		return false;
@@ -150,7 +150,7 @@ private:
 };
 
 // Archive operator<< && operator>>
-////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 template<typename T>
 KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, const TOptional<T>& optional)

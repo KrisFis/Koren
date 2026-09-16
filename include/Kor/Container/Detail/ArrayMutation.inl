@@ -239,7 +239,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 	const SizeType totalRemoved = SFriend::RemoveByFunc(*this,
 		[&val](const ElementType& el) noexcept -> bool
 		{
-			return SMemoryOps::IsEqualAs(&el, &val);
+			return SMemoryOps::IsEqual(&el, &val);
 		}
 	);
 
@@ -257,7 +257,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 	const SizeType idx = SFriend::FindIndexByFunc(*this,
 		[&val](const ElementType& el) noexcept -> bool
 		{
-			return SMemoryOps::IsEqualAs(&el, &val);
+			return SMemoryOps::IsEqual(&el, &val);
 		}
 	);
 
@@ -296,7 +296,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 	const SizeType totalRemoved = SFriend::RemoveSwapByFunc(*this,
 		[&val](const ElementType& el) noexcept -> bool
 		{
-			return SMemoryOps::IsEqualAs(&el, &val);
+			return SMemoryOps::IsEqual(&el, &val);
 		}
 	);
 
@@ -314,7 +314,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 	const SizeType idx = SFriend::FindIndexByFunc(*this,
 		[&val](const ElementType& el) noexcept -> bool
 		{
-			return SMemoryOps::IsEqualAs(&el, &val);
+			return SMemoryOps::IsEqual(&el, &val);
 		}
 	);
 
@@ -386,6 +386,19 @@ KOR_FORCEINLINE ElementT TArray<ElementT, AllocatorT>::Pop() noexcept
 }
 
 template<typename ElementT, typename AllocatorT>
+KOR_INLINE void TArray<ElementT, AllocatorT>::Swap(TArray& other) noexcept
+{
+	if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
+	{
+		KOR_NAMESPACE::Swap(_allocator, other._allocator);
+	}
+
+	KOR_NAMESPACE::Swap(_data, other._data);
+	KOR_NAMESPACE::Swap(_num, other._num);
+	KOR_NAMESPACE::Swap(_reservedNum, other._reservedNum);
+}
+
+template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::Swap(SizeType firstIdx, SizeType secondIdx) noexcept
 {
 	if (firstIdx == secondIdx) return;
@@ -394,7 +407,7 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::Swap(SizeType firstIdx, SizeType s
 	KOR_ASSERT(IsValidIndex(firstIdx));
 	KOR_ASSERT(IsValidIndex(secondIdx));
 
-	SMemoryOps::SwapAs(_data + firstIdx, _data + secondIdx);
+	KOR_NAMESPACE::Swap(_data[firstIdx], _data[secondIdx]);
 }
 
 template<typename ElementT, typename AllocatorT>
@@ -402,9 +415,9 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::SwapRange(SizeType firstIdx, SizeT
 {
 	if (firstIdx == secondIdx) return;
 
-	KOR_ASSERT(firstIdx < secondIdx);
+	KOR_ASSERT(firstIdx + num <= secondIdx)
 	KOR_ASSERT(0 <= firstIdx && firstIdx + (num - 1) <= _num - 1);
 	KOR_ASSERT(0 <= secondIdx && secondIdx + (num - 1) <= _num - 1);
 
-	SMemoryOps::SwapAs(_data + firstIdx, _data + secondIdx, num);
+	KOR_NAMESPACE::Swap(_data[firstIdx], _data[secondIdx], num);
 }

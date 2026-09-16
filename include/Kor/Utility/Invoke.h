@@ -92,7 +92,8 @@ namespace Detail
 // * Invoke(&FWidget::GetName, w); // -> w.GetName()
 // * Invoke(&FWidget::GetName, pw); // -> pw->GetName()
 // * Invoke(KOR_LIFT(FWidget, GetName), pw); // -> pw->GetName()
-//
+// -------------------------------------------------------------------------
+
 template<typename FunctorT, typename... ArgsT>
 KOR_FORCEINLINE constexpr auto Invoke(FunctorT&& func, ArgsT&&... args)
 	-> decltype(Forward<FunctorT>(func)(Forward<ArgsT>(args)...))

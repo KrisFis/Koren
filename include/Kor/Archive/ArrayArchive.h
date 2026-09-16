@@ -31,13 +31,13 @@ struct TArrayArchive : public SArchive
 	}
 
 	// Data set/get
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE void SetData(ArrayType&& data) { _data = data; _offset = _data.GetNum(); }
 	KOR_FORCEINLINE const ArrayType& GetData() const { return _data; }
 
 	// SArchive overrides
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE virtual bool IsValid() const override { return true; }
 	KOR_FORCEINLINE virtual void Flush() override { SetData(ArrayType()); }

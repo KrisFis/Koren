@@ -30,7 +30,7 @@ struct TStdoutArchive : public TArrayArchive<tchar, AllocatorT>
 	}
 
 	// Getters / Setters
-	/////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE int32 GetFileNo() const { return FileNo; }
 
@@ -38,7 +38,7 @@ struct TStdoutArchive : public TArrayArchive<tchar, AllocatorT>
 	KOR_FORCEINLINE void SetFlushOnNewLine(bool val) { _flushOnNewLine = val; }
 
 	// SArchive overrides
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	virtual void Flush() override
 	{

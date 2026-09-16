@@ -14,6 +14,7 @@
 #include "Kor/Memory/TypedAllocator.h"
 
 #include "Kor/Utility/Invoke.h"
+#include "Kor/Utility/Swap.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -333,8 +334,11 @@ public:
 	ElementType Pop() noexcept;
 
 	// Swap
-	// Both index ranges must lie within [0, GetNum()).
+	// Index ranges must lie within [0, GetNum()).
 	// -------------------------------------------------------------------------
+
+	// Swaps the elements between array instances
+	void Swap(TArray& other) noexcept;
 
 	// Swaps the elements at `firstIdx` and `secondIdx`.
 	void Swap(SizeType firstIdx, SizeType secondIdx) noexcept;

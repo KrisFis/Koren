@@ -5,7 +5,7 @@
 
 // Main PCH
 // * Should include all features and functionality of Kor
-/////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 // Look at "Build.h" to see defines that affect features provided
 
@@ -20,6 +20,7 @@
 
 // Container
 #include "Kor/Container/Array.h"
+#include "Kor/Container/ContainerTraits.h"
 #include "Kor/Container/Queue.h"
 
 // IO
@@ -31,8 +32,8 @@
 // Memory
 #include "Kor/Memory/Allocator.h"
 #include "Kor/Memory/AllocatorTraits.h"
-#include "Container/ContainerTraits.h"
 #include "Kor/Memory/FixedAllocator.h"
+#include "Kor/Memory/MemoryOps.h"
 #include "Kor/Memory/QueueAllocator.h"
 #include "Kor/Memory/Shared.h"
 #include "Kor/Memory/TypedAllocator.h"
@@ -63,3 +64,6 @@
 #include "Kor/Utility/Forward.h"
 #include "Kor/Utility/Invoke.h"
 #include "Kor/Utility/IsValid.h"
+#include "Kor/Utility/NumOf.h"
+#include "Kor/Utility/Optional.h"
+#include "Kor/Utility/Swap.h"
