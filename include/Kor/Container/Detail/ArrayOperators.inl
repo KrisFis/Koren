@@ -35,7 +35,7 @@ KOR_INLINE bool TArray<ElementT, AllocatorT>::operator==(const TArray& other) co
 {
 	return
 		_num == other._num && 
-		SMemoryOps::IsEqualAs(_data, other._data, _num);
+		SMemoryOps::IsEqual(_data, other._data, _num);
 }
 
 template<typename ElementT, typename AllocatorT>

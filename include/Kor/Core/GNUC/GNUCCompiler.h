@@ -6,7 +6,7 @@
 #include "Kor/Core/Build.h"
 
 // BUILD
-////////////////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #define KOR_DO_PRAGMA(command) _Pragma(#command)
 
@@ -34,7 +34,7 @@
 #define KOR_STDCALL
 
 // DIAGNOSTICS
-////////////////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #define KOR_DIAG_WARNINGS_PUSH() KOR_DO_PRAGMA(GCC diagnostic push)
 #define KOR_DIAG_WARNINGS_POP() KOR_DO_PRAGMA(GCC diagnostic pop)
@@ -53,13 +53,13 @@
 // OPTIMIZATIONS
 // * Uses options, make sure it does not collide with anything
 // * Otherwise update macros
-////////////////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #define KOR_OPTIMIZATIONS_DISABLE() KOR_DO_PRAGMA(GCC push_options) KOR_DO_PRAGMA(GCC optimize("O0"))
 #define KOR_OPTIMIZATIONS_RESET() KOR_DO_PRAGMA(GCC pop_options)
 
 // Prediction
-////////////////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #define KOR_LIKELY(x) __builtin_expect(!!(x), 1)
 #define KOR_UNLIKELY(x) __builtin_expect(!!(x), 0)

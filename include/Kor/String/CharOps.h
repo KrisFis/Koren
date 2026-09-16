@@ -21,7 +21,7 @@ struct TCharConstant
 	static_assert(TIsCharacter<CharType>::Value, "CharType must be a character");
 
 	// Sentinel
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// U+FFFD for wide types, '?' for narrow (ANSI cannot represent U+FFFD)
 	static constexpr CharType Bogus = TIsSame<CharType, achar>::Value
@@ -29,7 +29,7 @@ struct TCharConstant
 		: (CharType)0xFFFD;
 
 	// Linebreak
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// '\n' - Unix/Linux/macOS line ending
 	static constexpr CharType LineFeed			= (CharType)0xa;
@@ -41,7 +41,7 @@ struct TCharConstant
 	static constexpr CharType CarriageReturn	= (CharType)0xd;
 
 	// Whitespace
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// ' ' - standard space
 	static constexpr CharType Space				= (CharType)0x20;
@@ -49,7 +49,7 @@ struct TCharConstant
 	static constexpr CharType Tab				= (CharType)0x9;
 
 	// Control
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// '\0' - string terminator in C-style strings
 	static constexpr CharType Null				= (CharType)0x0;
@@ -61,7 +61,7 @@ struct TCharConstant
 	static constexpr CharType Delete			= (CharType)0x7f;
 
 	// Arithmetic & Punctuation
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// '+' - positive sign / addition operator
 	static constexpr CharType Plus				= (CharType)0x2B;
@@ -103,7 +103,7 @@ struct TCharConstant
 	static constexpr CharType Question			= (CharType)0x3F;
 
 	// Numbers
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// '0' - digit zero
 	static constexpr CharType Zero				= (CharType)0x30;
@@ -147,13 +147,13 @@ struct TCharOps
 	using CharConstant = TCharConstant<CharType>;
 
 	// Constants
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// Returns max valid codepoint supported by the character type
 	static constexpr CharType MaxCodePoint() noexcept;
 
 	// Classification
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// Returns true if c is within the ASCII range (0x00-0x7F)
 	// Useful as a guard before applying any ASCII-specific classification
@@ -219,7 +219,7 @@ struct TCharOps
 	static constexpr bool IsLinebreak(CharType c) noexcept;
 
 	// ToInt | FromInt
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// Converts a digit or letter character to its integer value (0-35)
 	// Returns KOR_INDEX_NONE if c is not a valid digit or letter
@@ -231,7 +231,7 @@ struct TCharOps
 	static constexpr CharType FromInt(int32 n) noexcept;
 
 	// ToDigit | FromDigit
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// Converts a digit character to its integer value (0-9)
 	// Returns KOR_INDEX_NONE if c is not a valid digit
@@ -242,7 +242,7 @@ struct TCharOps
 	static constexpr CharType FromDigit(int32 n) noexcept;
 
 	// ToHex | FromHex
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// Converts a hexadecimal digit character to its integer value (0-15)
 	// '0'-'9' -> 0-9, 'a'-'f' -> 10-15, 'A'-'F' -> 10-15
@@ -255,7 +255,7 @@ struct TCharOps
 	static constexpr CharType FromHex(int32 n) noexcept;
 
 	// Casing
-	///////////////////////////////////////////////////////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// Converts c to uppercase if it is a lowercase ASCII letter (a-z)
 	// Characters outside a-z are returned unchanged — no locale, no Unicode folding

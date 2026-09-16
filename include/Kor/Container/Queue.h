@@ -17,26 +17,26 @@ class TQueue
 {
 public:
 	// Types
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	typedef AllocatorT AllocatorType;
 	typedef typename AllocatorT::NodeType AllocatorNodeType;
 	typedef typename AllocatorT::SizeType SizeType;
 
 	// Constructors
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TQueue() = default;
 	KOR_FORCEINLINE TQueue(const TQueue& other) { CopyFrom(other); }
 	KOR_FORCEINLINE TQueue(TQueue&& other) { MoveFrom(Move(other)); }
 
 	// Destructor
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE ~TQueue() { EmptyImpl(); }
 
 	// Operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 	KOR_FORCEINLINE bool operator==(const TQueue& other) const { return _allocator == other._allocator; }
 
 	KOR_FORCEINLINE bool operator!=(const TQueue& other) const { return _allocator != other._allocator; }
@@ -45,32 +45,32 @@ public:
 	KOR_FORCEINLINE TQueue& operator=(TQueue&& other) { MoveFrom(Move(other)); return *this; }
 
 	// Getters
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool IsEmpty() const { return !_allocator.GetHead(); }
 	KOR_FORCEINLINE SizeType GetNum() const { return _allocator.GetSize(); }
 
 	// Peek
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool Peek(ElementT& outVal) const { return PeekImpl(outVal); }
 	KOR_FORCEINLINE ElementT Peek_GetCopy() const { ElementT result = ElementT(); PeekImpl(result); return result; }
 
 	// Enqueue
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE void Enqueue(const ElementT& val) { AddImpl(val); }
 	KOR_FORCEINLINE void Enqueue(ElementT&& val) { AddImpl(Move(val)); }
 
 	// Dequeue
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool Dequeue() { return RemoveFromHeadImpl(); }
 	KOR_FORCEINLINE bool Dequeue(ElementT& outVal) { return RemoveFromHeadImpl(outVal); }
 	KOR_FORCEINLINE ElementT Dequeue_GetCopy() { ElementT result = ElementT(); Dequeue(result); return result; }
 
 	// Empty
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE void Empty() { EmptyImpl(); }
 	KOR_FORCEINLINE void Reset() { EmptyImpl(); }

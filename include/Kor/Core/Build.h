@@ -4,14 +4,13 @@
 #pragma once
 
 // Build Type
-///////////////////////////////////////////////////////////////
-//
+// -------------------------------------------------------------------------
 // Defines the active build mode. Exactly one must be set to 1.
 // Set via compiler flags: -DKOR_BUILD_DEBUG=1 or -DKOR_BUILD_RELEASE=1
 //
 // Supported: Debug, Release
 // Example: KOR_BUILD_RELEASE
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #ifndef KOR_BUILD_RELEASE
 	#define KOR_BUILD_RELEASE 0
@@ -26,12 +25,12 @@
 #endif
 
 // Compiler
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 // Detected automatically from predefined compiler macros.
 //
 // Supported: MSVC, CLANG, GCC
 // Example: KOR_COMPILER_CLANG
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #if defined(_MSC_VER)
 	#define KOR_COMPILER_MSVC 1
@@ -56,12 +55,12 @@
 #endif
 
 // Architecture
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 // Detected automatically. Exactly one will be set to 1.
 //
 // Supported: 32, 64
 // Example: KOR_ARCHITECTURE_64
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__)
 	#define KOR_ARCHITECTURE_64 1
@@ -80,7 +79,7 @@
 #endif
 
 // CPP Version
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 // cpp11 - Published 2011-03
 #define KOR_CPP_11 (__cplusplus >= 201103L)
@@ -94,12 +93,12 @@
 #define KOR_CPP_23 (__cplusplus >= 202302L)
 
 // Platform
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 // Detected automatically
 //
 // Supported: Windows, Linux, Apple, Unix
 // Example: KOR_PLATFORM_WINDOWS
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #if defined(_WIN32) || defined(_WIN64)
 	#define KOR_PLATFORM_WINDOWS 1
@@ -132,11 +131,11 @@
 #endif
 
 // Configuration
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 // Optional overrides.
 // Define before including this header to change defaults.
 // All default to safe/conservative values.
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 // Whether to use wide characters (wchar) as the default char type (tchar).
 // Defaults to 1 on Windows, 0 elsewhere. See: Platform.h
@@ -166,11 +165,11 @@
 #endif
 
 // Namespace
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 // Wraps library declarations in "Kor" when KOR_USE_NAMESPACE=1.
 // Use KOR_NAMESPACE_BEGIN / KOR_NAMESPACE_END around declarations,
 // and KOR_NAMESPACE::as a prefix in definitions.
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #if KOR_USE_NAMESPACE
 #define KOR_NAMESPACE Kor
@@ -183,9 +182,9 @@
 #endif
 
 // Macros
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 // General-purpose utility macros. No platform or config dependencies.
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 // Macro utilities - expand, stringify, and concatenate with proper expansion order.
 #define KOR_MACRO_EXPAND(x) x

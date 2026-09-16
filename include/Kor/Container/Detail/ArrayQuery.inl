@@ -47,7 +47,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 	return SFriend::FindIndexByFunc(*this, 
 		[&val](const ElementType& el) noexcept -> bool
 		{
-			return SMemoryOps::IsEqualAs(&el, &val);
+			return SMemoryOps::IsEqual(&el, &val);
 		}
 	);
 }
@@ -66,7 +66,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 	return SFriend::FindIndexByFunc(*this, 
 		[&key](const ElementType& el) noexcept -> bool
 		{
-			return SMemoryOps::IsEqualAs(&el, &key);
+			return SMemoryOps::IsEqual(&el, &key);
 		}
 	);
 }
@@ -92,7 +92,7 @@ KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorT>::FindByKey(const KeyType&
 	return SFriend::FindByFunc(*this, 
 		[&key](const ElementType& el) noexcept -> bool
 		{
-			return SMemoryOps::IsEqualAs(&el, &key);
+			return SMemoryOps::IsEqual(&el, &key);
 		}
 	);
 }
@@ -104,7 +104,7 @@ KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::FindByKey(const Ke
 	return SFriend::FindByFunc(*this, 
 		[&key](const ElementType& el) noexcept -> bool
 		{
-			return SMemoryOps::IsEqualAs(&el, &key);
+			return SMemoryOps::IsEqual(&el, &key);
 		}
 	);
 }

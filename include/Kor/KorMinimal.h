@@ -5,7 +5,7 @@
 
 // Minimal PCH
 // * Should include minimal features required for correct build
-/////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 // Main include
 // * Look at "Build.h" to see defines that affect compilation

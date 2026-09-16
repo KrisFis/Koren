@@ -28,12 +28,12 @@ enum class EArchiveMode : uint8
 struct SArchive
 {
 	// Types
-	/////////////////////////
+	// -------------------------------------------------------------------------
 
 	typedef int64 SizeType;
 
 	// Constructors
-	/////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE SArchive() = delete;
 	KOR_FORCEINLINE SArchive(EArchiveType type, EArchiveMode mode)
@@ -47,7 +47,7 @@ struct SArchive
 	KOR_FORCEINLINE virtual ~SArchive() = default;
 
 	// Type & Mode
-	/////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE EArchiveType GetType() const { return _type; }
 	KOR_FORCEINLINE bool IsBinary() const { return _type == EArchiveType::Binary; }
@@ -58,13 +58,13 @@ struct SArchive
 	KOR_FORCEINLINE bool AllowsWrite() const { return _mode == EArchiveMode::Write || _mode == EArchiveMode::ReadWrite; }
 
 	// Essentials
-	/////////////////////////
+	// -------------------------------------------------------------------------
 
 	virtual bool IsValid() const = 0;
 	virtual void Flush() = 0;
 
 	// Position
-	/////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool GetIsBegin() const { return GetBytesOffset() <= 0; }
 	KOR_FORCEINLINE bool GetIsEnd() const { return GetBytesOffset() >= GetTotalBytes(); }
@@ -137,7 +137,7 @@ struct SArchive
 	KOR_FORCEINLINE bool Seek(SizeType offset) { return SetBytesOffset(offset); }
 
 	// Read / Write
-	/////////////////////////
+	// -------------------------------------------------------------------------
 
 	// Reads bytes and moves while doing so
 	virtual SizeType ReadBytes(void* ptr, SizeType size) = 0;
@@ -161,7 +161,7 @@ struct SArchive
 
 	// Packet
 	// * Packet is a bunch of bytes basically
-	/////////////////////////
+	// -------------------------------------------------------------------------
 
 	// Func: (const void* packet, SizeType numOfBytes) -> bool
 	template<SizeType MaxPacketSize, typename FuncType>
@@ -195,7 +195,7 @@ struct SArchive
 
 	// Container
 	// * Takes all data and copies to provided container
-	/////////////////////////
+	// -------------------------------------------------------------------------
 
 	template<typename ContainerT>
 	bool CopyToContainer(ContainerT& outContainer)
@@ -214,7 +214,7 @@ struct SArchive
 	}
 
 	// Reads string with defined memory pool
-	/////////////////////////
+	// -------------------------------------------------------------------------
 
 	template<typename ArchiveT, typename PredT>
 	const tchar* ReadPooledStringByPred(ArchiveT& ar, PredT&& predicate)
@@ -257,7 +257,7 @@ private:
 };
 
 // Archive operator<< && operator>>
-////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 static SArchive& operator<<(SArchive& ar, SArchive& otherAr)
 {
@@ -266,7 +266,7 @@ static SArchive& operator<<(SArchive& ar, SArchive& otherAr)
 		const uint32 remainingBytes = (otherAr.GetTotalBytes() - otherAr.GetBytesOffset());
 		if (remainingBytes > 0)
 		{
-			uint8* buffer = SMemoryOps::MallocAs<uint8>(remainingBytes);
+			uint8* buffer = SMemoryOps::Malloc<uint8>(remainingBytes);
 			{
 				otherAr.ReadBytes(buffer, remainingBytes);
 				ar.WriteBytes(buffer, remainingBytes);

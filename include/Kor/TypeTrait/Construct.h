@@ -33,7 +33,7 @@ template<typename T>
 struct TIsMoveConstructible : TIsConstructible<T, typename TClean<T>::Type&&> {};
 
 // Trivial type
-////////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 // [Is trivially constructible]
 // * Checks whether specific type has trivial constructor from specific types

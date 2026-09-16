@@ -56,8 +56,8 @@ struct SMemoryOps
 
 	static void* Malloc(uint64 size) noexcept;
 	static void* Malloc(uint64 size, uint32 alignment) noexcept;
-	template<typename T> static T* MallocAs(uint64 num = 1) noexcept;
-	template<typename T> static T* MallocAs(uint64 num, uint32 alignment) noexcept;
+	template<typename T> static T* Malloc(uint64 num = 1) noexcept;
+	template<typename T> static T* Malloc(uint64 num, uint32 alignment) noexcept;
 
 	// Calloc / CallocAs
 	// Allocates zero-initialized memory. CallocAs takes an element count; Calloc takes a byte size.
@@ -67,8 +67,8 @@ struct SMemoryOps
 
 	static void* Calloc(uint64 size) noexcept;
 	static void* Calloc(uint64 size, uint32 alignment) noexcept;
-	template<typename T> static T* CallocAs(uint64 num = 1) noexcept;
-	template<typename T> static T* CallocAs(uint64 num, uint32 alignment) noexcept;
+	template<typename T> static T* Calloc(uint64 num = 1) noexcept;
+	template<typename T> static T* Calloc(uint64 num, uint32 alignment) noexcept;
 
 	// Realloc / ReallocAs
 	// Resizes a previously allocated block. ReallocAs takes an element count; Realloc takes a byte size.
@@ -77,8 +77,8 @@ struct SMemoryOps
 
 	static void* Realloc(void* ptr, uint64 size) noexcept;
 	static void* Realloc(void* ptr, uint64 size, uint32 alignment) noexcept;
-	template<typename T> static T* ReallocAs(T* ptr, uint64 num = 1) noexcept;
-	template<typename T> static T* ReallocAs(T* ptr, uint64 num, uint32 alignment) noexcept;
+	template<typename T> static T* Realloc(T* ptr, uint64 num = 1) noexcept;
+	template<typename T> static T* Realloc(T* ptr, uint64 num, uint32 alignment) noexcept;
 
 	// Copy / CopyConstruct / CopyAssign
 	// Copies elements from src to dest.
@@ -138,7 +138,7 @@ struct SMemoryOps
 	// -------------------------------------------------------------------------
 
 	static void Swap(void* lhs, void* rhs, uint64 size) noexcept;
-	template<typename T, typename R> static void SwapAs(T* lhs, R* rhs, uint64 num = 1) noexcept;
+	template<typename T, typename R> static void Swap(T* lhs, R* rhs, uint64 num = 1) noexcept;
 
 	// Compare / CompareAs
 	// Compares two memory regions. Returns negative, zero, or positive like memcmp.
@@ -147,7 +147,7 @@ struct SMemoryOps
 	// -------------------------------------------------------------------------
 
 	static int32 Compare(const void* lhs, const void* rhs, uint64 size) noexcept;
-	template<typename T, typename R> static int32 CompareAs(const T* lhs, const R* rhs, uint64 num = 1) noexcept;
+	template<typename T, typename R> static int32 Compare(const T* lhs, const R* rhs, uint64 num = 1) noexcept;
 
 	// IsEqual / IsEqualAs
 	// Returns true if both memory regions are identical.
@@ -156,7 +156,7 @@ struct SMemoryOps
 	// -------------------------------------------------------------------------
 
 	static bool IsEqual(const void* lhs, const void* rhs, uint64 size) noexcept;
-	template<typename T, typename R> static bool IsEqualAs(const T* lhs, const R* rhs, uint64 num = 1) noexcept;
+	template<typename T, typename R> static bool IsEqual(const T* lhs, const R* rhs, uint64 num = 1) noexcept;
 
 	// Construct
 	// Constructs a T in-place from arbitrary args. Single element only.

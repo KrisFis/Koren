@@ -86,13 +86,13 @@ KOR_INLINE void* SMemoryOps::Malloc(uint64 size, uint32 alignment) noexcept
 }
 
 template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::MallocAs(uint64 num) noexcept
+KOR_FORCEINLINE T* SMemoryOps::Malloc(uint64 num) noexcept
 {
 	return (T*)Malloc(num * sizeof(T), alignof(T));
 }
 
 template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::MallocAs(uint64 num, uint32 alignment) noexcept
+KOR_FORCEINLINE T* SMemoryOps::Malloc(uint64 num, uint32 alignment) noexcept
 {
 	return (T*)Malloc(num * sizeof(T), alignment);
 }
@@ -124,13 +124,13 @@ KOR_INLINE void* SMemoryOps::Calloc(uint64 size, uint32 alignment) noexcept
 }
 
 template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::CallocAs(uint64 num) noexcept
+KOR_FORCEINLINE T* SMemoryOps::Calloc(uint64 num) noexcept
 {
 	return (T*)Calloc(num * sizeof(T), alignof(T));
 }
 
 template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::CallocAs(uint64 num, uint32 alignment) noexcept
+KOR_FORCEINLINE T* SMemoryOps::Calloc(uint64 num, uint32 alignment) noexcept
 {
 	return (T*)Calloc(num * sizeof(T), alignment);
 }
@@ -187,13 +187,13 @@ KOR_INLINE void* SMemoryOps::Realloc(void* ptr, uint64 size, uint32 alignment) n
 }
 
 template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::ReallocAs(T* ptr, uint64 num) noexcept
+KOR_FORCEINLINE T* SMemoryOps::Realloc(T* ptr, uint64 num) noexcept
 {
 	return (T*)SPlatformMemoryOps::Realloc(ptr, num * sizeof(T), alignof(T));
 }
 
 template<typename T>
-KOR_FORCEINLINE T* SMemoryOps::ReallocAs(T* ptr, uint64 num, uint32 alignment) noexcept
+KOR_FORCEINLINE T* SMemoryOps::Realloc(T* ptr, uint64 num, uint32 alignment) noexcept
 {
 	return (T*)SPlatformMemoryOps::Realloc(ptr, num * sizeof(T), alignment);
 }
@@ -396,9 +396,9 @@ KOR_FORCEINLINE void SMemoryOps::ZeroAssign(T* ptr, uint64 num) noexcept
 	}
 }
 
-KOR_FORCEINLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcept
+KOR_INLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcept
 {
-	uint8 temp[KOR_BUFFER_SIZE_SMALL];
+	thread_local uint8 temp[KOR_BUFFER_SIZE_SMALL];
 
 	while (size > 0)
 	{
@@ -417,23 +417,25 @@ KOR_FORCEINLINE void SMemoryOps::Swap(void* lhs, void* rhs, uint64 size) noexcep
 }
 
 template<typename T, typename R>
-KOR_FORCEINLINE void SMemoryOps::SwapAs(T* lhs, R* rhs, uint64 num) noexcept
+KOR_FORCEINLINE void SMemoryOps::Swap(T* lhs, R* rhs, uint64 num) noexcept
 {
-	if constexpr (!TIsTriviallyMovable<T>::Value)
+	if constexpr (TIsTriviallyMovable<T>::Value)
 	{
-		while (num-- > 0)
+		if (sizeof(T) * num > KOR_BUFFER_SIZE_SMALL)
 		{
-			T tmp(KOR_NAMESPACE::Move(*lhs));
-			*lhs = KOR_NAMESPACE::Move(*rhs);
-			*rhs = KOR_NAMESPACE::Move(tmp);
-
-			++lhs;
-			++rhs;
+			Swap((void*)lhs, (void*)rhs, num * sizeof(T));
+			return;
 		}
 	}
-	else
+
+	while (num-- > 0)
 	{
-		Swap(lhs, rhs, num * sizeof(T));
+		T tmp(KOR_NAMESPACE::Move(*lhs));
+		*lhs = KOR_NAMESPACE::Move(*rhs);
+		*rhs = KOR_NAMESPACE::Move(tmp);
+
+		++lhs;
+		++rhs;
 	}
 }
 
@@ -443,7 +445,7 @@ KOR_FORCEINLINE int32 SMemoryOps::Compare(const void* lhs, const void* rhs, uint
 }
 
 template<typename T, typename R>
-KOR_FORCEINLINE int32 SMemoryOps::CompareAs(const T* lhs, const R* rhs, uint64 num) noexcept
+KOR_FORCEINLINE int32 SMemoryOps::Compare(const T* lhs, const R* rhs, uint64 num) noexcept
 {
 	if constexpr (!TIsFundamental<T>::Value && !TIsEnum<T>::Value)
 	{
@@ -458,7 +460,7 @@ KOR_FORCEINLINE int32 SMemoryOps::CompareAs(const T* lhs, const R* rhs, uint64 n
 	} 
 	else
 	{
-		return Compare(lhs, rhs, sizeof(T) * num);
+		return Compare((const void*)lhs, (const void*)rhs, sizeof(T) * num);
 	}
 }
 
@@ -468,7 +470,7 @@ KOR_FORCEINLINE bool SMemoryOps::IsEqual(const void* lhs, const void* rhs, uint6
 }
 
 template<typename T, typename R>
-KOR_FORCEINLINE bool SMemoryOps::IsEqualAs(const T* lhs, const R* rhs, uint64 num) noexcept
+KOR_FORCEINLINE bool SMemoryOps::IsEqual(const T* lhs, const R* rhs, uint64 num) noexcept
 {
 	if constexpr (!TIsFundamental<T>::Value && !TIsEnum<T>::Value)
 	{
@@ -484,7 +486,7 @@ KOR_FORCEINLINE bool SMemoryOps::IsEqualAs(const T* lhs, const R* rhs, uint64 nu
 	} 
 	else
 	{
-		return IsEqual(lhs, rhs, sizeof(T) * num);
+		return IsEqual((const void*)lhs, (const void*)rhs, sizeof(T) * num);
 	}
 }
 

@@ -14,7 +14,7 @@ class TQueueAllocator
 public:
 
 	// Types
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	typedef ElementT ElementType;
 	typedef uint32 SizeType;
@@ -30,18 +30,18 @@ public:
 	typedef SNode NodeType;
 
 	// Constructor
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TQueueAllocator() = default;
 
 	// Operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool operator==(const TQueueAllocator& other) const { return _head == other._head && _tail == other._tail && _size == other._size; }
 	KOR_FORCEINLINE bool operator!=(const TQueueAllocator& other) const { return !operator==(other); }
 
 	// Getters
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE NodeType* GetHead() const { return _head; }
 	KOR_FORCEINLINE void SetHead(NodeType* node) { _head = node; }
@@ -53,7 +53,7 @@ public:
 	KOR_FORCEINLINE void SetSize(SizeType size) { _size = size; }
 
 	// Methods
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	NodeType* Allocate(SizeType num)
 	{
@@ -61,7 +61,7 @@ public:
 		NodeType* prevNode = _tail;
 		for(SizeType i = 0; i < num; ++i)
 		{
-			NodeType* newNode = SMemoryOps::MallocAs<NodeType>();
+			NodeType* newNode = SMemoryOps::Malloc<NodeType>();
 			newNode->Previous = prevNode;
 			newNode->Next = nullptr;
 

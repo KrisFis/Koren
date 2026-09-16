@@ -6,7 +6,7 @@
 #include "Kor/Core/Build.h"
 
 // Platform Primitives
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 // Helpers for resolving platform-specific headers and type names.
 // KOR_PLATFORM_NAME expands to the active platform identifier (e.g. Win32).
 //
@@ -22,7 +22,7 @@
 //   KOR_PLATFORM_TEMPLATE(Name)            - e.g. TWin32Name          (templates)
 //   KOR_PLATFORM_NAMESPACE(Name)           - e.g. NWin32Name          (namespaces)
 //   KOR_PLATFORM_FUNC(Name)                - e.g. FWin32Name          (free functions)
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #if KOR_PLATFORM_WINDOWS
 	#define KOR_PLATFORM_NAME Win32
@@ -50,12 +50,12 @@
 #define KOR_PLATFORM_FUNC(name) KOR_PLATFORM_TYPE_CUSTOM(F, name)
 
 // Main platform include
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #include KOR_PLATFORM_HEADER_FROM(Kor/Core, Platform)
 
 // Other macros
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 #ifndef KOR_WCHAR_BYTES
 	#error "Platform must define size of wide character"
@@ -107,7 +107,7 @@
 #endif
 
 // Types
-///////////////////////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 KOR_NAMESPACE_BEGIN
 

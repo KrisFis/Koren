@@ -20,29 +20,29 @@ class TSharedPtr
 public:
 
 	// Typedefs
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	typedef T ObjectType;
 
 	// Constructor
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TSharedPtr(Detail::SNullType* = nullptr) {}
 	KOR_FORCEINLINE TSharedPtr(Detail::CReferencerBase& ref) : _referencerProxy(&ref) { _referencerProxy.AddShared(); }
 
 	// Copy/Move constructors [SharedPtr]
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TSharedPtr(const TSharedPtr& other) { ReplaceBy(other); }
 	KOR_FORCEINLINE TSharedPtr(TSharedPtr&& other) { ReplaceBy(Forward<TSharedPtr>(other)); }
 
 	// Destructor
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE ~TSharedPtr() { Reset(); }
 
 	// Conversion operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE operator bool() const { return IsValid(); }
 
@@ -50,13 +50,13 @@ public:
 	KOR_FORCEINLINE explicit operator TSharedPtr<OtherT>() const { return _referencerProxy.IsValid() ? TSharedPtr<OtherT>(*_referencerProxy) : nullptr; }
 
 	// Comparison operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool operator==(const TSharedPtr& other) const { return _referencerProxy == other._referencerProxy; }
 	KOR_FORCEINLINE bool operator!=(const TSharedPtr& other) const { return !operator==(other); }
 
 	// Assignment operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TSharedPtr& operator=(Detail::SNullType*) { Reset(); return *this; }
 
@@ -64,25 +64,25 @@ public:
 	KOR_FORCEINLINE TSharedPtr& operator=(TSharedPtr&& Other) { if(&Other != this) ReplaceBy(Forward<TSharedPtr>(Other)); return *this; }
 
 	// Pointer operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE ObjectType* operator->() const { return Get(); }
 	KOR_FORCEINLINE ObjectType& operator*() const { return *Get(); }
 
 	// Validation
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool IsValid() const { return _referencerProxy.IsSafeToDereference(); }
 	KOR_FORCEINLINE bool IsUnique() const { return _referencerProxy.IsUnique(); }
 
 	// Getters
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE ObjectType* Get() const { return _referencerProxy.IsValid() ? _referencerProxy->GetObject<ObjectType>() : nullptr; }
 	KOR_FORCEINLINE ObjectType& GetRef() { return *Get(); }
 
 	// Other
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE void Reset() { _referencerProxy.RemoveShared(); _referencerProxy.Set(nullptr); }
 
@@ -125,7 +125,7 @@ private:
 };
 
 // Archive operator<< && operator>>
-////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 template<typename T>
 KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, const TSharedPtr<T>& sharedPtr)
@@ -159,18 +159,18 @@ class TWeakPtr
 public:
 
 	// Typedefs
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	typedef T ObjectType;
 
 	// Constructors
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TWeakPtr(Detail::SNullType* = nullptr) {}
 	KOR_FORCEINLINE TWeakPtr(Detail::CReferencerBase& ref) : _referencerProxy(&ref) { _referencerProxy.AddWeak();}
 
 	// Copy/Move constructors
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TWeakPtr(const TWeakPtr& other) { ReplaceBy(other); }
 	KOR_FORCEINLINE TWeakPtr(TWeakPtr&& other) noexcept { ReplaceBy(Forward<TWeakPtr>(other)); }
@@ -179,12 +179,12 @@ public:
 	KOR_FORCEINLINE explicit TWeakPtr(TSharedPtr<T>&& other) noexcept { ReplaceBy(Forward<TSharedPtr<T>>(other)); }
 
 	// Destructor
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE ~TWeakPtr() { Reset(); }
 
 	// Conversion operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE operator bool() const { return IsValid(); }
 
@@ -195,54 +195,54 @@ public:
 	KOR_FORCEINLINE explicit operator TWeakPtr<OtherT>() const { return _referencerProxy.IsValid() ? TWeakPtr<OtherT>(*_referencerProxy) : nullptr; }
 
 	// Comparison operators [WeakPtr]
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool operator==(const TWeakPtr& other) const	{ return _referencerProxy == other._referencerProxy; }
 	KOR_FORCEINLINE bool operator!=(const TWeakPtr& other) const	{ return !operator==(other); }
 
 	// Comparison operators [SharedPtr]
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool operator==(const TSharedPtr<T>& other) const	{ return _referencerProxy == other._referencerProxy; }
 	KOR_FORCEINLINE bool operator!=(const TSharedPtr<T>& other) const	{ return !operator==(other); }
 
 	// Assignment operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TWeakPtr& operator=(const Detail::SNullType*) { Reset(); return *this; }
 
 	// Assignment operators [WeakPtr]
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TWeakPtr& operator=(const TWeakPtr& other) { if (&other != this) ReplaceBy(other); return *this; }
 	KOR_FORCEINLINE TWeakPtr& operator=(TWeakPtr&& other) { if (&other != this) ReplaceBy(Forward<TWeakPtr>(other)); return *this; }
 
 	// Assignment operators [SharedPtr]
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TWeakPtr& operator=(const TSharedPtr<T>& other) { ReplaceBy(other); return *this; }
 	KOR_FORCEINLINE TWeakPtr& operator=(TSharedPtr<T>&& other) { ReplaceBy(Forward<TSharedPtr<T>>(other)); return *this; }
 
 	// Pointer operators
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 	// * Our weak pointer supports dereferencing without shared_ptr
 
 	KOR_FORCEINLINE ObjectType* operator->() const { return Get(); }
 	KOR_FORCEINLINE ObjectType& operator*() const { return *Get(); }
 
 	// Validity
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool IsValid() const { return _referencerProxy.IsSafeToDereference(); }
 
 	// Getters
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE ObjectType* Get() const { return _referencerProxy.IsValid() ? _referencerProxy->GetObject<ObjectType>() : nullptr; }
 	KOR_FORCEINLINE ObjectType& GetRef() const { return *Get(); }
 
 	// Other
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE void Reset() { _referencerProxy.RemoveWeak(); _referencerProxy.Set(nullptr); }
 
@@ -309,7 +309,7 @@ private:
 };
 
 // Archive operator<< && operator>>
-////////////////////////////////////////////
+// -------------------------------------------------------------------------
 
 template<typename T>
 KOR_FORCEINLINE_DEBUG static SArchive& operator<<(SArchive& ar, const TWeakPtr<T>& weakPtr)
@@ -338,22 +338,22 @@ class TSharedClass
 {
 public:
 	// Typedefs
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	typedef T ClassType;
 
 	// Constructors
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE TSharedClass() : _isSharedInitialized(false) {}
 
 	// Getters
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	KOR_FORCEINLINE bool IsSharedInitialized() const { return _isSharedInitialized; }
 
 	// External method
-	/////////////////////////////////
+	// -------------------------------------------------------------------------
 
 	// Gets pointer as shared_ptr
 	KOR_FORCEINLINE TSharedPtr<ClassType> AsShared()

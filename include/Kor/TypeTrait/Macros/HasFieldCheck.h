@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Kor/TypeTrait/Minimal.h"
+#include "Kor/Utility/Forward.h"
 
 // METHOD/FIELD CHECK TRAIT
 // * Generates a trait struct with a static constexpr bool "Value"
@@ -33,53 +34,17 @@
 // **          THasCount<SMyType>::Value
 // -------------------------------------------------------------------------
 
-// In "MethodCall" parameter "TestType" can be used
-#define KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(DeclareName, MethodCall)															\
-	template <typename CheckType>																								\
-	struct DeclareName																											\
-	{																															\
-	private:																													\
-																																\
-		typedef typename TClean<CheckType>::Type PureType;																		\
-																																\
-		template<class TestType, typename = void> struct FGetTestValue : TFalseValue {};										\
-		template<class TestType> struct FGetTestValue<TestType, TVoid<decltype(MethodCall())>> : TTrueValue {};					\
-																																\
-	public:																														\
-																																\
-		static constexpr bool Value = FGetTestValue<PureType>::Value;															\
-	};
 
 // In "MethodCall" parameter "TestType" can be used
-#define KOR_DEFINE_HAS_METHOD_TRAIT(DeclareName, MethodCall)																		\
-	template <typename CheckType>																									\
-	struct DeclareName																												\
-	{																																\
-	private:																														\
-																																	\
-		typedef typename TClean<CheckType>::Type PureType;																			\
-																																	\
-		template<class TestType, typename = void> struct FGetTestValue : TFalseValue {};											\
-		template<class TestType> struct FGetTestValue<TestType, TVoid<decltype(DeclVal<TestType>().MethodCall)>> : TTrueValue {};	\
-																																	\
-	public:																															\
-																																	\
-		static constexpr bool Value = FGetTestValue<PureType>::Value;																\
-	};
+#define KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(TraitName, MethodCall)								\
+	template<typename T, typename = void> struct TraitName : TFalseValue {};					\
+	template<typename T> struct TraitName<T, TVoid<decltype(MethodCall())>> : TTrueValue {};
 
-#define KOR_DEFINE_HAS_FIELD_TRAIT(DeclareName, FieldName)																		\
-	template <typename CheckType>																									\
-	struct DeclareName																												\
-	{																																\
-	private:																														\
-																																	\
-		typedef typename TClean<CheckType>::Type PureType;																			\
-																																	\
-		template<class TestType, typename = void> struct FGetTestValue : TFalseValue {};											\
-		template<class TestType> struct FGetTestValue<TestType, TVoid<decltype(&TestType::FieldName)>> : TTrueValue {};				\
-																																	\
-	public:																															\
-																																	\
-		static constexpr bool Value = FGetTestValue<PureType>::Value;																\
-	};
-	
+// In "MethodCall" parameter "TestType" can be used
+#define KOR_DEFINE_HAS_METHOD_TRAIT(TraitName, MethodCall)													\
+	template<typename T, typename = void> struct TraitName : TFalseValue {};								\
+	template<typename T> struct TraitName<T, TVoid<decltype(DeclVal<T>().MethodCall())>> : TTrueValue {};
+
+#define KOR_DEFINE_HAS_FIELD_TRAIT(TraitName, FieldName)										\
+	template<typename T, typename = void> struct TraitName : TFalseValue {};					\
+	template<typename T> struct TraitName<T, TVoid<decltype(&T::FieldName)>> : TTrueValue {};

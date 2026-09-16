@@ -17,7 +17,7 @@ namespace Detail
 		virtual ~CReferencerBase() = default;
 
 		// Getters
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		KOR_FORCEINLINE bool HasAnyReference() const { return _sharedNum + _weakCount > 0; }
 		KOR_FORCEINLINE uint16 GetSharedNum() const { return _sharedNum; }
@@ -29,7 +29,7 @@ namespace Detail
 		KOR_FORCEINLINE bool HasObject() const { return GetObjectImpl() != nullptr; }
 
 		// Setters [Add]
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		KOR_FORCEINLINE void AddShared()
 		{
@@ -44,7 +44,7 @@ namespace Detail
 		}
 
 		// Setters [REMOVE]
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		KOR_FORCEINLINE void RemoveShared()
 		{
@@ -73,13 +73,13 @@ namespace Detail
 	{
 	public:
 		// Typedefs
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		typedef T ObjectType;
 		typedef DeleterT DeleterType;
 
 		// Constructors
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		TCustomReferencer() = delete;
 
@@ -142,20 +142,20 @@ namespace Detail
 	struct SReferencerProxy
 	{
 		// Constructors
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		KOR_FORCEINLINE SReferencerProxy(CReferencerBase* InReferencer)
 			: _inner(InReferencer)
 		{}
 
 		// Compare operators
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		KOR_FORCEINLINE bool operator==(const SReferencerProxy& other) const { return _inner == other._inner; }
 		KOR_FORCEINLINE bool operator!=(const SReferencerProxy& other) const { return !operator==(other); }
 
 		// Pointer operators
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		KOR_FORCEINLINE CReferencerBase* operator->() { return Get(); }
 		KOR_FORCEINLINE const CReferencerBase* operator->() const { return Get(); }
@@ -164,24 +164,24 @@ namespace Detail
 		KOR_FORCEINLINE const CReferencerBase& operator*() const { return *Get(); }
 
 		// Checkers
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		KOR_FORCEINLINE bool IsValid() const { return _inner != nullptr; }
 		KOR_FORCEINLINE bool IsUnique() const { return _inner != nullptr && _inner->GetSharedNum() == 1; }
 		KOR_FORCEINLINE bool IsSafeToDereference() const { return _inner != nullptr && _inner->GetSharedNum() > 0; }
 
 		// Getters
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		KOR_FORCEINLINE CReferencerBase* Get() const { return _inner; }
 
 		// Setters
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		KOR_FORCEINLINE void Set(CReferencerBase* referencer) { _inner = referencer; }
 
 		// Helper methods [Add]
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		KOR_FORCEINLINE void AddShared()
 		{
@@ -198,7 +198,7 @@ namespace Detail
 		}
 
 		// Helper methods [Remove]
-		/////////////////////////////////
+		// -------------------------------------------------------------------------
 
 		KOR_FORCEINLINE void RemoveShared()
 		{
