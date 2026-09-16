@@ -201,6 +201,12 @@ public:
 	TArray<TStringView> SplitToArray(const TStringView& delim, bool discardEmpty = true) const noexcept;
 	TArray<TStringView> SplitToArray(const TStringView& delim, bool discardEmpty = true, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
 
+	// Swap
+	// -------------------------------------------------------------------------
+
+	// Swaps elements between containers
+	void Swap(TStringView& other) noexcept;
+
 	// Iteration
 	// -------------------------------------------------------------------------
 
@@ -548,6 +554,12 @@ public:
 
 	// Releases any excess allocated memory to fit the current length.
 	void ShrinkToFit() noexcept;
+
+	// Swap
+	// -------------------------------------------------------------------------
+
+	// Swaps elements between containers
+	void Swap(TString& other) noexcept;
 
 	// Iteration
 	// -------------------------------------------------------------------------

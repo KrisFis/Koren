@@ -42,3 +42,16 @@ KOR_FORCEINLINE void TString<CharT>::ShrinkToFit() noexcept
 {
 	_data.ShrinkToFit();
 }
+
+template<typename CharT>
+KOR_FORCEINLINE void TStringView<CharT>::Swap(TStringView& other) noexcept
+{
+	KOR_NAMESPACE::Swap(_data, other._data);
+	KOR_NAMESPACE::Swap(_len, other._len);
+}
+
+template<typename CharT>
+KOR_FORCEINLINE void TString<CharT>::Swap(TString& other) noexcept
+{
+	KOR_NAMESPACE::Swap(_data, other._data);
+}

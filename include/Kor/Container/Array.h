@@ -337,6 +337,9 @@ public:
 	// Index ranges must lie within [0, GetNum()).
 	// -------------------------------------------------------------------------
 
+	// Swaps the elements between array instances
+	void Swap(TArray& other) noexcept;
+
 	// Swaps the elements at `firstIdx` and `secondIdx`.
 	void Swap(SizeType firstIdx, SizeType secondIdx) noexcept;
 

@@ -386,6 +386,19 @@ KOR_FORCEINLINE ElementT TArray<ElementT, AllocatorT>::Pop() noexcept
 }
 
 template<typename ElementT, typename AllocatorT>
+KOR_INLINE void TArray<ElementT, AllocatorT>::Swap(TArray& other) noexcept
+{
+	if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
+	{
+		KOR_NAMESPACE::Swap(_allocator, other._allocator);
+	}
+
+	KOR_NAMESPACE::Swap(_data, other._data);
+	KOR_NAMESPACE::Swap(_num, other._num);
+	KOR_NAMESPACE::Swap(_reservedNum, other._reservedNum);
+}
+
+template<typename ElementT, typename AllocatorT>
 KOR_INLINE void TArray<ElementT, AllocatorT>::Swap(SizeType firstIdx, SizeType secondIdx) noexcept
 {
 	if (firstIdx == secondIdx) return;
