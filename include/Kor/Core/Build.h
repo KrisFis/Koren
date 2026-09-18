@@ -186,14 +186,13 @@
 // General-purpose utility macros. No platform or config dependencies.
 // -------------------------------------------------------------------------
 
-// Macro utilities - expand, stringify, and concatenate with proper expansion order.
-#define KOR_MACRO_EXPAND(x) x
+#define KOR_PP_EXPAND(x) x
 
-#define KOR_MACRO_STRINGIFY(x) #x
-#define KOR_MACRO_STRINGIFY_EXPAND(x) KOR_MACRO_STRINGIFY(x)
+#define KOR_PP_STRINGIFY(x) #x
+#define KOR_PP_STRINGIFY_EXPAND(x) KOR_PP_STRINGIFY(x)
 
-#define KOR_MACRO_CONCAT(x, y) x##y
-#define KOR_MACRO_CONCAT_EXPAND(x, y) KOR_MACRO_CONCAT(x,y)
+#define KOR_PP_CONCAT(x, y) x##y
+#define KOR_PP_CONCAT_EXPAND(x, y) KOR_PP_CONCAT(x,y)
 
-#define KOR_MACRO_DOUBLE_CONCAT(x, y, z) KOR_MACRO_CONCAT_EXPAND(KOR_MACRO_CONCAT_EXPAND(x, y), z)
-#define KOR_MACRO_DOUBLE_CONCAT_EXPAND(x, y, z) KOR_MACRO_DOUBLE_CONCAT(x, y, z)
+#define KOR_PP_CONCAT3(x, y, z) KOR_PP_CONCAT_EXPAND(KOR_PP_CONCAT_EXPAND(x, y), z)
+#define KOR_PP_CONCAT3_EXPAND(x, y, z) KOR_PP_CONCAT3(x, y, z)
