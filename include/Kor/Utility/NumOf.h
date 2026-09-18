@@ -4,28 +4,30 @@
 #pragma once
 
 #include "Kor/TypeTrait/Minimal.h"
-#include "Kor/TypeTrait/Macros/HasFieldCheck.h"
+#include "Kor/Utility/Detail/NumOfHelper.h"
 
 KOR_NAMESPACE_BEGIN
 
 // Returns number of elements within `range`
-// * Number type and value is one as calling "GetNum()"
+// Supports containers with `GetNum()` or `size()` and static arrays
 //
-// Example:
+// Examples:
 // TArray<uint8> arr = { 1, 2, 3, 4 };
-// TArray<uint8>::SizeType arr = NumOf(arr);
+// TArray<uint8>::SizeType arrNum = NumOf(arr);
+//
+// std::vector<uint8> vec = { 1, 2, 3, 4 };
+// std::vector<uint8>::size_type vecNum = NumOf(vec);
+//
+// static const int32 Ids[] = { 1, 2, 3, 4 };
+// TSize idsNum = NumOf(Ids);
+
 template<typename RangeT>
-KOR_NODISCARD KOR_FORCEINLINE constexpr auto NumOf(const RangeT& range)
-	-> decltype(DeclVal<RangeT>().GetNum())
+KOR_NODISCARD KOR_FORCEINLINE constexpr auto NumOf(RangeT&& range)
+	-> decltype(Detail::TNumOfTrait<typename TClean<RangeT>::Type>::Get(range))
 {
-	return range.GetNum();
+	return Detail::TNumOfTrait<typename TClean<RangeT>::Type>::Get(range);
 }
 
-// Returns number of elements within static array
-//
-// Example:
-// static const int32 Ids[]   = { 1, 2, 3, 4 };
-// TSize numOfIds = NumOf(Ids);
 template<typename T, TSize N>
 KOR_NODISCARD KOR_FORCEINLINE constexpr TSize NumOf(const T(&)[N]) noexcept
 {
