@@ -4,35 +4,17 @@
 #pragma once
 
 #include "Kor/TypeTrait/Minimal.h"
-#include "Kor/TypeTrait/Qualifier.h"
+
+#include "Kor/TypeTrait/Detail/DecayHelper.h"
 
 KOR_NAMESPACE_BEGIN
-
-namespace Detail
-{
-	template<typename T>
-	struct TDecayHelper { typedef T Type; };
-
-	template<typename T>
-	struct TDecayHelper<T[]> { typedef T* Type; };
-
-	template<typename T, TSize N>
-	struct TDecayHelper<T[N]> { typedef T* Type; };
-
-	template<typename T, typename... Params>
-	struct TDecayHelper<T(Params...)> { typedef T (*Type)(Params...); };
-}
 
 // [Decay]
 // * Returns the decayed type
 // * ie. applies array-to-pointer and function-to-pointer conversions
 
 template<typename T>
-struct TDecay : TType<
-	typename Detail::TDecayHelper<
-		typename TClean<T>::Type
-	>::Type>
-{};
+using TDecay = Detail::TDecayImpl<T>;
 
 // [Remove Extent]
 // * Removes extent '[]' from the type

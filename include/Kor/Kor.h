@@ -62,6 +62,7 @@
 // Utility
 #include "Kor/Utility/Assert.h"
 #include "Kor/Utility/Forward.h"
+#include "Kor/Utility/Functional.h"
 #include "Kor/Utility/Invoke.h"
 #include "Kor/Utility/IsValid.h"
 #include "Kor/Utility/NumOf.h"
