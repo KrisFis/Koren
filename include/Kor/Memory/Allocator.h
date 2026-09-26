@@ -15,20 +15,18 @@ KOR_NAMESPACE_BEGIN
 class CAllocator
 {
 public:
-	using SizeType = int32;
-
 	// Allocates a raw, untyped memory block.
 	// @param bytes - Number of bytes to allocate.
 	// @param alignment - Required alignment of the returned block, in bytes.
 	// @return Pointer to the allocated block, or nullptr on failure.
-	void* Allocate(SizeType bytes, uint32 alignment) noexcept;
+	void* Allocate(int32 bytes, uint32 alignment) noexcept;
 
 	// Resizes a previously allocated block, possibly moving it.
 	// @param ptr - Block previously returned by Allocate/Reallocate.
 	// @param bytes - New size of the block, in bytes.
 	// @param alignment - Required alignment of the returned block, in bytes.
 	// @return Pointer to the (possibly relocated) block, or nullptr on failure.
-	void* Reallocate(void* ptr, SizeType bytes, uint32 alignment) noexcept;
+	void* Reallocate(void* ptr, int32 bytes, uint32 alignment) noexcept;
 
 	// Frees a block previously returned by Allocate/Reallocate.
 	// @param ptr - Block to free.
@@ -36,16 +34,49 @@ public:
 	void Deallocate(void* ptr, uint32 alignment) noexcept;
 };
 
-template<>
-struct TAllocatorTraits<CAllocator> : TAllocatorTraitsBase<CAllocator>
+template<typename ElementT>
+class TTypedAllocator<CAllocator, ElementT> : protected CAllocator
 {
-	using SizeType = typename CAllocator::SizeType;
+public:
+	// Asserts
+	// -------------------------------------------------------------------------
 
-	enum
-	{
-		NeedsAlignment = true,
-		HasReallocate = true,
-	};
+	static_assert(
+		!TIsVoid<ElementT>::Value && TIsClean<ElementT>::Value,
+		"ElementType must be a non-void clean type");
+
+	// Allocator Interface
+	// -------------------------------------------------------------------------
+
+	// Allocate
+	// * Allocates storage for num elements.
+	// @param num - Number of elements to allocate storage for.
+	// @param alignment - Required alignment of the returned block, in bytes.
+	// @return Pointer to the allocated elements, or nullptr on failure.
+	ElementT* Allocate(
+		int32 num,
+		uint32 alignment
+	) noexcept { return (ElementT*)CAllocator::Allocate(sizeof(ElementT) * num, alignment); }
+
+	// Reallocate
+	// @param ptr - Block previously returned by Allocate/Reallocate.
+	// @param num - New number of elements the block should hold.
+	// @param alignment - Required alignment of the returned block, in bytes.
+	// @return Pointer to the (possibly relocated) elements, or nullptr on failure.
+	ElementT* Reallocate(
+		ElementT* ptr,
+		int32 num,
+		uint32 alignment
+	) noexcept { return (ElementT*)CAllocator::Reallocate((void*)ptr, sizeof(ElementT) * num, alignment); }
+
+	// Free
+	// Frees a block previously returned by Allocate/Reallocate, using ElementT's natural alignment.
+	// @param ptr - Block to free.
+	// @param alignment - Alignment the block was originally allocated with.
+	void Deallocate(
+		ElementT* ptr,
+		uint32 alignment
+	) noexcept { return CAllocator::Deallocate((void*)ptr, alignment); }
 };
 
 #include "Kor/Memory/Detail/Allocator.inl"

@@ -5,45 +5,51 @@
 
 #include "Kor/KorMinimal.h"
 
-#include "Kor/TypeTrait/Property.h"
+#include "Kor/TypeTrait/MemberFunction.h"
+#include "Kor/TypeTrait/Macros/HasFieldCheck.h"
 
 KOR_NAMESPACE_BEGIN
 
 // See Allocator.h for model concept
 
-// [Allocator Traits Base]
-// * Shared defaults for allocator trait specializations.
-// * Specializations of TAllocatorTraits should inherit from this and override as needed.
-
-template<typename T>
-struct TAllocatorTraitsBase
+namespace Detail
 {
-	using SizeType = void;
+	KOR_DEFINE_HAS_MEMBER_TRAIT(THasAllocate, Allocate)
+	KOR_DEFINE_HAS_MEMBER_TRAIT(THasReallocate, Reallocate)
+	KOR_DEFINE_HAS_MEMBER_TRAIT(THasDeallocate, Deallocate)
 
-	enum
+	template<typename T, typename = void>
+	struct TIsAllocatorImpl : TFalseValue {};
+
+	template<typename T>
+	struct TIsAllocatorImpl<T, typename TEnableIf<THasAllocate<T>::Value && THasDeallocate<T>::Value>::Type> : TTrueValue {};
+
+	template<typename T>
+	struct TAllocatorTraitsHelper
 	{
-		// Supports and needs alignment as part of its method signatures
-		// * Alignment parameter should come immediately after main signature
-		NeedsAlignment = false,
+		static_assert(
+			THasAllocate<T>::Value,
+			"T must define Allocate(size, [optional] alignment) method"
+		);
 
-		// Supports reallocation of previously allocated memory
-		HasReallocate = false,
+		static_assert(
+			THasDeallocate<T>::Value,
+			"T must define Deallocate(ptr, size, [optional] alignment) method"
+		);
+
+	private:
+		using AllocateTraits = TMemberFunctionTraits<decltype(&T::Allocate)>;
+
+	public:
+		using SizeType = typename AllocateTraits::template ArgType<0>;
+
+		enum
+		{
+			NeedsAlignment = AllocateTraits::Arity >= 2,
+			SupportsReallocate = THasReallocate<T>::Value,
+		};
 	};
-};
-
-// [Allocator Traits]
-// * Defines meta about an allocator type.
-// * Is intentionally left as forward declare
-//
-// Example Declaration:
-//
-// template<>
-// struct TAllocatorTraits<MyAllocator> : TAllocatorTraitsBase<MyAllocator>
-// {
-//    using SizeType = MyAllocator::SizeType;
-// }
-template<typename T>
-struct TAllocatorTraits;
+}
 
 // [Typed Allocator]
 // Adapter of AllocatorT for ElementT
@@ -51,9 +57,13 @@ template<typename AllocatorT, typename ElementT>
 class TTypedAllocator;
 
 // [Is Allocator]
-// * Checks whether specific type is an allocator (defines TAllocatorTraits)
+// * Checks whether specific type is an allocator (follows allocator concept)
 template<typename T>
-struct TIsAllocator : TBoolValue<TIsComplete<TAllocatorTraits<T>>::Value> {};
+using TIsAllocator = Detail::TIsAllocatorImpl<T>;
+
+// [Allocator Traits]
+template<typename T>
+struct TAllocatorTraits : private Detail::TAllocatorTraitsHelper<T> {};
 
 // [Is Typed Allocator]
 // * Checks whether specific type is a typed allocator type

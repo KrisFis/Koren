@@ -36,7 +36,6 @@
 #include "Kor/Memory/MemoryOps.h"
 #include "Kor/Memory/QueueAllocator.h"
 #include "Kor/Memory/Shared.h"
-#include "Kor/Memory/TypedAllocator.h"
 
 // String
 #include "Kor/String/CharOps.h"
@@ -50,6 +49,7 @@
 #include "Kor/TypeTrait/Construct.h"
 #include "Kor/TypeTrait/Decay.h"
 #include "Kor/TypeTrait/Integer.h"
+#include "Kor/TypeTrait/MemberFunction.h"
 #include "Kor/TypeTrait/MemberPointer.h"
 #include "Kor/TypeTrait/Pack.h"
 #include "Kor/TypeTrait/Property.h"

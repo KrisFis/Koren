@@ -3,13 +3,13 @@
 
 #pragma once // silence tooling
 
-KOR_FORCEINLINE void* CAllocator::Allocate(SizeType bytes, uint32 alignment) noexcept
+KOR_FORCEINLINE void* CAllocator::Allocate(int32 bytes, uint32 alignment) noexcept
 {
 	KOR_ASSERT_DEBUG(bytes > 0);
 	return SMemoryOps::Malloc(bytes, alignment);
 }
 
-KOR_FORCEINLINE void* CAllocator::Reallocate(void* ptr, SizeType bytes, uint32 alignment) noexcept
+KOR_FORCEINLINE void* CAllocator::Reallocate(void* ptr, int32 bytes, uint32 alignment) noexcept
 {
 	KOR_ASSERT_DEBUG(bytes > 0);
 	return SMemoryOps::Realloc(ptr, bytes, alignment);

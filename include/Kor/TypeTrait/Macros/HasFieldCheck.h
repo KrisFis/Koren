@@ -6,7 +6,7 @@
 #include "Kor/TypeTrait/Minimal.h"
 #include "Kor/Utility/Forward.h"
 
-// METHOD/FIELD CHECK TRAIT
+// METHOD/FIELD/TYPE CHECK TRAIT
 // * Generates a trait struct with a static constexpr bool "Value"
 // * "Value" is true if the given expression is well-formed for CheckType, false otherwise
 // * Detection uses the TVoid (void_t) SFINAE idiom: the specialization only matches
@@ -16,22 +16,27 @@
 // * @param1 -> Name of the generated trait
 // * @param2 -> Expression to test for validity (see per-macro notes below)
 // *
-// * KOR_GENERATE_HAS_GLOBAL_METHOD_TRAIT(DeclareName, MethodCall)
+// * KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(DeclareName, MethodCall)
 // ** Tests whether a free/global function call expression is well-formed
 // ** "T" may be referenced inside MethodCall
-// ** Example: KOR_GENERATE_HAS_GLOBAL_METHOD_TRAIT(FHasToString, ToString<T>)
+// ** Example: KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(FHasToString, ToString<T>)
 // **          FHasToString<FMyType>::Value
 // *
-// * KOR_GENERATE_HAS_METHOD_TRAIT(DeclareName, MethodCall)
+// * KOR_DEFINE_HAS_METHOD_TRAIT(DeclareName, MethodCall)
 // ** Tests whether T has a member method matching MethodCall
 // ** MethodCall is appended to DeclVal<T>(), e.g. pass "Foo()" to test T::Foo()
-// ** Example: KOR_GENERATE_HAS_METHOD_TRAIT(THasIsSharedInitialized, IsSharedInitialized())
+// ** Example: KOR_DEFINE_HAS_METHOD_TRAIT(THasIsSharedInitialized, IsSharedInitialized())
 // **          THasIsSharedInitialized<SMyType>::Value
 // *
-// * KOR_GENERATE_HAS_FIELD_TRAIT(DeclareName, FieldName)
+// * KOR_DEFINE_HAS_MEMBER_TRAIT(DeclareName, FieldName)
 // ** Tests whether T has a member field/member named FieldName
-// ** Example: KOR_GENERATE_HAS_FIELD_TRAIT(THasCount, Count)
+// ** Example: KOR_DEFINE_HAS_MEMBER_TRAIT(THasCount, Count)
 // **          THasCount<SMyType>::Value
+// *
+// * KOR_DEFINE_HAS_TYPE_TRAIT(DeclareName, TypeName)
+// ** Tests whether T has a nested type named TypeName
+// ** Example: KOR_DEFINE_HAS_FIELD_TRAIT(THasSizeType, SizeType)
+// **          THasSizeType<SMyType>::Value
 // -------------------------------------------------------------------------
 
 // In "MethodCall" parameter "T" can be used
@@ -44,6 +49,10 @@
 	template<typename T, typename = void> struct TraitName : TFalseValue {};								\
 	template<typename T> struct TraitName<T, TVoid<decltype(DeclVal<T>().MethodCall)>> : TTrueValue {};
 
-#define KOR_DEFINE_HAS_FIELD_TRAIT(TraitName, FieldName)										\
+#define KOR_DEFINE_HAS_MEMBER_TRAIT(TraitName, MemberName)										\
 	template<typename T, typename = void> struct TraitName : TFalseValue {};					\
-	template<typename T> struct TraitName<T, TVoid<decltype(&T::FieldName)>> : TTrueValue {};
+	template<typename T> struct TraitName<T, TVoid<decltype(&T::MemberName)>> : TTrueValue {};
+
+#define KOR_DEFINE_HAS_TYPE_TRAIT(TraitName, TypeName)											\
+	template<typename T, typename = void> struct TraitName : TFalseValue {};					\
+	template<typename T> struct TraitName<T, TVoid<typename T::TypeName>> : TTrueValue {};
