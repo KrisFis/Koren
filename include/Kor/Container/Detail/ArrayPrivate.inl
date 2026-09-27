@@ -96,6 +96,7 @@ namespace Detail::Array
 						if (arr._num > 0)
 						{
 							SMemoryOps::MoveConstruct(newData, arr._data, arr._num);
+							SMemoryOps::Destruct(arr._data, arr._num);
 							arr._allocator.Deallocate(arr._data);
 						}
 
