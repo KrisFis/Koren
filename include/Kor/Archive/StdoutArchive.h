@@ -11,7 +11,7 @@
 
 KOR_NAMESPACE_BEGIN
 
-template<int32 FileNo, typename AllocatorT = typename TArray<tchar>::AllocatorType>
+template<int32 FileNo, typename AllocatorT>
 struct TStdoutArchive : public TArrayArchive<tchar, AllocatorT>
 {
 	typedef TArrayArchive<tchar, AllocatorT> Super;

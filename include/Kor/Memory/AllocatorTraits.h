@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/KorMinimal.h"
+#include "Kor/Memory/Minimal.h"
 
 #include "Kor/TypeTrait/MemberFunction.h"
 #include "Kor/TypeTrait/Macros/HasFieldCheck.h"
@@ -14,63 +14,142 @@ KOR_NAMESPACE_BEGIN
 
 namespace Detail
 {
-	KOR_DEFINE_HAS_MEMBER_TRAIT(THasAllocate, Allocate)
+	KOR_DEFINE_MEMBER_FUNCTION_TRAIT(TAllocateFunctionTrait, Allocate)
 	KOR_DEFINE_HAS_MEMBER_TRAIT(THasReallocate, Reallocate)
 	KOR_DEFINE_HAS_MEMBER_TRAIT(THasDeallocate, Deallocate)
 
-	template<typename T, typename = void>
-	struct TIsAllocatorImpl : TFalseValue {};
+	template<typename T>
+	struct TFollowsAllocatorConcept
+		: TBoolValue<TAllocateFunctionTrait<T>::Valid && THasDeallocate<T>::Value>
+	{};
+
+	template<typename T> struct TIsTypedAllocator : TFalseValue {};
+
+	template<typename AllocatorT, typename ElementT>
+	struct TIsTypedAllocator<TTypedAllocator<AllocatorT, ElementT>> : TTrueValue {};
 
 	template<typename T>
-	struct TIsAllocatorImpl<T, typename TEnableIf<THasAllocate<T>::Value && THasDeallocate<T>::Value>::Type> : TTrueValue {};
+	struct TIsUntypedAllocator : TBoolValue<!TIsTypedAllocator<T>::Value && TFollowsAllocatorConcept<T>::Value> {};
 
 	template<typename T>
-	struct TAllocatorTraitsHelper
+	struct TAnyAllocatorTraitsBase
 	{
 		static_assert(
-			THasAllocate<T>::Value,
-			"T must define Allocate(size, [optional] alignment) method"
+			TAllocateFunctionTrait<T>::Valid,
+			"T must define Allocate(size, alignment) method"
 		);
 
 		static_assert(
 			THasDeallocate<T>::Value,
-			"T must define Deallocate(ptr, size, [optional] alignment) method"
+			"T must define Deallocate(ptr, size, alignment) method"
 		);
 
-	private:
-		using AllocateTraits = TMemberFunctionTraits<decltype(&T::Allocate)>;
+		using Type = T;
 
-	public:
-		using SizeType = typename AllocateTraits::template ArgType<0>;
+		// Gets first argument type of "Allocate" method
+		using SizeType = typename TAllocateFunctionTrait<T>::template ArgType<0>;
 
-		enum
-		{
-			NeedsAlignment = AllocateTraits::Arity >= 2,
-			SupportsReallocate = THasReallocate<T>::Value,
-		};
+		// Checks whether allocator exposes "Reallocate" method
+		static constexpr bool HasReallocate = THasReallocate<T>::Value;
 	};
 }
 
-// [Typed Allocator]
-// Adapter of AllocatorT for ElementT
-template<typename AllocatorT, typename ElementT>
-class TTypedAllocator;
-
 // [Is Allocator]
-// * Checks whether specific type is an allocator (follows allocator concept)
-template<typename T>
-using TIsAllocator = Detail::TIsAllocatorImpl<T>;
 
-// [Allocator Traits]
 template<typename T>
-struct TAllocatorTraits : private Detail::TAllocatorTraitsHelper<T> {};
+using TIsAllocator = Detail::TIsUntypedAllocator<T>;
 
 // [Is Typed Allocator]
-// * Checks whether specific type is a typed allocator type
 
-template<typename T> struct TIsTypedAllocator : TFalseValue {};
+template<typename T>
+using TIsTypedAllocator = Detail::TIsTypedAllocator<T>;
+
+// [Allocator Traits]
+
+template<typename T>
+struct TAllocatorTraits	: Detail::TAnyAllocatorTraitsBase<T>
+{
+private:
+	using Super = Detail::TAnyAllocatorTraitsBase<T>;
+
+public:
+	using AllocatorType = T;
+
+	template<typename ElementT>
+	using TypedType = TTypedAllocator<AllocatorType, ElementT>;
+
+	// Algo
+
+	static void* Reallocate(
+		Super::Type& allocator,
+		void* ptr,
+		typename Super::SizeType oldSize,
+		typename Super::SizeType newSize,
+		uint32 alignment = KOR_DEFAULT_HEAP_ALIGNMENT)
+	{
+		if constexpr (Super::HasReallocate)
+		{
+			return allocator.Reallocate(ptr, newSize, alignment);
+		}
+		else
+		{
+			void* newData = allocator.Allocate(newSize, alignment);
+			KOR_ASSERT(newData);
+
+			if (oldSize > 0)
+			{
+				SPlatformMemoryOps::Move(newData, ptr, oldSize);
+				allocator.Deallocate(ptr);
+			}
+
+			return newData;
+		}
+	}
+};
+
+// [Typed Allocator Traits]
 
 template<typename AllocatorT, typename ElementT>
-struct TIsTypedAllocator<TTypedAllocator<AllocatorT, ElementT>> : TTrueValue {};
+struct TTypedAllocatorTraits : Detail::TAnyAllocatorTraitsBase<TTypedAllocator<AllocatorT, ElementT>>
+{
+private:
+	using Super = Detail::TAnyAllocatorTraitsBase<TTypedAllocator<AllocatorT, ElementT>>;
+
+public:
+	using AllocatorType = AllocatorT;
+	using ElementType = ElementT;
+
+	template<typename OtherElementT>
+	using CastedType = TTypedAllocator<AllocatorT, OtherElementT>;
+
+	// Algo
+
+	static ElementType* Reallocate(
+		Super::Type& allocator,
+		ElementType* ptr,
+		typename Super::SizeType oldNum,
+		typename Super::SizeType newNum,
+		uint32 alignment = alignof(ElementType))
+	{
+		if constexpr (Super::HasReallocate)
+		{
+			return allocator.Reallocate(ptr, newNum, alignment);
+		}
+		else
+		{
+			ElementType* newData = allocator.Allocate(newNum, alignment);
+			KOR_ASSERT(newData);
+
+			if (oldNum > 0)
+			{
+				SMemoryOps::MoveConstruct(newData, ptr, oldNum);
+				SMemoryOps::Destruct(ptr, oldNum);
+				allocator.Deallocate(ptr, oldNum);
+			}
+
+			return newData;
+		}
+	}
+};
 
 KOR_NAMESPACE_END

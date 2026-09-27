@@ -36,6 +36,7 @@
 #include "Kor/Memory/MemoryOps.h"
 #include "Kor/Memory/QueueAllocator.h"
 #include "Kor/Memory/Shared.h"
+#include "Kor/Memory/TypedAllocator.h"
 
 // String
 #include "Kor/String/CharOps.h"

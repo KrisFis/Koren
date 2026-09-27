@@ -12,7 +12,7 @@ KOR_NAMESPACE_BEGIN
 
 // TODO(krisfis): we might want to in-place memory, meaning that it will write to memory block provided
 // Also setting read/write mode is annoying, maybe make it optional
-template<typename ElementT, typename AllocatorT = typename TArray<tchar>::AllocatorType>
+template<typename ElementT, typename AllocatorT>
 struct TArrayArchive : public SArchive
 {
 	typedef TArray<ElementT, AllocatorT> ArrayType;

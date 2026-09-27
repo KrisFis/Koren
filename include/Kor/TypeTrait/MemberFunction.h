@@ -16,7 +16,10 @@ KOR_NAMESPACE_BEGIN
 // ** using FooTraits = TMemberFunction<decltype(SMyType::Foo)>;
 
 template<typename Fn>
-struct TMemberFunctionTraits;
+struct TMemberFunctionTraits
+{
+	static constexpr bool Valid = false;
+};
 
 template<typename R, typename C, typename... Args>
 struct TMemberFunctionTraits<R (C::*)(Args...) const>
@@ -27,6 +30,11 @@ struct TMemberFunctionTraits<R (C::*)(Args...) const>
 	using ArgType = typename TNthArg<N, Args...>::Type;
 
 	static constexpr int32 Arity = sizeof...(Args);
+	static constexpr bool Valid = true;
 };
+
+#define KOR_DEFINE_MEMBER_FUNCTION_TRAIT(DefineName, FuncName)			\
+	template<typename T>												\
+	using DefineName = TMemberFunctionTraits<decltype(&T::FuncName)>;
 
 KOR_NAMESPACE_END
