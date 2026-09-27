@@ -32,6 +32,7 @@
 // Memory
 #include "Kor/Memory/Allocator.h"
 #include "Kor/Memory/AllocatorTraits.h"
+#include "Kor/Memory/Bytes.h"
 #include "Kor/Memory/FixedAllocator.h"
 #include "Kor/Memory/MemoryOps.h"
 #include "Kor/Memory/QueueAllocator.h"
