@@ -5,55 +5,39 @@
 
 #include "Kor/Memory/Minimal.h"
 
-#include "Kor/Memory/Allocator.h"
 #include "Kor/Memory/Bytes.h"
-#include "Kor/Memory/TypedAllocator.h"
 
 #include "Kor/Math/MathOps.h"
 
 KOR_NAMESPACE_BEGIN
 
 template<uint32 NumLimit>
-class TFixedAllocator
+struct TFixedAllocator
 {
-public:
-	KOR_FORCEINLINE void* Allocate(int32 bytes) noexcept { return GetAllocation(bytes); }
-	KOR_FORCEINLINE void* Reallocate(void* ptr, int32 bytes) noexcept { return GetAllocation(bytes); }
-	KOR_FORCEINLINE void Deallocate(void* ptr) noexcept {}
-
-private:
-	void* GetAllocation(int32 bytes) noexcept
+	template<typename T, uint32 Alignment = alignof(T)>
+	struct Typed
 	{
-		KOR_EXPECT(SMathOps::IsWithin(bytes, 0, (int32)NumLimit));
-		return (void*)&_data;
-	}
+		Typed() = default;
 
-	TBytes<NumLimit> _data;
-};
+		Typed(const Typed&) = delete;
+		Typed& operator=(const Typed&) = delete;
 
-template<uint32 NumLimit, typename ElementT>
-class TTypedAllocator<TFixedAllocator<NumLimit>, ElementT>
-	: public TTypedAllocatorBase<TFixedAllocator<NumLimit>, ElementT>
-{
-public:
-	TTypedAllocator() = default;
+		KOR_FORCEINLINE T* Allocate(int32 num) noexcept { return GetAllocation(num); }
+		KOR_FORCEINLINE T* Reallocate(T*, int32 num) noexcept { return GetAllocation(num); }
+		KOR_FORCEINLINE void Deallocate(T*) noexcept {}
 
-	TTypedAllocator(const TTypedAllocator&) = delete;
-	TTypedAllocator& operator=(const TTypedAllocator&) = delete;
+	private:
+		T* GetAllocation(int32 num) noexcept
+		{
+			// Ensure that expected allocation can fit
+			KOR_EXPECT(SMathOps::IsWithin(num, 0, (int32)NumLimit));
+			return *_data[0];
+		}
 
-	KOR_FORCEINLINE ElementT* Allocate(int32 num) noexcept { return GetAllocation(num); }
-	KOR_FORCEINLINE ElementT* Reallocate(ElementT* ptr, int32 newNum) noexcept { return GetAllocation(newNum); }
-	KOR_FORCEINLINE void Deallocate(ElementT* ptr) noexcept {}
+		TTypedBytes<T, Alignment> _data[NumLimit];
+	};
 
-private:
-	ElementT* GetAllocation(int32 num) noexcept
-	{
-		// Ensure that expected allocation can fit
-		KOR_EXPECT(SMathOps::IsWithin(num, 0, (int32)NumLimit));
-		return *_data[0];
-	}
-
-	TTypedBytes<ElementT> _data[NumLimit];
+	using Untyped = Typed<uint8, KOR_DEFAULT_HEAP_ALIGNMENT>;
 };
 
 KOR_NAMESPACE_END

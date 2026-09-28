@@ -27,7 +27,7 @@ namespace Init
 	inline constexpr SNoInit NoInit {};
 }
 
-class CAllocator;
+struct CAllocator;
 
 template<typename AllocatorT, typename ElementT> class TTypedAllocator;
 template<typename ElementT> class TQueueAllocator;

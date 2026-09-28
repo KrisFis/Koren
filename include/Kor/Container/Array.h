@@ -3,15 +3,15 @@
 
 #pragma once
 
-#include "Kor/KorMinimal.h"
+#include "Kor/Memory/Minimal.h"
 
 #include "Kor/Container/ContainerTraits.h"
 
 #include "Kor/Math/MathOps.h"
 
 #include "Kor/Memory/Allocator.h"
+#include "Kor/Memory/AllocatorTraits.h"
 #include "Kor/Memory/MemoryOps.h"
-#include "Kor/Memory/TypedAllocator.h"
 
 #include "Kor/Utility/Invoke.h"
 #include "Kor/Utility/Swap.h"
@@ -42,7 +42,7 @@ public:
 		!TIsVoid<ElementT>::Value && TIsClean<ElementT>::Value,
 		"ElementType must be a non-void and pure type");
 
-	static_assert(TIsAllocator<AllocatorT>::Value,
+	static_assert(TAllocatorAssert<AllocatorT>::Passed,
 		"AllocatorType must be a valid allocator type");
 
 	static_assert(TIsSigned<typename TAllocatorTraits<AllocatorT>::SizeType>::Value,

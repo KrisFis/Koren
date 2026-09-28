@@ -17,6 +17,20 @@ typedef decltype(sizeof(0)) TSize;
 
 typedef decltype(nullptr) TNullptr;
 
+// [ Function Pointer ]
+// * Function pointer type from provided signature
+// * Example: TFunctionPointer<bool(int,int,bool)> -> bool(*)(int,int,bool)
+
+template<typename Signature>
+using TFunctionPointer = Signature*;
+
+// [Member Function Pointer]
+// * Member function pointer from provided signature
+// * Example: TMemberFunctionPointer<FFoo, bool(int,int,bool)> -> bool (FFoo*)(int,int,bool)
+
+template<typename T, typename Signature>
+using TMemberFunctionPointer = Signature T::*;
+
 // [TVoid]
 // * Void type
 // * Used as SFINAE detection idiom target
