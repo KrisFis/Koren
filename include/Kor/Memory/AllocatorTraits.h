@@ -32,11 +32,11 @@ namespace Detail
 		static constexpr bool HasUntypedType = THasUntypedType<AllocatorFamilyT>::Value;
 
 		static_assert(!Assert || HasUntypedType,
-			"Allocator Family must define `Untyped` allocator type"
+			"Allocator Family must define `Untyped` allocator type. Use `using Untyped = void` if not supported"
 		);
 
 		static_assert(!Assert || HasTypedType,
-			"Allocator Family must define `Typed<T>` allocator type"
+			"Allocator Family must define `Typed<T>` allocator type. Use `using Typed = void` if not supported"
 		);
 
 	public:
@@ -64,26 +64,38 @@ namespace Detail
 }
 
 // [Allocator Family Assert]
+// * Asserts (with messages) whether type follows AllocatorFamily concept
+// Example: static_assert(TAllocatorFamilyAssert<AllocatorFamilyT>::Passed)
 
 template<typename T>
 using TAllocatorFamilyAssert = Detail::TAllocatorFamilyConcept<T, true>;
 
 // [Is Allocator Family]
+// * Checks whether type follows AllocatorFamily concept
+// Example: TIsAllocatorFamily<AllocatorFamilyT>::Value
 
 template<typename T>
 struct TIsAllocatorFamily : TBoolValue<Detail::TAllocatorFamilyConcept<T, false>::Passed> {};
 
 // [Allocator Assert]
+// * Asserts (with messages) whether type follows Allocator concept
+// Example: static_assert(TAllocatorAssert<AllocatorT>::Passed)
 
 template<typename T>
 using TAllocatorAssert = Detail::TAllocatorConcept<T, true>;
 
 // [Is Allocator]
+// * Checks whether type follows Allocator concept
+// Example: TIsAllocator<AllocatorT>::Value
 
 template<typename T>
 struct TIsAllocator : TBoolValue<Detail::TAllocatorConcept<T, false>::Passed> {};
 
 // [Allocator Traits]
+// * Traits for Allocator (not suitable for AllocatorFamily)
+// * Provides types and flags about Allocators (SizeType, ElementType, SupportsAlignment etc..)
+// Example: TAllocatorTraits<AllocatorT>::SupportsReallocate
+// See. AllocatorOps.h
 
 template<typename T>
 struct TAllocatorTraits
