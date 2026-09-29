@@ -31,6 +31,7 @@
 
 // Memory
 #include "Kor/Memory/Allocator.h"
+#include "Kor/Memory/AllocatorOps.h"
 #include "Kor/Memory/AllocatorTraits.h"
 #include "Kor/Memory/Bytes.h"
 #include "Kor/Memory/FixedAllocator.h"
@@ -68,4 +69,5 @@
 #include "Kor/Utility/IsValid.h"
 #include "Kor/Utility/NumOf.h"
 #include "Kor/Utility/Optional.h"
+#include "Kor/Utility/SizeAlignOf.h"
 #include "Kor/Utility/Swap.h"

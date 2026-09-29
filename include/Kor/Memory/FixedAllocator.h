@@ -14,7 +14,7 @@ KOR_NAMESPACE_BEGIN
 template<uint32 NumLimit>
 struct TFixedAllocator
 {
-	template<typename T, uint32 Alignment = alignof(T)>
+	template<typename T>
 	struct Typed
 	{
 		Typed() = default;
@@ -34,10 +34,15 @@ struct TFixedAllocator
 			return *_data[0];
 		}
 
-		TTypedBytes<T, Alignment> _data[NumLimit];
+		using BytesType = TChoose<TIsVoid<T>::Value,
+			TTypedBytes<uint8, KOR_DEFAULT_HEAP_ALIGNMENT>,
+			TTypedBytes<T>
+		>::Type;
+
+		BytesType _data[NumLimit];
 	};
 
-	using Untyped = Typed<uint8, KOR_DEFAULT_HEAP_ALIGNMENT>;
+	using Untyped = Typed<void>;
 };
 
 KOR_NAMESPACE_END

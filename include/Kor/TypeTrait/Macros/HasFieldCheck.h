@@ -40,19 +40,23 @@
 // -------------------------------------------------------------------------
 
 // In "MethodCall" parameter "T" can be used
-#define KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(TraitName, MethodCall)								\
-	template<typename T, typename = void> struct TraitName : TFalseValue {};					\
+#define KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(TraitName, MethodCall)													\
+	template<typename T, typename = void> struct TraitName : TFalseValue {};										\
 	template<typename T> struct TraitName<T, TVoid<decltype(MethodCall)>> : TTrueValue {};
 
 // In "MethodCall" parameter "T" can be used
-#define KOR_DEFINE_HAS_METHOD_TRAIT(TraitName, MethodCall)													\
-	template<typename T, typename = void> struct TraitName : TFalseValue {};								\
+#define KOR_DEFINE_HAS_METHOD_TRAIT(TraitName, MethodCall)															\
+	template<typename T, typename = void> struct TraitName : TFalseValue {};										\
 	template<typename T> struct TraitName<T, TVoid<decltype(DeclVal<T>().MethodCall)>> : TTrueValue {};
 
-#define KOR_DEFINE_HAS_MEMBER_TRAIT(TraitName, MemberName)										\
-	template<typename T, typename = void> struct TraitName : TFalseValue {};					\
+#define KOR_DEFINE_HAS_MEMBER_TRAIT(TraitName, MemberName)															\
+	template<typename T, typename = void> struct TraitName : TFalseValue {};										\
 	template<typename T> struct TraitName<T, TVoid<decltype(&T::MemberName)>> : TTrueValue {};
 
-#define KOR_DEFINE_HAS_TYPE_TRAIT(TraitName, TypeName)										\
-	template<typename T, typename = void> struct TraitName : TFalseValue {};					\
+#define KOR_DEFINE_HAS_TYPE_TRAIT(TraitName, TypeName)																\
+	template<typename T, typename = void> struct TraitName : TFalseValue {};										\
 	template<typename T> struct TraitName<T, TVoid<typename T::TypeName>> : TTrueValue {};
+
+#define KOR_DEFINE_HAS_TEMPLATE_TYPE_TRAIT(TraitName, TypeName, ...)												\
+	template<typename T, typename = void> struct TraitName : TFalseValue {};										\
+	template<typename T> struct TraitName<T, TVoid<typename T::template TypeName<__VA_ARGS__>>> : TTrueValue {};

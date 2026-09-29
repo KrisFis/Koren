@@ -5,6 +5,7 @@
 
 #include "Kor/Memory/Minimal.h"
 
+#include "Kor/TypeTrait/Decay.h"
 #include "Kor/TypeTrait/MemberFunction.h"
 #include "Kor/TypeTrait/Macros/HasFieldCheck.h"
 
@@ -27,8 +28,8 @@ namespace Detail
 	struct TAllocatorFamilyConcept
 	{
 	private:
-		static constexpr bool HasTypedType = THasTypedType::Value;
-		static constexpr bool HasUntypedType = THasUntypedType::Value;
+		static constexpr bool HasTypedType = THasTypedType<AllocatorFamilyT>::Value;
+		static constexpr bool HasUntypedType = THasUntypedType<AllocatorFamilyT>::Value;
 
 		static_assert(!Assert || HasUntypedType,
 			"Allocator Family must define `Untyped` allocator type"
@@ -67,15 +68,15 @@ namespace Detail
 template<typename T>
 using TAllocatorFamilyAssert = Detail::TAllocatorFamilyConcept<T, true>;
 
+// [Is Allocator Family]
+
+template<typename T>
+struct TIsAllocatorFamily : TBoolValue<Detail::TAllocatorFamilyConcept<T, false>::Passed> {};
+
 // [Allocator Assert]
 
 template<typename T>
 using TAllocatorAssert = Detail::TAllocatorConcept<T, true>;
-
-// [Is Allocator Family]
-
-template<typename T>
-struct TIsAllocatorFamily : TBoolValue<Detail::TAllocatorConcept<T, false>::Passed> {};
 
 // [Is Allocator]
 
@@ -85,24 +86,38 @@ struct TIsAllocator : TBoolValue<Detail::TAllocatorConcept<T, false>::Passed> {}
 // [Allocator Traits]
 
 template<typename T>
-struct TAllocatorTraitsBase
+struct TAllocatorTraits
 {
-	static_assert(Detail::TAllocatorConcept<T, true>::Passed);
+	static_assert(TAllocatorAssert<T>::Passed);
 
-	// Gets first argument type of "Allocate" method
+	// Size type used by the allocator
+	// * Infers type from first argument of "Allocate" method
 	using SizeType = typename Detail::TAllocateFunctionTrait<T>::template ArgType<0>;
+
+	// Pointer type used by the allocator
+	// * Infers type from return type of "Allocate" method
+	using PointerType = typename Detail::TAllocateFunctionTrait<T>::ReturnType;
+
+	// Allocator type for ease of use
+	using AllocatorType = T;
+
+	// Allocator element type
+	using ElementType = TRemovePointer<PointerType>::Type;
 
 	enum
 	{
-		// Checks whether allocator allows "Alignment" parameter
+		// Whether allocator allows "Alignment" parameter
 		SupportsAlignment = Detail::TAllocateFunctionTrait<T>::Arity >= 2,
 
-		// Checks whether allocator exposes "Reallocate" method
+		// Whether allocator exposes "Reallocate" method
 		SupportsReallocate = Detail::THasReallocateMember<T>::Value,
+
+		// Whether allocator is typed allocator
+		IsTyped = !TIsSame<ElementType, void>::Value,
+
+		// Whether allocator is untyped/raw allocator
+		IsUntyped = !IsTyped,
 	};
 };
-
-template<typename T>
-struct TAllocatorTraits : TAllocatorTraitsBase<T> {};
 
 KOR_NAMESPACE_END

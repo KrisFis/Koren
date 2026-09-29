@@ -148,9 +148,9 @@
 	#define KOR_USE_ASSERT KOR_BUILD_DEBUG
 #endif
 
-// Whether memory allocations are tracked. Defaults to debug builds only. See: Memory.h
-#ifndef KOR_TRACK_MEMORY
-	#define KOR_TRACK_MEMORY KOR_BUILD_DEBUG
+// Whether static tests should be run as part of the build. (list of static_asserts)
+#ifndef KOR_ALLOW_STATIC_TESTS
+	#define KOR_ALLOW_STATIC_TESTS 1
 #endif
 
 // Whether platform-specific default warnings are suppressed. See: <Platform>Build.h

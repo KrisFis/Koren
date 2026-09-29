@@ -28,6 +28,10 @@ namespace Init
 }
 
 struct CAllocator;
+template<uint32 NumLimit> struct TFixedAllocator;
+
+template<int32 Size, uint32 Alignment> struct TBytes;
+template<typename T, uint32 Alignment> struct TTypedBytes;
 
 template<typename AllocatorT, typename ElementT> class TTypedAllocator;
 template<typename ElementT> class TQueueAllocator;

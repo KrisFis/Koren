@@ -52,7 +52,7 @@ public:
 
 	using ElementType = ElementT;
 	using AllocatorType = AllocatorT;
-	using ElementAllocatorType = AllocatorT::Typed<ElementType>;
+	using ElementAllocatorType = typename AllocatorT::template Typed<ElementType>;
 	using SizeType = typename TAllocatorTraits<ElementAllocatorType>::SizeType;
 	using ILType = std::initializer_list<ElementType>;
 	using ArrayIteratorType = ElementType*;
