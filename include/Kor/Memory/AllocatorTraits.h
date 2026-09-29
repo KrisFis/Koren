@@ -14,51 +14,68 @@ KOR_NAMESPACE_BEGIN
 
 namespace Detail
 {
-	KOR_DEFINE_HAS_MEMBER_TRAIT(THasAllocate, Allocate)
-	KOR_DEFINE_HAS_MEMBER_TRAIT(THasReallocate, Reallocate)
-	KOR_DEFINE_HAS_MEMBER_TRAIT(THasDeallocate, Deallocate)
+	KOR_DEFINE_HAS_TYPE_TRAIT(THasUntypedType, Untyped);
+	KOR_DEFINE_HAS_TYPE_TRAIT(THasTypedType, Typed);
+
+	KOR_DEFINE_HAS_MEMBER_TRAIT(THasAllocateMember, Allocate)
+	KOR_DEFINE_HAS_MEMBER_TRAIT(THasReallocateMember, Reallocate)
+	KOR_DEFINE_HAS_MEMBER_TRAIT(THasDeallocateMember, Deallocate)
 
 	KOR_DEFINE_MEMBER_FUNCTION_TRAIT(TAllocateFunctionTrait, Allocate)
+
+	template<typename AllocatorFamilyT, bool Assert>
+	struct TAllocatorFamilyConcept
+	{
+	private:
+		static constexpr bool HasTypedType = THasTypedType::Value;
+		static constexpr bool HasUntypedType = THasUntypedType::Value;
+
+		static_assert(!Assert || HasUntypedType,
+			"Allocator Family must define `Untyped` allocator type"
+		);
+
+		static_assert(!Assert || HasTypedType,
+			"Allocator Family must define `Typed<T>` allocator type"
+		);
+
+	public:
+		static constexpr bool Passed = HasTypedType && HasUntypedType;
+	};
 
 	template<typename AllocatorT, bool Assert>
 	struct TAllocatorConcept
 	{
 	private:
-		static constexpr bool HasAllocate = THasAllocate<AllocatorT>::Value;
-		static constexpr bool HasDeallocate = THasDeallocate<AllocatorT>::Value;
+		static constexpr bool HasAllocate = THasAllocateMember<AllocatorT>::Value;
+		static constexpr bool HasDeallocate = THasDeallocateMember<AllocatorT>::Value;
 
-		static_assert(Assert || HasAllocate,
-			"T must define `Allocate(size)` or `Allocate(size, alignment)` method"
+		static_assert(!Assert || HasAllocate,
+			"Allocator must define `Allocate(size)` or `Allocate(size, alignment)` method"
 		);
 
-		static_assert(Assert || HasDeallocate,
-			"T must define `Deallocate(ptr, size)` or `Deallocate(ptr, size, alignment)` method"
+		static_assert(!Assert || HasDeallocate,
+			"Allocator must define `Deallocate(ptr, size)` or `Deallocate(ptr, size, alignment)` method"
 		);
 
 	public:
 		static constexpr bool Passed = HasAllocate && HasDeallocate;
 	};
-
-	template<typename T>
-	struct TAllocatorTraitsBase
-	{
-		static_assert(TAllocatorConcept<T, true>::Passed);
-
-		// Gets first argument type of "Allocate" method
-		using SizeType = typename TAllocateFunctionTrait<T>::template ArgType<0>;
-
-		// Checks whether allocator allows "Alignment" parameter
-		static constexpr bool SupportsAlignment = TAllocateFunctionTrait<T>::Arity >= 2;
-
-		// Checks whether allocator exposes "Reallocate" method
-		static constexpr bool SupportsReallocate = THasReallocate<T>::Value;
-	};
 }
 
-// [Allocator Concept]
+// [Allocator Family Assert]
+
+template<typename T>
+using TAllocatorFamilyAssert = Detail::TAllocatorFamilyConcept<T, true>;
+
+// [Allocator Assert]
 
 template<typename T>
 using TAllocatorAssert = Detail::TAllocatorConcept<T, true>;
+
+// [Is Allocator Family]
+
+template<typename T>
+struct TIsAllocatorFamily : TBoolValue<Detail::TAllocatorConcept<T, false>::Passed> {};
 
 // [Is Allocator]
 
@@ -68,32 +85,24 @@ struct TIsAllocator : TBoolValue<Detail::TAllocatorConcept<T, false>::Passed> {}
 // [Allocator Traits]
 
 template<typename T>
-struct TAllocatorTraits	: Detail::TAllocatorTraitsBase<T>
+struct TAllocatorTraitsBase
 {
-private:
-	using Super = Detail::TAllocatorTraitsBase<T>;
+	static_assert(Detail::TAllocatorConcept<T, true>::Passed);
 
-public:
-	using AllocatorType = T;
+	// Gets first argument type of "Allocate" method
+	using SizeType = typename Detail::TAllocateFunctionTrait<T>::template ArgType<0>;
 
-	template<typename ElementT>
-	using TypedType = TTypedAllocator<AllocatorType, ElementT>;
+	enum
+	{
+		// Checks whether allocator allows "Alignment" parameter
+		SupportsAlignment = Detail::TAllocateFunctionTrait<T>::Arity >= 2,
+
+		// Checks whether allocator exposes "Reallocate" method
+		SupportsReallocate = Detail::THasReallocateMember<T>::Value,
+	};
 };
 
-// [Typed Allocator Traits]
-
-template<template<typename AllocatorT, typename ElementT> Base>
-struct TAllocatorTraits : Detail::TAllocatorTraitsBase<Base<AllocatorT, ElementT>>
-{
-private:
-	using Super = Detail::TAllocatorTraitsBase<TTypedAllocator<AllocatorT, ElementT>>;
-
-public:
-	using AllocatorType = AllocatorT;
-	using ElementType = ElementT;
-
-	template<typename OtherElementT>
-	using CastedType = TTypedAllocator<AllocatorT, OtherElementT>;
-};
+template<typename T>
+struct TAllocatorTraits : TAllocatorTraitsBase<T> {};
 
 KOR_NAMESPACE_END

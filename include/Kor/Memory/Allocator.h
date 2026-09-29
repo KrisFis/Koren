@@ -9,8 +9,8 @@
 
 KOR_NAMESPACE_BEGIN
 
-// Reference model for the allocator
-// * Each allocator must expose "Typed" and/or "Untyped"
+// Reference model of allocator "family"
+// * Each allocator family must expose "Typed" AND "Untyped" versions
 // * Typed/Untyped types must satisfy TIsAllocator concept
 struct CAllocator
 {

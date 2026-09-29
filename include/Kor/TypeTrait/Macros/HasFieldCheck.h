@@ -53,6 +53,6 @@
 	template<typename T, typename = void> struct TraitName : TFalseValue {};					\
 	template<typename T> struct TraitName<T, TVoid<decltype(&T::MemberName)>> : TTrueValue {};
 
-#define KOR_DEFINE_HAS_TYPE_TRAIT(TraitName, TypeName)											\
+#define KOR_DEFINE_HAS_TYPE_TRAIT(TraitName, TypeName)										\
 	template<typename T, typename = void> struct TraitName : TFalseValue {};					\
 	template<typename T> struct TraitName<T, TVoid<typename T::TypeName>> : TTrueValue {};

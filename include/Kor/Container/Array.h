@@ -38,12 +38,11 @@ public:
 	// Asserts
 	// -------------------------------------------------------------------------
 
-	static_assert(
-		!TIsVoid<ElementT>::Value && TIsClean<ElementT>::Value,
+	static_assert(!TIsVoid<ElementT>::Value && TIsClean<ElementT>::Value,
 		"ElementType must be a non-void and pure type");
 
-	static_assert(TAllocatorAssert<AllocatorT>::Passed,
-		"AllocatorType must be a valid allocator type");
+	static_assert(TAllocatorFamilyAssert<AllocatorT>::Passed,
+		"AllocatorType must be a valid allocator family type");
 
 	static_assert(TIsSigned<typename TAllocatorTraits<AllocatorT>::SizeType>::Value,
 		"SizeType must be a valid signed type");
@@ -53,8 +52,8 @@ public:
 
 	using ElementType = ElementT;
 	using AllocatorType = AllocatorT;
-	using ElementAllocatorType = TTypedAllocator<AllocatorT, ElementType>;
-	using SizeType = typename TAllocatorTraits<AllocatorT>::SizeType;
+	using ElementAllocatorType = AllocatorT::Typed<ElementType>;
+	using SizeType = typename TAllocatorTraits<ElementAllocatorType>::SizeType;
 	using ILType = std::initializer_list<ElementType>;
 	using ArrayIteratorType = ElementType*;
 	using ConstArrayIteratorType = const ElementType*;
