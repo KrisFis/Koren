@@ -36,7 +36,7 @@ KOR_NAMESPACE_BEGIN
 //
 //     // Qualifier queries
 //     static constexpr bool IsConst, IsVolatile, IsCV;
-//     static constexpr bool IsLValueRef, IsRValueRef, IsRef;
+//     static constexpr bool IsLValue, IsRValue, IsRef;
 //     static constexpr bool IsNoexcept;
 //     static constexpr bool IsClean;  // no cv and no ref, noexcept is allowed
 //     static constexpr bool IsPlain;  // no qualifiers at all, including noexcept
@@ -48,7 +48,7 @@ KOR_NAMESPACE_BEGIN
 //
 //     // Add (same function type, qualifier added, result is ::Type, no-op when already present)
 //     using AddConst, AddVolatile, AddNoexcept;
-//     using AddLValueRef, AddRValueRef;  // replace the existing ref qualifier
+//     using AddLValue, AddRValue;  // replace the existing ref qualifier
 // };
 
 // [Define member function trait]
@@ -84,20 +84,21 @@ template<typename Fn> struct TIsMemberFunctionPointer : TBoolValue<TMemberFuncti
 // * Volatile  - "volatile" is present
 // * CV        - any of "const", "volatile" or both, matches semantics of TIsConst
 // * LValueRef - "&" ref qualifier is present
-// * RValueRef - "&&" ref qualifier is present
+// * RValue - "&&" ref qualifier is present
 // * Ref       - any of "&" or "&&"
 // * Noexcept  - "noexcept" is present
 // * Clean     - none of "const", "volatile", "&" or "&&" is present, "noexcept" is allowed (like TClean)
 // * Plain     - no qualifiers at all, including "noexcept"
 
-template<typename Fn> struct TIsConstMemberFunction : TBoolValue<TMemberFunctionTraits<Fn>::IsConst> {};
-template<typename Fn> struct TIsVolatileMemberFunction : TBoolValue<TMemberFunctionTraits<Fn>::IsVolatile> {};
-template<typename Fn> struct TIsCVMemberFunction : TBoolValue<TMemberFunctionTraits<Fn>::IsCV> {};
-template<typename Fn> struct TIsLValueRefMemberFunction : TBoolValue<TMemberFunctionTraits<Fn>::IsLValueRef> {};
-template<typename Fn> struct TIsRValueRefMemberFunction : TBoolValue<TMemberFunctionTraits<Fn>::IsRValueRef> {};
-template<typename Fn> struct TIsNoexceptMemberFunction : TBoolValue<TMemberFunctionTraits<Fn>::IsNoexcept> {};
-template<typename Fn> struct TIsCleanMemberFunction : TBoolValue<TMemberFunctionTraits<Fn>::IsClean> {};
-template<typename Fn> struct TIsPlainMemberFunction : TBoolValue<TMemberFunctionTraits<Fn>::IsPlain> {};
+template<typename Fn> struct TIsConstMemberFunction     : TBoolValue<TMemberFunctionTraits<Fn>::IsConst> {};
+template<typename Fn> struct TIsVolatileMemberFunction  : TBoolValue<TMemberFunctionTraits<Fn>::IsVolatile> {};
+template<typename Fn> struct TIsCVMemberFunction        : TBoolValue<TMemberFunctionTraits<Fn>::IsCV> {};
+template<typename Fn> struct TIsReferenceMemberFunction : TBoolValue<TMemberFunctionTraits<Fn>::IsRef> {};
+template<typename Fn> struct TIsLValueMemberFunction    : TBoolValue<TMemberFunctionTraits<Fn>::IsLValue> {};
+template<typename Fn> struct TIsRValueMemberFunction    : TBoolValue<TMemberFunctionTraits<Fn>::IsRValue> {};
+template<typename Fn> struct TIsNoexceptMemberFunction  : TBoolValue<TMemberFunctionTraits<Fn>::IsNoexcept> {};
+template<typename Fn> struct TIsCleanMemberFunction     : TBoolValue<TMemberFunctionTraits<Fn>::IsClean> {};
+template<typename Fn> struct TIsPlainMemberFunction     : TBoolValue<TMemberFunctionTraits<Fn>::IsPlain> {};
 
 // [Member Function Signature]
 // * Retrieves parts of member function signature, qualifiers do not matter
@@ -106,10 +107,10 @@ template<typename Fn> struct TIsPlainMemberFunction : TBoolValue<TMemberFunction
 // * Arity  - number of arguments
 // * Arg    - type of Nth argument (zero based), out of range index is a compile error
 
-template<typename Fn> struct TMemberFunctionReturn : TType<typename TMemberFunctionTraits<Fn>::ReturnType> {};
-template<typename Fn> struct TMemberFunctionClass : TType<typename TMemberFunctionTraits<Fn>::ClassType> {};
+template<typename Fn> struct TMemberFunctionReturn       : TType<typename TMemberFunctionTraits<Fn>::ReturnType> {};
+template<typename Fn> struct TMemberFunctionClass        : TType<typename TMemberFunctionTraits<Fn>::ClassType> {};
 
-template<typename Fn> struct TMemberFunctionArity : TValue<TSize, TMemberFunctionTraits<Fn>::Arity> {};
+template<typename Fn> struct TMemberFunctionArity        : TValue<TSize, TMemberFunctionTraits<Fn>::Arity> {};
 template<typename Fn, TSize N> struct TMemberFunctionArg : TType<typename TMemberFunctionTraits<Fn>::template ArgType<N>> {};
 
 // [Remove Member Function Qualifiers]
@@ -122,13 +123,13 @@ template<typename Fn, TSize N> struct TMemberFunctionArg : TType<typename TMembe
 // * Clean    - removes "const", "volatile" and "&" or "&&", keeps "noexcept" (like TClean)
 // * Plain    - removes everything
 
-template<typename Fn> using TRemoveMemberConst = typename TMemberFunctionTraits<Fn>::RemoveConst;
-template<typename Fn> using TRemoveMemberVolatile = typename TMemberFunctionTraits<Fn>::RemoveVolatile;
-template<typename Fn> using TRemoveMemberCV = typename TMemberFunctionTraits<Fn>::RemoveCV;
-template<typename Fn> using TRemoveMemberRef = typename TMemberFunctionTraits<Fn>::RemoveRef;
-template<typename Fn> using TRemoveMemberNoexcept = typename TMemberFunctionTraits<Fn>::RemoveNoexcept;
-template<typename Fn> using TMemberClean = typename TMemberFunctionTraits<Fn>::Clean;
-template<typename Fn> using TMemberPlain = typename TMemberFunctionTraits<Fn>::Plain;
+template<typename Fn> using TRemoveMemberConst        = typename TMemberFunctionTraits<Fn>::RemoveConst;
+template<typename Fn> using TRemoveMemberVolatile     = typename TMemberFunctionTraits<Fn>::RemoveVolatile;
+template<typename Fn> using TRemoveMemberCV           = typename TMemberFunctionTraits<Fn>::RemoveCV;
+template<typename Fn> using TRemoveMemberRef          = typename TMemberFunctionTraits<Fn>::RemoveRef;
+template<typename Fn> using TRemoveMemberNoexcept     = typename TMemberFunctionTraits<Fn>::RemoveNoexcept;
+template<typename Fn> using TMemberClean              = typename TMemberFunctionTraits<Fn>::Clean;
+template<typename Fn> using TMemberPlain              = typename TMemberFunctionTraits<Fn>::Plain;
 
 // [Add Member Function Qualifiers]
 // * Adds qualifier to the member function and keeps the rest of signature
@@ -137,14 +138,14 @@ template<typename Fn> using TMemberPlain = typename TMemberFunctionTraits<Fn>::P
 // * Const     - adds "const"
 // * Volatile  - adds "volatile"
 // * Noexcept  - adds "noexcept"
-// * LValueRef - adds "&"
-// * RValueRef - adds "&&"
+// * LValue - adds "&"
+// * RValue - adds "&&"
 
-template<typename Fn> using TAddMemberConst  = typename TMemberFunctionTraits<Fn>::AddConst;
-template<typename Fn> using TAddMemberVolatile  = typename TMemberFunctionTraits<Fn>::AddVolatile;
-template<typename Fn> using TAddMemberNoexcept  = typename TMemberFunctionTraits<Fn>::AddNoexcept;
-template<typename Fn> using TAddMemberLValueRef  = typename TMemberFunctionTraits<Fn>::AddLValueRef;
-template<typename Fn> using TAddMemberRValueRef  = typename TMemberFunctionTraits<Fn>::AddRValueRef;
+template<typename Fn> using TAddMemberConst          = typename TMemberFunctionTraits<Fn>::AddConst;
+template<typename Fn> using TAddMemberVolatile       = typename TMemberFunctionTraits<Fn>::AddVolatile;
+template<typename Fn> using TAddMemberNoexcept       = typename TMemberFunctionTraits<Fn>::AddNoexcept;
+template<typename Fn> using TAddMemberLValue         = typename TMemberFunctionTraits<Fn>::AddLValue;
+template<typename Fn> using TAddMemberRValue         = typename TMemberFunctionTraits<Fn>::AddRValue;
 
 #ifdef KOR_ALLOW_STATIC_TESTS
 namespace Detail::MemberFnTraitsTest
@@ -172,25 +173,25 @@ namespace Detail::MemberFnTraitsTest
 	static_assert(A::Arity == 2);
 
 	// Queries
-	static_assert(!A::IsConst && A::IsNoexcept && !A::IsRefQualified);
-	static_assert(F::IsConst && F::IsVolatile && F::IsConstOrVolatile);
-	static_assert(F::IsLValueRef && !F::IsRValueRef && F::IsNoexcept);
+	static_assert(!A::IsConst && A::IsNoexcept && !A::IsRef);
+	static_assert(F::IsConst && F::IsVolatile && F::IsCV);
+	static_assert(F::IsLValue && !F::IsRValue && F::IsNoexcept);
 
 	// Strip
-	static_assert(TIsSame<F::RemoveConst,    int (Probe::*)(char) volatile & noexcept>::Value);
-	static_assert(TIsSame<F::RemoveVolatile, int (Probe::*)(char) const & noexcept>::Value);
-	static_assert(TIsSame<F::RemoveCV,       int (Probe::*)(char) & noexcept>::Value);
-	static_assert(TIsSame<F::RemoveRef,      int (Probe::*)(char) const volatile noexcept>::Value);
-	static_assert(TIsSame<F::RemoveNoexcept, int (Probe::*)(char) const volatile &>::Value);
-	static_assert(TIsSame<F::Clean,          int (Probe::*)(char) noexcept>::Value);
-	static_assert(TIsSame<F::Plain,          int (Probe::*)(char)>::Value);
+	static_assert(TIsSame<F::RemoveConst::Type,    int (Probe::*)(char) volatile & noexcept>::Value);
+	static_assert(TIsSame<F::RemoveVolatile::Type, int (Probe::*)(char) const & noexcept>::Value);
+	static_assert(TIsSame<F::RemoveCV::Type,       int (Probe::*)(char) & noexcept>::Value);
+	static_assert(TIsSame<F::RemoveRef::Type,      int (Probe::*)(char) const volatile noexcept>::Value);
+	static_assert(TIsSame<F::RemoveNoexcept::Type, int (Probe::*)(char) const volatile &>::Value);
+	static_assert(TIsSame<F::Clean::Type,          int (Probe::*)(char) noexcept>::Value);
+	static_assert(TIsSame<F::Plain::Type,          int (Probe::*)(char)>::Value);
 
 	// Add (including no-op and ref replacement)
 	using P = TMemberFunctionTraits<decltype(&Probe::Plain)>;
-	static_assert(TIsSame<P::AddConst,    void (Probe::*)() const>::Value);
-	static_assert(TIsSame<P::AddNoexcept, void (Probe::*)() noexcept>::Value);
-	static_assert(TIsSame<F::AddConst,    int (Probe::*)(char) const volatile & noexcept>::Value); // no-op
-	static_assert(TIsSame<F::AddRValueRef, int (Probe::*)(char) const volatile && noexcept>::Value);
+	static_assert(TIsSame<P::AddConst::Type,    void (Probe::*)() const>::Value);
+	static_assert(TIsSame<P::AddNoexcept::Type, void (Probe::*)() noexcept>::Value);
+	static_assert(TIsSame<F::AddConst::Type,    int (Probe::*)(char) const volatile & noexcept>::Value); // no-op
+	static_assert(TIsSame<F::AddRValue::Type, int (Probe::*)(char) const volatile && noexcept>::Value);
 
 	// Wrappers
 	static_assert(TIsSame<TRemoveMemberCV<decltype(&Probe::Full)>::Type, int (Probe::*)(char) & noexcept>::Value);

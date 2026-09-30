@@ -70,8 +70,8 @@ struct TMemberFunctionTraits<R (Cls::*)(Args...) K V Rf Nx> \
 	static constexpr bool IsConst           = bK; \
 	static constexpr bool IsVolatile        = bV; \
 	static constexpr bool IsCV              = bK || bV; \
-	static constexpr bool IsLValueRef       = bL; \
-	static constexpr bool IsRValueRef       = bR; \
+	static constexpr bool IsLValue          = bL; \
+	static constexpr bool IsRValue          = bR; \
 	static constexpr bool IsRef             = bL || bR; \
 	static constexpr bool IsNoexcept        = bNx; \
 	static constexpr bool IsClean           = !(bK || bV || bL || bR); \
@@ -85,11 +85,11 @@ struct TMemberFunctionTraits<R (Cls::*)(Args...) K V Rf Nx> \
 	using Clean          = TType<R (Cls::*)(Args...) Nx>;\
 	using Plain          = TType<R (Cls::*)(Args...)>;\
 	\
-	using AddConst    = typename Detail::TMemberFnBuilder<R, Cls, true, bV,   bL,    bR,    bNx,  Args...>; \
-	using AddVolatile = typename Detail::TMemberFnBuilder<R, Cls, bK,   true, bL,    bR,    bNx,  Args...>; \
-	using AddNoexcept = typename Detail::TMemberFnBuilder<R, Cls, bK,   bV,   bL,    bR,    true, Args...>; \
-	using AddLValueRef = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   true,  false, bNx,  Args...>; \
-	using AddRValueRef = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   false, true,  bNx,  Args...>; \
+	using AddConst      = typename Detail::TMemberFnBuilder<R, Cls, true, bV,   bL,    bR,    bNx,  Args...>; \
+	using AddVolatile   = typename Detail::TMemberFnBuilder<R, Cls, bK,   true, bL,    bR,    bNx,  Args...>; \
+	using AddNoexcept   = typename Detail::TMemberFnBuilder<R, Cls, bK,   bV,   bL,    bR,    true, Args...>; \
+	using AddLValue     = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   true,  false, bNx,  Args...>; \
+	using AddRValue     = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   false, true,  bNx,  Args...>; \
 };
 KOR_MEMFN_MATRIX(KOR_X)
 
