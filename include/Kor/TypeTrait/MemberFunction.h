@@ -165,7 +165,7 @@ namespace Detail::MemberFnTraitsTest
 	static_assert(!TIsMemberFunctionPointer<int>::Value);
 	static_assert(!TIsMemberFunctionPointer<int(*)(int)>::Value);
 
-	// Signature (the case that started all this)
+	// Signature
 	static_assert(TIsSame<A::ReturnType, int*>::Value);
 	static_assert(TIsSame<A::ClassType, Probe>::Value);
 	static_assert(TIsSame<A::ArgType<0>, int>::Value);
@@ -186,7 +186,7 @@ namespace Detail::MemberFnTraitsTest
 	static_assert(TIsSame<F::Clean::Type,          int (Probe::*)(char) noexcept>::Value);
 	static_assert(TIsSame<F::Plain::Type,          int (Probe::*)(char)>::Value);
 
-	// Add (including no-op and ref replacement)
+	// Add
 	using P = TMemberFunctionTraits<decltype(&Probe::Plain)>;
 	static_assert(TIsSame<P::AddConst::Type,    void (Probe::*)() const>::Value);
 	static_assert(TIsSame<P::AddNoexcept::Type, void (Probe::*)() noexcept>::Value);
