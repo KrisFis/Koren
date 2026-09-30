@@ -30,7 +30,7 @@ template<typename T> struct TIsRValue<T&&> : TTrueValue {};
 // * Removes reference from type
 
 template<typename T> struct TRemoveReference : TType<T> {};
-template<typename T> struct TRemoveReference<T& > : TType<T> {};
+template<typename T> struct TRemoveReference<T&> : TType<T> {};
 template<typename T> struct TRemoveReference<T&&> : TType<T> {};
 
 // [Is Const]

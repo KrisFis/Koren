@@ -62,37 +62,34 @@ struct TMemberFunctionTraits<R (Cls::*)(Args...) K V Rf Nx> \
 { \
 	static constexpr bool Valid = true; \
 	\
-	/* Signature */ \
 	using ReturnType = R; \
 	using ClassType  = Cls; \
 	template<TSize N> using ArgType = typename TNthArg<N, Args...>::Type; \
 	static constexpr TSize Arity = sizeof...(Args); \
 	\
-	/* Qualifier queries */ \
 	static constexpr bool IsConst           = bK; \
 	static constexpr bool IsVolatile        = bV; \
-	static constexpr bool IsConstOrVolatile = bK || bV; \
+	static constexpr bool IsCV              = bK || bV; \
 	static constexpr bool IsLValueRef       = bL; \
 	static constexpr bool IsRValueRef       = bR; \
-	static constexpr bool IsRefQualified    = bL || bR; \
+	static constexpr bool IsRef             = bL || bR; \
 	static constexpr bool IsNoexcept        = bNx; \
+	static constexpr bool IsClean           = !(bK || bV || bL || bR); \
+	static constexpr bool IsPlain           = !(bK || bV || bL || bR || bNx); \
 	\
-	/* Strip: drop one token from the rebuilt type */ \
-	using RemoveConst    = R (Cls::*)(Args...) V Rf Nx; \
-	using RemoveVolatile = R (Cls::*)(Args...) K Rf Nx; \
-	using RemoveCV       = R (Cls::*)(Args...) Rf Nx; \
-	using RemoveRef      = R (Cls::*)(Args...) K V Nx; \
-	using RemoveNoexcept = R (Cls::*)(Args...) K V Rf; \
-	using Clean          = R (Cls::*)(Args...) Nx; /* cv + ref removed, noexcept kept */ \
-	using Plain          = R (Cls::*)(Args...);    /* everything removed */ \
+	using RemoveConst    = TType<R (Cls::*)(Args...) V Rf Nx>; \
+	using RemoveVolatile = TType<R (Cls::*)(Args...) K Rf Nx>; \
+	using RemoveCV       = TType<R (Cls::*)(Args...) Rf Nx>; \
+	using RemoveRef      = TType<R (Cls::*)(Args...) K V Nx>; \
+	using RemoveNoexcept = TType<R (Cls::*)(Args...) K V Rf>; \
+	using Clean          = TType<R (Cls::*)(Args...) Nx>;\
+	using Plain          = TType<R (Cls::*)(Args...)>;\
 	\
-	/* Add: rebuilt from flags, so adding an existing qualifier is a no-op */ \
-	using AddConst    = typename Detail::TMemberFnBuilder<R, Cls, true, bV,   bL,    bR,    bNx,  Args...>::Type; \
-	using AddVolatile = typename Detail::TMemberFnBuilder<R, Cls, bK,   true, bL,    bR,    bNx,  Args...>::Type; \
-	using AddNoexcept = typename Detail::TMemberFnBuilder<R, Cls, bK,   bV,   bL,    bR,    true, Args...>::Type; \
-	/* Ref qualifiers replace each other: AddLValueRef on a && function yields & */ \
-	using AddLValueRef = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   true,  false, bNx,  Args...>::Type; \
-	using AddRValueRef = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   false, true,  bNx,  Args...>::Type; \
+	using AddConst    = typename Detail::TMemberFnBuilder<R, Cls, true, bV,   bL,    bR,    bNx,  Args...>; \
+	using AddVolatile = typename Detail::TMemberFnBuilder<R, Cls, bK,   true, bL,    bR,    bNx,  Args...>; \
+	using AddNoexcept = typename Detail::TMemberFnBuilder<R, Cls, bK,   bV,   bL,    bR,    true, Args...>; \
+	using AddLValueRef = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   true,  false, bNx,  Args...>; \
+	using AddRValueRef = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   false, true,  bNx,  Args...>; \
 };
 KOR_MEMFN_MATRIX(KOR_X)
 
