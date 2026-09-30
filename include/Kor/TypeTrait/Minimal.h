@@ -31,23 +31,34 @@ using TFunctionPointer = Signature*;
 template<typename T, typename Signature>
 using TMemberFunctionPointer = Signature T::*;
 
-// [TVoid]
+// [Void]
 // * Void type
 // * Used as SFINAE detection idiom target
 
 template<typename...>
 using TVoid = void;
 
+// [Void Template]
+// * Void type for template
+// * Used as SFINAE probe for template target
+
+template<template<typename...> typename>
+using TVoidTemplate = void;
+
 // [Type]
 // * Defines "Type" as provided type
 
 template<typename T> struct TType { using Type = T; };
 
+// [Value]
+// * Defines "Value" as provided value
+
+template<typename T, T ConstValue> struct TValue { inline static constexpr T Value = ConstValue; };
+
 // [Bool Value]
 // * Defines "Value" from provided const bool
 
-template<bool T> struct TBoolValue { static constexpr bool Value = T; };
-template<typename> struct TValue : TBoolValue<true> {};
+template<bool T> struct TBoolValue : TValue<bool, T> {};
 
 using TTrueValue = TBoolValue<true>;
 using TFalseValue = TBoolValue<false>;

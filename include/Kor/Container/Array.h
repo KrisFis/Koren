@@ -44,7 +44,7 @@ public:
 	static_assert(TAllocatorFamilyAssert<AllocatorT>::Passed,
 		"AllocatorType must be a valid allocator family type");
 
-	static_assert(TIsSigned<typename TAllocatorTraits<AllocatorT>::SizeType>::Value,
+	static_assert(TIsSigned<typename TAllocatorTraits<typename AllocatorT::template Typed<ElementT>>::SizeType>::Value,
 		"SizeType must be a valid signed type");
 
 	// Types

@@ -16,7 +16,7 @@ KOR_NAMESPACE_BEGIN
 namespace Detail
 {
 	KOR_DEFINE_HAS_TYPE_TRAIT(THasUntypedType, Untyped);
-	KOR_DEFINE_HAS_TYPE_TRAIT(THasTypedType, Typed);
+	KOR_DEFINE_HAS_TEMPLATE_TRAIT(THasTypedType, Typed);
 
 	KOR_DEFINE_HAS_MEMBER_TRAIT(THasAllocateMember, Allocate)
 	KOR_DEFINE_HAS_MEMBER_TRAIT(THasReallocateMember, Reallocate)
