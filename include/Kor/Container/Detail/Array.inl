@@ -66,9 +66,11 @@ template<typename ElementT, typename AllocatorT>
 struct TContainerTraits<TArray<ElementT, AllocatorT>>
 	: TContainerTraitsBase<TArray<ElementT, AllocatorT>>
 {
+	using Type = TArray<ElementT, AllocatorT>;
+
 	using ElementType = ElementT;
 	using AllocatorType = AllocatorT;
-	using SizeType = TAllocatorTraits<AllocatorT>::SizeType;
+	using SizeType = typename Type::SizeType;
 
 	enum { InlineMemory = true };
 };

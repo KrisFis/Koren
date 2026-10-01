@@ -50,7 +50,7 @@ struct CAllocator
 		// @return Possibly relocated block, or nullptr on failure (original stays valid).
 		KOR_FORCEINLINE T* Reallocate(T* ptr, int32 num, uint32 alignment) noexcept
 		{
-			return (T*)SMemoryOps::Realloc(ptr, num * SizeOf<T, 1>(), alignment);
+			return (T*)SMemoryOps::Realloc((void*)ptr, num * SizeOf<T, 1>(), alignment);
 		}
 
 		// [REQUIRED] Frees a block from Allocate/Reallocate.
@@ -58,7 +58,7 @@ struct CAllocator
 		// @param alignment - [OPTIONAL PARAMETER] Alignment the block was allocated with.
 		KOR_FORCEINLINE void Deallocate(T* ptr, uint32 alignment) noexcept
 		{
-			SMemoryOps::Free(ptr, alignment);
+			SMemoryOps::Free((void*)ptr, alignment);
 		}
 	};
 

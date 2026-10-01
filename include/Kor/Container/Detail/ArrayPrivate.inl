@@ -157,7 +157,7 @@ namespace Detail::Array
 			}
 			else
 			{
-				arr._data = arr._allocator.Allocate(num);
+				arr._data = AllocatorOps::Allocate(arr._allocator, num);
 				arr._reservedNum = num;
 			}
 		}
