@@ -21,6 +21,12 @@ using TIsAllocatorFamily = Detail::Allocator::TIsFamily<FamilyT>;
 template<typename AllocatorT>
 struct TIsAllocator : TBoolValue<Detail::Allocator::IsAllocator<AllocatorT>> {};
 
+// [Allocator Family Size Type]
+// * Gets allocator family size type
+
+template<typename FamilyT>
+struct TAllocatorFamilySizeType : TType<typename FamilyT::SizeType> {};
+
 // [Make Untyped/Typed Allocator]
 // * Makes typed or untyped allocator from allocator family
 

@@ -42,15 +42,17 @@ public:
 	static_assert(TIsAllocatorFamily<AllocatorT>::Value,
 		"AllocatorType must be a valid allocator family type");
 
+	static_assert(TIsSigned<typename TAllocatorFamilySizeType<AllocatorT>::Type>::Value,
+		"SizeType must be a valid signed type");
+
 	using ElementType = ElementT;
 	using AllocatorType = AllocatorT;
 	using ElementAllocatorType = typename TMakeTypedAllocator<AllocatorT, ElementType>::Type;
-	using SizeType = typename TAllocatorTraits<ElementAllocatorType>::SizeType;
+	using SizeType = typename TAllocatorFamilySizeType<AllocatorT>::Type;
 	using ILType = std::initializer_list<ElementType>;
 	using ArrayIteratorType = ElementType*;
 	using ConstArrayIteratorType = const ElementType*;
 
-	static_assert(TIsSigned<SizeType>::Value, "SizeType must be a valid signed type");
 
 	// Constructors
 	// -------------------------------------------------------------------------

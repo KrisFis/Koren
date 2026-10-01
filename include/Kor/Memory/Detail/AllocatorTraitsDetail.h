@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <ranges>
+
 #include "Kor/Memory/Minimal.h"
 
 #include "Kor/TypeTrait/Composite.h"
@@ -19,9 +21,11 @@ namespace Detail::Allocator
 	KOR_DEFINE_HAS_TYPE_TRAIT(THasUntypedTypeTrait, Untyped);
 	KOR_DEFINE_HAS_TEMPLATE_TRAIT(THasTypedTypeTrait, Typed);
 
-	KOR_DEFINE_HAS_METHOD_TRAIT(THasAllocateTrait, Allocate)
-	KOR_DEFINE_HAS_METHOD_TRAIT(THasReallocateTrait, Reallocate)
-	KOR_DEFINE_HAS_METHOD_TRAIT(THasDeallocateTrait, Deallocate)
+	KOR_DEFINE_HAS_TYPE_TRAIT(THasSizeType, SizeType);
+
+	KOR_DEFINE_HAS_METHOD_TRAIT(THasAllocateTrait, Allocate);
+	KOR_DEFINE_HAS_METHOD_TRAIT(THasReallocateTrait, Reallocate);
+	KOR_DEFINE_HAS_METHOD_TRAIT(THasDeallocateTrait, Deallocate);
 
 	KOR_DEFINE_MEMBER_FUNCTION_TRAIT(TAllocateFunctionTrait, Allocate)
 
@@ -77,10 +81,12 @@ namespace Detail::Allocator
 		using UntypedT = typename TUntypedOf<FamilyT>::Type;
 		using TypedT = typename TTypedOf<FamilyT, uint8>::Type; // probe with a dummy element
 
+		static constexpr bool HasSizeType = THasSizeType<FamilyT>::Value;
 		static constexpr bool Declared = !TIsSame<UntypedT, SNoType>::Value && !TIsSame<TypedT, SNoType>::Value;
 		static constexpr bool Usable = !TIsVoid<UntypedT>::Value || !TIsVoid<TypedT>::Value;
+
 	public:
-		static constexpr bool Value = Declared && Usable;
+		static constexpr bool Value = HasSizeType && Declared && Usable;
 	};
 
 	template<typename ResolvedT, bool IsTyped>
@@ -91,7 +97,7 @@ namespace Detail::Allocator
 		static constexpr bool Unsupported = TIsSame<ResolvedT, void>::Value;
 		static constexpr bool Resolved    = !Missing && !Unsupported;
 
-		// Family doesn't declare the type at all
+		// Family doesn't declare the types at all
 		static_assert(IsTyped || !Missing,
 			"Allocator Family must declare `Untyped` (use `using Untyped = void` if unsupported)");
 		static_assert(!IsTyped || !Missing,

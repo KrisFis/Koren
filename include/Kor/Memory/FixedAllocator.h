@@ -14,6 +14,8 @@ KOR_NAMESPACE_BEGIN
 template<uint32 NumLimit>
 struct TFixedAllocator
 {
+	using SizeType = int32;
+
 	template<typename T>
 	struct Typed
 	{
@@ -22,15 +24,15 @@ struct TFixedAllocator
 		Typed(const Typed&) = delete;
 		Typed& operator=(const Typed&) = delete;
 
-		KOR_FORCEINLINE T* Allocate(int32 num) noexcept { return GetAllocation(num); }
-		KOR_FORCEINLINE T* Reallocate(T*, int32 num) noexcept { return GetAllocation(num); }
+		KOR_FORCEINLINE T* Allocate(SizeType num) noexcept { return GetAllocation(num); }
+		KOR_FORCEINLINE T* Reallocate(T*, SizeType num) noexcept { return GetAllocation(num); }
 		KOR_FORCEINLINE void Deallocate(T*) noexcept {}
 
 	private:
-		T* GetAllocation(int32 num) noexcept
+		T* GetAllocation(SizeType num) noexcept
 		{
 			// Ensure that expected allocation can fit
-			KOR_EXPECT(SMathOps::IsWithin(num, 0, (int32)NumLimit));
+			KOR_EXPECT(SMathOps::IsWithin<int64>(num, 0, NumLimit));
 			return *_data[0];
 		}
 
