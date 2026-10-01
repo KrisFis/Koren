@@ -5,110 +5,47 @@
 
 #include "Kor/Memory/Minimal.h"
 
-#include "Kor/TypeTrait/Decay.h"
-#include "Kor/TypeTrait/MemberFunction.h"
-#include "Kor/TypeTrait/Macros/HasFieldCheck.h"
+#include "Kor/Memory/Detail/AllocatorTraitsDetail.h"
 
 KOR_NAMESPACE_BEGIN
 
-// See Allocator.h for model concept
-
-namespace Detail
-{
-	KOR_DEFINE_HAS_TYPE_TRAIT(THasUntypedType, Untyped);
-	KOR_DEFINE_HAS_TEMPLATE_TRAIT(THasTypedType, Typed);
-
-	KOR_DEFINE_HAS_MEMBER_TRAIT(THasAllocateMember, Allocate)
-	KOR_DEFINE_HAS_MEMBER_TRAIT(THasReallocateMember, Reallocate)
-	KOR_DEFINE_HAS_MEMBER_TRAIT(THasDeallocateMember, Deallocate)
-
-	KOR_DEFINE_MEMBER_FUNCTION_TRAIT(TAllocateFunctionTrait, Allocate)
-
-	template<typename AllocatorFamilyT, bool Assert>
-	struct TAllocatorFamilyConcept
-	{
-	private:
-		static constexpr bool HasTypedType = THasTypedType<AllocatorFamilyT>::Value;
-		static constexpr bool HasUntypedType = THasUntypedType<AllocatorFamilyT>::Value;
-
-		static_assert(!Assert || HasUntypedType,
-			"Allocator Family must define `Untyped` allocator type. Use `using Untyped = void` if not supported"
-		);
-
-		static_assert(!Assert || HasTypedType,
-			"Allocator Family must define `Typed<T>` allocator type. Use `using Typed = void` if not supported"
-		);
-
-	public:
-		static constexpr bool Passed = HasTypedType && HasUntypedType;
-	};
-
-	template<typename AllocatorT, bool Assert>
-	struct TAllocatorConcept
-	{
-	private:
-		static constexpr bool HasAllocate = THasAllocateMember<AllocatorT>::Value;
-		static constexpr bool HasDeallocate = THasDeallocateMember<AllocatorT>::Value;
-
-		static_assert(!Assert || HasAllocate,
-			"Allocator must define `Allocate(size)` or `Allocate(size, alignment)` method"
-		);
-
-		static_assert(!Assert || HasDeallocate,
-			"Allocator must define `Deallocate(ptr, size)` or `Deallocate(ptr, size, alignment)` method"
-		);
-
-	public:
-		static constexpr bool Passed = HasAllocate && HasDeallocate;
-	};
-}
-
-// [Allocator Family Assert]
-// * Asserts (with messages) whether type follows AllocatorFamily concept
-// Example: static_assert(TAllocatorFamilyAssert<AllocatorFamilyT>::Passed)
-
-template<typename T>
-using TAllocatorFamilyAssert = Detail::TAllocatorFamilyConcept<T, true>;
-
 // [Is Allocator Family]
 // * Checks whether type follows AllocatorFamily concept
-// Example: TIsAllocatorFamily<AllocatorFamilyT>::Value
 
-template<typename T>
-struct TIsAllocatorFamily : TBoolValue<Detail::TAllocatorFamilyConcept<T, false>::Passed> {};
-
-// [Allocator Assert]
-// * Asserts (with messages) whether type follows Allocator concept
-// Example: static_assert(TAllocatorAssert<AllocatorT>::Passed)
-
-template<typename T>
-using TAllocatorAssert = Detail::TAllocatorConcept<T, true>;
+template<typename FamilyT>
+using TIsAllocatorFamily = Detail::Allocator::TIsFamily<FamilyT>;
 
 // [Is Allocator]
 // * Checks whether type follows Allocator concept
-// Example: TIsAllocator<AllocatorT>::Value
 
-template<typename T>
-struct TIsAllocator : TBoolValue<Detail::TAllocatorConcept<T, false>::Passed> {};
+template<typename AllocatorT>
+struct TIsAllocator : TBoolValue<Detail::Allocator::IsAllocator<AllocatorT>> {};
+
+// [Make Untyped/Typed Allocator]
+// * Makes typed or untyped allocator from allocator family
+
+template<typename FamilyT>
+using TMakeUntypedAllocator = typename Detail::Allocator::TValidateMake<typename Detail::Allocator::TUntypedOf<FamilyT>::Type, false>;
+
+template<typename FamilyT, typename ElementT>
+using TMakeTypedAllocator = typename Detail::Allocator::TValidateMake<typename Detail::Allocator::TTypedOf<FamilyT, ElementT>::Type, true>;
 
 // [Allocator Traits]
 // * Traits for Allocator (not suitable for AllocatorFamily)
 // * Provides types and flags about Allocators (SizeType, ElementType, SupportsAlignment etc..)
-// Example: TAllocatorTraits<AllocatorT>::SupportsReallocate
-// See. AllocatorOps.h
 
 template<typename T>
 struct TAllocatorTraits
 {
-	static_assert(TAllocatorAssert<T>::Passed);
+	static_assert(TIsAllocator<T>::Value, "T is not an allocator type");
 
 	// Size type used by the allocator
 	// * Infers type from first argument of "Allocate" method
-	using SizeType = typename Detail::TAllocateFunctionTrait<T>::template ArgType<0>;
+	using SizeType = typename Detail::Allocator::TAllocateFunctionTrait<T>::template ArgType<0>;
 
 	// Pointer type used by the allocator
 	// * Infers type from return type of "Allocate" method
-	using PointerType = typename Detail::TAllocateFunctionTrait<T>::ReturnType;
+	using PointerType = typename Detail::Allocator::TAllocateFunctionTrait<T>::ReturnType;
 
 	// Allocator type for ease of use
 	using AllocatorType = T;
@@ -119,13 +56,13 @@ struct TAllocatorTraits
 	enum
 	{
 		// Whether allocator allows "Alignment" parameter
-		SupportsAlignment = Detail::TAllocateFunctionTrait<T>::Arity >= 2,
+		SupportsAlignment = Detail::Allocator::TAllocateFunctionTrait<T>::Arity >= 2,
 
 		// Whether allocator exposes "Reallocate" method
-		SupportsReallocate = Detail::THasReallocateMember<T>::Value,
+		SupportsReallocate = Detail::Allocator::HasReallocate<T>,
 
 		// Whether allocator is typed allocator
-		IsTyped = !TIsSame<ElementType, void>::Value,
+		IsTyped = !TIsVoid<ElementType>::Value,
 
 		// Whether allocator is untyped/raw allocator
 		IsUntyped = !IsTyped,

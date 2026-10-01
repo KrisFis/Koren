@@ -6,6 +6,7 @@
 #include "Kor/Memory/Minimal.h"
 
 #include "Kor/Memory/MemoryOps.h"
+#include "Kor/Memory/AllocatorTraits.h"
 
 #include "Kor/Math/MathOps.h"
 
@@ -13,10 +14,15 @@
 
 KOR_NAMESPACE_BEGIN
 
+// TAllocatorOps
+// -------------------------------------------------------------------------
+// Uniform front-end over allocators: forwards alignment only when the allocator
+// supports it, and adds fallback and element-lifetime handling on top.
+// All sizes and capacities are in elements, not bytes.
 template<typename AllocatorT>
-struct SAllocatorOps
+struct TAllocatorOps
 {
-	static_assert(TAllocatorAssert<AllocatorT>::Passed);
+	static_assert(TIsAllocator<AllocatorT>::Value, "AllocatorT must be an allocator type");
 
 	using Traits = TAllocatorTraits<AllocatorT>;
 
@@ -25,122 +31,73 @@ struct SAllocatorOps
 	using ElementType = typename Traits::ElementType;
 	using PointerType = typename Traits::PointerType;
 
+	// alignof(ElementType) for typed allocators, KOR_DEFAULT_HEAP_ALIGNMENT otherwise.
 	static constexpr uint32 DefaultAlignment = Traits::IsTyped
 		? AlignOf<ElementType>()
 		: KOR_DEFAULT_HEAP_ALIGNMENT;
 
-	KOR_FORCEINLINE static PointerType Allocate(
+	// Allocate | Reallocate
+	// -------------------------------------------------------------------------
+
+	// Allocates uninitialized storage for capacity elements
+	// Failure behavior is defined by the allocator
+	static PointerType Allocate(
 		AllocatorType& allocator,
 		SizeType capacity,
-		uint32 alignment = DefaultAlignment) noexcept
-	{
-		if constexpr (Traits::SupportsAlignment) { return allocator.Allocate(capacity, alignment); }
-		else { return allocator.Allocate(capacity); }
-	}
+		uint32 alignment = DefaultAlignment) noexcept;
 
-	KOR_INLINE static PointerType Reallocate(
+	// Resizes a block using the allocator's native Reallocate
+	// Static-asserts if the allocator has no Reallocate — use ReallocateWithFallback instead
+	// May move the block bitwise, no constructors or destructors run
+	static PointerType Reallocate(
 		AllocatorType& allocator,
 		PointerType ptr,
 		SizeType newCapacity,
-		uint32 alignment = DefaultAlignment) noexcept
-	{
-		static_assert(Traits::SupportsReallocate,
-			"Allocator does not support Reallocate. "
-			"Prefer `ReallocateWithFallback(allocator, ptr, oldCapacity, newCapacity, alignment)`");
+		uint32 alignment = DefaultAlignment) noexcept;
 
-		if constexpr (Traits::SupportsAlignment) { return allocator.Reallocate(ptr, newCapacity, alignment); }
-		else { return allocator.Reallocate(ptr, newCapacity); }
-	}
-
-	KOR_INLINE static PointerType ReallocateWithFallback(
+	// Uses native Reallocate if available, otherwise Allocate + Move + Deallocate
+	// The fallback moves min(oldCapacity, newCapacity) elements bitwise (memmove)
+	// Asserts if the fallback allocation fails
+	// oldCapacity == 0 -> frees ptr (if any) and allocates a fresh block
+	static PointerType ReallocateWithFallback(
 		AllocatorType& allocator,
 		PointerType ptr,
 		SizeType oldCapacity,
 		SizeType newCapacity,
-		uint32 alignment = DefaultAlignment) noexcept
-	{
-		if constexpr (Traits::SupportsReallocate)
-		{
-			if constexpr (Traits::SupportsAlignment) { return allocator.Reallocate(ptr, newCapacity, alignment); }
-			else { return allocator.Reallocate(ptr, newCapacity); }
-		}
-		else if (oldCapacity > 0)
-		{
-			PointerType newData = Allocate(allocator, newCapacity, alignment);
-			KOR_ASSERT(newData);
+		uint32 alignment = DefaultAlignment) noexcept;
 
-			SPlatformMemoryOps::Move(newData, ptr, SMathOps::Min(oldCapacity, newCapacity) * SizeOf<ElementType, 1>());
-			Deallocate(allocator, ptr, alignment);
-
-			return newData;
-		}
-		else
-		{
-			if (ptr) Deallocate(allocator, ptr, alignment);
-			return Allocate(allocator, newCapacity, alignment);
-		}
-	}
-
-	KOR_INLINE static PointerType ReallocateConstructed(
+	// Lifetime-aware reallocation: only [0, oldConstructed) holds live elements
+	// Untyped or trivially relocatable -> ReallocateWithFallback, moving oldConstructed elements
+	// Otherwise -> Allocate + MoveConstruct + destroy and free the old block
+	// The remainder of the new block is left uninitialized
+	// oldConstructed == 0 -> frees ptr (if oldCapacity > 0) and allocates a fresh block
+	static PointerType ReallocateConstructed(
 		AllocatorType& allocator,
 		PointerType ptr,
 		SizeType oldCapacity,
 		SizeType oldConstructed,
 		SizeType newCapacity,
-		uint32 alignment = DefaultAlignment) noexcept
-	{
-		if constexpr (!Traits::IsTyped)
-		{
-			// We know that "oldConstructed" will be used for moving bytes and we don't want to move "oldCapacity"
-			return ReallocateWithFallback(allocator, ptr, oldConstructed, newCapacity, alignment);
-		}
-		else // Traits::IsTyped
-		{
-			if constexpr (TIsTriviallyRelocatable<ElementType>::Value)
-			{
-				// We know that "oldConstructed" will be used for moving bytes and we don't want to move "oldCapacity"
-				return ReallocateWithFallback(allocator, ptr, oldConstructed, newCapacity, alignment);
-			}
-			else if (oldConstructed > 0)
-			{
-				PointerType newData = Allocate(allocator, newCapacity, alignment);
-				KOR_ASSERT(newData);
+		uint32 alignment = DefaultAlignment) noexcept;
 
-				SMemoryOps::MoveConstruct(newData, ptr, oldConstructed);
-				DeallocateConstructed(allocator, ptr, oldConstructed, alignment);
+	// Deallocate
+	// -------------------------------------------------------------------------
 
-				return newData;
-			}
-			else
-			{
-				if (oldCapacity > 0) Deallocate(allocator, ptr, alignment);
-				return Allocate(allocator, newCapacity, alignment);
-			}
-		}
-	}
-
-	KOR_FORCEINLINE static void Deallocate(
+	// Frees storage only — elements must already be destroyed
+	// Null handling is defined by the allocator
+	static void Deallocate(
 		AllocatorType& allocator,
 		PointerType ptr,
-		uint32 alignment = DefaultAlignment) noexcept
-	{
-		if constexpr (Traits::SupportsAlignment) allocator.Deallocate(ptr, alignment);
-		else allocator.Deallocate(ptr);
-	}
+		uint32 alignment = DefaultAlignment) noexcept;
 
-	KOR_INLINE static void DeallocateConstructed(
+	// Destroys [0, numConstructed), then frees the block
+	// numConstructed == 0 -> skips destruction
+	static void DeallocateConstructed(
 		AllocatorType& allocator,
 		PointerType ptr,
 		SizeType numConstructed,
-		uint32 alignment = DefaultAlignment) noexcept
-	{
-		if (numConstructed > 0)
-		{
-			SMemoryOps::Destruct(ptr, numConstructed);
-		}
-
-		Deallocate(allocator, ptr, alignment);
-	}
+		uint32 alignment = DefaultAlignment) noexcept;
 };
+
+#include "Kor/Memory/Detail/AllocatorOps.inl"
 
 KOR_NAMESPACE_END

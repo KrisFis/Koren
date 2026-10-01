@@ -10,6 +10,7 @@
 #include "Kor/Math/MathOps.h"
 
 #include "Kor/Memory/Allocator.h"
+#include "Kor/Memory/AllocatorOps.h"
 #include "Kor/Memory/AllocatorTraits.h"
 #include "Kor/Memory/MemoryOps.h"
 
@@ -35,28 +36,21 @@ template<typename ElementT, typename AllocatorT>
 class TArray
 {
 public:
-	// Asserts
-	// -------------------------------------------------------------------------
-
 	static_assert(!TIsVoid<ElementT>::Value && TIsClean<ElementT>::Value,
 		"ElementType must be a non-void and pure type");
 
-	static_assert(TAllocatorFamilyAssert<AllocatorT>::Passed,
+	static_assert(TIsAllocatorFamily<AllocatorT>::Value,
 		"AllocatorType must be a valid allocator family type");
-
-	static_assert(TIsSigned<typename TAllocatorTraits<typename AllocatorT::template Typed<ElementT>>::SizeType>::Value,
-		"SizeType must be a valid signed type");
-
-	// Types
-	// -------------------------------------------------------------------------
 
 	using ElementType = ElementT;
 	using AllocatorType = AllocatorT;
-	using ElementAllocatorType = typename AllocatorT::template Typed<ElementType>;
+	using ElementAllocatorType = typename TMakeTypedAllocator<AllocatorT, ElementType>::Type;
 	using SizeType = typename TAllocatorTraits<ElementAllocatorType>::SizeType;
 	using ILType = std::initializer_list<ElementType>;
 	using ArrayIteratorType = ElementType*;
 	using ConstArrayIteratorType = const ElementType*;
+
+	static_assert(TIsSigned<SizeType>::Value, "SizeType must be a valid signed type");
 
 	// Constructors
 	// -------------------------------------------------------------------------

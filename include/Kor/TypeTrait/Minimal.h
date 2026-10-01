@@ -17,6 +17,11 @@ typedef decltype(sizeof(0)) TSize;
 
 typedef decltype(nullptr) TNullptr;
 
+// [ Args ]
+// * Useful shareable wrapper type around args
+
+template<typename...> struct TArgs;
+
 // [ Function Pointer ]
 // * Function pointer type from provided signature
 // * Example: TFunctionPointer<bool(int,int,bool)> -> bool(*)(int,int,bool)

@@ -17,31 +17,62 @@
 // * @param1 -> Name of the generated trait
 // * @param2 -> Expression or member name to test (see per-macro notes below)
 
-// KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(TraitName, MethodCall)
+// KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(TraitName, MethodName)
+// KOR_DEFINE_HAS_GLOBAL_METHOD_ARGS_TRAIT(TraitName, MethodName, ...)
 // -------------------------------------------------------------------------
-// Tests whether a free/global function call expression is well-formed
-// "T" may be referenced inside MethodCall, which must be a complete call expression
+// Tests whether a free/global function call MethodName(args...) is well-formed
+// Generates: template<typename T, typename ArgsT = <default args>> struct TraitName
 //
-// Example: KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(THasToString, ToString(DeclVal<T>()))
-//          THasToString<SMyType>::Value
+// - Default args come from the macro: none, or the listed types ("T" is the trait's own parameter)
+// - Override at the use site with TArgs<...> to test a different overload
+// - Args are forwarded via DeclVal<Arg>(): T& = lvalue, T = rvalue, const T& = const lvalue
+// - Qualified names (Kor::Begin) disable ADL; unqualified names find class-type overloads via ADL
+//
+// Example: KOR_DEFINE_HAS_GLOBAL_METHOD_ARGS_TRAIT(THasGlobalSwap, Swap, T&, T&);
+//          THasGlobalSwap<SMyType>::Value                    // Swap(SMyType&, SMyType&)
+//          THasGlobalSwap<SMyType, TArgs<SMyType&, SOther&>>::Value
+//
+//          KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(THasGlobalInit, Init);
+//          THasGlobalInit<void>::Value                       // Init(), T is just a tag
 
-#define KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(TraitName, MethodCall)													\
-	template<typename T, typename = void> struct TraitName : TFalseValue {};										\
-	template<typename T> struct TraitName<T, TVoid<decltype(MethodCall)>> : TTrueValue {};
+#define KOR_DEFINE_HAS_GLOBAL_METHOD_TRAIT(TraitName, MethodName)												\
+	template<typename T, typename ArgsT = TArgs<>, typename = void> struct TraitName : TFalseValue {};			\
+	template<typename T, typename... ArgsT> struct TraitName<T, TArgs<ArgsT...>,								\
+		TVoid<decltype(MethodName(DeclVal<ArgsT>()...))>> : TTrueValue {};
 
-// KOR_DEFINE_HAS_METHOD_TRAIT(TraitName, MethodCall)
+#define KOR_DEFINE_HAS_GLOBAL_METHOD_ARGS_TRAIT(TraitName, MethodName, ...)											\
+	template<typename T, typename ArgsT = TArgs<__VA_ARGS__>, typename = void> struct TraitName : TFalseValue {};	\
+	template<typename T, typename... ArgsT> struct TraitName<T, TArgs<ArgsT...>,									\
+		TVoid<decltype(MethodName(DeclVal<ArgsT>()...))>> : TTrueValue {};
+
+// KOR_DEFINE_HAS_METHOD_TRAIT(TraitName, MethodName)
+// KOR_DEFINE_HAS_METHOD_ARGS_TRAIT(TraitName, MethodName, ...)
 // -------------------------------------------------------------------------
-// Tests whether T has a member method callable as MethodCall
-// MethodCall is appended to DeclVal<T>(), e.g. pass "Foo()" to test T::Foo()
-// Arguments are part of the test: "Foo(1)" tests T::Foo accepting an int
-// T is tested as an rvalue (DeclVal<T>()), so &-qualified overloads are not matched
+// Tests whether T has a member method callable as obj.MethodName(args...)
+// Generates: template<typename T, typename ArgsT = <default args>> struct TraitName
 //
-// Example: KOR_DEFINE_HAS_METHOD_TRAIT(THasIsSharedInitialized, IsSharedInitialized())
-//          THasIsSharedInitialized<SMyType>::Value
+// - Default args come from the macro: none, or the listed types ("T" is the trait's own parameter)
+// - Override at the use site with TArgs<...> to test a different overload
+// - Args are forwarded via DeclVal<Arg>(): T& = lvalue, T = rvalue, const T& = const lvalue
+// - The object is tested as an lvalue (DeclVal<T&>): &-qualified overloads match, &&-qualified do not
+// - Pass "const T" to test const-callability
+//
+// Example: KOR_DEFINE_HAS_METHOD_TRAIT(THasIsSharedInitialized, IsSharedInitialized);
+//          THasIsSharedInitialized<SMyType>::Value           // obj.IsSharedInitialized()
+//
+//          KOR_DEFINE_HAS_METHOD_ARGS_TRAIT(THasSwap, Swap, T&);
+//          THasSwap<SMyType>::Value                          // obj.Swap(SMyType&)
+//          THasSwap<SMyType, TArgs<SOther&>>::Value          // obj.Swap(SOther&)
 
-#define KOR_DEFINE_HAS_METHOD_TRAIT(TraitName, MethodCall)															\
-	template<typename T, typename = void> struct TraitName : TFalseValue {};										\
-	template<typename T> struct TraitName<T, TVoid<decltype(DeclVal<T>().MethodCall)>> : TTrueValue {};
+#define KOR_DEFINE_HAS_METHOD_TRAIT(TraitName, MethodName)													\
+	template<typename T, typename ArgsT = TArgs<>, typename = void> struct TraitName : TFalseValue {};		\
+	template<typename T, typename... ArgsT> struct TraitName<T, TArgs<ArgsT...>,							\
+		TVoid<decltype(DeclVal<T&>().MethodName(DeclVal<ArgsT>()...))>> : TTrueValue {};
+
+#define KOR_DEFINE_HAS_METHOD_ARGS_TRAIT(TraitName, MethodName, ...)												\
+	template<typename T, typename ArgsT = TArgs<__VA_ARGS__>, typename = void> struct TraitName : TFalseValue {};	\
+	template<typename T, typename... ArgsT> struct TraitName<T, TArgs<ArgsT...>,									\
+		TVoid<decltype(DeclVal<T&>().MethodName(DeclVal<ArgsT>()...))>> : TTrueValue {};
 
 // KOR_DEFINE_HAS_MEMBER_TRAIT(TraitName, MemberName)
 // -------------------------------------------------------------------------
@@ -58,20 +89,6 @@
 	template<typename T, typename = void> struct TraitName : TFalseValue {};										\
 	template<typename T> struct TraitName<T, TVoid<decltype(&T::MemberName)>> : TTrueValue {};
 
-// KOR_DEFINE_HAS_TYPE_TRAIT(TraitName, TypeName)
-// -------------------------------------------------------------------------
-// Tests whether T has a nested type named TypeName
-//
-// NOTE:
-// Does not detect nested templates (a template name is not a type), use KOR_DEFINE_HAS_TEMPLATE_TRAIT for those
-//
-// Example: KOR_DEFINE_HAS_TYPE_TRAIT(THasUntyped, Untyped)
-//          THasUntyped<SMyType>::Value
-
-#define KOR_DEFINE_HAS_TYPE_TRAIT(TraitName, TypeName)																\
-	template<typename T, typename = void> struct TraitName : TFalseValue {};										\
-	template<typename T> struct TraitName<T, TVoid<typename T::TypeName>> : TTrueValue {};
-
 // KOR_DEFINE_HAS_TEMPLATE_TRAIT(TraitName, TemplateName)
 // -------------------------------------------------------------------------
 // Tests whether T has a nested class/alias template named TemplateName taking type parameters
@@ -87,17 +104,16 @@
 	template<typename T, typename = void> struct TraitName : TFalseValue {};										\
 	template<typename T> struct TraitName<T, TVoidTemplate<T::template TemplateName>> : TTrueValue {};
 
-// KOR_DEFINE_HAS_TEMPLATE_TYPE_TRAIT(TraitName, TemplateName, ...)
+// KOR_DEFINE_HAS_TYPE_TRAIT(TraitName, TypeName)
 // -------------------------------------------------------------------------
-// Tests whether T::TemplateName<...> is a valid type for the given arguments
-// Implies TemplateName is a template, but reports false when the arguments are rejected (constraints, wrong arity),
-// * so prefer KOR_DEFINE_HAS_TEMPLATE_TRAIT for pure existence
+// Tests whether T has a nested type named TypeName
 //
-// At least one argument must be supplied (an empty __VA_ARGS__ warns pre-C++20)
+// NOTE:
+// Does not detect nested templates (a template name is not a type), use KOR_DEFINE_HAS_TEMPLATE_TRAIT for those
 //
-// Example: KOR_DEFINE_HAS_TEMPLATE_TYPE_TRAIT(THasTypedInt32, Typed, int32)
-//          THasTypedInt32<SMyType>::Value
+// Example: KOR_DEFINE_HAS_TYPE_TRAIT(THasUntyped, Untyped)
+//          THasUntyped<SMyType>::Value
 
-#define KOR_DEFINE_HAS_TEMPLATE_TYPE_TRAIT(TraitName, TemplateName, ...)											\
+#define KOR_DEFINE_HAS_TYPE_TRAIT(TraitName, TypeName)																\
 	template<typename T, typename = void> struct TraitName : TFalseValue {};										\
-	template<typename T> struct TraitName<T, TVoid<typename T::template TemplateName<__VA_ARGS__>>> : TTrueValue {};
+	template<typename T> struct TraitName<T, TVoid<typename T::TypeName>> : TTrueValue {};

@@ -9,8 +9,8 @@ KOR_NAMESPACE_BEGIN
 
 namespace Detail
 {
-	KOR_DEFINE_HAS_METHOD_TRAIT(THasSharedInit, IsSharedInitialized())
-	KOR_DEFINE_HAS_METHOD_TRAIT(THasAsShared, AsShared())
+	KOR_DEFINE_HAS_METHOD_TRAIT(THasSharedInit, IsSharedInitialized)
+	KOR_DEFINE_HAS_METHOD_TRAIT(THasAsShared, AsShared)
 
 	template<typename T>
 	struct TIsSharedClassType
