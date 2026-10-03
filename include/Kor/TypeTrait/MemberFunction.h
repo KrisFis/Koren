@@ -8,7 +8,7 @@
 #include "Kor/TypeTrait/Detail/MemberFunctionTraits.h"
 
 KOR_NAMESPACE_BEGIN
-	// [Member function traits layout]
+// [Member function traits layout]
 // * Overview of TMemberFunctionTraits<Fn>, which lives in Detail/MemberFunctionTraits.h
 // * Everything below is a thin wrapper over its members, so each function type is deduced only once
 // * Specializations are emitted from one qualifier matrix (cv x ref x noexcept = 24 shapes)

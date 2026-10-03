@@ -7,7 +7,7 @@
 #include "Kor/TypeTrait/Qualifier.h"
 
 KOR_NAMESPACE_BEGIN
-	// [Is Array]
+// [Is Array]
 // * Checks whether specific type is array
 
 template<typename T> struct TIsArray : TFalseValue {};

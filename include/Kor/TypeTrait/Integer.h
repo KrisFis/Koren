@@ -8,7 +8,7 @@
 #include "Kor/TypeTrait/Qualifier.h"
 
 KOR_NAMESPACE_BEGIN
-	// [Limits]
+// [Limits]
 // Tells value limit of specific integral type
 // Similar to std::numeric_limits<T>
 

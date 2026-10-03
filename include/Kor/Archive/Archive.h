@@ -12,7 +12,7 @@
 #include "Kor/String/CharOps.h"
 
 KOR_NAMESPACE_BEGIN
-	enum class EArchiveType : uint8
+enum class EArchiveType : uint8
 {
 	Binary = 0,
 	String
