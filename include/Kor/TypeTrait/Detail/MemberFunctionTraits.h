@@ -53,7 +53,7 @@ namespace Detail
 template<typename Fn>
 struct TMemberFunctionTraits
 {
-	static_assert(TAlwaysFalse<Fn>::Value, "TMemberFunctionTraits: Fn must be a pointer to member function");
+	static_assert(TAlwaysFalse<Fn>::Value, "Fn must be a pointer to member function");
 };
 
 #define KOR_X(K, V, Rf, Nx, bK, bV, bL, bR, bNx)																\

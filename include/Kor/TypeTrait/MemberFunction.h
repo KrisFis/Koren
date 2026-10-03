@@ -20,13 +20,12 @@ KOR_NAMESPACE_BEGIN
 // template<typename Fn>
 // struct TMemberFunctionTraits
 // {
-//     static constexpr bool Valid = false;
+//     static_assert(TAlwaysFalse<Fn>::Value, "Fn must be a pointer to member function");
 // };
 //
 // template<typename R, typename Cls, typename... Args>
 // struct TMemberFunctionTraits<R (Cls::*)(Args...) [const] [volatile] [& or &&] [noexcept]>
 // {
-//     static constexpr bool Valid = true;
 //
 //     // Signature
 //     using ReturnType = R;
