@@ -18,16 +18,11 @@ KOR_NAMESPACE_BEGIN
 
 namespace Detail::Allocator
 {
-	KOR_DEFINE_HAS_TYPE_TRAIT(THasUntypedTypeTrait, Untyped);
-	KOR_DEFINE_HAS_TEMPLATE_TRAIT(THasTypedTypeTrait, Typed);
-
-	KOR_DEFINE_HAS_TYPE_TRAIT(THasSizeType, SizeType);
-
 	KOR_DEFINE_HAS_METHOD_TRAIT(THasAllocateTrait, Allocate);
 	KOR_DEFINE_HAS_METHOD_TRAIT(THasReallocateTrait, Reallocate);
 	KOR_DEFINE_HAS_METHOD_TRAIT(THasDeallocateTrait, Deallocate);
 
-	KOR_DEFINE_MEMBER_FUNCTION_TRAIT(TAllocateFunctionTrait, Allocate)
+	KOR_DEFINE_MEMBER_FUNCTION_TRAIT(TAllocateFunctionTraits, Allocate)
 
 	struct SAnyInteger
 	{
@@ -41,20 +36,12 @@ namespace Detail::Allocator
 		operator PointerT*() const;
 	};
 
-	struct SNoType {};
-
 	template<typename FamilyT, typename = void>
-	struct TUntypedOf : TType<SNoType> {};
+	struct TSizeTypeOf : TType<void> {};
 
 	template<typename FamilyT>
-	struct TUntypedOf<FamilyT, TVoid<typename FamilyT::Untyped>> : TType<typename FamilyT::Untyped> {};
-
-	template<typename FamilyT, typename ElementT, typename = void>
-	struct TTypedOf : TType<SNoType> {};
-
-	template<typename FamilyT, typename ElementT>
-	struct TTypedOf<FamilyT, ElementT, TVoid<typename FamilyT::template Typed<ElementT>>>
-		: TType<typename FamilyT::template Typed<ElementT>> {};
+	struct TSizeTypeOf<FamilyT, TVoid<typename FamilyT::SizeType>>
+		: TType<typename FamilyT::SizeType> {};
 
 	template<typename T>
 	inline constexpr bool HasAllocate =
@@ -71,50 +58,76 @@ namespace Detail::Allocator
 		THasDeallocateTrait<T, TArgs<SAnyInteger>>::Value ||
 		THasDeallocateTrait<T, TArgs<SAnyInteger, uint32>>::Value;
 
+	template<typename FamilyT, typename = void>
+	struct TUntypedOf : TType<void> {};
+
+	template<typename FamilyT>
+	struct TUntypedOf<FamilyT, TVoid<typename FamilyT::Untyped>> : TType<typename FamilyT::Untyped> {};
+
+	template<typename FamilyT, typename ElementT, typename = void>
+	struct TTypedOf : TType<void> {};
+
+	template<typename FamilyT, typename ElementT>
+	struct TTypedOf<FamilyT, ElementT, TVoid<typename FamilyT::template Typed<ElementT>>>
+		: TType<typename FamilyT::template Typed<ElementT>> {};
+
 	template<typename T>
-	inline constexpr bool IsAllocator = HasAllocate<T> && HasDeallocate<T>;
+	struct TIsAllocator : TBoolValue<HasAllocate<T> && HasDeallocate<T>> {};
 
 	template<typename FamilyT>
 	struct TIsFamily
 	{
 	private:
-		using UntypedT = typename TUntypedOf<FamilyT>::Type;
-		using TypedT = typename TTypedOf<FamilyT, uint8>::Type; // probe with a dummy element
+		using SizeTypeT = typename TSizeTypeOf<FamilyT>::Type;
+		using UntypedAllocatorT = typename TUntypedOf<FamilyT>::Type;
+		using TypedAllocatorT = typename TTypedOf<FamilyT, uint8>::Type; // probe with a dummy element
 
-		static constexpr bool HasSizeType = THasSizeType<FamilyT>::Value;
-		static constexpr bool Declared = !TIsSame<UntypedT, SNoType>::Value && !TIsSame<TypedT, SNoType>::Value;
-		static constexpr bool Usable = !TIsVoid<UntypedT>::Value || !TIsVoid<TypedT>::Value;
+		static constexpr bool SizeTypeDeclared =
+			!TIsVoid<SizeTypeT>::Value;
+
+		static constexpr bool AllocatorsDeclared =
+			!TIsVoid<UntypedAllocatorT>::Value ||
+			!TIsVoid<TypedAllocatorT>::Value;
 
 	public:
-		static constexpr bool Value = HasSizeType && Declared && Usable;
+		static constexpr bool Value = SizeTypeDeclared && AllocatorsDeclared;
 	};
 
-	template<typename ResolvedT, bool IsTyped>
-	struct TValidateMake
+	template<typename FamilyT>
+	struct TSizeTypeOfValidated
 	{
+		using Type = TSizeTypeOf<FamilyT>::Type;
+		static_assert(!TIsVoid<Type>::Value, "Allocator Family SizeType is undefined");
+	};
+
+	template<typename FamilyT>
+	struct TUntypedOfValidated
+	{
+		using Type = TUntypedOf<FamilyT>::Type;
+
 	private:
-		static constexpr bool Missing     = TIsSame<ResolvedT, SNoType>::Value;
-		static constexpr bool Unsupported = TIsSame<ResolvedT, void>::Value;
-		static constexpr bool Resolved    = !Missing && !Unsupported;
+		static constexpr bool Supported = !TIsVoid<Type>::Value;
 
-		// Family doesn't declare the types at all
-		static_assert(IsTyped || !Missing,
-			"Allocator Family must declare `Untyped` (use `using Untyped = void` if unsupported)");
-		static_assert(!IsTyped || !Missing,
-			"Allocator Family must declare `template<typename T> using Typed = ...` (use `void` if unsupported)");
+		static_assert(Supported,
+			"Allocator Family does not support untyped allocator (FamilyT::Untyped undefined)");
 
-		// Family declares it as void
-		static_assert(IsTyped || !Unsupported,
-			"This allocator family does not support untyped allocation");
-		static_assert(!IsTyped || !Unsupported,
-			"This allocator family does not support typed allocation");
-
-		// Declared and non-void, but doesn't look like an allocator
-		static_assert(!Resolved || IsAllocator<ResolvedT>,
+		static_assert(!Supported || TIsAllocator<Type>::Value,
 			"Allocator must provide Allocate(size[, alignment]) and Deallocate(ptr[, alignment])");
+	};
 
-	public:
-		using Type = ResolvedT;
+	template<typename FamilyT, typename ElementT>
+	struct TTypedOfValidated
+	{
+		using Type = TTypedOf<FamilyT, ElementT>::Type;
+
+	private:
+		static constexpr bool Supported = !TIsVoid<Type>::Value;
+
+		static_assert(Supported,
+			"Allocator Family does not support untyped allocator (FamilyT::Typed<T> undefined)");
+
+		static_assert(!Supported || TIsAllocator<Type>::Value,
+			"Allocator must provide Allocate(size[, alignment]) and Deallocate(ptr[, alignment])");
 	};
 }
 

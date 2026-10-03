@@ -25,34 +25,34 @@ namespace Detail::Array { template<typename T> struct TFriend; }
 // [ TArray ]
 // A dynamically-sized, heap-allocated array container.
 // * ElementType must be non-void and pure (non-reference, non-cv)
-// * AllocatorType must expose a signed SizeType
+// * AllocatorFamilyType must expose a signed SizeType
 // * Ownership is exclusive; copying performs a deep copy, moving transfers ownership
 //
 // Example:
 //   TArray<int32> values = { 1, 2, 3 };
 //   values.Add(4);
 //
-template<typename ElementT, typename AllocatorT>
+template<typename ElementT, typename AllocatorFamilyT>
 class TArray
 {
 public:
-	static_assert(!TIsVoid<ElementT>::Value && TIsClean<ElementT>::Value,
-		"ElementType must be a non-void and pure type");
-
-	static_assert(TIsAllocatorFamily<AllocatorT>::Value,
-		"AllocatorType must be a valid allocator family type");
-
-	static_assert(TIsSigned<typename TAllocatorFamilySizeType<AllocatorT>::Type>::Value,
-		"SizeType must be a valid signed type");
+	static_assert(!TIsVoid<ElementT>::Value, "ElementType must be non-void type");
+	static_assert(TIsClean<ElementT>::Value, "ElementType must be a clean type (no qualifiers)");
 
 	using ElementType = ElementT;
-	using AllocatorType = AllocatorT;
-	using ElementAllocatorType = typename TMakeTypedAllocator<AllocatorT, ElementType>::Type;
-	using SizeType = typename TAllocatorFamilySizeType<AllocatorT>::Type;
-	using ILType = std::initializer_list<ElementType>;
-	using ArrayIteratorType = ElementType*;
-	using ConstArrayIteratorType = const ElementType*;
 
+	using AllocatorFamilyType = AllocatorFamilyT;
+	using AllocatorFamilyTraits = TAllocatorFamilyTraits<AllocatorFamilyType>;
+
+	using AllocatorType = AllocatorFamilyTraits::template TypedAllocator<ElementType>::Type;
+	using AllocatorTraits = TAllocatorTraits<AllocatorType>;
+
+	using SizeType = typename AllocatorFamilyTraits::SizeType;
+
+	using ILType = std::initializer_list<ElementType>;
+
+	using IteratorType = ElementType*;
+	using ConstIteratorType = const ElementType*;
 
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -132,8 +132,8 @@ public:
 	// -------------------------------------------------------------------------
 
 	// Allocator instance backing this array.
-	ElementAllocatorType& GetAllocator() noexcept;
-	const ElementAllocatorType& GetAllocator() const noexcept;
+	AllocatorType& GetAllocator() noexcept;
+	const AllocatorType& GetAllocator() const noexcept;
 
 	// Pointer to the data buffer. Null if empty and never allocated.
 	ElementType* GetData() noexcept;
@@ -414,14 +414,14 @@ public:
 	// Iterators
 	// -------------------------------------------------------------------------
 
-	ArrayIteratorType begin() noexcept;
-	ConstArrayIteratorType begin() const noexcept;
-	ArrayIteratorType end() noexcept;
-	ConstArrayIteratorType end() const noexcept;
+	IteratorType begin() noexcept;
+	ConstIteratorType begin() const noexcept;
+	IteratorType end() noexcept;
+	ConstIteratorType end() const noexcept;
 
 private:
 	// Allocator instance for _data
-	ElementAllocatorType _allocator;
+	AllocatorType _allocator;
 
 	// Allocated data
 	ElementType* _data;

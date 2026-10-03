@@ -53,43 +53,41 @@ namespace Detail
 template<typename Fn>
 struct TMemberFunctionTraits
 {
-	static constexpr bool Valid = false;
+	static_assert(TAlwaysFalse<Fn>::Value, "TMemberFunctionTraits: Fn must be a pointer to member function");
 };
 
-#define KOR_X(K, V, Rf, Nx, bK, bV, bL, bR, bNx) \
-template<typename R, typename Cls, typename... Args> \
-struct TMemberFunctionTraits<R (Cls::*)(Args...) K V Rf Nx> \
-{ \
-	static constexpr bool Valid = true; \
-	\
-	using ReturnType = R; \
-	using ClassType  = Cls; \
-	template<TSize N> using ArgType = typename TNthArg<N, Args...>::Type; \
-	static constexpr TSize Arity = sizeof...(Args); \
-	\
-	static constexpr bool IsConst           = bK; \
-	static constexpr bool IsVolatile        = bV; \
-	static constexpr bool IsCV              = bK || bV; \
-	static constexpr bool IsLValue          = bL; \
-	static constexpr bool IsRValue          = bR; \
-	static constexpr bool IsRef             = bL || bR; \
-	static constexpr bool IsNoexcept        = bNx; \
-	static constexpr bool IsClean           = !(bK || bV || bL || bR); \
-	static constexpr bool IsPlain           = !(bK || bV || bL || bR || bNx); \
-	\
-	using RemoveConst    = TType<R (Cls::*)(Args...) V Rf Nx>; \
-	using RemoveVolatile = TType<R (Cls::*)(Args...) K Rf Nx>; \
-	using RemoveCV       = TType<R (Cls::*)(Args...) Rf Nx>; \
-	using RemoveRef      = TType<R (Cls::*)(Args...) K V Nx>; \
-	using RemoveNoexcept = TType<R (Cls::*)(Args...) K V Rf>; \
-	using Clean          = TType<R (Cls::*)(Args...) Nx>;\
-	using Plain          = TType<R (Cls::*)(Args...)>;\
-	\
-	using AddConst      = typename Detail::TMemberFnBuilder<R, Cls, true, bV,   bL,    bR,    bNx,  Args...>; \
-	using AddVolatile   = typename Detail::TMemberFnBuilder<R, Cls, bK,   true, bL,    bR,    bNx,  Args...>; \
-	using AddNoexcept   = typename Detail::TMemberFnBuilder<R, Cls, bK,   bV,   bL,    bR,    true, Args...>; \
-	using AddLValue     = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   true,  false, bNx,  Args...>; \
-	using AddRValue     = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   false, true,  bNx,  Args...>; \
+#define KOR_X(K, V, Rf, Nx, bK, bV, bL, bR, bNx)																\
+template<typename R, typename Cls, typename... Args>															\
+struct TMemberFunctionTraits<R (Cls::*)(Args...) K V Rf Nx>														\
+{																												\
+	using ReturnType = R;																						\
+	using ClassType  = Cls;																						\
+	template<TSize N> using ArgType = typename TNthArg<N, Args...>::Type;										\
+	static constexpr TSize Arity = sizeof...(Args);																\
+																												\
+	static constexpr bool IsConst           = bK;																\
+	static constexpr bool IsVolatile        = bV;																\
+	static constexpr bool IsCV              = bK || bV;															\
+	static constexpr bool IsLValue          = bL; 																\
+	static constexpr bool IsRValue          = bR; 																\
+	static constexpr bool IsRef             = bL || bR;															\
+	static constexpr bool IsNoexcept        = bNx;																\
+	static constexpr bool IsClean           = !(bK || bV || bL || bR);											\
+	static constexpr bool IsPlain           = !(bK || bV || bL || bR || bNx);									\
+																												\
+	using RemoveConst    = TType<R (Cls::*)(Args...) V Rf Nx>; 													\
+	using RemoveVolatile = TType<R (Cls::*)(Args...) K Rf Nx>; 													\
+	using RemoveCV       = TType<R (Cls::*)(Args...) Rf Nx>;													\
+	using RemoveRef      = TType<R (Cls::*)(Args...) K V Nx>; 													\
+	using RemoveNoexcept = TType<R (Cls::*)(Args...) K V Rf>; 													\
+	using Clean          = TType<R (Cls::*)(Args...) Nx>;														\
+	using Plain          = TType<R (Cls::*)(Args...)>;															\
+																												\
+	using AddConst      = typename Detail::TMemberFnBuilder<R, Cls, true, bV,   bL,    bR,    bNx,  Args...>; 	\
+	using AddVolatile   = typename Detail::TMemberFnBuilder<R, Cls, bK,   true, bL,    bR,    bNx,  Args...>; 	\
+	using AddNoexcept   = typename Detail::TMemberFnBuilder<R, Cls, bK,   bV,   bL,    bR,    true, Args...>; 	\
+	using AddLValue     = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   true,  false, bNx,  Args...>; 	\
+	using AddRValue     = typename Detail::TMemberFnBuilder<R, Cls, bK,  bV,   false, true,  bNx,  Args...>; 	\
 };
 KOR_MEMFN_MATRIX(KOR_X)
 

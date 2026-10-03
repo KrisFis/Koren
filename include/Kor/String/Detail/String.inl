@@ -102,7 +102,7 @@ struct TContainerTraits<TString<T>>
 	: TContainerTraitsBase<TString<T>>
 {
 	using ElementType = T;
-	using AllocatorType = typename TContainerTraits<typename TString<T>::DataType>::AllocatorType;
+	using AllocatorType = typename TContainerTraits<typename TString<T>::DataType>::AllocatorFamilyType;
 	using SizeType = typename TContainerTraits<typename TString<T>::DataType>::SizeType;
 
 	enum { InlineMemory = true };

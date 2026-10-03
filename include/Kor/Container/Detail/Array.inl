@@ -4,13 +4,13 @@
 #pragma once // silence tooling
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>::ElementAllocatorType& TArray<ElementT, AllocatorT>::GetAllocator() noexcept
+KOR_FORCEINLINE TArray<ElementT, AllocatorT>::AllocatorType& TArray<ElementT, AllocatorT>::GetAllocator() noexcept
 {
 	return _allocator;
 }
 
 template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE const TArray<ElementT, AllocatorT>::ElementAllocatorType& TArray<ElementT, AllocatorT>::GetAllocator() const noexcept
+KOR_FORCEINLINE const TArray<ElementT, AllocatorT>::AllocatorType& TArray<ElementT, AllocatorT>::GetAllocator() const noexcept
 {
 	return _allocator;
 }

@@ -49,8 +49,7 @@ namespace Detail::Array
 		using SizeType = typename ArrayType::SizeType;
 		using ElementType = typename ArrayType::ElementType;
 		using AllocatorType = typename ArrayType::AllocatorType;
-		using ElementAllocatorType = typename ArrayType::ElementAllocatorType;
-		using AllocatorOps = TAllocatorOps<ElementAllocatorType>;
+		using AllocatorOps = TAllocatorOps<AllocatorType>;
 		using AllocatorPolicy = TDefaultAllocationPolicy<ElementType, SizeType>;
 
 		// Memory
@@ -234,7 +233,7 @@ namespace Detail::Array
 		template<bool HasItems = true>
 		static void CopyFromOther(ArrayType& dest, const ArrayType& source) noexcept
 		{
-			if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
+			if constexpr (!TIsEmpty<AllocatorType>::Value)
 			{
 				if constexpr (HasItems)
 				{
@@ -271,7 +270,7 @@ namespace Detail::Array
 				}
 			}
 
-			if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
+			if constexpr (!TIsEmpty<AllocatorType>::Value)
 			{
 				dest._allocator = Move(source._allocator);
 			}

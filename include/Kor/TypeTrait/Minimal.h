@@ -68,6 +68,13 @@ template<bool T> struct TBoolValue : TValue<bool, T> {};
 using TTrueValue = TBoolValue<true>;
 using TFalseValue = TBoolValue<false>;
 
+// [Always False]
+// * Dependent false for static_assert in uninstantiated branches
+// * Always pass at least one dependent argument, otherwise it is non-dependent and fires immediately
+
+template<typename...>
+struct TAlwaysFalse : TFalseValue {};
+
 // [Enable if]
 // * Enables compilation of specific template function/struct when condition met
 

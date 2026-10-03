@@ -76,7 +76,8 @@ KOR_NAMESPACE_BEGIN
 // * Checks whether provided type is a pointer to member function of any qualifiers
 // * The only trait below that is safe to use with any type, others require a member function pointer
 
-template<typename Fn> struct TIsMemberFunctionPointer : TBoolValue<TMemberFunctionTraits<Fn>::Valid> {};
+template<typename Fn> struct TIsMemberFunctionPointer : TFalseValue {};
+template<typename T, typename C> struct TIsMemberFunctionPointer<T C::*> : TIsFunction<T> {};
 
 // [Is Member Function Qualified]
 // * Checks qualifiers of the member function itself (not of the pointer to it)
@@ -152,24 +153,24 @@ namespace Detail::MemberFnTraitsTest
 {
 	struct Probe
 	{
-		int* Allocate(int, unsigned) noexcept;
-		int  Full(char) const volatile & noexcept;
+		int32* Allocate(int32, uint) noexcept;
+		int32  Full(char) const volatile & noexcept;
 		void Plain();
 	};
 
 	using A = TMemberFunctionTraits<decltype(&Probe::Allocate)>;
 	using F = TMemberFunctionTraits<decltype(&Probe::Full)>;
+	using P = TMemberFunctionTraits<decltype(&Probe::Plain)>;
 
 	// Validity
-	static_assert(A::Valid && F::Valid);
-	static_assert(!TIsMemberFunctionPointer<int>::Value);
-	static_assert(!TIsMemberFunctionPointer<int(*)(int)>::Value);
+	static_assert(!TIsMemberFunctionPointer<int32>::Value);
+	static_assert(!TIsMemberFunctionPointer<int32(*)(int32)>::Value);
 
 	// Signature
-	static_assert(TIsSame<A::ReturnType, int*>::Value);
+	static_assert(TIsSame<A::ReturnType, int32*>::Value);
 	static_assert(TIsSame<A::ClassType, Probe>::Value);
-	static_assert(TIsSame<A::ArgType<0>, int>::Value);
-	static_assert(TIsSame<A::ArgType<1>, unsigned>::Value);
+	static_assert(TIsSame<A::ArgType<0>, int32>::Value);
+	static_assert(TIsSame<A::ArgType<1>, uint>::Value);
 	static_assert(A::Arity == 2);
 
 	// Queries
@@ -178,25 +179,24 @@ namespace Detail::MemberFnTraitsTest
 	static_assert(F::IsLValue && !F::IsRValue && F::IsNoexcept);
 
 	// Strip
-	static_assert(TIsSame<F::RemoveConst::Type,    int (Probe::*)(char) volatile & noexcept>::Value);
-	static_assert(TIsSame<F::RemoveVolatile::Type, int (Probe::*)(char) const & noexcept>::Value);
-	static_assert(TIsSame<F::RemoveCV::Type,       int (Probe::*)(char) & noexcept>::Value);
-	static_assert(TIsSame<F::RemoveRef::Type,      int (Probe::*)(char) const volatile noexcept>::Value);
-	static_assert(TIsSame<F::RemoveNoexcept::Type, int (Probe::*)(char) const volatile &>::Value);
-	static_assert(TIsSame<F::Clean::Type,          int (Probe::*)(char) noexcept>::Value);
-	static_assert(TIsSame<F::Plain::Type,          int (Probe::*)(char)>::Value);
+	static_assert(TIsSame<F::RemoveConst::Type,    int32 (Probe::*)(char) volatile & noexcept>::Value);
+	static_assert(TIsSame<F::RemoveVolatile::Type, int32 (Probe::*)(char) const & noexcept>::Value);
+	static_assert(TIsSame<F::RemoveCV::Type,       int32 (Probe::*)(char) & noexcept>::Value);
+	static_assert(TIsSame<F::RemoveRef::Type,      int32 (Probe::*)(char) const volatile noexcept>::Value);
+	static_assert(TIsSame<F::RemoveNoexcept::Type, int32 (Probe::*)(char) const volatile &>::Value);
+	static_assert(TIsSame<F::Clean::Type,          int32 (Probe::*)(char) noexcept>::Value);
+	static_assert(TIsSame<F::Plain::Type,          int32 (Probe::*)(char)>::Value);
 
 	// Add
-	using P = TMemberFunctionTraits<decltype(&Probe::Plain)>;
 	static_assert(TIsSame<P::AddConst::Type,    void (Probe::*)() const>::Value);
 	static_assert(TIsSame<P::AddNoexcept::Type, void (Probe::*)() noexcept>::Value);
-	static_assert(TIsSame<F::AddConst::Type,    int (Probe::*)(char) const volatile & noexcept>::Value); // no-op
-	static_assert(TIsSame<F::AddRValue::Type, int (Probe::*)(char) const volatile && noexcept>::Value);
+	static_assert(TIsSame<F::AddConst::Type,    int32 (Probe::*)(char) const volatile & noexcept>::Value); // no-op
+	static_assert(TIsSame<F::AddRValue::Type, int32 (Probe::*)(char) const volatile && noexcept>::Value);
 
 	// Wrappers
-	static_assert(TIsSame<TRemoveMemberCV<decltype(&Probe::Full)>::Type, int (Probe::*)(char) & noexcept>::Value);
+	static_assert(TIsSame<TRemoveMemberCV<decltype(&Probe::Full)>::Type, int32 (Probe::*)(char) & noexcept>::Value);
 	static_assert(TIsNoexceptMemberFunction<decltype(&Probe::Allocate)>::Value);
-	static_assert(TIsSame<TMemberFunctionArg<decltype(&Probe::Allocate), 0>::Type, int>::Value);
+	static_assert(TIsSame<TMemberFunctionArg<decltype(&Probe::Allocate), 0>::Type, int32>::Value);
 }
 #endif
 

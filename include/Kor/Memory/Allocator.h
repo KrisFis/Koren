@@ -12,11 +12,11 @@ KOR_NAMESPACE_BEGIN
 
 // FAMILY CONTRACT
 // -------------------------------------------------------------------------
-// * A family exposes exactly three members:
+// * A family exposes three members:
 //     - `SizeType` : integral type used for every size/count in the family
 //     - `Typed<T>` : allocator template for objects of type T
 //     - `Untyped`  : allocator for raw bytes
-// * `Typed<T>` and `Untyped` must satisfy TIsAllocator.
+// * `Typed<T>` and `Untyped` must satisfy TIsAllocator. Or left void/undeclared.
 // * `SizeType` is the single source of truth: allocators use it for every
 //   size/count parameter, and TAllocatorOps/containers take it from the family.
 //

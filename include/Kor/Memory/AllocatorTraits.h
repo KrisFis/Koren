@@ -19,26 +19,32 @@ using TIsAllocatorFamily = Detail::Allocator::TIsFamily<FamilyT>;
 // * Checks whether type follows Allocator concept
 
 template<typename AllocatorT>
-struct TIsAllocator : TBoolValue<Detail::Allocator::IsAllocator<AllocatorT>> {};
+using TIsAllocator = Detail::Allocator::TIsAllocator<AllocatorT>;
 
-// [Allocator Family Size Type]
-// * Gets allocator family size type
-
-template<typename FamilyT>
-struct TAllocatorFamilySizeType : TType<typename FamilyT::SizeType> {};
-
-// [Make Untyped/Typed Allocator]
-// * Makes typed or untyped allocator from allocator family
+// [Allocator Family Traits]
+// * Traits for allocator family (not suitable for allocator)
 
 template<typename FamilyT>
-using TMakeUntypedAllocator = typename Detail::Allocator::TValidateMake<typename Detail::Allocator::TUntypedOf<FamilyT>::Type, false>;
+struct TAllocatorFamilyTraits
+{
+	static_assert(TIsAllocatorFamily<FamilyT>::Value, "T is not an allocator family type");
 
-template<typename FamilyT, typename ElementT>
-using TMakeTypedAllocator = typename Detail::Allocator::TValidateMake<typename Detail::Allocator::TTypedOf<FamilyT, ElementT>::Type, true>;
+	// Size type used by the allocator family
+	// * Gets type from FamilyT::SizeType or asserts
+	using SizeType = typename Detail::Allocator::TSizeTypeOfValidated<FamilyT>::Type;
+
+	// Get untyped allocator type lazily
+	// * Asserts on resolve if allocator is not supported
+	struct UntypedAllocator : TType<typename Detail::Allocator::TUntypedOfValidated<FamilyT>::Type> {};
+
+	// Gets typed allocator type lazily
+	// * Asserts on resolve if allocator is not supported
+	template<typename ElementT>
+	using TypedAllocator = typename Detail::Allocator::TTypedOfValidated<FamilyT, ElementT>;
+};
 
 // [Allocator Traits]
 // * Traits for Allocator (not suitable for AllocatorFamily)
-// * Provides types and flags about Allocators (SizeType, ElementType, SupportsAlignment etc..)
 
 template<typename T>
 struct TAllocatorTraits
@@ -47,11 +53,11 @@ struct TAllocatorTraits
 
 	// Size type used by the allocator
 	// * Infers type from first argument of "Allocate" method
-	using SizeType = typename Detail::Allocator::TAllocateFunctionTrait<T>::template ArgType<0>;
+	using SizeType = typename Detail::Allocator::TAllocateFunctionTraits<T>::template ArgType<0>;
 
 	// Pointer type used by the allocator
 	// * Infers type from return type of "Allocate" method
-	using PointerType = typename Detail::Allocator::TAllocateFunctionTrait<T>::ReturnType;
+	using PointerType = typename Detail::Allocator::TAllocateFunctionTraits<T>::ReturnType;
 
 	// Allocator type for ease of use
 	using AllocatorType = T;
@@ -62,7 +68,7 @@ struct TAllocatorTraits
 	enum
 	{
 		// Whether allocator allows "Alignment" parameter
-		SupportsAlignment = Detail::Allocator::TAllocateFunctionTrait<T>::Arity >= 2,
+		SupportsAlignment = Detail::Allocator::TAllocateFunctionTraits<T>::Arity >= 2,
 
 		// Whether allocator exposes "Reallocate" method
 		SupportsReallocate = Detail::Allocator::HasReallocate<T>,
