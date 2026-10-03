@@ -109,6 +109,36 @@ if (KOR_EXPECT(index < size))       // non-fatal - recoverable expectation
 
 ---
 
+## Allocators
+
+Allocators are plain structs detected structurally (no base class, no virtuals). A family bundles a `SizeType` with typed and untyped allocators, and containers use them through `TAllocatorOps`, which handles alignment, growth policy, reallocation fallbacks, and element lifetime.
+
+```cpp
+struct MyFamily
+{
+    using SizeType = int32;
+ 
+    template<typename T>
+    struct Typed
+    {
+        T*   Allocate(SizeType num, uint32 alignment) noexcept;    // required, nullptr on failure
+        void Deallocate(T* ptr, uint32 alignment) noexcept;        // required
+ 
+        T*       Reallocate(T* ptr, SizeType newNum, uint32 alignment) noexcept;                // optional
+        SizeType CalculateGrow(SizeType newNum, SizeType oldNum, uint32 alignment) const noexcept;   // optional
+        SizeType CalculateShrink(SizeType newNum, SizeType oldNum, uint32 alignment) const noexcept; // optional
+    };
+ 
+    using Untyped = Typed<void>;
+};
+ 
+static_assert(TIsAllocatorFamily<MyFamily>::Value);
+```
+
+Optional methods and the `alignment` parameter can be omitted; `TAllocatorOps` fills in the gaps. See `Kor/Memory/Allocator.h` for the full contract.
+
+---
+
 ## STL Equivalents
 
 | **Description** |                **Koren**                 |      **STL equivalent**       |
