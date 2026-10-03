@@ -26,7 +26,6 @@ KOR_NAMESPACE_BEGIN
 // template<typename R, typename Cls, typename... Args>
 // struct TMemberFunctionTraits<R (Cls::*)(Args...) [const] [volatile] [& or &&] [noexcept]>
 // {
-//
 //     // Signature
 //     using ReturnType = R;
 //     using ClassType = Cls;
