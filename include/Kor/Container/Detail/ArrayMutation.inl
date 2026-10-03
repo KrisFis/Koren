@@ -245,7 +245,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 
 	if (allowShrink && totalRemoved > 0)
 	{
-		SFriend::Shrink(*this, _num - totalRemoved);
+		SFriend::Shrink(*this, _num);
 	}
 
 	return totalRemoved;
@@ -274,7 +274,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 	const SizeType totalRemoved = SFriend::RemoveByFunc(*this, Forward<FunctorT>(func));
 	if (allowShrink && totalRemoved > 0)
 	{
-		SFriend::Shrink(*this, _num - totalRemoved);
+		SFriend::Shrink(*this, _num);
 	}
 	return totalRemoved;
 }
@@ -302,7 +302,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 
 	if (allowShrink && totalRemoved > 0)
 	{
-		SFriend::Shrink(*this, _num - totalRemoved);
+		SFriend::Shrink(*this, _num);
 	}
 
 	return totalRemoved;
@@ -332,7 +332,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::SizeType TArray<ElementT,
 
 	if (allowShrink && totalRemoved > 0)
 	{
-		SFriend::Shrink(*this, _num - totalRemoved);
+		SFriend::Shrink(*this, _num);
 	}
 
 	return totalRemoved;

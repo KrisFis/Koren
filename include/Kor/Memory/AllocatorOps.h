@@ -16,8 +16,10 @@ KOR_NAMESPACE_BEGIN
 
 // TAllocatorOps
 // -------------------------------------------------------------------------
-// Uniform front-end over allocators: forwards alignment only when the allocator
-// supports it, and adds fallback and element-lifetime handling on top.
+// Uniform front-end over allocators
+// * Forwards alignment only when the allocator supports it
+// * Adds fallback, growth policy and element-lifetime handling on top.
+//
 // All sizes and capacities are in elements, not bytes.
 template<typename AllocatorT>
 struct TAllocatorOps
@@ -95,6 +97,29 @@ struct TAllocatorOps
 		AllocatorType& allocator,
 		PointerType ptr,
 		SizeType numConstructed,
+		uint32 alignment = DefaultAlignment) noexcept;
+
+	// Policy
+	// -------------------------------------------------------------------------
+	// Policy result is a hint, Ops enforces the bounds, callers can use the result as is
+	// newCapacity == oldCapacity is a no-op, returns oldCapacity (policy not consulted)
+
+	// Returns a capacity for growing from oldCapacity to fit newCapacity
+	// Requires newCapacity >= oldCapacity
+	// Result >= newCapacity
+	static SizeType CalculateGrow(
+		AllocatorType& allocator,
+		SizeType oldCapacity,
+		SizeType newCapacity,
+		uint32 alignment = DefaultAlignment) noexcept;
+
+	// Returns a capacity for shrinking from oldCapacity toward newCapacity
+	// Requires newCapacity <= oldCapacity
+	// newCapacity <= result <= oldCapacity, may keep slack (result > newCapacity)
+	static SizeType CalculateShrink(
+		AllocatorType& allocator,
+		SizeType oldCapacity,
+		SizeType newCapacity,
 		uint32 alignment = DefaultAlignment) noexcept;
 };
 

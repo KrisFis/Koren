@@ -5,43 +5,6 @@
 
 namespace Detail::Array
 {
-	template<typename ElementT, typename SizeT>
-	struct TDefaultAllocationPolicy
-	{
-		static constexpr int64 INIT = 4;
-		static constexpr int64 CONSTANT = KOR_DEFAULT_HEAP_ALIGNMENT;
-		static constexpr float FACTOR = 3 / 8;
-
-		static SizeT CalculateGrow(
-			SizeT num,
-			SizeT oldNum) noexcept
-		{
-			SizeT result = INIT;
-			if (oldNum != 0 || num > INIT)
-			{
-				result = num + (num * FACTOR) + CONSTANT;
-			}
-
-			return result;
-		}
-
-		static SizeT CalculateShrink(
-			SizeT num,
-			SizeT oldNum) noexcept
-		{
-			const SizeT slack = num - oldNum;
-			const SizeT slackBytes = slack * sizeof(ElementT);
-
-			SizeT result = oldNum;
-			if (slackBytes >= KOR_BUFFER_SIZE_LARGE)
-			{
-				result = num;
-			}
-
-			return result;
-		}
-	};
-
 	template<typename ArrayT>
 	struct TFriend
 	{
@@ -50,7 +13,6 @@ namespace Detail::Array
 		using ElementType = typename ArrayType::ElementType;
 		using AllocatorType = typename ArrayType::AllocatorType;
 		using AllocatorOps = TAllocatorOps<AllocatorType>;
-		using AllocatorPolicy = TDefaultAllocationPolicy<ElementType, SizeType>;
 
 		// Memory
 		// -------------------------------------------------------------------------
@@ -176,48 +138,30 @@ namespace Detail::Array
 			arr._num = 0;
 		}
 
-		// Calculates `num` for `Allocate`, using allocation policy for growth
-		static SizeType CalculateGrow(ArrayType& arr, SizeType num) noexcept
-		{
-			const SizeType newNum = AllocatorPolicy::CalculateGrow(
-				num, 
-				arr._reservedNum
-			);
-
-			// Return value that is at least as big as provided num
-			return SMathOps::Max(newNum, num);
-		}
-
 		static void Grow(ArrayType& arr, SizeType num) noexcept
 		{
-			num = CalculateGrow(arr, num);
-			if (num > arr._reservedNum)
-			{
-				Reallocate(arr, num);
-			}
-		}
-
-		// Calculates `num` for `Allocate`, using allocation policy for shrink
-		static SizeType CalculateShrink(ArrayType& arr, SizeType num) noexcept
-		{
-			const SizeType newNum = AllocatorPolicy::CalculateShrink(
-				num, 
-				arr._reservedNum
+			num = AllocatorOps::CalculateGrow(
+				arr._allocator,
+				arr._reservedNum,
+				num
 			);
 
-			// Return value that is at most as provided num
-			return SMathOps::Min(newNum, num);
+			if (num == arr._reservedNum) return; // no-op hit
+
+			Reallocate(arr, num);
 		}
 
-		template<bool LimitToInitialized = true>
 		static void Shrink(ArrayType& arr, SizeType num) noexcept
 		{
-			num = CalculateShrink(arr, num);
+			KOR_ASSERT(num >= arr._num);
 
-			if constexpr (LimitToInitialized)
-			{
-				if (num < arr._num) return;
-			}
+			num = AllocatorOps::CalculateShrink(
+				arr._allocator,
+				arr._reservedNum,
+				num
+			);
+
+			if (num == arr._reservedNum) return; // no-op hit
 
 			if (num > 0)
 			{
