@@ -31,12 +31,13 @@
 
 // Memory
 #include "Kor/Memory/Allocator.h"
+#include "Kor/Memory/AllocatorOps.h"
 #include "Kor/Memory/AllocatorTraits.h"
+#include "Kor/Memory/Bytes.h"
 #include "Kor/Memory/FixedAllocator.h"
 #include "Kor/Memory/MemoryOps.h"
 #include "Kor/Memory/QueueAllocator.h"
 #include "Kor/Memory/Shared.h"
-#include "Kor/Memory/TypedAllocator.h"
 
 // String
 #include "Kor/String/CharOps.h"
@@ -50,6 +51,7 @@
 #include "Kor/TypeTrait/Construct.h"
 #include "Kor/TypeTrait/Decay.h"
 #include "Kor/TypeTrait/Integer.h"
+#include "Kor/TypeTrait/MemberFunction.h"
 #include "Kor/TypeTrait/MemberPointer.h"
 #include "Kor/TypeTrait/Pack.h"
 #include "Kor/TypeTrait/Property.h"
@@ -67,4 +69,5 @@
 #include "Kor/Utility/IsValid.h"
 #include "Kor/Utility/NumOf.h"
 #include "Kor/Utility/Optional.h"
+#include "Kor/Utility/SizeAlignOf.h"
 #include "Kor/Utility/Swap.h"

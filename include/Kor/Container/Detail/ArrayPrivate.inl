@@ -5,53 +5,15 @@
 
 namespace Detail::Array
 {
-	template<typename ElementT>
-	struct TDefaultAllocationPolicy
-	{
-		using SizeType = int64;
-
-		static constexpr int64 INIT = 4;
-		static constexpr int64 CONSTANT = KOR_DEFAULT_HEAP_ALIGNMENT;
-		static constexpr float FACTOR = 3 / 8;
-
-		static int64 CalculateGrow(
-			int64 num,
-			int64 oldNum) noexcept
-		{
-			int64 result = INIT;
-			if (oldNum != 0 || num > INIT)
-			{
-				result = num + (num * FACTOR) + CONSTANT;
-			}
-
-			return result;
-		}
-
-		static int64 CalculateShrink(
-			int64 num,
-			int64 oldNum) noexcept
-		{
-			const int64 slack = num - oldNum;
-			const int64 slackBytes = slack * sizeof(ElementT);
-
-			int64 result = oldNum;
-			if (slackBytes >= KOR_BUFFER_SIZE_LARGE)
-			{
-				result = num;
-			}
-
-			return result;
-		}
-	};
-
 	template<typename ArrayT>
 	struct TFriend
 	{
 		using ArrayType = ArrayT;
+		using ILType = typename ArrayType::ILType;
 		using SizeType = typename ArrayType::SizeType;
 		using ElementType = typename ArrayType::ElementType;
 		using AllocatorType = typename ArrayType::AllocatorType;
-		using ElementAllocatorType = typename ArrayType::ElementAllocatorType;
+		using AllocatorOps = TAllocatorOps<AllocatorType>;
 
 		// Memory
 		// -------------------------------------------------------------------------
@@ -68,7 +30,7 @@ namespace Detail::Array
 
 				if (arr._reservedNum == 0)
 				{
-					arr._data = arr._allocator.Allocate(num);
+					arr._data = AllocatorOps::Allocate(arr._allocator, num);
 					KOR_ASSERT(arr._data);
 				}
 				else
@@ -83,24 +45,13 @@ namespace Detail::Array
 						arr._num = num;
 					}
 
-					if constexpr (TAllocatorTraits<AllocatorType>::HasReallocate)
-					{
-						arr._data = arr._allocator.Reallocate(arr._data, num);
-						KOR_ASSERT(arr._data);
-					}
-					else
-					{
-						ElementType* newData = arr._allocator.Allocate(num);
-						KOR_ASSERT(newData);
-
-						if (arr._num > 0)
-						{
-							SMemoryOps::MoveConstruct(newData, arr._data, arr._num);
-							arr._allocator.Deallocate(arr._data);
-						}
-
-						arr._data = newData;
-					}
+					arr._data = AllocatorOps::ReallocateConstructed(
+						arr._allocator,
+						arr._data,
+						num,
+						arr._reservedNum,
+						arr._num
+					);
 				}
 			}
 			else
@@ -110,7 +61,7 @@ namespace Detail::Array
 					arr._reservedNum == 0
 				);
 
-				arr._data = arr._allocator.Allocate(num);
+				arr._data = AllocatorOps::Allocate(arr._allocator, num);
 				KOR_ASSERT(arr._data);
 			}
 
@@ -121,13 +72,9 @@ namespace Detail::Array
 		{
 			KOR_ASSERT(arr._reservedNum > 0);
 
-			if (arr._num > 0)
-			{
-				SMemoryOps::Destruct(arr._data, arr._num);
-				arr._num = 0;
-			}
+			AllocatorOps::DeallocateConstructed(arr._allocator, arr._data, arr._num);
 
-			arr._allocator.Deallocate(arr._data);
+			arr._num = 0;
 			arr._data = nullptr;
 			arr._reservedNum = 0;
 		}
@@ -161,23 +108,18 @@ namespace Detail::Array
 
 				if (arr._reservedNum == num) return;
 
-				if constexpr (TAllocatorTraits<AllocatorType>::HasReallocate)
-				{
-					arr._data = arr._allocator.Reallocate(arr._data, num);
-					KOR_ASSERT(arr._data);
-				}
-				else
-				{
-					arr._allocator.Deallocate(arr._data);
-					arr._data = arr._allocator.Allocate(num);
-					KOR_ASSERT(arr._data);
-				}
+				arr._data = AllocatorOps::ReallocateWithFallback(
+					arr._allocator,
+					arr._data,
+					num,
+					arr._reservedNum
+				);
 
 				arr._reservedNum = num;
 			}
 			else
 			{
-				arr._data = arr._allocator.Allocate(num);
+				arr._data = AllocatorOps::Allocate(arr._allocator, num);
 				arr._reservedNum = num;
 			}
 		}
@@ -197,48 +139,30 @@ namespace Detail::Array
 			arr._num = 0;
 		}
 
-		// Calculates `num` for `Allocate`, using allocation policy for growth
-		static SizeType CalculateGrow(ArrayType& arr, SizeType num) noexcept
-		{
-			const SizeType newNum = TDefaultAllocationPolicy<ElementType>::CalculateGrow(
-				num, 
-				arr._reservedNum
-			);
-
-			// Return value that is at least as big as provided num
-			return SMathOps::Max(newNum, num);
-		}
-
 		static void Grow(ArrayType& arr, SizeType num) noexcept
 		{
-			num = CalculateGrow(arr, num);
-			if (num > arr._reservedNum)
-			{
-				Reallocate(arr, num);
-			}
-		}
-
-		// Calculates `num` for `Allocate`, using allocation policy for shrink
-		static SizeType CalculateShrink(ArrayType& arr, SizeType num) noexcept
-		{
-			const SizeType newNum = TDefaultAllocationPolicy<ElementType>::CalculateShrink(
-				num, 
+			num = AllocatorOps::CalculateGrow(
+				arr._allocator,
+				num,
 				arr._reservedNum
 			);
 
-			// Return value that is at most as provided num
-			return SMathOps::Min(newNum, num);
+			if (num == arr._reservedNum) return; // no-op hit
+
+			Reallocate(arr, num);
 		}
 
-		template<bool LimitToInitialized = true>
 		static void Shrink(ArrayType& arr, SizeType num) noexcept
 		{
-			num = CalculateShrink(arr, num);
+			KOR_ASSERT(num >= arr._num);
 
-			if constexpr (LimitToInitialized)
-			{
-				if (num < arr._num) return;
-			}
+			num = AllocatorOps::CalculateShrink(
+				arr._allocator,
+				num,
+				arr._reservedNum
+			);
+
+			if (num == arr._reservedNum) return; // no-op hit
 
 			if (num > 0)
 			{
@@ -254,7 +178,7 @@ namespace Detail::Array
 		template<bool HasItems = true>
 		static void CopyFromOther(ArrayType& dest, const ArrayType& source) noexcept
 		{
-			if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
+			if constexpr (!TIsEmpty<AllocatorType>::Value) // EBO optimization
 			{
 				if constexpr (HasItems)
 				{
@@ -291,7 +215,7 @@ namespace Detail::Array
 				}
 			}
 
-			if constexpr (!TIsEmpty<ElementAllocatorType>::Value)
+			if constexpr (!TIsEmpty<AllocatorType>::Value) // EBO optimization
 			{
 				dest._allocator = Move(source._allocator);
 			}
@@ -391,7 +315,8 @@ namespace Detail::Array
 				source._num
 			);
 
-			source._allocator.Deallocate(source._data);
+			AllocatorOps::DeallocateConstructed(source._data, source._num);
+
 			source._data = nullptr;
 			source._reservedNum = 0;
 			source._num = 0;

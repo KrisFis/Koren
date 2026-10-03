@@ -8,20 +8,21 @@
 #include "Kor/TypeTrait/Qualifier.h"
 
 KOR_NAMESPACE_BEGIN
-	// [Limits]
+// [Limits]
 // Tells value limit of specific integral type
 // Similar to std::numeric_limits<T>
 
 template<typename T>
 struct TLimits
 {
-	static_assert(TIsArithmetic<T>::Value, "TLimits accepts only arithmetic types");
+	static_assert(TIsInteger<T>::Value, "TLimits accepts only integral types");
 	static_assert(TIsSame<T, typename TClean<T>::Type>::Value, "TLimits accepts only clean types");
 
 	static constexpr bool IsSigned = TIsSigned<T>::Value;
+	static constexpr uint32 Bits = sizeof(T) * 8 - (IsSigned ? 1 : 0);
 
-	static constexpr T Max = (T)((uint64)1 << (sizeof(T) * 8 - (IsSigned ? 1 : 0))) - 1;
-	static constexpr T Min = IsSigned ? (-(int64)((uint64)1 << (sizeof(T) * 8 - 1))) : 0;
+	static constexpr T Max = (T)(~(uint64)0 >> (64 - Bits));
+	static constexpr T Min = IsSigned ? (T)(-Max - 1) : (T)0;
 };
 
 // [TInt]

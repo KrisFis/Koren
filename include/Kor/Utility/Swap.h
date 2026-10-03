@@ -12,7 +12,7 @@ KOR_NAMESPACE_BEGIN
 // Checks whether specific type has "Swap" method
 // -------------------------------------------------------------------------
 
-KOR_DEFINE_HAS_METHOD_TRAIT(THasSwap, Swap(DeclVal<T&>()));
+KOR_DEFINE_HAS_METHOD_ARGS_TRAIT(THasSwap, Swap, T&);
 
 // Swaps values between `lhs` and `rhs`.
 // * Single-value, `num`-count, and static-array overloads

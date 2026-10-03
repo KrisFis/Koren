@@ -4,9 +4,9 @@
 #pragma once
 
 #include "Kor/TypeTrait/Minimal.h"
+#include "Kor/TypeTrait/Qualifier.h"
 
 KOR_NAMESPACE_BEGIN
-
 // [Is Array]
 // * Checks whether specific type is array
 
@@ -15,10 +15,11 @@ template<typename T> struct TIsArray<T[]> : TTrueValue {};
 template<typename T, TSize N> struct TIsArray<T[N]> : TTrueValue {};
 
 // [Is Function]
-// * Checks whether specific type is function
+// * Checks whether specific type is a function type (any cv/ref/noexcept/varargs form)
+// * Only function and reference types ignore const qualification, so excluding references leaves functions
 
-template<typename T> struct TIsFunction : TFalseValue {};
-template<typename RetType, typename... Params> struct TIsFunction<RetType(Params...)> : TTrueValue {};
+template<typename T>
+struct TIsFunction : TBoolValue<!TIsConst<const T>::Value && !TIsReference<T>::Value> {};
 
 // [Is Nullptr]
 // * Checks whether specific type is nullptr

@@ -3,64 +3,97 @@
 
 #pragma once
 
-#include "Kor/KorMinimal.h"
+#include "Kor/Memory/Minimal.h"
 
-#include "Kor/TypeTrait/Property.h"
+#include "Kor/Memory/Detail/AllocatorTraitsDetail.h"
+#include "Kor/Utility/SizeAlignOf.h"
 
 KOR_NAMESPACE_BEGIN
 
-// See Allocator.h for model concept
+// [Is Allocator Family]
+// * Checks whether type follows AllocatorFamily concept
 
-// [Allocator Traits Base]
-// * Shared defaults for allocator trait specializations.
-// * Specializations of TAllocatorTraits should inherit from this and override as needed.
+template<typename FamilyT>
+using TIsAllocatorFamily = Detail::Allocator::TIsFamily<FamilyT>;
 
-template<typename T>
-struct TAllocatorTraitsBase
+// [Is Allocator]
+// * Checks whether type follows Allocator concept
+
+template<typename AllocatorT>
+using TIsAllocator = Detail::Allocator::TIsAllocator<AllocatorT>;
+
+// [Allocator Family Traits]
+// * Traits for allocator family (not suitable for allocator)
+
+template<typename FamilyT>
+struct TAllocatorFamilyTraits
 {
-	using SizeType = void;
+	static_assert(TIsAllocatorFamily<FamilyT>::Value, "T is not an allocator family type");
 
-	enum
-	{
-		// Supports and needs alignment as part of its method signatures
-		// * Alignment parameter should come immediately after main signature
-		NeedsAlignment = false,
+	// Size type used by the allocator family
+	// * Gets type from FamilyT::SizeType or asserts
+	using SizeType = typename Detail::Allocator::TSizeTypeOfValidated<FamilyT>::Type;
 
-		// Supports reallocation of previously allocated memory
-		HasReallocate = false,
-	};
+	// Get untyped allocator type lazily
+	// * Asserts on resolve if allocator is not supported
+	struct UntypedAllocator : TType<typename Detail::Allocator::TUntypedOfValidated<FamilyT>::Type> {};
+
+	// Gets typed allocator type lazily
+	// * Asserts on resolve if allocator is not supported
+	template<typename ElementT>
+	using TypedAllocator = typename Detail::Allocator::TTypedOfValidated<FamilyT, ElementT>;
 };
 
 // [Allocator Traits]
-// * Defines meta about an allocator type.
-// * Is intentionally left as forward declare
-//
-// Example Declaration:
-//
-// template<>
-// struct TAllocatorTraits<MyAllocator> : TAllocatorTraitsBase<MyAllocator>
-// {
-//    using SizeType = MyAllocator::SizeType;
-// }
+// * Traits for Allocator (not suitable for AllocatorFamily)
+
 template<typename T>
-struct TAllocatorTraits;
+struct TAllocatorTraits
+{
+	static_assert(TIsAllocator<T>::Value, "T is not an allocator type");
 
-// [Typed Allocator]
-// Adapter of AllocatorT for ElementT
-template<typename AllocatorT, typename ElementT>
-class TTypedAllocator;
+	// Size type used by the allocator
+	// * Infers type from first argument of "Allocate" method
+	using SizeType = typename Detail::Allocator::TAllocateFunctionTraits<T>::template ArgType<0>;
 
-// [Is Allocator]
-// * Checks whether specific type is an allocator (defines TAllocatorTraits)
-template<typename T>
-struct TIsAllocator : TBoolValue<TIsComplete<TAllocatorTraits<T>>::Value> {};
+	// Pointer type used by the allocator
+	// * Infers type from return type of "Allocate" method
+	using PointerType = typename Detail::Allocator::TAllocateFunctionTraits<T>::ReturnType;
 
-// [Is Typed Allocator]
-// * Checks whether specific type is a typed allocator type
+	// Allocator type for ease of use
+	using AllocatorType = T;
 
-template<typename T> struct TIsTypedAllocator : TFalseValue {};
+	// Allocator element type
+	using ElementType = TRemovePointer<PointerType>::Type;
 
-template<typename AllocatorT, typename ElementT>
-struct TIsTypedAllocator<TTypedAllocator<AllocatorT, ElementT>> : TTrueValue {};
+	// Default element alignment for allocator
+	// * alignof(ElementType) for typed allocators, KOR_DEFAULT_HEAP_ALIGNMENT otherwise.
+	static constexpr uint32 ElementAlignment = AlignOf<ElementType, KOR_DEFAULT_HEAP_ALIGNMENT>();
+
+	// Default element size for allocator
+	// * sizeof(ElementType) for typed allocators, 1 (bytes) otherwise
+	static constexpr uint32 ElementSize = SizeOf<ElementType, 1>();
+
+	enum
+	{
+		// Whether allocator allows "Alignment" parameter
+		NeedsAlignment = Detail::Allocator::TAllocateFunctionTraits<T>::Arity >= 2,
+
+		// Whether allocator exposes "Reallocate" method
+		SupportsReallocate = Detail::Allocator::HasReallocate<T>,
+
+		// Whether allocator exposed "CalculateGrow" method
+		SupportsGrowPolicy = Detail::Allocator::HasCalculateGrow<T>,
+
+		// Whether allocator exposed "CalculateShrink" method
+		SupportsShrinkPolicy = Detail::Allocator::HasCalculateShrink<T>,
+
+		// Whether allocator is typed allocator
+		IsTyped = !TIsVoid<ElementType>::Value,
+
+		// Whether allocator is untyped/raw allocator
+		IsUntyped = !IsTyped,
+	};
+};
 
 KOR_NAMESPACE_END

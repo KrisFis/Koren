@@ -12,7 +12,7 @@
 
 KOR_NAMESPACE_BEGIN
 
-template<typename ElementT, typename AllocatorT = CAllocator> class TArray;
+template<typename ElementT, typename AllocatorFamilyT = CAllocator> class TArray;
 template<typename ElementT, typename AllocatorT = TQueueAllocator<ElementT>> class TQueue;
 
 KOR_NAMESPACE_END

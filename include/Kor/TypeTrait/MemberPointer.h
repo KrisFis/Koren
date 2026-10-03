@@ -10,8 +10,8 @@ KOR_NAMESPACE_BEGIN
 // [Member Pointer Outer]
 // * Gets member pointer outer from provided member pointer
 
-template<typename T> struct TMemberPointer : TType<T> {};
-template<typename T, typename C> struct TMemberPointer<T C::*> : TType<T> {};
+template<typename T> struct TMemberPointerOuter : TType<T> {};
+template<typename T, typename C> struct TMemberPointerOuter<T C::*> : TType<T> {};
 
 // [Member Pointer Base]
 // * Gets member pointer base/outer from provided member pointer

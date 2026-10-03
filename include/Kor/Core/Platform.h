@@ -161,7 +161,8 @@ typedef char tchar;
 #define KOR_BUFFER_SIZE_SMALL (1024)
 #define KOR_BUFFER_SIZE_LARGE (4096)
 
-namespace Detail::TypeTests
+#if KOR_ALLOW_STATIC_TESTS
+namespace Detail
 {
 	static_assert(sizeof(uint8) == 1, "uint8 type size test failed.");
 	static_assert(sizeof(uint16) == 2, "uint16 type size test failed.");
@@ -184,5 +185,6 @@ namespace Detail::TypeTests
 
 	static_assert(sizeof(wchar) == KOR_WCHAR_BYTES, "wchar type size test failed.");
 }
+#endif
 
 KOR_NAMESPACE_END

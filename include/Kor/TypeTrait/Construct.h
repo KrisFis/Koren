@@ -8,32 +8,14 @@
 
 KOR_NAMESPACE_BEGIN
 
+// Constructible
+// -------------------------------------------------------------------------
+
 // [Is constructible]
 // * Checks whether specific type is constructible from specific types
 
 template<typename T, typename... ArgTypes>
 struct TIsConstructible : TBoolValue<__is_constructible(T, ArgTypes...)> {};
-
-// [Is default constructible]
-// * Checks whether specific type is default constructible
-
-template<typename T>
-struct TIsDefaultConstructible : TBoolValue<__is_constructible(T)> {};
-
-// [Is copy constructible]
-// * Checks whether specific type is copy constructible
-
-template<typename T>
-struct TIsCopyConstructible : TIsConstructible<T, const typename TClean<T>::Type&> {};
-
-// [Is move constructible]
-// * Checks whether specific type is move constructible
-
-template<typename T>
-struct TIsMoveConstructible : TIsConstructible<T, typename TClean<T>::Type&&> {};
-
-// Trivial type
-// -------------------------------------------------------------------------
 
 // [Is trivially constructible]
 // * Checks whether specific type has trivial constructor from specific types
@@ -41,11 +23,23 @@ struct TIsMoveConstructible : TIsConstructible<T, typename TClean<T>::Type&&> {}
 template<typename T, typename... ArgTypes>
 struct TIsTriviallyConstructible : TBoolValue<__is_trivially_constructible(T, ArgTypes...)> {};
 
+// [Is default constructible]
+// * Checks whether specific type is default constructible
+
+template<typename T>
+struct TIsDefaultConstructible : TBoolValue<__is_constructible(T)> {};
+
 // [Is trivially default constructible]
 // * Checks whether specific type has trivial default constructor
 
 template<typename T>
 struct TIsTriviallyDefaultConstructible : TBoolValue<__is_trivially_constructible(T)> {};
+
+// [Is copy constructible]
+// * Checks whether specific type is copy constructible
+
+template<typename T>
+struct TIsCopyConstructible : TIsConstructible<T, const typename TClean<T>::Type&> {};
 
 // [Is trivially copy constructible]
 // * Checks whether specific type has trivial copy constructor
@@ -53,41 +47,59 @@ struct TIsTriviallyDefaultConstructible : TBoolValue<__is_trivially_constructibl
 template<typename T>
 struct TIsTriviallyCopyConstructible : TIsTriviallyConstructible<T, const typename TClean<T>::Type&> {};
 
+// [Is move constructible]
+// * Checks whether specific type is move constructible
+
+template<typename T>
+struct TIsMoveConstructible : TIsConstructible<T, typename TClean<T>::Type&&> {};
+
 // [Is trivially move constructible]
 // * Checks whether specific type has trivial move constructor
 
 template<typename T>
 struct TIsTriviallyMoveConstructible : TIsTriviallyConstructible<T, typename TClean<T>::Type&&> {};
 
-// [Is trivially destructible]
-// * Checks whether specific type has trivial destructor
+// Assignable
+// -------------------------------------------------------------------------
 
-template<typename T>
-struct TIsTriviallyDestructible : TBoolValue<
-#if KOR_COMPILER_GCC
-	__has_trivial_destructor(T)
-#else
-	__is_trivially_destructible(T)
-#endif
-> {};
+// [Is assignable]
+// * Checks whether specific type is assignable from R
 
-// [Is trivially copy assignable]
-// * Checks whether specific type has trivial assignment operator
+template<typename T, typename R>
+struct TIsAssignable : TBoolValue<__is_assignable(T, R)> {};
+
+// [Is trivially assignable]
+// * Checks whether specific type is trivially assignable from R
 
 template<typename T, typename R>
 struct TIsTriviallyAssignable : TBoolValue<__is_trivially_assignable(T, R)> {};
 
+// [Is copy assignable]
+// * Checks whether specific is copy assignable
+
+template<typename T>
+struct TIsCopyAssignable : TIsAssignable<T, const typename TClean<T>::Type&> {};
+
 // [Is trivially copy assignable]
-// * Checks whether specific type has trivial copy assignment operator
+// * Checks whether specific type is trivially copy assignable
 
 template<typename T>
 struct TIsTriviallyCopyAssignable : TIsTriviallyAssignable<T, const typename TClean<T>::Type&> {};
 
+// [Is move assignable]
+// * Checks whether specific type is move assignable
+
+template<typename T>
+struct TIsMoveAssignable : TIsAssignable<T, typename TClean<T>::Type&&> {};
+
 // [Is trivially move assignable]
-// * Checks whether specific type has trivial move assignment operator
+// * Checks whether specific type is trivially move assignable
 
 template<typename T>
 struct TIsTriviallyMoveAssignable : TIsTriviallyAssignable<T, typename TClean<T>::Type&&> {};
+
+// Copyable / Movable
+// -------------------------------------------------------------------------
 
 // [Is trivially copyable]
 // * Checks whether specific type can be trivially copied
@@ -114,5 +126,20 @@ struct TIsTriviallyMovable : TBoolValue<
 
 template<typename T>
 struct TIsTriviallyRelocatable : TIsTriviallyMovable<T> {};
+
+// Destructible
+// -------------------------------------------------------------------------
+
+// [Is trivially destructible]
+// * Checks whether specific type has trivial destructor
+
+template<typename T>
+struct TIsTriviallyDestructible : TBoolValue<
+#if KOR_COMPILER_GCC
+	__has_trivial_destructor(T)
+#else
+	__is_trivially_destructible(T)
+#endif
+> {};
 
 KOR_NAMESPACE_END

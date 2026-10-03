@@ -17,26 +17,63 @@ typedef decltype(sizeof(0)) TSize;
 
 typedef decltype(nullptr) TNullptr;
 
-// [TVoid]
+// [ Args ]
+// * Useful shareable wrapper type around args
+
+template<typename...> struct TArgs;
+
+// [ Function Pointer ]
+// * Function pointer type from provided signature
+// * Example: TFunctionPointer<bool(int,int,bool)> -> bool(*)(int,int,bool)
+
+template<typename Signature>
+using TFunctionPointer = Signature*;
+
+// [Member Function Pointer]
+// * Member function pointer from provided signature
+// * Example: TMemberFunctionPointer<FFoo, bool(int,int,bool)> -> bool (FFoo*)(int,int,bool)
+
+template<typename T, typename Signature>
+using TMemberFunctionPointer = Signature T::*;
+
+// [Void]
 // * Void type
 // * Used as SFINAE detection idiom target
 
 template<typename...>
 using TVoid = void;
 
+// [Void Template]
+// * Void type for template
+// * Used as SFINAE probe for template target
+
+template<template<typename...> typename>
+using TVoidTemplate = void;
+
 // [Type]
 // * Defines "Type" as provided type
 
 template<typename T> struct TType { using Type = T; };
 
+// [Value]
+// * Defines "Value" as provided value
+
+template<typename T, T ConstValue> struct TValue { inline static constexpr T Value = ConstValue; };
+
 // [Bool Value]
 // * Defines "Value" from provided const bool
 
-template<bool T> struct TBoolValue { static constexpr bool Value = T; };
-template<typename> struct TValue : TBoolValue<true> {};
+template<bool T> struct TBoolValue : TValue<bool, T> {};
 
 using TTrueValue = TBoolValue<true>;
 using TFalseValue = TBoolValue<false>;
+
+// [Always False]
+// * Dependent false for static_assert in uninstantiated branches
+// * Always pass at least one dependent argument, otherwise it is non-dependent and fires immediately
+
+template<typename...>
+struct TAlwaysFalse : TFalseValue {};
 
 // [Enable if]
 // * Enables compilation of specific template function/struct when condition met

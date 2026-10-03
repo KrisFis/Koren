@@ -22,12 +22,20 @@ namespace Init
 	struct SZero {};
 	inline constexpr SZero Zero {};
 
-	// Request uninitialized construction (no initialization performed)
+	// Request uninitialized 'initialization' (no initialization performed)
 	struct SNoInit {};
 	inline constexpr SNoInit NoInit {};
+
+	// Request consteval 'initialization' (initialization for compile-time only)
+	struct SConstEval {};
+	inline constexpr SConstEval ConstEval {};
 }
 
-class CAllocator;
+struct CAllocator;
+template<uint32 NumLimit> struct TFixedAllocator;
+
+template<int32 Size, uint32 Alignment> struct TBytes;
+template<typename T, uint32 Alignment> struct TTypedBytes;
 
 template<typename AllocatorT, typename ElementT> class TTypedAllocator;
 template<typename ElementT> class TQueueAllocator;

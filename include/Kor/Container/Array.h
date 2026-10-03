@@ -3,15 +3,16 @@
 
 #pragma once
 
-#include "Kor/KorMinimal.h"
+#include "Kor/Memory/Minimal.h"
 
 #include "Kor/Container/ContainerTraits.h"
 
 #include "Kor/Math/MathOps.h"
 
 #include "Kor/Memory/Allocator.h"
+#include "Kor/Memory/AllocatorOps.h"
+#include "Kor/Memory/AllocatorTraits.h"
 #include "Kor/Memory/MemoryOps.h"
-#include "Kor/Memory/TypedAllocator.h"
 
 #include "Kor/Utility/Invoke.h"
 #include "Kor/Utility/Swap.h"
@@ -24,46 +25,45 @@ namespace Detail::Array { template<typename T> struct TFriend; }
 // [ TArray ]
 // A dynamically-sized, heap-allocated array container.
 // * ElementType must be non-void and pure (non-reference, non-cv)
-// * AllocatorType must expose a signed SizeType
+// * AllocatorFamilyType must expose a signed SizeType
 // * Ownership is exclusive; copying performs a deep copy, moving transfers ownership
 //
 // Example:
 //   TArray<int32> values = { 1, 2, 3 };
 //   values.Add(4);
 //
-template<typename ElementT, typename AllocatorT>
+template<typename ElementT, typename AllocatorFamilyT>
 class TArray
 {
 public:
-	// Asserts
-	// -------------------------------------------------------------------------
-
-	static_assert(
-		!TIsVoid<ElementT>::Value && TIsClean<ElementT>::Value,
-		"ElementType must be a non-void and pure type");
-
-	static_assert(TIsAllocator<AllocatorT>::Value,
-		"AllocatorType must be a valid allocator type");
-
-	static_assert(TIsSigned<typename TAllocatorTraits<AllocatorT>::SizeType>::Value,
-		"SizeType must be a valid signed type");
-
-	// Types
-	// -------------------------------------------------------------------------
+	static_assert(!TIsVoid<ElementT>::Value, "ElementType must be non-void type");
+	static_assert(TIsClean<ElementT>::Value, "ElementType must be a clean type (no qualifiers)");
 
 	using ElementType = ElementT;
-	using AllocatorType = AllocatorT;
-	using ElementAllocatorType = TTypedAllocator<AllocatorT, ElementType>;
-	using SizeType = typename TAllocatorTraits<AllocatorT>::SizeType;
+
+	using AllocatorFamilyType = AllocatorFamilyT;
+	using AllocatorFamilyTraits = TAllocatorFamilyTraits<AllocatorFamilyType>;
+
+	using AllocatorType = AllocatorFamilyTraits::template TypedAllocator<ElementType>::Type;
+	using AllocatorTraits = TAllocatorTraits<AllocatorType>;
+
+	using SizeType = typename AllocatorFamilyTraits::SizeType;
+
 	using ILType = std::initializer_list<ElementType>;
-	using ArrayIteratorType = ElementType*;
-	using ConstArrayIteratorType = const ElementType*;
+
+	using IteratorType = ElementType*;
+	using ConstIteratorType = const ElementType*;
 
 	// Constructors
 	// -------------------------------------------------------------------------
 
 	// Empty array, no allocation.
 	constexpr TArray() noexcept;
+	explicit constexpr TArray(AllocatorType&& allocator) noexcept;
+
+	// Leaves Detail state uninitialized.
+	// * Caller must bring it to a valid state before any other use.
+	explicit consteval TArray(Init::SConstEval) noexcept;
 
 	// Deep copy.
 	// * Capacity becomes exactly Num of `other`; slack is not preserved.
@@ -75,27 +75,29 @@ public:
 
 	// Deep copy from an initializer list. `{}` is valid and yields an empty array.
 	TArray(const ILType& list) noexcept;
-
-	// Leaves Detail state uninitialized.
-	// * Caller must bring it to a valid state before any other use.
-	explicit constexpr TArray(Init::SNoInit) noexcept;
+	explicit TArray(AllocatorType&& allocator, const ILType& list) noexcept;
 
 	// Reserves `num` elements without constructing any. Num becomes `num`.
 	explicit TArray(SizeType num, Init::SNoInit) noexcept;
+	explicit TArray(AllocatorType&& allocator, SizeType num, Init::SNoInit) noexcept;
 
 	// Reserves and default-constructs `num` elements. Num becomes `num`.
 	explicit TArray(SizeType num, Init::SDefault) noexcept;
+	explicit TArray(AllocatorType&& allocator, SizeType num, Init::SDefault) noexcept;
 
 	// Reserves `num` elements and zero-fills them. Num becomes `num`.
 	// * Only for trivially-constructible ElementType.
 	explicit TArray(SizeType num, Init::SZero) noexcept;
+	explicit TArray(AllocatorType&& allocator, SizeType num, Init::SZero) noexcept;
 
 	// Copies `num` elements from `data`.
 	// * `data` may be null only if `num == 0`.
 	explicit TArray(const ElementType* data, SizeType num) noexcept;
+	explicit TArray(AllocatorType&& allocator, const ElementType* data, SizeType num) noexcept;
 
 	// Reserves `num` elements, each copy-constructed from `value`. Num becomes `num`.
 	explicit TArray(const ElementType& val, SizeType num) noexcept;
+	explicit TArray(AllocatorType&& allocator, const ElementType& val, SizeType num) noexcept;
 
 	// Destructor
 	// -------------------------------------------------------------------------
@@ -137,8 +139,8 @@ public:
 	// -------------------------------------------------------------------------
 
 	// Allocator instance backing this array.
-	ElementAllocatorType& GetAllocator() noexcept;
-	const ElementAllocatorType& GetAllocator() const noexcept;
+	AllocatorType& GetAllocator() noexcept;
+	const AllocatorType& GetAllocator() const noexcept;
 
 	// Pointer to the data buffer. Null if empty and never allocated.
 	ElementType* GetData() noexcept;
@@ -419,14 +421,14 @@ public:
 	// Iterators
 	// -------------------------------------------------------------------------
 
-	ArrayIteratorType begin() noexcept;
-	ConstArrayIteratorType begin() const noexcept;
-	ArrayIteratorType end() noexcept;
-	ConstArrayIteratorType end() const noexcept;
+	IteratorType begin() noexcept;
+	ConstIteratorType begin() const noexcept;
+	IteratorType end() noexcept;
+	ConstIteratorType end() const noexcept;
 
 private:
 	// Allocator instance for _data
-	ElementAllocatorType _allocator;
+	AllocatorType _allocator;
 
 	// Allocated data
 	ElementType* _data;

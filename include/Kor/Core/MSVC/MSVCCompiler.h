@@ -17,7 +17,7 @@
 #define KOR_DEPRECATED __declspec(deprecated)
 #define KOR_DEPRECATED_MSG(msg) __declspec(deprecated(msg))
 
-#define KOR_NODISCARD __declspec(noreturn)
+#define KOR_NODISCARD [[nodiscard]]
 #define KOR_NORETURN __declspec(noreturn)
 
 #define KOR_INLINE __inline

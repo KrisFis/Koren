@@ -22,7 +22,7 @@ KOR_NAMESPACE_BEGIN
 // TSize idsNum = NumOf(Ids);
 
 template<typename RangeT>
-KOR_NODISCARD KOR_FORCEINLINE constexpr auto NumOf(RangeT&& range)
+KOR_NODISCARD KOR_FORCEINLINE constexpr auto NumOf(RangeT&& range) noexcept
 	-> decltype(Detail::TNumOfTrait<typename TClean<RangeT>::Type>::Get(range))
 {
 	return Detail::TNumOfTrait<typename TClean<RangeT>::Type>::Get(range);

@@ -5,47 +5,105 @@
 
 #include "Kor/Memory/Minimal.h"
 
-#include "Kor/Memory/AllocatorTraits.h"
 #include "Kor/Memory/MemoryOps.h"
+
+#include "Kor/TypeTrait/Integer.h"
+
+#include "Kor/Utility/SizeAlignOf.h"
 
 KOR_NAMESPACE_BEGIN
 
-// Reference model for the untyped allocator interface.
-// Any type satisfying TIsAllocator must expose Allocate/Reallocate/Deallocate with this signature
-class CAllocator
+// FAMILY CONTRACT
+// -------------------------------------------------------------------------
+// A family exposes three members:
+//   - `SizeType` : integral type used for every size/count in the family
+//   - `Typed<T>` : allocator template for objects of type T
+//   - `Untyped`  : allocator for raw bytes
+//
+// `Typed<T>` and `Untyped` must satisfy TIsAllocator. Or left void/undeclared.
+//
+// `SizeType` is the single source of truth:
+// * allocators use it for every size/count parameter, and TAllocatorOps/containers take it from the family.
+//
+// ALLOCATOR CONTRACT (for `Typed<T>` and `Untyped`)
+// -------------------------------------------------------------------------
+// Typed allocators return `T*` from `Allocate`; untyped ones return `void*` and count in bytes.
+// Declare each method once (no overloads).
+// Every size/count parameter must be the family's `SizeType`.
+//
+// Optional parameters and methods:
+// * If declared, the allocator honours it
+// * If omitted, the allocator ignores it. Don't add defaults, since TAllocatorOps fills them in.
+//
+// Failure is reported by returning nullptr. All methods are noexcept.
+// -------------------------------------------------------------------------
+struct CAllocator
 {
-public:
 	using SizeType = int32;
 
-	// Allocates a raw, untyped memory block.
-	// @param bytes - Number of bytes to allocate.
-	// @param alignment - Required alignment of the returned block, in bytes.
-	// @return Pointer to the allocated block, or nullptr on failure.
-	void* Allocate(SizeType bytes, uint32 alignment) noexcept;
+	template<typename T>
+	struct Typed
+	{
+		// [REQUIRED] Allocates storage for `num` elements (bytes if untyped).
+		// @param num       - New element (or byte) count.
+		// @param alignment - [OPTIONAL] Required block alignment, in bytes.
+		// @return Allocated block, or nullptr on failure.
+		T* Allocate(SizeType num, uint32 alignment) noexcept;
 
-	// Resizes a previously allocated block, possibly moving it.
-	// @param ptr - Block previously returned by Allocate/Reallocate.
-	// @param bytes - New size of the block, in bytes.
-	// @param alignment - Required alignment of the returned block, in bytes.
-	// @return Pointer to the (possibly relocated) block, or nullptr on failure.
-	void* Reallocate(void* ptr, SizeType bytes, uint32 alignment) noexcept;
+		// [OPTIONAL] Resizes a block, possibly moving it; contents are preserved up
+		// to the smaller size. Omit it if not natively supported. Containers then
+		// fall back to Allocate + copy + Deallocate.
+		// @param ptr       - Block from Allocate/Reallocate.
+		// @param num       - New element (or byte) count.
+		// @param alignment - [OPTIONAL] Must match the original alignment.
+		// @return Possibly relocated block, or nullptr on failure (original stays valid).
+		T* Reallocate(T* ptr, SizeType newNum, uint32 alignment) noexcept;
 
-	// Frees a block previously returned by Allocate/Reallocate.
-	// @param ptr - Block to free.
-	// @param alignment - Alignment the block was originally allocated with.
-	void Deallocate(void* ptr, uint32 alignment) noexcept;
+		// [REQUIRED] Frees a block from Allocate/Reallocate.
+		// @param ptr       - Block to free (not nullptr).
+		// @param alignment - [OPTIONAL] Alignment the block was allocated with.
+		void Deallocate(T* ptr, uint32 alignment) noexcept;
+
+		// [OPTIONAL] Calculates capacity for growing allocation from oldNum to fit newNum
+		// @param newNum    - New element (or byte) count
+		// @param oldNum    - Old element (or byte) count
+		// @param alignment - [OPTIONAL] Alignment the block was allocated with
+		//
+		// SizeType CalculateGrow(SizeType newNum, SizeType oldNum, uint32 alignment) const noexcept;
+
+		// [OPTIONAL] Calculates capacity for shrinking allocation from oldNum towards newNum
+		// @param newNum    - New element (or byte) count
+		// @param oldNum    - Old element (or byte) count
+		// @param alignment - [OPTIONAL] Alignment the block was allocated with
+		//
+		// SizeType CalculateShrink(SizeType newNum, SizeType oldNum, uint32 alignment) const noexcept;
+	};
+
+	// Untyped allocator: returns void*.
+	using Untyped = Typed<void>;
 };
 
-template<>
-struct TAllocatorTraits<CAllocator> : TAllocatorTraitsBase<CAllocator>
+// Default sizing policy.
+// * TAllocatorOps falls back to it when an allocator does not declare its own CalculateGrow / CalculateShrink.
+//
+// Intended as an unclamped intermediate step in the allocator call flow
+struct SDefaultAllocationPolicy
 {
-	using SizeType = typename CAllocator::SizeType;
+	// Calculates capacity for growing an allocation from oldNum to fit newNum.
+	// @param newNum          - New element count
+	// @param oldNum          - Old element count
+	// @param bytesPerElement - Size of one element in bytes
+	// @param alignment       - Alignment the block was allocated with
+	template<typename SizeType>
+	static SizeType CalculateGrow(SizeType newNum, SizeType oldNum, uint32 bytesPerElement, uint32 alignment) noexcept;
 
-	enum
-	{
-		NeedsAlignment = true,
-		HasReallocate = true,
-	};
+	// Calculates capacity for shrinking an allocation from oldNum towards newNum.
+	// @param newNum          - New element count
+	// @param oldNum          - Old element count
+	// @param bytesPerElement - Size of one element in bytes
+	// @param alignment       - Alignment the block was allocated with
+	template<typename SizeType>
+	static SizeType CalculateShrink(SizeType newNum, SizeType oldNum, uint32 bytesPerElement, uint32 alignment) noexcept;
 };
 
 #include "Kor/Memory/Detail/Allocator.inl"
