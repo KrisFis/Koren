@@ -14,6 +14,8 @@ KOR_NAMESPACE_BEGIN
 template<uint32 NumLimit>
 struct TFixedAllocator
 {
+	static_assert(NumLimit > 0, "NumLimit must be greater than 0");
+
 	using SizeType = int32;
 
 	template<typename T>
@@ -36,7 +38,7 @@ struct TFixedAllocator
 		{
 			// Ensure that expected allocation can fit
 			KOR_EXPECT(SMathOps::IsWithin<int64>(num, 0, NumLimit));
-			return *_data[0];
+			return _data[0].Get();
 		}
 
 		using BytesType = TChoose<TIsVoid<T>::Value,
