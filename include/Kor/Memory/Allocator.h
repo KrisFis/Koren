@@ -41,10 +41,7 @@ struct CAllocator
 		// [REQUIRED] Allocates storage for `num` elements (bytes if untyped).
 		// @param alignment - [OPTIONAL PARAMETER] Required block alignment, in bytes.
 		// @return Allocated block, or nullptr on failure.
-		KOR_FORCEINLINE T* Allocate(SizeType num, uint32 alignment) noexcept
-		{
-			return (T*)SMemoryOps::Malloc(num * SizeOf<T, 1>(), alignment);
-		}
+		KOR_FORCEINLINE T* Allocate(SizeType num, uint32 alignment) noexcept;
 
 		// [OPTIONAL] Resizes a block, possibly moving it; contents are preserved up
 		// to the smaller size. Omit it if not natively supported. Containers then
@@ -53,22 +50,18 @@ struct CAllocator
 		// @param num       - New element (or byte) count.
 		// @param alignment - [OPTIONAL PARAMETER] Must match the original alignment.
 		// @return Possibly relocated block, or nullptr on failure (original stays valid).
-		KOR_FORCEINLINE T* Reallocate(T* ptr, SizeType num, uint32 alignment) noexcept
-		{
-			return (T*)SMemoryOps::Realloc((void*)ptr, num * SizeOf<T, 1>(), alignment);
-		}
+		KOR_FORCEINLINE T* Reallocate(T* ptr, SizeType num, uint32 alignment) noexcept;
 
 		// [REQUIRED] Frees a block from Allocate/Reallocate.
 		// @param ptr       - Block to free (not nullptr).
 		// @param alignment - [OPTIONAL PARAMETER] Alignment the block was allocated with.
-		KOR_FORCEINLINE void Deallocate(T* ptr, uint32 alignment) noexcept
-		{
-			SMemoryOps::Free((void*)ptr, alignment);
-		}
+		KOR_FORCEINLINE void Deallocate(T* ptr, uint32 alignment) noexcept;
 	};
 
 	// Untyped allocator: returns void*.
 	using Untyped = Typed<void>;
 };
+
+#include "Kor/Memory/Detail/Allocator.inl"
 
 KOR_NAMESPACE_END
