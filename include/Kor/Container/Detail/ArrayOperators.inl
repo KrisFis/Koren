@@ -3,8 +3,8 @@
 
 #pragma once // silence tooling
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::operator=(const TArray& other) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>& TArray<ElementT, AllocatorFamilyT>::operator=(const TArray& other) noexcept
 {
 	if (this != &other)
 	{
@@ -13,8 +13,8 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::oper
 	return *this;
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::operator=(TArray&& other) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>& TArray<ElementT, AllocatorFamilyT>::operator=(TArray&& other) noexcept
 {
 	if (this != &other)
 	{
@@ -23,47 +23,47 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::oper
 	return *this;
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE TArray<ElementT, AllocatorT>& TArray<ElementT, AllocatorT>::operator=(const ILType& list) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>& TArray<ElementT, AllocatorFamilyT>::operator=(const ILType& list) noexcept
 {
 	Assign(list.begin(), list.size());
 	return *this;
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_INLINE bool TArray<ElementT, AllocatorT>::operator==(const TArray& other) const noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE bool TArray<ElementT, AllocatorFamilyT>::operator==(const TArray& other) const noexcept
 {
 	return
 		_num == other._num && 
 		SMemoryOps::IsEqual(_data, other._data, _num);
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE bool TArray<ElementT, AllocatorT>::operator!=(const TArray& other) const noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::operator!=(const TArray& other) const noexcept
 {
 	return !operator==(other);
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorT>::operator*() noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorFamilyT>::operator*() noexcept
 {
 	return _data;
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorT>::operator*() const noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::operator*() const noexcept
 {
 	return _data;
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorT>::operator[](SizeType idx) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorFamilyT>::operator[](SizeType idx) noexcept
 {
 	return *GetAt(idx);
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE const ElementT& TArray<ElementT, AllocatorT>::operator[](SizeType idx) const noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE const ElementT& TArray<ElementT, AllocatorFamilyT>::operator[](SizeType idx) const noexcept
 {
 	return *GetAt(idx);
 }

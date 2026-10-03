@@ -3,26 +3,26 @@
 
 #pragma once // silence tooling
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::IteratorType TArray<ElementT, AllocatorT>::begin() noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::IteratorType TArray<ElementT, AllocatorFamilyT>::begin() noexcept
 {
 	return _data;
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::ConstIteratorType TArray<ElementT, AllocatorT>::begin() const noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::ConstIteratorType TArray<ElementT, AllocatorFamilyT>::begin() const noexcept
 {
 	return _data;
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::IteratorType TArray<ElementT, AllocatorT>::end() noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::IteratorType TArray<ElementT, AllocatorFamilyT>::end() noexcept
 {
 	return _data + _num;
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorT>::ConstIteratorType TArray<ElementT, AllocatorT>::end() const noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::ConstIteratorType TArray<ElementT, AllocatorFamilyT>::end() const noexcept
 {
 	return _data + _num;
 }

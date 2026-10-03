@@ -59,6 +59,11 @@ public:
 
 	// Empty array, no allocation.
 	constexpr TArray() noexcept;
+	explicit constexpr TArray(AllocatorType&& allocator) noexcept;
+
+	// Leaves Detail state uninitialized.
+	// * Caller must bring it to a valid state before any other use.
+	explicit consteval TArray(Init::SConstEval) noexcept;
 
 	// Deep copy.
 	// * Capacity becomes exactly Num of `other`; slack is not preserved.
@@ -70,27 +75,29 @@ public:
 
 	// Deep copy from an initializer list. `{}` is valid and yields an empty array.
 	TArray(const ILType& list) noexcept;
-
-	// Leaves Detail state uninitialized.
-	// * Caller must bring it to a valid state before any other use.
-	explicit constexpr TArray(Init::SNoInit) noexcept;
+	explicit TArray(AllocatorType&& allocator, const ILType& list) noexcept;
 
 	// Reserves `num` elements without constructing any. Num becomes `num`.
 	explicit TArray(SizeType num, Init::SNoInit) noexcept;
+	explicit TArray(AllocatorType&& allocator, SizeType num, Init::SNoInit) noexcept;
 
 	// Reserves and default-constructs `num` elements. Num becomes `num`.
 	explicit TArray(SizeType num, Init::SDefault) noexcept;
+	explicit TArray(AllocatorType&& allocator, SizeType num, Init::SDefault) noexcept;
 
 	// Reserves `num` elements and zero-fills them. Num becomes `num`.
 	// * Only for trivially-constructible ElementType.
 	explicit TArray(SizeType num, Init::SZero) noexcept;
+	explicit TArray(AllocatorType&& allocator, SizeType num, Init::SZero) noexcept;
 
 	// Copies `num` elements from `data`.
 	// * `data` may be null only if `num == 0`.
 	explicit TArray(const ElementType* data, SizeType num) noexcept;
+	explicit TArray(AllocatorType&& allocator, const ElementType* data, SizeType num) noexcept;
 
 	// Reserves `num` elements, each copy-constructed from `value`. Num becomes `num`.
 	explicit TArray(const ElementType& val, SizeType num) noexcept;
+	explicit TArray(AllocatorType&& allocator, const ElementType& val, SizeType num) noexcept;
 
 	// Destructor
 	// -------------------------------------------------------------------------

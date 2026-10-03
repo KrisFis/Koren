@@ -9,6 +9,7 @@ namespace Detail::Array
 	struct TFriend
 	{
 		using ArrayType = ArrayT;
+		using ILType = typename ArrayType::ILType;
 		using SizeType = typename ArrayType::SizeType;
 		using ElementType = typename ArrayType::ElementType;
 		using AllocatorType = typename ArrayType::AllocatorType;
@@ -177,7 +178,7 @@ namespace Detail::Array
 		template<bool HasItems = true>
 		static void CopyFromOther(ArrayType& dest, const ArrayType& source) noexcept
 		{
-			if constexpr (!TIsEmpty<AllocatorType>::Value)
+			if constexpr (!TIsEmpty<AllocatorType>::Value) // EBO optimization
 			{
 				if constexpr (HasItems)
 				{
@@ -214,7 +215,7 @@ namespace Detail::Array
 				}
 			}
 
-			if constexpr (!TIsEmpty<AllocatorType>::Value)
+			if constexpr (!TIsEmpty<AllocatorType>::Value) // EBO optimization
 			{
 				dest._allocator = Move(source._allocator);
 			}

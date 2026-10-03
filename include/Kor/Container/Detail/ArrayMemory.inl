@@ -3,15 +3,15 @@
 
 #pragma once // silence tooling
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::Reserve(SizeType num) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE void TArray<ElementT, AllocatorFamilyT>::Reserve(SizeType num) noexcept
 {
 	if (num <= _reservedNum) return;
 	SFriend::Reallocate(*this, num);
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Resize(SizeType num) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::Resize(SizeType num) noexcept
 {
 	if (num == _num) return;
 
@@ -34,8 +34,8 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::Resize(SizeType num) noexcept
 	}
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::ResizeZeroed(SizeType num) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::ResizeZeroed(SizeType num) noexcept
 {
 	if (num == _num) return;
 
@@ -57,8 +57,8 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::ResizeZeroed(SizeType num) noexcep
 		SFriend::Deallocate(*this);
 	}
 }
-template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::ResizeUninitialized(SizeType num) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::ResizeUninitialized(SizeType num) noexcept
 {
 	if (num == _num) return;
 
@@ -72,22 +72,22 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::ResizeUninitialized(SizeType num) 
 	}
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::ShrinkToFit() noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE void TArray<ElementT, AllocatorFamilyT>::ShrinkToFit() noexcept
 {
 	if (_num == _reservedNum) return;
 	SFriend::Reallocate(*this, _num);
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::Reset() noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE void TArray<ElementT, AllocatorFamilyT>::Reset() noexcept
 {
 	if (_num == 0) return;
 	SFriend::Destruct(*this);
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Empty(SizeType num) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::Empty(SizeType num) noexcept
 {
 	if (_num == 0) return;
 
@@ -101,29 +101,29 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::Empty(SizeType num) noexcept
 	}
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::Fill(const ElementType& val) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE void TArray<ElementT, AllocatorFamilyT>::Fill(const ElementType& val) noexcept
 {
 	if (_num == 0) return;
 	SMemoryOps::FillAssign(_data, val, _num);
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_FORCEINLINE void TArray<ElementT, AllocatorT>::Assign(const TArray& other) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE void TArray<ElementT, AllocatorFamilyT>::Assign(const TArray& other) noexcept
 {
 	if (this == &other) return;
 	SFriend::CopyFromOther(*this, other);
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Assign(TArray&& other) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::Assign(TArray&& other) noexcept
 {
 	if (this == &other) return;
 	SFriend::MoveFromOther(*this, Move(other));
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Assign(const ElementType& val, SizeType num) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::Assign(const ElementType& val, SizeType num) noexcept
 {
 	if (num > 0)
 	{
@@ -136,8 +136,8 @@ KOR_INLINE void TArray<ElementT, AllocatorT>::Assign(const ElementType& val, Siz
 	}
 }
 
-template<typename ElementT, typename AllocatorT>
-KOR_INLINE void TArray<ElementT, AllocatorT>::Assign(const ElementType* data, SizeType num) noexcept
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::Assign(const ElementType* data, SizeType num) noexcept
 {
 	if (num > 0)
 	{

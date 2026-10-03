@@ -22,9 +22,13 @@ namespace Init
 	struct SZero {};
 	inline constexpr SZero Zero {};
 
-	// Request uninitialized construction (no initialization performed)
+	// Request uninitialized 'initialization' (no initialization performed)
 	struct SNoInit {};
 	inline constexpr SNoInit NoInit {};
+
+	// Request consteval 'initialization' (initialization for compile-time only)
+	struct SConstEval {};
+	inline constexpr SConstEval ConstEval {};
 }
 
 struct CAllocator;
