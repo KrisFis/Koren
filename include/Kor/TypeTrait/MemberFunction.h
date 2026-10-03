@@ -153,7 +153,7 @@ namespace Detail::MemberFnTraitsTest
 {
 	struct Probe
 	{
-		int32* Allocate(int32, uint) noexcept;
+		int32* Allocate(int32, uint8) noexcept;
 		int32  Full(char) const volatile & noexcept;
 		void Plain();
 	};
@@ -170,7 +170,7 @@ namespace Detail::MemberFnTraitsTest
 	static_assert(TIsSame<A::ReturnType, int32*>::Value);
 	static_assert(TIsSame<A::ClassType, Probe>::Value);
 	static_assert(TIsSame<A::ArgType<0>, int32>::Value);
-	static_assert(TIsSame<A::ArgType<1>, uint>::Value);
+	static_assert(TIsSame<A::ArgType<1>, uint8>::Value);
 	static_assert(A::Arity == 2);
 
 	// Queries
