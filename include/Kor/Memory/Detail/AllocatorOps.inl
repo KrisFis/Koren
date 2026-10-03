@@ -3,56 +3,13 @@
 
 #pragma once // silence tooling
 
-namespace Detail
-{
-	template<typename ElementT, typename SizeT>
-	struct TDefaultAllocationPolicy
-	{
-		static constexpr SizeT INIT = 4;
-		static constexpr SizeT PADDING = KOR_DEFAULT_HEAP_ALIGNMENT; // in elements
-		static constexpr SizeT FACTOR_NUM = 3;
-		static constexpr SizeT FACTOR_DEN = 8;
-
-		KOR_INLINE static SizeT CalculateGrow(
-			SizeT oldNum,
-			SizeT num,
-			uint32 /*alignment*/) noexcept
-		{
-			// First small allocation: start at INIT
-			if (oldNum == 0 && num <= INIT)
-			{
-				return INIT;
-			}
-
-			// 64-bit intermediate so num * FACTOR_NUM can't overflow a 32-bit SizeT
-			const uint64 n = (uint64)num;
-			const uint64 result = n + (n * FACTOR_NUM) / FACTOR_DEN + PADDING;
-
-			return (SizeT)SMathOps::Clamp<uint64>(result, 0, TLimits<SizeT>::Max);
-		}
-
-		KOR_INLINE static SizeT CalculateShrink(
-			SizeT oldNum,
-			SizeT num,
-			uint32 /*alignment*/) noexcept
-		{
-			// num <= oldNum, so slack is oldNum - num
-			const uint64 slack = (uint64)oldNum - (uint64)num;
-			const uint64 slackBytes = slack * (uint64)sizeof(ElementT);
-
-			// Keep the block unless enough memory would be reclaimed
-			return (slackBytes >= KOR_BUFFER_SIZE_LARGE) ? num : oldNum;
-		}
-	};
-}
-
 template<typename AllocatorT>
 KOR_FORCEINLINE typename TAllocatorOps<AllocatorT>::PointerType TAllocatorOps<AllocatorT>::Allocate(
 	AllocatorType& allocator,
 	SizeType capacity,
 	uint32 alignment) noexcept
 {
-	if constexpr (Traits::SupportsAlignment) { return allocator.Allocate(capacity, alignment); }
+	if constexpr (Traits::NeedsAlignment) { return allocator.Allocate(capacity, alignment); }
 	else { return allocator.Allocate(capacity); }
 }
 
@@ -65,9 +22,9 @@ KOR_FORCEINLINE typename TAllocatorOps<AllocatorT>::PointerType TAllocatorOps<Al
 {
 	static_assert(Traits::SupportsReallocate,
 	              "Allocator does not support Reallocate. "
-	              "Prefer `ReallocateWithFallback(allocator, ptr, oldCapacity, newCapacity, alignment)`");
+	              "Prefer `ReallocateWithFallback(allocator, ptr, newCapacity, oldCapacity, alignment)`");
 
-	if constexpr (Traits::SupportsAlignment) { return allocator.Reallocate(ptr, newCapacity, alignment); }
+	if constexpr (Traits::NeedsAlignment) { return allocator.Reallocate(ptr, newCapacity, alignment); }
 	else { return allocator.Reallocate(ptr, newCapacity); }
 }
 
@@ -75,13 +32,13 @@ template<typename AllocatorT>
 typename TAllocatorOps<AllocatorT>::PointerType TAllocatorOps<AllocatorT>::ReallocateWithFallback(
 	AllocatorType& allocator,
 	PointerType ptr,
-	SizeType oldCapacity,
 	SizeType newCapacity,
+	SizeType oldCapacity,
 	uint32 alignment) noexcept
 {
 	if constexpr (Traits::SupportsReallocate)
 	{
-		if constexpr (Traits::SupportsAlignment) { return allocator.Reallocate(ptr, newCapacity, alignment); }
+		if constexpr (Traits::NeedsAlignment) { return allocator.Reallocate(ptr, newCapacity, alignment); }
 		else { return allocator.Reallocate(ptr, newCapacity); }
 	}
 	else if (oldCapacity > 0)
@@ -89,7 +46,7 @@ typename TAllocatorOps<AllocatorT>::PointerType TAllocatorOps<AllocatorT>::Reall
 		PointerType newData = Allocate(allocator, newCapacity, alignment);
 		KOR_ASSERT(newData);
 
-		SPlatformMemoryOps::Move(newData, ptr, SMathOps::Min(oldCapacity, newCapacity) * SizeOf<ElementType, 1>());
+		SPlatformMemoryOps::Move(newData, ptr, SMathOps::Min(oldCapacity, newCapacity) * ElementSize);
 		Deallocate(allocator, ptr, alignment);
 
 		return newData;
@@ -105,15 +62,15 @@ template<typename AllocatorT>
 typename TAllocatorOps<AllocatorT>::PointerType TAllocatorOps<AllocatorT>::ReallocateConstructed(
 	AllocatorType& allocator,
 	PointerType ptr,
+	SizeType newCapacity,
 	SizeType oldCapacity,
 	SizeType oldConstructed,
-	SizeType newCapacity,
 	uint32 alignment) noexcept
 {
 	if constexpr (!Traits::IsTyped)
 	{
 		// We know that "oldConstructed" will be used for moving bytes and we don't want to move "oldCapacity"
-		return ReallocateWithFallback(allocator, ptr, oldConstructed, newCapacity, alignment);
+		return ReallocateWithFallback(allocator, ptr, newCapacity, oldCapacity, alignment);
 	}
 	else // Traits::IsTyped
 	{
@@ -126,7 +83,7 @@ typename TAllocatorOps<AllocatorT>::PointerType TAllocatorOps<AllocatorT>::Reall
 			}
 
 			// We know that "oldConstructed" will be used for moving bytes and we don't want to move "oldCapacity"
-			return ReallocateWithFallback(allocator, ptr, oldConstructed, newCapacity, alignment);
+			return ReallocateWithFallback(allocator, ptr, newCapacity, oldCapacity, alignment);
 		}
 		else if (oldConstructed > 0)
 		{
@@ -152,7 +109,7 @@ KOR_FORCEINLINE void TAllocatorOps<AllocatorT>::Deallocate(
 	PointerType ptr,
 	uint32 alignment) noexcept
 {
-	if constexpr (Traits::SupportsAlignment) allocator.Deallocate(ptr, alignment);
+	if constexpr (Traits::NeedsAlignment) allocator.Deallocate(ptr, alignment);
 	else allocator.Deallocate(ptr);
 }
 
@@ -174,8 +131,8 @@ void TAllocatorOps<AllocatorT>::DeallocateConstructed(
 template<typename AllocatorT>
 typename TAllocatorOps<AllocatorT>::SizeType TAllocatorOps<AllocatorT>::CalculateGrow(
 	AllocatorType& allocator,
-	SizeType oldCapacity,
 	SizeType newCapacity,
+	SizeType oldCapacity,
 	uint32 alignment) noexcept
 {
 	KOR_ASSERT(newCapacity >= oldCapacity);
@@ -185,12 +142,16 @@ typename TAllocatorOps<AllocatorT>::SizeType TAllocatorOps<AllocatorT>::Calculat
 		return oldCapacity;
 	}
 
-	// TODO: Allow allocators to provide their implementation
-	const SizeType result = Detail::TDefaultAllocationPolicy<ElementType, SizeType>::CalculateGrow(
-		oldCapacity,
-		newCapacity,
-		alignment
-	);
+	SizeType result;
+	if constexpr (Traits::SupportsGrowPolicy)
+	{
+		if constexpr (Traits::NeedsAlignment) result = allocator.CalculateGrow(newCapacity, oldCapacity, alignment);
+		else result = allocator.CalculateGrow(newCapacity, oldCapacity);
+	}
+	else
+	{
+		result = SDefaultAllocationPolicy::CalculateGrow(newCapacity, oldCapacity, ElementSize, ElementAlignment);
+	}
 
 	// never less than requested
 	return SMathOps::Max(result, newCapacity);
@@ -199,8 +160,8 @@ typename TAllocatorOps<AllocatorT>::SizeType TAllocatorOps<AllocatorT>::Calculat
 template<typename AllocatorT>
 typename TAllocatorOps<AllocatorT>::SizeType TAllocatorOps<AllocatorT>::CalculateShrink(
 	AllocatorType& allocator,
-	SizeType oldCapacity,
 	SizeType newCapacity,
+	SizeType oldCapacity,
 	uint32 alignment) noexcept
 {
 	KOR_ASSERT(newCapacity <= oldCapacity);
@@ -210,12 +171,16 @@ typename TAllocatorOps<AllocatorT>::SizeType TAllocatorOps<AllocatorT>::Calculat
 		return oldCapacity;
 	}
 
-	// TODO: Allow allocators to provide their implementation
-	const SizeType result = Detail::TDefaultAllocationPolicy<ElementType, SizeType>::CalculateShrink(
-		oldCapacity,
-		newCapacity,
-		alignment
-	);
+	SizeType result;
+	if constexpr (Traits::SupportsShrinkPolicy)
+	{
+		if constexpr (Traits::NeedsAlignment) result = allocator.CalculateShrink(newCapacity, oldCapacity, alignment);
+		else result = allocator.CalculateShrink(newCapacity, oldCapacity);
+	}
+	else
+	{
+		result = SDefaultAllocationPolicy::CalculateShrink(newCapacity, oldCapacity, ElementSize, ElementAlignment);
+	}
 
 	// never below requested, never above current
 	return SMathOps::Clamp(result, newCapacity, oldCapacity);

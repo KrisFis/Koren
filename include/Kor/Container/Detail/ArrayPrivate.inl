@@ -47,9 +47,9 @@ namespace Detail::Array
 					arr._data = AllocatorOps::ReallocateConstructed(
 						arr._allocator,
 						arr._data,
+						num,
 						arr._reservedNum,
-						arr._num,
-						num
+						arr._num
 					);
 				}
 			}
@@ -110,8 +110,8 @@ namespace Detail::Array
 				arr._data = AllocatorOps::ReallocateWithFallback(
 					arr._allocator,
 					arr._data,
-					arr._reservedNum,
-					num
+					num,
+					arr._reservedNum
 				);
 
 				arr._reservedNum = num;
@@ -142,8 +142,8 @@ namespace Detail::Array
 		{
 			num = AllocatorOps::CalculateGrow(
 				arr._allocator,
-				arr._reservedNum,
-				num
+				num,
+				arr._reservedNum
 			);
 
 			if (num == arr._reservedNum) return; // no-op hit
@@ -157,8 +157,8 @@ namespace Detail::Array
 
 			num = AllocatorOps::CalculateShrink(
 				arr._allocator,
-				arr._reservedNum,
-				num
+				num,
+				arr._reservedNum
 			);
 
 			if (num == arr._reservedNum) return; // no-op hit

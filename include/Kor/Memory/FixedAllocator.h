@@ -25,8 +25,11 @@ struct TFixedAllocator
 		Typed& operator=(const Typed&) = delete;
 
 		KOR_FORCEINLINE T* Allocate(SizeType num) noexcept { return GetAllocation(num); }
-		KOR_FORCEINLINE T* Reallocate(T*, SizeType num) noexcept { return GetAllocation(num); }
+		KOR_FORCEINLINE T* Reallocate(T*, SizeType newNum) noexcept { return GetAllocation(newNum); }
 		KOR_FORCEINLINE void Deallocate(T*) noexcept {}
+
+		KOR_FORCEINLINE SizeType CalculateGrow(SizeType newNum, SizeType oldNum) const noexcept { return NumLimit; }
+		KOR_FORCEINLINE SizeType CalculateShrink(SizeType newNum, SizeType oldNum) const noexcept { return NumLimit; }
 
 	private:
 		T* GetAllocation(SizeType num) noexcept

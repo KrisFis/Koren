@@ -22,6 +22,9 @@ namespace Detail::Allocator
 	KOR_DEFINE_HAS_METHOD_TRAIT(THasReallocateTrait, Reallocate);
 	KOR_DEFINE_HAS_METHOD_TRAIT(THasDeallocateTrait, Deallocate);
 
+	KOR_DEFINE_HAS_METHOD_TRAIT(THasCalculateGrow, CalculateGrow)
+	KOR_DEFINE_HAS_METHOD_TRAIT(THasCalculateShrink, CalculateShrink)
+
 	KOR_DEFINE_MEMBER_FUNCTION_TRAIT(TAllocateFunctionTraits, Allocate)
 
 	struct SAnyInteger
@@ -43,20 +46,35 @@ namespace Detail::Allocator
 	struct TSizeTypeOf<FamilyT, TVoid<typename FamilyT::SizeType>>
 		: TType<typename FamilyT::SizeType> {};
 
+	// T* Allocate(SizeT [, uint32])
 	template<typename T>
 	inline constexpr bool HasAllocate =
 		THasAllocateTrait<T, TArgs<SAnyInteger>>::Value ||
 		THasAllocateTrait<T, TArgs<SAnyInteger, uint32>>::Value;
 
+	// T* Reallocate(T*, SizeT [, uint32])
 	template<typename T>
 	inline constexpr bool HasReallocate =
 		THasReallocateTrait<T, TArgs<SAnyPointer, SAnyInteger>>::Value ||
 		THasReallocateTrait<T, TArgs<SAnyPointer, SAnyInteger, uint32>>::Value;
 
+	// void Deallocate(T* [, uint32])
 	template<typename T>
 	inline constexpr bool HasDeallocate =
 		THasDeallocateTrait<T, TArgs<SAnyInteger>>::Value ||
 		THasDeallocateTrait<T, TArgs<SAnyInteger, uint32>>::Value;
+
+	// SizeT CalculateGrow(SizeT, SizeT [, uint32])
+	template<typename T>
+	inline constexpr bool HasCalculateGrow =
+		THasCalculateGrow<T, TArgs<SAnyInteger, SAnyInteger>>::Value ||
+		THasCalculateGrow<T, TArgs<SAnyInteger, SAnyInteger, uint32>>::Value;
+
+	// SizeT CalculateShrink(SizeT, SizeT [, uint32])
+	template<typename T>
+	inline constexpr bool HasCalculateShrink =
+		THasCalculateShrink<T, TArgs<SAnyInteger, SAnyInteger>>::Value ||
+		THasCalculateShrink<T, TArgs<SAnyInteger, SAnyInteger, uint32>>::Value;
 
 	template<typename FamilyT, typename = void>
 	struct TUntypedOf : TType<void> {};

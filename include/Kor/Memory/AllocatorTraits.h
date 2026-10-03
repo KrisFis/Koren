@@ -6,6 +6,7 @@
 #include "Kor/Memory/Minimal.h"
 
 #include "Kor/Memory/Detail/AllocatorTraitsDetail.h"
+#include "Kor/Utility/SizeAlignOf.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -65,13 +66,27 @@ struct TAllocatorTraits
 	// Allocator element type
 	using ElementType = TRemovePointer<PointerType>::Type;
 
+	// Default element alignment for allocator
+	// * alignof(ElementType) for typed allocators, KOR_DEFAULT_HEAP_ALIGNMENT otherwise.
+	static constexpr uint32 ElementAlignment = AlignOf<ElementType, KOR_DEFAULT_HEAP_ALIGNMENT>();
+
+	// Default element size for allocator
+	// * sizeof(ElementType) for typed allocators, 1 (bytes) otherwise
+	static constexpr uint32 ElementSize = SizeOf<ElementType, 1>();
+
 	enum
 	{
 		// Whether allocator allows "Alignment" parameter
-		SupportsAlignment = Detail::Allocator::TAllocateFunctionTraits<T>::Arity >= 2,
+		NeedsAlignment = Detail::Allocator::TAllocateFunctionTraits<T>::Arity >= 2,
 
 		// Whether allocator exposes "Reallocate" method
 		SupportsReallocate = Detail::Allocator::HasReallocate<T>,
+
+		// Whether allocator exposed "CalculateGrow" method
+		SupportsGrowPolicy = Detail::Allocator::HasCalculateGrow<T>,
+
+		// Whether allocator exposed "CalculateShrink" method
+		SupportsShrinkPolicy = Detail::Allocator::HasCalculateShrink<T>,
 
 		// Whether allocator is typed allocator
 		IsTyped = !TIsVoid<ElementType>::Value,

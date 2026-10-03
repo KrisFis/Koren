@@ -5,8 +5,9 @@
 
 #include "Kor/Memory/Minimal.h"
 
-#include "Kor/Memory/MemoryOps.h"
+#include "Kor/Memory/Allocator.h"
 #include "Kor/Memory/AllocatorTraits.h"
+#include "Kor/Memory/MemoryOps.h"
 
 #include "Kor/Math/MathOps.h"
 
@@ -24,8 +25,6 @@ KOR_NAMESPACE_BEGIN
 template<typename AllocatorT>
 struct TAllocatorOps
 {
-	static_assert(TIsAllocator<AllocatorT>::Value, "AllocatorT must be an allocator type");
-
 	using Traits = TAllocatorTraits<AllocatorT>;
 
 	using AllocatorType = AllocatorT;
@@ -33,10 +32,8 @@ struct TAllocatorOps
 	using ElementType = typename Traits::ElementType;
 	using PointerType = typename Traits::PointerType;
 
-	// alignof(ElementType) for typed allocators, KOR_DEFAULT_HEAP_ALIGNMENT otherwise.
-	static constexpr uint32 DefaultAlignment = Traits::IsTyped
-		? AlignOf<ElementType>()
-		: KOR_DEFAULT_HEAP_ALIGNMENT;
+	static constexpr uint32 ElementAlignment = Traits::ElementAlignment;
+	static constexpr uint32 ElementSize = Traits::ElementSize;
 
 	// Allocate | Reallocate
 	// -------------------------------------------------------------------------
@@ -46,7 +43,7 @@ struct TAllocatorOps
 	static PointerType Allocate(
 		AllocatorType& allocator,
 		SizeType capacity,
-		uint32 alignment = DefaultAlignment) noexcept;
+		uint32 alignment = ElementAlignment) noexcept;
 
 	// Resizes a block using the allocator's native Reallocate
 	// Static-asserts if the allocator has no Reallocate — use ReallocateWithFallback instead
@@ -55,7 +52,7 @@ struct TAllocatorOps
 		AllocatorType& allocator,
 		PointerType ptr,
 		SizeType newCapacity,
-		uint32 alignment = DefaultAlignment) noexcept;
+		uint32 alignment = ElementAlignment) noexcept;
 
 	// Uses native Reallocate if available, otherwise Allocate + Move + Deallocate
 	// The fallback moves min(oldCapacity, newCapacity) elements bitwise (memmove)
@@ -64,9 +61,9 @@ struct TAllocatorOps
 	static PointerType ReallocateWithFallback(
 		AllocatorType& allocator,
 		PointerType ptr,
-		SizeType oldCapacity,
 		SizeType newCapacity,
-		uint32 alignment = DefaultAlignment) noexcept;
+		SizeType oldCapacity,
+		uint32 alignment = ElementAlignment) noexcept;
 
 	// Lifetime-aware reallocation: only [0, oldConstructed) holds live elements
 	// Untyped or trivially relocatable -> ReallocateWithFallback, moving oldConstructed elements
@@ -76,10 +73,10 @@ struct TAllocatorOps
 	static PointerType ReallocateConstructed(
 		AllocatorType& allocator,
 		PointerType ptr,
+		SizeType newCapacity,
 		SizeType oldCapacity,
 		SizeType oldConstructed,
-		SizeType newCapacity,
-		uint32 alignment = DefaultAlignment) noexcept;
+		uint32 alignment = ElementAlignment) noexcept;
 
 	// Deallocate
 	// -------------------------------------------------------------------------
@@ -89,7 +86,7 @@ struct TAllocatorOps
 	static void Deallocate(
 		AllocatorType& allocator,
 		PointerType ptr,
-		uint32 alignment = DefaultAlignment) noexcept;
+		uint32 alignment = ElementAlignment) noexcept;
 
 	// Destroys [0, numConstructed), then frees the block
 	// numConstructed == 0 -> skips destruction
@@ -97,7 +94,7 @@ struct TAllocatorOps
 		AllocatorType& allocator,
 		PointerType ptr,
 		SizeType numConstructed,
-		uint32 alignment = DefaultAlignment) noexcept;
+		uint32 alignment = ElementAlignment) noexcept;
 
 	// Policy
 	// -------------------------------------------------------------------------
@@ -109,18 +106,18 @@ struct TAllocatorOps
 	// Result >= newCapacity
 	static SizeType CalculateGrow(
 		AllocatorType& allocator,
-		SizeType oldCapacity,
 		SizeType newCapacity,
-		uint32 alignment = DefaultAlignment) noexcept;
+		SizeType oldCapacity,
+		uint32 alignment = ElementAlignment) noexcept;
 
 	// Returns a capacity for shrinking from oldCapacity toward newCapacity
 	// Requires newCapacity <= oldCapacity
 	// newCapacity <= result <= oldCapacity, may keep slack (result > newCapacity)
 	static SizeType CalculateShrink(
 		AllocatorType& allocator,
-		SizeType oldCapacity,
 		SizeType newCapacity,
-		uint32 alignment = DefaultAlignment) noexcept;
+		SizeType oldCapacity,
+		uint32 alignment = ElementAlignment) noexcept;
 };
 
 #include "Kor/Memory/Detail/AllocatorOps.inl"
