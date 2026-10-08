@@ -45,8 +45,10 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(const ILType& list) n
 	const SizeType num = (SizeType)list.size();
 	if (num == 0) return;
 
-	SFriend::template Resize<false>(*this, num);
+	SFriend::template Reallocate<false>(*this, num);
 	SMemoryOps::CopyConstruct(_data, list.begin(), num);
+
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -56,8 +58,10 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(AllocatorType&& alloc
 	const SizeType num = (SizeType)list.size();
 	if (num == 0) return;
 
-	SFriend::template Resize<false>(*this, num);
+	SFriend::template Reallocate<false>(*this, num);
 	SMemoryOps::CopyConstruct(_data, list.begin(), num);
+
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -65,7 +69,9 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(SizeType num, Init::S
 	: TArray()
 {
 	if (num <= 0) return;
-	SFriend::template Resize<false>(*this, num);
+
+	SFriend::template Reallocate<false>(*this, num);
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -73,7 +79,9 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(AllocatorType&& alloc
 	: TArray(Move(allocator))
 {
 	if (num <= 0) return;
-	SFriend::template Resize<false>(*this, num);
+
+	SFriend::template Reallocate<false>(*this, num);
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -81,8 +89,11 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(SizeType num, Init::S
 	: TArray()
 {
 	if (num == 0) return;
-	SFriend::template Resize<false>(*this, num);
+
+	SFriend::template Reallocate<false>(*this, num);
 	SMemoryOps::DefaultConstruct(_data, num);
+
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -90,8 +101,11 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(AllocatorType&& alloc
 	: TArray(Move(allocator))
 {
 	if (num == 0) return;
-	SFriend::template Resize<false>(*this, num);
+
+	SFriend::template Reallocate<false>(*this, num);
 	SMemoryOps::DefaultConstruct(_data, num);
+
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -99,8 +113,11 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(SizeType num, Init::S
 	: TArray()
 {
 	if (num == 0) return;
-	SFriend::template Resize<false>(*this, num);
+
+	SFriend::template Reallocate<false>(*this, num);
 	SMemoryOps::ZeroConstruct(_data, num);
+
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -108,8 +125,11 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(AllocatorType&& alloc
 	: TArray(Move(allocator))
 {
 	if (num == 0) return;
-	SFriend::template Resize<false>(*this, num);
+
+	SFriend::template Reallocate<false>(*this, num);
 	SMemoryOps::ZeroConstruct(_data, num);
+
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -117,8 +137,11 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(const ElementType* da
 	: TArray()
 {
 	if (num == 0) return;
-	SFriend::template Resize<false>(*this, num);
+
+	SFriend::template Reallocate<false>(*this, num);
 	SMemoryOps::CopyConstruct(_data, data, num);
+
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -126,8 +149,11 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(AllocatorType&& alloc
 	: TArray(Move(allocator))
 {
 	if (num == 0) return;
-	SFriend::template Resize<false>(*this, num);
+
+	SFriend::template Reallocate<false>(*this, num);
 	SMemoryOps::CopyConstruct(_data, data, num);
+
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -135,8 +161,11 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(const ElementType& va
 	: TArray()
 {
 	if (num == 0) return;
-	SFriend::template Resize<false>(*this, num);
+
+	SFriend::template Reallocate<false>(*this, num);
 	SMemoryOps::FillConstruct(_data, val, num);
+
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -144,8 +173,11 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(AllocatorType&& alloc
 	: TArray(Move(allocator))
 {
 	if (num == 0) return;
-	SFriend::template Resize<false>(*this, num);
+
+	SFriend::template Reallocate<false>(*this, num);
 	SMemoryOps::FillConstruct(_data, val, num);
+
+	_num = num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
