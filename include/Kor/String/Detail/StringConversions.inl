@@ -11,7 +11,7 @@ KOR_INLINE TString<CharT> TString<CharT>::FromInt(int64 value, int32 base) noexc
 	const int32 convLen = SOps::FromInt(*result._data, value, SStringConstant::BufferSize_Int64, base);
 	KOR_ASSERT_DEBUG(convLen > 0);
 
-	result._data.Resize(convLen + 1);
+	result._data.SetNum(convLen + 1);
 	result._data[convLen] = Constant::Null;
 
 	return result;
@@ -25,7 +25,7 @@ KOR_INLINE TString<CharT> TString<CharT>::FromUInt(uint64 value, int32 base) noe
 	const int32 convLen = SOps::FromUInt(*result._data, value, SStringConstant::BufferSize_UInt64, base);
 	KOR_ASSERT_DEBUG(convLen > 0);
 
-	result._data.Resize(convLen + 1);
+	result._data.SetNum(convLen + 1);
 	result._data[convLen] = Constant::Null;
 
 	return result;
@@ -64,7 +64,7 @@ KOR_INLINE TString<CharT> TString<CharT>::FromFloat(double value, uint8 precisio
 	const int32 convLen = SOps::template FromFloat<Format>(*result._data, value, SStringConstant::BufferSize_Double, precision);
 	KOR_ASSERT_DEBUG(convLen > 0);
 
-	result._data.Resize(convLen + 1);
+	result._data.SetNum(convLen + 1);
 	result._data[convLen] = Constant::Null;
 
 	return result;
