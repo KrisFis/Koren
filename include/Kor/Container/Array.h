@@ -179,23 +179,27 @@ public:
 	ElementType* GetLast() noexcept;
 	const ElementType* GetLast() const noexcept;
 
-	// Reserve / Resize / Reset
+	// Reserve / ReserveExact / SetNum / Reset
 	// -------------------------------------------------------------------------
 
 	// Ensures capacity for at least `num` elements; Num is unchanged.
 	// * No-op if capacity already satisfies the request.
 	void Reserve(SizeType num) noexcept;
 
+	// Ensures capacity for exact `num` elements; Num is unchanged.
+	// * No-op if capacity already satisfies the request.
+	void ReserveExact(SizeType num) noexcept;
+
 	// Sets Num to `num`, never releasing memory.
 	// * Grown elements are default-constructed; shrunk elements are destroyed.
-	void Resize(SizeType num) noexcept;
+	void SetNum(SizeType num) noexcept;
 
-	// Same as Resize, but grown elements are zero-constructed.
-	void ResizeZeroed(SizeType num) noexcept;
+	// Same as SetNum, but grown elements are zero-constructed.
+	void SetNumZeroed(SizeType num) noexcept;
 
-	// Same as Resize, but grown elements are left uninitialized.
+	// Same as SetNum, but grown elements are left uninitialized.
 	// * Caller must initialize them before reading.
-	void ResizeUninitialized(SizeType num) noexcept;
+	void SetNumUninitialized(SizeType num) noexcept;
 
 	// Frees excess capacity so GetReservedNum() == GetNum().
 	// * No-op if already tight or empty.
@@ -300,20 +304,20 @@ public:
 	// -------------------------------------------------------------------------
 
 	// Requires operator==. Optionally shrinks capacity afterward.
-	SizeType Remove(const ElementType& val, bool allowShrink = true) noexcept;
+	SizeType Remove(const ElementType& val) noexcept;
 	SizeType RemoveSingle(const ElementType& val) noexcept;
 
 	template<typename FunctorT>
-	SizeType RemoveByFunc(FunctorT&& func, bool allowShrink = true);
+	SizeType RemoveByFunc(FunctorT&& func);
 
 	template<typename FunctorT>
 	SizeType RemoveSingleByFunc(FunctorT&& func);
 
-	SizeType RemoveSwap(const ElementType& val, bool allowShrink = true) noexcept;
+	SizeType RemoveSwap(const ElementType& val) noexcept;
 	SizeType RemoveSwapSingle(const ElementType& val) noexcept;
 
 	template<typename FunctorT>
-	SizeType RemoveSwapByFunc(FunctorT&& func, bool allowShrink = true);
+	SizeType RemoveSwapByFunc(FunctorT&& func);
 
 	template<typename FunctorT>
 	SizeType RemoveSwapSingleByFunc(FunctorT&& func);

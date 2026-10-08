@@ -7,16 +7,24 @@ template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE void TArray<ElementT, AllocatorFamilyT>::Reserve(SizeType num) noexcept
 {
 	if (num <= _reservedNum) return;
+	SFriend::Grow(*this, num);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE void TArray<ElementT, AllocatorFamilyT>::ReserveExact(SizeType num) noexcept
+{
+	if (num <= _reservedNum) return;
 	SFriend::Reallocate(*this, num);
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::Resize(SizeType num) noexcept
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::SetNum(SizeType num) noexcept
 {
 	if (num == _num) return;
 
 	if (num > 0)
 	{
+		// TODO: Apply geometric growth
 		const SizeType oldNum = _num;
 		SFriend::Resize(*this, num);
 
@@ -28,19 +36,20 @@ KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::Resize(SizeType num) noexcep
 			);
 		}
 	}
-	else if (_reservedNum > 0)
+	else if (_num > 0)
 	{
-		SFriend::Deallocate(*this);
+		SFriend::Destruct(*this);
 	}
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::ResizeZeroed(SizeType num) noexcept
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::SetNumZeroed(SizeType num) noexcept
 {
 	if (num == _num) return;
 
 	if (num > 0)
 	{
+		// TODO: Apply geometric growth
 		const SizeType oldNum = _num;
 		SFriend::Resize(*this, num);
 
@@ -52,23 +61,24 @@ KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::ResizeZeroed(SizeType num) n
 			);
 		}
 	}
-	else if (_reservedNum > 0)
+	else if (_num > 0)
 	{
-		SFriend::Deallocate(*this);
+		SFriend::Destruct(*this);
 	}
 }
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::ResizeUninitialized(SizeType num) noexcept
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::SetNumUninitialized(SizeType num) noexcept
 {
 	if (num == _num) return;
 
 	if (num > 0)
 	{
+		// TODO: Apply geometric growth
 		SFriend::Resize(*this, num);
 	}
-	else if (_reservedNum > 0)
+	else if (_num > 0)
 	{
-		SFriend::Deallocate(*this);
+		SFriend::Destruct(*this);
 	}
 }
 

@@ -141,6 +141,8 @@ namespace Detail::Array
 
 		static void Grow(ArrayType& arr, SizeType num) noexcept
 		{
+			KOR_ASSERT(num > arr._reservedNum);
+
 			num = AllocatorOps::CalculateGrow(
 				arr._allocator,
 				num,
@@ -154,7 +156,10 @@ namespace Detail::Array
 
 		static void Shrink(ArrayType& arr, SizeType num) noexcept
 		{
-			KOR_ASSERT(num >= arr._num);
+			KOR_ASSERT(
+				num >= arr._num &&
+				num < arr._reservedNum
+			);
 
 			num = AllocatorOps::CalculateShrink(
 				arr._allocator,

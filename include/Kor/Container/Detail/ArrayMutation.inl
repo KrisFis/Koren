@@ -234,21 +234,14 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::Remove(const ElementType& val, bool allowShrink) noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::Remove(const ElementType& val) noexcept
 {
-	const SizeType totalRemoved = SFriend::RemoveByFunc(*this,
+	return SFriend::RemoveByFunc(*this,
 		[&val](const ElementType& el) noexcept -> bool
 		{
 			return SMemoryOps::IsEqual(&el, &val);
 		}
 	);
-
-	if (allowShrink && totalRemoved > 0)
-	{
-		SFriend::Shrink(*this, _num);
-	}
-
-	return totalRemoved;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -269,14 +262,9 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 
 template<typename ElementT, typename AllocatorFamilyT>
 template<typename FunctorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveByFunc(FunctorT&& func, bool allowShrink)
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveByFunc(FunctorT&& func)
 {
-	const SizeType totalRemoved = SFriend::RemoveByFunc(*this, Forward<FunctorT>(func));
-	if (allowShrink && totalRemoved > 0)
-	{
-		SFriend::Shrink(*this, _num);
-	}
-	return totalRemoved;
+	return SFriend::RemoveByFunc(*this, Forward<FunctorT>(func));
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -291,21 +279,14 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSwap(const ElementType& val, bool allowShrink) noexcept
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSwap(const ElementType& val) noexcept
 {
-	const SizeType totalRemoved = SFriend::RemoveSwapByFunc(*this,
+	return SFriend::RemoveSwapByFunc(*this,
 		[&val](const ElementType& el) noexcept -> bool
 		{
 			return SMemoryOps::IsEqual(&el, &val);
 		}
 	);
-
-	if (allowShrink && totalRemoved > 0)
-	{
-		SFriend::Shrink(*this, _num);
-	}
-
-	return totalRemoved;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -326,16 +307,9 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 
 template<typename ElementT, typename AllocatorFamilyT>
 template<typename FunctorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSwapByFunc(FunctorT&& func, bool allowShrink)
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSwapByFunc(FunctorT&& func)
 {
-	const SizeType totalRemoved = SFriend::RemoveSwapByFunc(*this, Forward<FunctorT>(func));
-
-	if (allowShrink && totalRemoved > 0)
-	{
-		SFriend::Shrink(*this, _num);
-	}
-
-	return totalRemoved;
+	return SFriend::RemoveSwapByFunc(*this, Forward<FunctorT>(func));
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
