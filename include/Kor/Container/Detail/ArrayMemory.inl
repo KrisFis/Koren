@@ -7,68 +7,60 @@ template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE void TArray<ElementT, AllocatorFamilyT>::Reserve(SizeType num) noexcept
 {
 	if (num <= _reservedNum) return;
+	SFriend::Grow(*this, num);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE void TArray<ElementT, AllocatorFamilyT>::ReserveExact(SizeType num) noexcept
+{
+	if (num <= _reservedNum) return;
 	SFriend::Reallocate(*this, num);
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::Resize(SizeType num) noexcept
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::SetNum(SizeType num) noexcept
 {
-	if (num == _num) return;
-
-	if (num > 0)
+	if (num > _num)
 	{
-		const SizeType oldNum = _num;
-		SFriend::Resize(*this, num);
-
-		if (num > oldNum)
-		{
-			SMemoryOps::DefaultConstruct(
-				_data + oldNum,
-				num - oldNum
-			);
-		}
+		if (num > _reservedNum) SFriend::Grow(*this, num);
+		SMemoryOps::DefaultConstruct(_data + _num, num - _num);
+		_num = num;
 	}
-	else if (_reservedNum > 0)
+	else if (num < _num)
 	{
-		SFriend::Deallocate(*this);
+		SMemoryOps::Destruct(_data + num, _num - num);
+		_num = num;
 	}
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::ResizeZeroed(SizeType num) noexcept
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::SetNumZeroed(SizeType num) noexcept
 {
-	if (num == _num) return;
-
-	if (num > 0)
+	if (num > _num)
 	{
-		const SizeType oldNum = _num;
-		SFriend::Resize(*this, num);
-
-		if (num > oldNum)
-		{
-			SMemoryOps::ZeroConstruct(
-				_data + oldNum,
-				num - oldNum
-			);
-		}
+		if (num > _reservedNum) SFriend::Grow(*this, num);
+		SMemoryOps::ZeroConstruct(_data + _num, num - _num);
+		_num = num;
 	}
-	else if (_reservedNum > 0)
+	else if (num < _num)
 	{
-		SFriend::Deallocate(*this);
+		SMemoryOps::Destruct(_data + num, _num - num);
+		_num = num;
 	}
 }
-template<typename ElementT, typename AllocatorFamilyT>
-KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::ResizeUninitialized(SizeType num) noexcept
-{
-	if (num == _num) return;
 
-	if (num > 0)
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::SetNumUninitialized(SizeType num) noexcept
+{
+	if (num > _num)
 	{
-		SFriend::Resize(*this, num);
+		if (num > _reservedNum) SFriend::Grow(*this, num);
+		_num = num;
 	}
-	else if (_reservedNum > 0)
+	else if (num < _num)
 	{
-		SFriend::Deallocate(*this);
+		SMemoryOps::Destruct(_data + num, _num - num);
+		_num = num;
 	}
 }
 
@@ -83,7 +75,9 @@ template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE void TArray<ElementT, AllocatorFamilyT>::Reset() noexcept
 {
 	if (_num == 0) return;
-	SFriend::Destruct(*this);
+
+	SMemoryOps::Destruct(_data, _num);
+	_num = 0;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -93,7 +87,7 @@ KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::Empty(SizeType num) noexcept
 
 	if (num > 0)
 	{
-		SFriend::EmptyAndReallocate(*this, num);
+		SFriend::ResetAndReallocate(*this, num);
 	}
 	else if (_reservedNum > 0)
 	{
@@ -127,8 +121,9 @@ KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::Assign(const ElementType& va
 {
 	if (num > 0)
 	{
-		SFriend::EmptyAndResize(*this, num);
+		SFriend::ResetAndReallocate(*this, num);
 		SMemoryOps::FillConstruct(_data, val, num);
+		_num = num;
 	}
 	else if (_reservedNum > 0)
 	{
@@ -143,8 +138,9 @@ KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::Assign(const ElementType* da
 	{
 		KOR_ASSERT(data);
 
-		SFriend::EmptyAndResize(*this, num);
+		SFriend::ResetAndReallocate(*this, num);
 		SMemoryOps::CopyConstruct(_data, data, num);
+		_num = num;
 	}
 	else if (_reservedNum > 0)
 	{

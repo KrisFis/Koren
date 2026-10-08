@@ -298,9 +298,8 @@ struct TStringOps
 
 	// FromInt | FromUInt
 	// Writes the integer value as a string into the buffer.
-	// Returns the number of characters written, excluding null terminator
+	// Returns the number of characters written, excluding null terminator (KOR_INDEX_NONE if buffer is too small)
 	// On error, returns KOR_INDEX_NONE (-1)
-	// * Use the bounded overload to guard against buffer overflows - returns KOR_INDEX_NONE if too small
 	// * Prefer the array ref overload when buffer size is known at compile time
 	// -------------------------------------------------------------------------
 
@@ -318,10 +317,9 @@ struct TStringOps
 
 	// FromFloat
 	// Writes a double value as a formatted string into the buffer.
-	// Returns the number of characters written, excluding null terminator.
+	// Returns the number of characters written, excluding null terminator (or would-be length on truncation)
 	// * Buffer must be at least SMemory::MAX_BUFFER_SIZE_DOUBLE characters
 	// * Prefer the template overload when Format is known at compile time
-	// * Bounded overload returns would-be length on truncation (Format/snprintf semantics)
 	// -------------------------------------------------------------------------
 
 	template<EFloatFormat Format = EFloatFormat::Fixed>

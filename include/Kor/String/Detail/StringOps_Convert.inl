@@ -8,6 +8,8 @@ namespace Detail
 	template<typename IntT, typename CharT>
 	static IntT Atoi(const CharT* str, const CharT** outEnd, int32 base) noexcept
 	{
+		// TODO: Overflow handling
+
 		// CRT version removes leading whitespaces
 		// while (TCharOps<CharType>::IsWhitespace(*str)) ++str;
 
@@ -38,6 +40,8 @@ namespace Detail
 	template<typename IntT, typename CharT>
 	static int32 Itoa(CharT* str, IntT value, int32 maxLen, int32 base) noexcept
 	{
+		// TODO: Overflow handling
+
 		if (maxLen <= 0) return KOR_INDEX_NONE;
 
 		if (value == 0)
@@ -71,7 +75,7 @@ namespace Detail
 			*--cur = TCharConstant<CharT>::Minus;
 		}
 
-		const int32 result = KOR_PTR_DIFF(int32, end, cur);
+		const int32 result = KOR_PTR_TYPED_DIFF(int32, end, cur);
 		if (cur != str)
 		{
 			SMemoryOps::CopyAssign(str, cur, result);
@@ -334,7 +338,7 @@ KOR_FORCEINLINE int64 TStringOps<CharType>::ToInt(const CharType* str, int32& ou
 {
 	const CharType* end = nullptr;
 	const int64 result = Atoi<int64>(str, &end, base);
-	outLen = KOR_PTR_DIFF(int32, end, str);
+	outLen = KOR_PTR_TYPED_DIFF(int32, end, str);
 	return result;
 }
 
@@ -350,7 +354,7 @@ KOR_FORCEINLINE uint64 TStringOps<CharType>::ToUInt(const CharType* str, int32& 
 {
 	const CharType* end = nullptr;
 	const int64 result = Atoi<int64>(str, &end, base);
-	outLen = KOR_PTR_DIFF(int32, end, str);
+	outLen = KOR_PTR_TYPED_DIFF(int32, end, str);
 	return result;
 }
 
@@ -395,14 +399,14 @@ KOR_FORCEINLINE double TStringOps<CharType>::ToFloat(const CharType* str, int32&
 	{
 		achar* end = nullptr;
 		const double result = SPlatformAnsiStringOps::Strtod(str, &end);
-		outLen = KOR_PTR_DIFF(int32, end, str);
+		outLen = KOR_PTR_TYPED_DIFF(int32, end, str);
 		return result;
 	}
 	else if constexpr (TIsSame<CharType, wchar>::Value)
 	{
 		wchar* end = nullptr;
 		const double result = SPlatformWideStringOps::Strtod(str, &end);
-		outLen = KOR_PTR_DIFF(int32, end, str);
+		outLen = KOR_PTR_TYPED_DIFF(int32, end, str);
 		return result;
 	}
 	else

@@ -98,6 +98,21 @@ struct TIsMoveAssignable : TIsAssignable<T, typename TClean<T>::Type&&> {};
 template<typename T>
 struct TIsTriviallyMoveAssignable : TIsTriviallyAssignable<T, typename TClean<T>::Type&&> {};
 
+// Destructible
+// -------------------------------------------------------------------------
+
+// [Is trivially destructible]
+// * Checks whether specific type has trivial destructor
+
+template<typename T>
+struct TIsTriviallyDestructible : TBoolValue<
+#if KOR_COMPILER_GCC
+	__has_trivial_destructor(T)
+#else
+	__is_trivially_destructible(T)
+#endif
+> {};
+
 // Copyable / Movable
 // -------------------------------------------------------------------------
 
@@ -126,20 +141,5 @@ struct TIsTriviallyMovable : TBoolValue<
 
 template<typename T>
 struct TIsTriviallyRelocatable : TIsTriviallyMovable<T> {};
-
-// Destructible
-// -------------------------------------------------------------------------
-
-// [Is trivially destructible]
-// * Checks whether specific type has trivial destructor
-
-template<typename T>
-struct TIsTriviallyDestructible : TBoolValue<
-#if KOR_COMPILER_GCC
-	__has_trivial_destructor(T)
-#else
-	__is_trivially_destructible(T)
-#endif
-> {};
 
 KOR_NAMESPACE_END

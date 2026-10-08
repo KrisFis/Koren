@@ -79,22 +79,61 @@ namespace Detail::Array
 			arr._reservedNum = 0;
 		}
 
-		template<bool HasItems = true>
-		static void Resize(ArrayType& arr, SizeType num) noexcept
+		static void Grow(ArrayType& arr, SizeType num) noexcept
 		{
-			if constexpr (HasItems)
-			{
-				Reallocate<true>(arr, num);
-			}
-			else if (arr._reservedNum != num)
-			{
-				Reallocate<false>(arr, num);
-			}
+			KOR_ASSERT(num > arr._reservedNum);
 
-			arr._num = num;
+			num = AllocatorOps::CalculateGrow(
+				arr._allocator,
+				num,
+				arr._reservedNum
+			);
+
+			if (num == arr._reservedNum) return; // no-op hit
+
+			Reallocate(arr, num);
 		}
 
-		static void EmptyAndReallocate(ArrayType& arr, SizeType num) noexcept
+		static void Shrink(ArrayType& arr, SizeType num) noexcept
+		{
+			KOR_ASSERT(
+				num >= arr._num &&
+				num < arr._reservedNum
+			);
+
+			num = AllocatorOps::CalculateShrink(
+				arr._allocator,
+				num,
+				arr._reservedNum
+			);
+
+			if (num == arr._reservedNum) return; // no-op hit
+
+			if (num > 0)
+			{
+				Reallocate(arr, num);
+			}
+			else if (num == 0 && arr._reservedNum > 0)
+			{
+				Deallocate(arr);
+			}
+		}
+
+		static void ReallocateByPolicy(ArrayType& arr, SizeType num) noexcept
+		{
+			if (num > arr._reservedNum)
+			{
+				Grow(arr, num);
+			}
+			else if (num < arr._reservedNum)
+			{
+				Shrink(arr, num);
+			}
+		}
+
+		// Version of reallocate that will reset elements beforehand
+		// * Is faster alternative to Reset(arr); Reallocate(arr, num);
+		static void ResetAndReallocate(ArrayType& arr, SizeType num) noexcept
 		{
 			KOR_ASSERT(num > 0);
 
@@ -124,56 +163,6 @@ namespace Detail::Array
 			}
 		}
 
-		static void EmptyAndResize(ArrayType& arr, SizeType num) noexcept
-		{
-			EmptyAndReallocate(arr, num);
-			arr._num = num;
-		}
-
-		// Destructs all items, but keeps array allocation
-		static void Destruct(ArrayType& arr) noexcept
-		{
-			KOR_ASSERT(arr._num > 0);
-
-			SMemoryOps::Destruct(arr._data, arr._num);
-			arr._num = 0;
-		}
-
-		static void Grow(ArrayType& arr, SizeType num) noexcept
-		{
-			num = AllocatorOps::CalculateGrow(
-				arr._allocator,
-				num,
-				arr._reservedNum
-			);
-
-			if (num == arr._reservedNum) return; // no-op hit
-
-			Reallocate(arr, num);
-		}
-
-		static void Shrink(ArrayType& arr, SizeType num) noexcept
-		{
-			KOR_ASSERT(num >= arr._num);
-
-			num = AllocatorOps::CalculateShrink(
-				arr._allocator,
-				num,
-				arr._reservedNum
-			);
-
-			if (num == arr._reservedNum) return; // no-op hit
-
-			if (num > 0)
-			{
-				Reallocate(arr, num);
-			}
-			else if (num == 0 && arr._reservedNum > 0)
-			{
-				Deallocate(arr);
-			}
-		}
-
 		// Copies array memory and items from source array to dest array
 		template<bool HasItems = true>
 		static void CopyFromOther(ArrayType& dest, const ArrayType& source) noexcept
@@ -184,23 +173,25 @@ namespace Detail::Array
 				{
 					if (dest._reservedNum > 0)
 					{
-						Empty(dest);
+						SMemoryOps::Destruct(dest._data, dest._num);
+						dest._num = 0;
 					}
 				}
 
 				dest._allocator = source._allocator;
-				Resize<false>(dest, source._num);
+				Reallocate<false>(dest, source._num);
 			}
 			else if constexpr (HasItems)
 			{
-				EmptyAndResize(dest, source._num);
+				ResetAndReallocate(dest, source._num);
 			}
 			else
 			{
-				Resize<false>(dest, source._num);
+				Reallocate<false>(dest, source._num);
 			}
 
 			SMemoryOps::CopyConstruct(dest._data, source._data, source._num);
+			dest._num = source._num;
 		}
 
 		// Moves array memory and items from source array to dest array
