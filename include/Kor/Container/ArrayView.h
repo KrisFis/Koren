@@ -146,14 +146,14 @@ public:
 
 	// Matches by key.
 	template<typename KeyType>
-	constexpr ElementType* FindByKey(const KeyType& key) noexcept;
+	constexpr ElementType* FindByKey(const KeyType& key) const noexcept;
 
 	// Contains
 	// True if any element matches. Never asserts; false on an empty array.
 	// -------------------------------------------------------------------------
 
 	// Matches by operator==.
-	constexpr bool Contains(ElementType& val) const noexcept;
+	constexpr bool Contains(const ElementType& val) const noexcept;
 
 	// Matches by predicate; not noexcept, since func may throw.
 	template<typename FunctorT>
