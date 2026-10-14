@@ -405,6 +405,7 @@ public:
 	// * Never asserts, even on an empty array.
 	// -------------------------------------------------------------------------
 
+	// Matches via memcmp if simple type otherwise operator==
 	template<typename KeyType>
 	SizeType FindIndex(const KeyType& key) const noexcept;
 
@@ -416,9 +417,11 @@ public:
 	// Returns a pointer to the first match, or nullptr. Never asserts.
 	// -------------------------------------------------------------------------
 
+	// Matches via memcmp if simple type otherwise operator==
 	template<typename KeyType>
 	ElementType* Find(const KeyType& key) noexcept;
 
+	// Matches via memcmp if simple type otherwise operator==
 	template<typename KeyType>
 	const ElementType* Find(const KeyType& key) const noexcept;
 
@@ -433,6 +436,7 @@ public:
 	// True if any element matches. Never asserts; false on an empty array.
 	// -------------------------------------------------------------------------
 
+	// Matches via memcmp if simple type otherwise operator==
 	template<typename KeyType>
 	bool Contains(const KeyType& key) const noexcept;
 
