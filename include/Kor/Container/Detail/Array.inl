@@ -48,7 +48,61 @@ KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::IsEmpty() const noexcep
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::IsValidIndex(SizeType idx) const noexcept
 {
-	return SMathOps::IsWithin(idx, 0, _num - 1);
+	return SMathOps::IsWithin(idx, (SizeType)0, _num - 1);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE TArrayView<ElementT, typename TArray<ElementT, AllocatorFamilyT>::SizeType> TArray<ElementT, AllocatorFamilyT>::View() noexcept
+{
+	return TArrayView<ElementType, SizeType>(_data, _num);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE TConstArrayView<ElementT, typename TArray<ElementT, AllocatorFamilyT>::SizeType> TArray<ElementT, AllocatorFamilyT>::View() const noexcept
+{
+	return TConstArrayView<ElementType, SizeType>(_data, _num);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE TArrayView<ElementT, typename TArray<ElementT, AllocatorFamilyT>::SizeType> TArray<ElementT, AllocatorFamilyT>::SubView(SizeType idx, SizeType num) noexcept
+{
+	KOR_ASSERT(idx + num <= _num);
+	return TArrayView<ElementType, SizeType>(_data + idx, num);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE TConstArrayView<ElementT, typename TArray<ElementT, AllocatorFamilyT>::SizeType> TArray<ElementT, AllocatorFamilyT>::SubView(SizeType idx, SizeType num) const noexcept
+{
+	KOR_ASSERT(idx + num <= _num);
+	return TConstArrayView<ElementType, SizeType>(_data + idx, num);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE TArrayView<ElementT, typename TArray<ElementT, AllocatorFamilyT>::SizeType> TArray<ElementT, AllocatorFamilyT>::LeftView(SizeType num) noexcept
+{
+	KOR_ASSERT(num <= _num);
+	return TArrayView<ElementType, SizeType>(_data, num);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE TConstArrayView<ElementT, typename TArray<ElementT, AllocatorFamilyT>::SizeType> TArray<ElementT, AllocatorFamilyT>::LeftView(SizeType num) const noexcept
+{
+	KOR_ASSERT(num <= _num);
+	return TConstArrayView<ElementType, SizeType>(_data, num);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE TArrayView<ElementT, typename TArray<ElementT, AllocatorFamilyT>::SizeType> TArray<ElementT, AllocatorFamilyT>::RightView(SizeType num) noexcept
+{
+	KOR_ASSERT(num <= _num);
+	return TArrayView<ElementType, SizeType>(_data + (_num - num), num);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE TConstArrayView<ElementT, typename TArray<ElementT, AllocatorFamilyT>::SizeType> TArray<ElementT, AllocatorFamilyT>::RightView(SizeType num) const noexcept
+{
+	KOR_ASSERT(num <= _num);
+	return TConstArrayView<ElementType, SizeType>(_data + (_num - num), num);
 }
 
 #include "Kor/Container/Detail/ArrayPrivate.inl"

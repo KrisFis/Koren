@@ -22,7 +22,7 @@ namespace Detail
 	KOR_OPTIMIZATIONS_RESET();
 	KOR_DIAG_WARNINGS_POP()
 
-	static void LogFailed(const achar* Expression, const achar* File, int32 Line) noexcept
+	KOR_INLINE static void LogFailed(const achar* Expression, const achar* File, int32 Line) noexcept
 	{
 		// TODO: Implement log without including non-minimal features
 		// thread_local achar LOG_BUFFER[KOR_BUFFER_SIZE_LARGE];

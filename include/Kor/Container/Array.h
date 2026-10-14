@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include "Kor/Memory/Minimal.h"
+#include "Kor/Container/Minimal.h"
 
+#include "Kor/Container/ArrayView.h"
 #include "Kor/Container/ContainerTraits.h"
 
 #include "Kor/Math/MathOps.h"
@@ -31,6 +32,8 @@ namespace Detail::Array { template<typename T> struct TFriend; }
 // Example:
 //   TArray<int32> values = { 1, 2, 3 };
 //   values.Add(4);
+//
+// TODO: Support generic containers via constructor/comparison operators
 //
 template<typename ElementT, typename AllocatorFamilyT>
 class TArray
@@ -95,6 +98,10 @@ public:
 	explicit TArray(const ElementType* data, SizeType num) noexcept;
 	explicit TArray(AllocatorType&& allocator, const ElementType* data, SizeType num) noexcept;
 
+	// Copies static array elements from `data`
+	template<TSize N> explicit TArray(const ElementType (&data)[N]) noexcept;
+	template<TSize N> explicit TArray(AllocatorType&& allocator, const ElementType (&data)[N]) noexcept;
+
 	// Reserves `num` elements, each copy-constructed from `value`. Num becomes `num`.
 	explicit TArray(const ElementType& val, SizeType num) noexcept;
 	explicit TArray(AllocatorType&& allocator, const ElementType& val, SizeType num) noexcept;
@@ -118,6 +125,9 @@ public:
 
 	bool operator==(const TArray& other) const noexcept;
 	bool operator!=(const TArray& other) const noexcept;
+
+	bool operator==(const ILType& other) const noexcept;
+	bool operator!=(const ILType& other) const noexcept;
 
 	// Dereference Operators
 	// Raw pointer to the data buffer. Null if empty and never allocated.
@@ -161,6 +171,23 @@ public:
 	// True if idx is in [0, GetNum()).
 	// * Never asserts; the standard guard to use before operator[]/Insert/RemoveAt.
 	bool IsValidIndex(SizeType idx) const noexcept;
+
+	// View
+	// Returns a non-owning view into this array's buffer.
+	// The view is valid as long as this array is alive and unmodified.
+	// -------------------------------------------------------------------------
+
+	TArrayView<ElementType, SizeType> View() noexcept;
+	TConstArrayView<ElementType, SizeType> View() const noexcept;
+
+	TArrayView<ElementType, SizeType> SubView(SizeType idx, SizeType num) noexcept;
+	TConstArrayView<ElementType, SizeType> SubView(SizeType idx, SizeType num) const noexcept;
+
+	TArrayView<ElementType, SizeType> LeftView(SizeType num) noexcept;
+	TConstArrayView<ElementType, SizeType> LeftView(SizeType num) const noexcept;
+
+	TArrayView<ElementType, SizeType> RightView(SizeType num) noexcept;
+	TConstArrayView<ElementType, SizeType> RightView(SizeType num) const noexcept;
 
 	// Get
 	// Safe, non-crashing access; unlike operator[] these never read out of bounds.
@@ -450,12 +477,12 @@ private:
 	friend SFriend;
 };
 
+#include "Kor/Container/Detail/Array.inl"
+
 // [ Is TArray ]
 // Checks if type is TArray type
 
 template<typename T> struct TIsTArray : TFalseValue {};
 template<typename ElementT, typename AllocatorT> struct TIsTArray<TArray<ElementT, AllocatorT>> : TTrueValue {};
-
-#include "Kor/Container/Detail/Array.inl"
 
 KOR_NAMESPACE_END

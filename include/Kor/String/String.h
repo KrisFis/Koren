@@ -37,12 +37,10 @@ class TStringView
 public:
 	using CharType = CharT;
 
-	// TODO: Replace with TArrayView once implemented
-	using DataType = const CharT*;
-	using SizeType = int32;
+	using DataType = TConstArrayView<CharType>;
+	using SizeType = typename DataType::SizeType;
 
-	using IteratorType = const CharType*;
-	using ConstIteratorType = const CharType*;
+	using IteratorType = typename DataType::IteratorType;
 
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -201,21 +199,14 @@ public:
 	TArray<TStringView> SplitToArray(const TStringView& delim, bool discardEmpty = true) const noexcept;
 	TArray<TStringView> SplitToArray(const TStringView& delim, bool discardEmpty = true, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
 
-	// Swap
-	// -------------------------------------------------------------------------
-
-	// Swaps elements between containers
-	void Swap(TStringView& other) noexcept;
-
 	// Iteration
 	// -------------------------------------------------------------------------
 
-	ConstIteratorType begin() const noexcept;
-	ConstIteratorType end() const noexcept;
+	IteratorType begin() const noexcept;
+	IteratorType end() const noexcept;
 
 private:
 	DataType _data = {};
-	SizeType _len = 0;
 };
 
 // [ TString ]
@@ -388,12 +379,24 @@ public:
 	// Parses the string as a double.
 	double ToFloat() const noexcept;
 
-	// Append
+	// Add/Append
 	// -------------------------------------------------------------------------
+
+	void Add(CharType c) noexcept;
 
 	void Append(const TString& other) noexcept;
 	void Append(TString&& other) noexcept;
-	void Append(const CharType* other, SizeType num) noexcept;
+
+	void Append(const CharType* text) noexcept;
+	void Append(const CharType* text, SizeType len) noexcept;
+
+	template<TSize N> void Append(const CharType (&text)[N]) noexcept;
+
+	// Remove
+	// -------------------------------------------------------------------------
+
+	// Removes `count` characters starting at `idx`.
+	void RemoveAt(SizeType idx, SizeType count) noexcept;
 
 	// Formatting
 	// -------------------------------------------------------------------------
@@ -508,9 +511,6 @@ public:
 
 	// Inserts `other` at position `idx`, shifting existing characters right.
 	void Insert(SizeType idx, const TString& other) noexcept;
-
-	// Removes `count` characters starting at `idx`.
-	void Remove(SizeType idx, SizeType count) noexcept;
 
 	// Splits the string at the first occurrence of `delim`.
 	// Returns false if `delim` was not found. outLeft/outRight may be null.

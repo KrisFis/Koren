@@ -9,7 +9,7 @@ KOR_INLINE TString<CharT> TString<CharT>::FromInt(int64 value, int32 base) noexc
 	TString result(SStringConstant::BufferSize_Int64, Init::NoInit);
 
 	const int32 convLen = SOps::FromInt(*result._data, value, SStringConstant::BufferSize_Int64, base);
-	KOR_ASSERT_DEBUG(convLen > 0);
+	KOR_ASSERT(convLen > 0);
 
 	result._data.SetNum(convLen + 1);
 	result._data[convLen] = Constant::Null;
@@ -23,7 +23,7 @@ KOR_INLINE TString<CharT> TString<CharT>::FromUInt(uint64 value, int32 base) noe
 	TString result(SStringConstant::BufferSize_UInt64, Init::NoInit);
 
 	const int32 convLen = SOps::FromUInt(*result._data, value, SStringConstant::BufferSize_UInt64, base);
-	KOR_ASSERT_DEBUG(convLen > 0);
+	KOR_ASSERT(convLen > 0);
 
 	result._data.SetNum(convLen + 1);
 	result._data[convLen] = Constant::Null;
@@ -62,7 +62,7 @@ KOR_INLINE TString<CharT> TString<CharT>::FromFloat(double value, uint8 precisio
 	TString result(SStringConstant::BufferSize_Double, Init::NoInit);
 
 	const int32 convLen = SOps::template FromFloat<Format>(*result._data, value, SStringConstant::BufferSize_Double, precision);
-	KOR_ASSERT_DEBUG(convLen > 0);
+	KOR_ASSERT(convLen > 0);
 
 	result._data.SetNum(convLen + 1);
 	result._data[convLen] = Constant::Null;
@@ -101,7 +101,7 @@ template<typename OtherCharType>
 KOR_INLINE TString<CharT> TString<CharT>::ConvertFrom(const OtherCharType* str, SizeType length) noexcept
 {
 	const SizeType convLen = TStringOps<OtherCharType>::template ConvertedLength<CharT>(str, length);
-	KOR_ASSERT_DEBUG(convLen > 0);
+	KOR_ASSERT(convLen > 0);
 
 	TString result(convLen + 1, Init::NoInit);
 

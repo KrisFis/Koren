@@ -34,12 +34,26 @@ template<typename ElementT, typename AllocatorFamilyT>
 KOR_INLINE bool TArray<ElementT, AllocatorFamilyT>::operator==(const TArray& other) const noexcept
 {
 	return
-		_num == other._num && 
+		_num == other._num &&
 		SMemoryOps::IsEqual(_data, other._data, _num);
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::operator!=(const TArray& other) const noexcept
+{
+	return !operator==(other);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_INLINE bool TArray<ElementT, AllocatorFamilyT>::operator==(const ILType& other) const noexcept
+{
+	return
+		_num == (SizeType)other.size() &&
+		SMemoryOps::IsEqual(_data, other.begin(), _num);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::operator!=(const ILType& other) const noexcept
 {
 	return !operator==(other);
 }
@@ -59,11 +73,13 @@ KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::operator*() 
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorFamilyT>::operator[](SizeType idx) noexcept
 {
-	return *GetAt(idx);
+	KOR_ASSERT(IsValidIndex(idx));
+	return _data[idx];
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE const ElementT& TArray<ElementT, AllocatorFamilyT>::operator[](SizeType idx) const noexcept
 {
-	return *GetAt(idx);
+	KOR_ASSERT(IsValidIndex(idx));
+	return _data[idx];
 }

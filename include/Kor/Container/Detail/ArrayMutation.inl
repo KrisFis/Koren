@@ -203,7 +203,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 	const SizeType num = (SizeType)list.size();
 	if (num == 0) return KOR_INDEX_NONE;
 
-	const SizeType idx = num;
+	const SizeType idx = _num;
 	SFriend::Add(*this, num);
 	SMemoryOps::CopyConstruct(_data + idx, list.begin(), num);
 	return idx;
@@ -389,7 +389,7 @@ KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::SwapRange(SizeType firstIdx,
 {
 	if (firstIdx == secondIdx) return;
 
-	KOR_ASSERT(firstIdx + num <= secondIdx)
+	KOR_ASSERT(firstIdx + num <= secondIdx);
 	KOR_ASSERT(0 <= firstIdx && firstIdx + (num - 1) <= _num - 1);
 	KOR_ASSERT(0 <= secondIdx && secondIdx + (num - 1) <= _num - 1);
 

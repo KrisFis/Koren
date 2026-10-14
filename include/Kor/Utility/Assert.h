@@ -18,11 +18,14 @@
 
 #if KOR_USE_ASSERT
 	#define KOR_ASSERT(statement)														\
+	do																					\
+	{																					\
 		if (!(statement)) [[ unlikely ]]												\
 		{																				\
 			Detail::LogFailed(#statement, __FILE__, __LINE__);							\
 			Detail::Crash();															\
-		}
+		}																				\
+	} while (0)
 
 	#define KOR_EXPECT(expression)														\
 		(KOR_LIKELY(!!(expression)) || []()												\
