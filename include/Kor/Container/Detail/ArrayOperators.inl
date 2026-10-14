@@ -59,11 +59,13 @@ KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::operator*() 
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE ElementT& TArray<ElementT, AllocatorFamilyT>::operator[](SizeType idx) noexcept
 {
-	return *GetAt(idx);
+	KOR_ASSERT(IsValidIndex(idx));
+	return _data[idx];
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE const ElementT& TArray<ElementT, AllocatorFamilyT>::operator[](SizeType idx) const noexcept
 {
-	return *GetAt(idx);
+	KOR_ASSERT(IsValidIndex(idx));
+	return _data[idx];
 }

@@ -6,15 +6,13 @@
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE_DEBUG ElementT* TArray<ElementT, AllocatorFamilyT>::GetAt(SizeType idx) noexcept
 {
-	KOR_ASSERT(IsValidIndex(idx));
-	return _data + idx;
+	return IsValidIndex(idx) ? _data + idx : nullptr;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE_DEBUG const ElementT* TArray<ElementT, AllocatorFamilyT>::GetAt(SizeType idx) const noexcept
 {
-	KOR_ASSERT(IsValidIndex(idx));
-	return _data + idx;
+	return IsValidIndex(idx) ? _data + idx : nullptr;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
