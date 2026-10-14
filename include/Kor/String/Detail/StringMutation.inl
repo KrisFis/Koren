@@ -4,6 +4,13 @@
 #pragma once // silence tooling
 
 template<typename CharT>
+KOR_INLINE void TString<CharT>::Add(CharType other) noexcept
+{
+	_data.Pop(); // remove null terminator
+	_data.Append({other, Constant::Null});
+}
+
+template<typename CharT>
 KOR_INLINE void TString<CharT>::Append(const TString& other) noexcept
 {
 	_data.Pop(); // remove null terminator
@@ -18,11 +25,32 @@ KOR_INLINE void TString<CharT>::Append(TString&& other) noexcept
 }
 
 template<typename CharT>
-KOR_INLINE void TString<CharT>::Append(const CharType* other, SizeType num) noexcept
+KOR_FORCEINLINE void TString<CharT>::Append(const CharType* text) noexcept
+{
+	Append(text, SOps::Length(text));
+}
+
+template<typename CharT>
+KOR_INLINE void TString<CharT>::Append(const CharType* text, SizeType len) noexcept
 {
 	_data.Pop(); // remove null terminator
-	_data.Append(other, num);
+	_data.Append(text, len);
 	_data.Add(Constant::Null);
+}
+
+template<typename CharT>
+template<TSize N>
+KOR_FORCEINLINE void TString<CharT>::Append(const CharType (&text)[N]) noexcept
+{
+	Append(text, N - 1);
+}
+
+template<typename CharT>
+KOR_INLINE void TString<CharT>::RemoveAt(SizeType idx, SizeType count) noexcept
+{
+	KOR_ASSERT_DEBUG(idx >= 0 && idx + count <= _data.GetNum() - 1);
+	_data.RemoveAt(idx, count);
+	_data[_data.GetNum() - 1] = Constant::Null;
 }
 
 template<typename CharT>
@@ -91,14 +119,6 @@ KOR_INLINE void TString<CharT>::Insert(SizeType idx, const TString& other) noexc
 	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
 	// Insert without the other's null terminator
 	_data.Insert(idx, *other._data, other._data.GetNum() - 1);
-	_data[_data.GetNum() - 1] = Constant::Null;
-}
-
-template<typename CharT>
-KOR_INLINE void TString<CharT>::Remove(SizeType idx, SizeType count) noexcept
-{
-	KOR_ASSERT_DEBUG(idx >= 0 && idx + count <= _data.GetNum() - 1);
-	_data.RemoveAt(idx, count);
 	_data[_data.GetNum() - 1] = Constant::Null;
 }
 

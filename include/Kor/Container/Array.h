@@ -95,9 +95,14 @@ public:
 	explicit TArray(const ElementType* data, SizeType num) noexcept;
 	explicit TArray(AllocatorType&& allocator, const ElementType* data, SizeType num) noexcept;
 
+	// Copies static array elements from `data`
+	template<TSize N> explicit TArray(const ElementType (&data)[N]) noexcept;
+	template<TSize N> explicit TArray(AllocatorType&& allocator, const ElementType (&data)[N]) noexcept;
+
 	// Reserves `num` elements, each copy-constructed from `value`. Num becomes `num`.
 	explicit TArray(const ElementType& val, SizeType num) noexcept;
 	explicit TArray(AllocatorType&& allocator, const ElementType& val, SizeType num) noexcept;
+
 
 	// Destructor
 	// -------------------------------------------------------------------------

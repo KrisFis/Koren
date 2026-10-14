@@ -388,12 +388,24 @@ public:
 	// Parses the string as a double.
 	double ToFloat() const noexcept;
 
-	// Append
+	// Add/Append
 	// -------------------------------------------------------------------------
+
+	void Add(CharType c) noexcept;
 
 	void Append(const TString& other) noexcept;
 	void Append(TString&& other) noexcept;
-	void Append(const CharType* other, SizeType num) noexcept;
+
+	void Append(const CharType* text) noexcept;
+	void Append(const CharType* text, SizeType len) noexcept;
+
+	template<TSize N> void Append(const CharType (&text)[N]) noexcept;
+
+	// Remove
+	// -------------------------------------------------------------------------
+
+	// Removes `count` characters starting at `idx`.
+	void RemoveAt(SizeType idx, SizeType count) noexcept;
 
 	// Formatting
 	// -------------------------------------------------------------------------
@@ -508,9 +520,6 @@ public:
 
 	// Inserts `other` at position `idx`, shifting existing characters right.
 	void Insert(SizeType idx, const TString& other) noexcept;
-
-	// Removes `count` characters starting at `idx`.
-	void Remove(SizeType idx, SizeType count) noexcept;
 
 	// Splits the string at the first occurrence of `delim`.
 	// Returns false if `delim` was not found. outLeft/outRight may be null.

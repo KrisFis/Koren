@@ -157,6 +157,18 @@ KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(AllocatorType&& alloc
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
+template<TSize N>
+KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(const ElementType(& data)[N]) noexcept
+	: TArray(static_cast<const ElementType*>(data), N)
+{}
+
+template<typename ElementT, typename AllocatorFamilyT>
+template<TSize N>
+KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(AllocatorType&& allocator, const ElementType(& data)[N]) noexcept
+	: TArray(Move(allocator), static_cast<const ElementType*>(data), N)
+{}
+
+template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE TArray<ElementT, AllocatorFamilyT>::TArray(const ElementType& val, SizeType num) noexcept
 	: TArray()
 {

@@ -48,7 +48,7 @@ KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::IsEmpty() const noexcep
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::IsValidIndex(SizeType idx) const noexcept
 {
-	return SMathOps::IsWithin(idx, 0, _num - 1);
+	return SMathOps::IsWithin(idx, (SizeType)0, _num - 1);
 }
 
 #include "Kor/Container/Detail/ArrayPrivate.inl"
