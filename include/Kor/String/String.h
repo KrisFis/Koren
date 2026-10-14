@@ -37,12 +37,10 @@ class TStringView
 public:
 	using CharType = CharT;
 
-	// TODO: Replace with TArrayView once implemented
-	using DataType = const CharT*;
-	using SizeType = int32;
+	using DataType = TConstArrayView<CharType>;
+	using SizeType = typename DataType::SizeType;
 
-	using IteratorType = const CharType*;
-	using ConstIteratorType = const CharType*;
+	using IteratorType = typename DataType::IteratorType;
 
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -201,21 +199,14 @@ public:
 	TArray<TStringView> SplitToArray(const TStringView& delim, bool discardEmpty = true) const noexcept;
 	TArray<TStringView> SplitToArray(const TStringView& delim, bool discardEmpty = true, ESearchCase searchCase = ESearchCase::Sensitive) const noexcept;
 
-	// Swap
-	// -------------------------------------------------------------------------
-
-	// Swaps elements between containers
-	void Swap(TStringView& other) noexcept;
-
 	// Iteration
 	// -------------------------------------------------------------------------
 
-	ConstIteratorType begin() const noexcept;
-	ConstIteratorType end() const noexcept;
+	IteratorType begin() const noexcept;
+	IteratorType end() const noexcept;
 
 private:
 	DataType _data = {};
-	SizeType _len = 0;
 };
 
 // [ TString ]

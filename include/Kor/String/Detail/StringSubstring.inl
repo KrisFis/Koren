@@ -6,7 +6,8 @@
 template<typename CharT>
 KOR_FORCEINLINE_DEBUG TStringView<CharT> TStringView<CharT>::Sub(SizeType start, SizeType length) const noexcept
 {
-	KOR_ASSERT(start + length <= _len);
+	const SizeType len = _data.GetNum() - 1;
+	KOR_ASSERT(start + length <= len);
 	return TStringView(_data + start, length);
 }
 
@@ -29,7 +30,8 @@ KOR_FORCEINLINE_DEBUG TStringView<CharT> TString<CharT>::SubView(SizeType start,
 template<typename CharT>
 KOR_FORCEINLINE_DEBUG TStringView<CharT> TStringView<CharT>::Left(SizeType count) const noexcept
 {
-	KOR_ASSERT(count <= _len);
+	const SizeType len = _data.GetNum() - 1;
+	KOR_ASSERT(count <= len);
 	return TStringView(_data, count);
 }
 
@@ -50,8 +52,9 @@ KOR_FORCEINLINE_DEBUG TStringView<CharT> TString<CharT>::LeftView(SizeType count
 template<typename CharT>
 KOR_FORCEINLINE_DEBUG TStringView<CharT> TStringView<CharT>::Right(SizeType count) const noexcept
 {
-	KOR_ASSERT(count <= _len);
-	return TStringView(_data + (_len - count), count);
+	const SizeType len = _data.GetNum() - 1;
+	KOR_ASSERT(count <= len);
+	return TStringView(_data + (len - count), count);
 }
 
 template<typename CharT>

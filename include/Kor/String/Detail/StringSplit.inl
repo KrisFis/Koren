@@ -7,8 +7,8 @@ template<typename CharT>
 template<ESearchCase Case, ESearchDir Dir>
 KOR_INLINE bool TStringView<CharT>::Split(const TStringView& delim, TStringView* outLeft, TStringView* outRight) const noexcept
 {
-	const SizeType thisLen = _len;
-	const SizeType delimLen = delim._len;
+	const SizeType thisLen = _data.GetNum() - 1;
+	const SizeType delimLen = delim._data.GetNum() - 1;
 
 	const SizeType foundIdx = SOps::template Find<Case, Dir>(_data, delim._data, thisLen, delimLen);
 
@@ -85,9 +85,9 @@ KOR_INLINE TArray<TStringView<CharT>> TStringView<CharT>::SplitToArray(const TSt
 {
 	TArray<TStringView> result;
 
-	const SizeType delimLen = delim._len;
+	const SizeType delimLen = delim._data.GetNum() - 1;
 	const CharT* cursor = _data;
-	SizeType remaining = _len;
+	SizeType remaining = _data.GetNum() - 1;
 
 	while (remaining > 0)
 	{

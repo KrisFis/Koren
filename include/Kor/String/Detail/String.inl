@@ -6,7 +6,7 @@
 template<typename CharT>
 KOR_FORCEINLINE bool TStringView<CharT>::IsValidIndex(SizeType idx) const noexcept
 {
-	return SMathOps::IsWithin(idx, 0, _len);
+	return SMathOps::IsWithin(idx, 0, _data.GetNum() - 1);
 }
 
 template<typename CharT>
@@ -18,7 +18,7 @@ KOR_FORCEINLINE bool TString<CharT>::IsValidIndex(SizeType idx) const noexcept
 template<typename CharT>
 KOR_FORCEINLINE bool TStringView<CharT>::IsEmpty() const noexcept
 {
-	return _len == 0;
+	return _data.GetNum() <= 1;
 }
 
 template<typename CharT>
@@ -30,7 +30,7 @@ KOR_FORCEINLINE bool TString<CharT>::IsEmpty() const noexcept
 template<typename CharT>
 KOR_FORCEINLINE typename TStringView<CharT>::SizeType TStringView<CharT>::GetLength() const noexcept
 {
-	return _len;
+	return _data.GetNum() - 1;
 }
 
 template<typename CharT>

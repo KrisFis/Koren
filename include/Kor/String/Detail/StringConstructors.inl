@@ -6,13 +6,11 @@
 template<typename CharT>
 KOR_FORCEINLINE constexpr TStringView<CharT>::TStringView() noexcept
 	: _data(&Constant::Null)
-	, _len(0)
 {}
 
 template<typename CharT>
 KOR_FORCEINLINE constexpr TStringView<CharT>::TStringView(Init::SNoInit) noexcept
 	: _data(nullptr)
-	, _len(KOR_INDEX_NONE)
 {}
 
 template<typename CharT>
@@ -40,13 +38,11 @@ KOR_INLINE TStringView<CharT>::TStringView(const CharType* text) noexcept
 {
 	if (text)
 	{
-		_data = text;
-		_len = SOps::Length(text);
+		_data = DataType(text, SOps::Length(text) + 1);
 	}
 	else
 	{
-		_data = &Constant::Null;
-		_len = 0;
+		_data = DataType(&Constant::Null, 1);
 	}
 }
 
@@ -68,13 +64,11 @@ KOR_INLINE TStringView<CharT>::TStringView(const CharType* text, SizeType length
 {
 	if (text && length > 0)
 	{
-		_data = text;
-		_len = length;
+		_data = DataType(text, length + 1);
 	}
 	else
 	{
-		_data = &Constant::Null;
-		_len = 0;
+		_data = DataType(&Constant::Null, 1);
 	}
 }
 
@@ -95,8 +89,7 @@ KOR_INLINE TString<CharT>::TString(const CharType* text, SizeType length) noexce
 template<typename CharT>
 template<TSize N>
 KOR_FORCEINLINE TStringView<CharT>::TStringView(const CharType(& text)[N]) noexcept
-	: _data(static_cast<const CharType*>(text))
-	, _len(N - 1)
+	: _data(text) // includes terminating character
 {}
 
 template<typename CharT>

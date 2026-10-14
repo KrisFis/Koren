@@ -52,6 +52,12 @@ namespace Detail::ArrayView
 }
 
 template<typename ElementT, typename SizeT>
+KOR_FORCEINLINE constexpr TArrayView<ElementT, SizeT>::TArrayView(TNullptr) noexcept
+	: _data(nullptr)
+	, _num(0)
+{}
+
+template<typename ElementT, typename SizeT>
 KOR_FORCEINLINE constexpr TArrayView<ElementT, SizeT>::TArrayView(const ILType& list) noexcept
 	: _data(list.begin())
 	, _num(list.size())

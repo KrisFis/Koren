@@ -8,6 +8,8 @@
 
 #include "Kor/TypeTrait/Category.h"
 #include "Kor/Memory/MemoryOps.h"
+#include "Kor/Utility/Invoke.h"
+#include "Kor/Utility/Swap.h"
 
 KOR_NAMESPACE_BEGIN
 
@@ -47,6 +49,9 @@ public:
 
 	// Empty array, no view.
 	constexpr TArrayView() noexcept = default;
+
+	// Default construction from nullptr
+	constexpr TArrayView(TNullptr) noexcept;
 
 	// Makes view to initializer list
 	constexpr TArrayView(const ILType& list) noexcept;
