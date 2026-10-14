@@ -48,7 +48,7 @@ KOR_FORCEINLINE void TString<CharT>::Append(const CharType (&text)[N]) noexcept
 template<typename CharT>
 KOR_INLINE void TString<CharT>::RemoveAt(SizeType idx, SizeType count) noexcept
 {
-	KOR_ASSERT_DEBUG(idx >= 0 && idx + count <= _data.GetNum() - 1);
+	KOR_ASSERT(idx >= 0 && idx + count <= _data.GetNum() - 1);
 	_data.RemoveAt(idx, count);
 	_data[_data.GetNum() - 1] = Constant::Null;
 }
@@ -90,7 +90,7 @@ template<typename CharT>
 KOR_INLINE void TString<CharT>::ChopRight(SizeType idx) noexcept
 {
 	// Remove everything from idx to end (excluding null terminator)
-	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
+	KOR_ASSERT(idx >= 0 && idx < _data.GetNum() - 1);
 	const SizeType count = _data.GetNum() - 1 - idx;
 	_data.RemoveAt(idx, count);
 	_data[_data.GetNum() - 1] = Constant::Null;
@@ -100,7 +100,7 @@ template<typename CharT>
 KOR_INLINE void TString<CharT>::ChopLeft(SizeType idx) noexcept
 {
 	// Remove everything before idx
-	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
+	KOR_ASSERT(idx >= 0 && idx < _data.GetNum() - 1);
 	_data.RemoveAt(0, idx);
 	// null terminator survives since we removed from the front
 }
@@ -108,7 +108,7 @@ KOR_INLINE void TString<CharT>::ChopLeft(SizeType idx) noexcept
 template<typename CharT>
 KOR_INLINE void TString<CharT>::ChopRange(SizeType firstIdx, SizeType secondIdx) noexcept
 {
-	KOR_ASSERT_DEBUG(firstIdx >= 0 && secondIdx >= firstIdx && secondIdx < _data.GetNum() - 1);
+	KOR_ASSERT(firstIdx >= 0 && secondIdx >= firstIdx && secondIdx < _data.GetNum() - 1);
 	_data.RemoveAt(firstIdx, secondIdx - firstIdx + 1);
 	_data[_data.GetNum() - 1] = Constant::Null;
 }
@@ -116,7 +116,7 @@ KOR_INLINE void TString<CharT>::ChopRange(SizeType firstIdx, SizeType secondIdx)
 template<typename CharT>
 KOR_INLINE void TString<CharT>::Insert(SizeType idx, const TString& other) noexcept
 {
-	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
+	KOR_ASSERT(idx >= 0 && idx < _data.GetNum() - 1);
 	// Insert without the other's null terminator
 	_data.Insert(idx, *other._data, other._data.GetNum() - 1);
 	_data[_data.GetNum() - 1] = Constant::Null;

@@ -47,14 +47,14 @@ KOR_FORCEINLINE CharT* TString<CharT>::operator*() noexcept
 template<typename CharT>
 KOR_FORCEINLINE_DEBUG CharT TStringView<CharT>::operator[](SizeType idx) const noexcept
 {
-	KOR_ASSERT_DEBUG(idx >= 0 && idx < _len);
+	KOR_ASSERT(IsValidIndex(idx));
 	return _data[idx];
 }
 
 template<typename CharT>
 KOR_FORCEINLINE_DEBUG CharT TString<CharT>::operator[](SizeType idx) const noexcept
 {
-	KOR_ASSERT_DEBUG(idx >= 0 && idx < _data.GetNum() - 1);
+	KOR_ASSERT(IsValidIndex(idx));
 	return _data[idx];
 }
 

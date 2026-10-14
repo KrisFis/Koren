@@ -5,6 +5,7 @@
 
 #include "Kor/Container/Minimal.h"
 
+#include "Kor/Container/ArrayView.h"
 #include "Kor/Container/ContainerTraits.h"
 
 #include "Kor/Math/MathOps.h"
@@ -166,6 +167,23 @@ public:
 	// True if idx is in [0, GetNum()).
 	// * Never asserts; the standard guard to use before operator[]/Insert/RemoveAt.
 	bool IsValidIndex(SizeType idx) const noexcept;
+
+	// View
+	// Returns a non-owning view into this array's buffer.
+	// The view is valid as long as this array is alive and unmodified.
+	// -------------------------------------------------------------------------
+
+	TArrayView<ElementType, SizeType> View() noexcept;
+	TConstArrayView<ElementType, SizeType> View() const noexcept;
+
+	TArrayView<ElementType, SizeType> SubView(SizeType idx, SizeType num) noexcept;
+	TConstArrayView<ElementType, SizeType> SubView(SizeType idx, SizeType num) const noexcept;
+
+	TArrayView<ElementType, SizeType> LeftView(SizeType num) noexcept;
+	TConstArrayView<ElementType, SizeType> LeftView(SizeType num) const noexcept;
+
+	TArrayView<ElementType, SizeType> RightView(SizeType num) noexcept;
+	TConstArrayView<ElementType, SizeType> RightView(SizeType num) const noexcept;
 
 	// Get
 	// Safe, non-crashing access; unlike operator[] these never read out of bounds.

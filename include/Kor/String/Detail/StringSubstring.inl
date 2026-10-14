@@ -6,7 +6,7 @@
 template<typename CharT>
 KOR_FORCEINLINE_DEBUG TStringView<CharT> TStringView<CharT>::Sub(SizeType start, SizeType length) const noexcept
 {
-	KOR_ASSERT_DEBUG(start + length <= _len);
+	KOR_ASSERT(start + length <= _len);
 	return TStringView(_data + start, length);
 }
 
@@ -14,7 +14,7 @@ template<typename CharT>
 KOR_FORCEINLINE_DEBUG TString<CharT> TString<CharT>::Sub(SizeType start, SizeType length) const noexcept
 {
 	const SizeType len = _data.GetNum() - 1;
-	KOR_ASSERT_DEBUG(start + length <= len);
+	KOR_ASSERT(start + length <= len);
 	return TString(_data.GetData() + start, length);
 }
 
@@ -22,35 +22,35 @@ template<typename CharT>
 KOR_FORCEINLINE_DEBUG TStringView<CharT> TString<CharT>::SubView(SizeType start, SizeType length) const noexcept
 {
 	const SizeType len = _data.GetNum() - 1;
-	KOR_ASSERT_DEBUG(start + length <= len);
+	KOR_ASSERT(start + length <= len);
 	return TStringView<CharT>(_data.GetData() + start, length);
 }
 
 template<typename CharT>
 KOR_FORCEINLINE_DEBUG TStringView<CharT> TStringView<CharT>::Left(SizeType count) const noexcept
 {
-	KOR_ASSERT_DEBUG(count <= _len);
+	KOR_ASSERT(count <= _len);
 	return TStringView(_data, count);
 }
 
 template<typename CharT>
 KOR_FORCEINLINE_DEBUG TString<CharT> TString<CharT>::Left(SizeType count) const noexcept
 {
-	KOR_ASSERT_DEBUG(count <= _data.GetNum() - 1);
+	KOR_ASSERT(count <= _data.GetNum() - 1);
 	return TString(_data.GetData(), count);
 }
 
 template<typename CharT>
 KOR_FORCEINLINE_DEBUG TStringView<CharT> TString<CharT>::LeftView(SizeType count) const noexcept
 {
-	KOR_ASSERT_DEBUG(count <= _data.GetNum() - 1);
+	KOR_ASSERT(count <= _data.GetNum() - 1);
 	return TStringView<CharT>(_data.GetData(), count);
 }
 
 template<typename CharT>
 KOR_FORCEINLINE_DEBUG TStringView<CharT> TStringView<CharT>::Right(SizeType count) const noexcept
 {
-	KOR_ASSERT_DEBUG(count <= _len);
+	KOR_ASSERT(count <= _len);
 	return TStringView(_data + (_len - count), count);
 }
 
@@ -58,7 +58,7 @@ template<typename CharT>
 KOR_FORCEINLINE_DEBUG TString<CharT> TString<CharT>::Right(SizeType count) const noexcept
 {
 	const SizeType len = _data.GetNum() - 1;
-	KOR_ASSERT_DEBUG(count <= len);
+	KOR_ASSERT(count <= len);
 	return TString(_data.GetData() + (len - count), count);
 }
 
@@ -66,7 +66,7 @@ template<typename CharT>
 KOR_FORCEINLINE_DEBUG TStringView<CharT> TString<CharT>::RightView(SizeType count) const noexcept
 {
 	const SizeType len = _data.GetNum() - 1;
-	KOR_ASSERT_DEBUG(count <= len);
+	KOR_ASSERT(count <= len);
 	return TStringView<CharT>(_data.GetData() + (len - count), count);
 }
 
