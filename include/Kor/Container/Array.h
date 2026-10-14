@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "Kor/Memory/Minimal.h"
+#include "Kor/Container/Minimal.h"
 
 #include "Kor/Container/ContainerTraits.h"
 
