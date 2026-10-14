@@ -33,6 +33,8 @@ namespace Detail::Array { template<typename T> struct TFriend; }
 //   TArray<int32> values = { 1, 2, 3 };
 //   values.Add(4);
 //
+// TODO: Support generic containers via constructor/comparison operators
+//
 template<typename ElementT, typename AllocatorFamilyT>
 class TArray
 {
@@ -104,7 +106,6 @@ public:
 	explicit TArray(const ElementType& val, SizeType num) noexcept;
 	explicit TArray(AllocatorType&& allocator, const ElementType& val, SizeType num) noexcept;
 
-
 	// Destructor
 	// -------------------------------------------------------------------------
 
@@ -124,6 +125,9 @@ public:
 
 	bool operator==(const TArray& other) const noexcept;
 	bool operator!=(const TArray& other) const noexcept;
+
+	bool operator==(const ILType& other) const noexcept;
+	bool operator!=(const ILType& other) const noexcept;
 
 	// Dereference Operators
 	// Raw pointer to the data buffer. Null if empty and never allocated.
@@ -473,12 +477,12 @@ private:
 	friend SFriend;
 };
 
+#include "Kor/Container/Detail/Array.inl"
+
 // [ Is TArray ]
 // Checks if type is TArray type
 
 template<typename T> struct TIsTArray : TFalseValue {};
 template<typename ElementT, typename AllocatorT> struct TIsTArray<TArray<ElementT, AllocatorT>> : TTrueValue {};
-
-#include "Kor/Container/Detail/Array.inl"
 
 KOR_NAMESPACE_END

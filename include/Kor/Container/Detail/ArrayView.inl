@@ -88,8 +88,8 @@ template<typename ElementT, typename SizeT>
 KOR_INLINE bool TArrayView<ElementT, SizeT>::operator==(const TArrayView& other) const noexcept
 {
 	return
-			_num == other._num &&
-			SMemoryOps::IsEqual(_data, other._data, _num);
+		_num == other._num &&
+		SMemoryOps::IsEqual(_data, other._data, _num);
 }
 
 template<typename ElementT, typename SizeT>
@@ -218,6 +218,9 @@ KOR_FORCEINLINE constexpr typename TArrayView<ElementT, SizeT>::IteratorType TAr
 {
 	return _data + _num;
 }
+
+template<typename T>
+TArrayView(std::initializer_list<T>) -> TArrayView<const T, int32>;
 
 template<typename ElementT, typename SizeT>
 struct TContainerTraits<TArrayView<ElementT, SizeT>>

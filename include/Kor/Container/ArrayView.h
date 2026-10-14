@@ -31,6 +31,8 @@ namespace Detail::ArrayView { template<typename T> struct TFriend; }
 //   TArrayView<int32, int32> view(values.GetData(), values.GetNum());
 //   for (int32 v : view) { ... }
 //
+// TODO: Support generic containers via constructor/comparison operators
+//
 template<typename ElementT, typename SizeT>
 class TArrayView
 {
@@ -41,7 +43,7 @@ public:
 	using ElementType = ElementT;
 	using SizeType = SizeT;
 
-	using ILType = std::initializer_list<ElementType>;
+	using ILType = std::initializer_list<typename TRemoveConst<ElementType>::Type>;
 	using IteratorType = ElementType*;
 
 	// Constructors
@@ -72,7 +74,6 @@ public:
 	// -------------------------------------------------------------------------
 
 	bool operator==(const TArrayView& other) const noexcept;
-
 	bool operator!=(const TArrayView& other) const noexcept;
 
 	// Dereference & Index Operators
@@ -186,5 +187,11 @@ private:
 
 template<typename ElementT, typename SizeT = int32>
 using TConstArrayView = TArrayView<const ElementT, SizeT>;
+
+// [ Is TArrayView ]
+// Checks if type is TArrayView type
+
+template<typename T> struct TIsTArrayView : TFalseValue {};
+template<typename ElementT, typename SizeT> struct TIsTArrayView<TArrayView<ElementT, SizeT>> : TTrueValue {};
 
 KOR_NAMESPACE_END
