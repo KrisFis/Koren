@@ -154,9 +154,10 @@ KOR_FORCEINLINE constexpr typename TArrayView<ElementT, SizeT>::ElementType* TAr
 }
 
 template<typename ElementT, typename SizeT>
-KOR_FORCEINLINE constexpr typename TArrayView<ElementT, SizeT>::SizeType TArrayView<ElementT, SizeT>::FindIndex(const ElementType& val) const noexcept
+template<typename KeyType>
+KOR_FORCEINLINE constexpr typename TArrayView<ElementT, SizeT>::SizeType TArrayView<ElementT, SizeT>::FindIndex(const KeyType& key) const noexcept
 {
-	return SFriend::FindIndexByFunc(*this, [&val](const ElementType& element) -> bool { return SMemoryOps::IsEqual(&element, &val); });
+	return SFriend::FindIndexByFunc(*this, [&key](const ElementType& element) -> bool { return SMemoryOps::IsEqual(&element, &key); });
 }
 
 template<typename ElementT, typename SizeT>
@@ -168,9 +169,9 @@ KOR_FORCEINLINE constexpr typename TArrayView<ElementT, SizeT>::SizeType TArrayV
 
 template<typename ElementT, typename SizeT>
 template<typename KeyType>
-KOR_FORCEINLINE constexpr typename TArrayView<ElementT, SizeT>::SizeType TArrayView<ElementT, SizeT>::FindIndexByKey(const KeyType& key) const noexcept
+KOR_FORCEINLINE constexpr typename TArrayView<ElementT, SizeT>::ElementType* TArrayView<ElementT, SizeT>::Find(const KeyType& key) const noexcept
 {
-	return SFriend::FindIndexByFunc(*this, [&key](const ElementType& element) -> bool { return SMemoryOps::IsEqual(&element, &key); });
+	return SFriend::FindByFunc(*this, [&key](const ElementType& element) -> bool { return SMemoryOps::IsEqual(&element, &key); });
 }
 
 template<typename ElementT, typename SizeT>
@@ -182,15 +183,9 @@ KOR_FORCEINLINE constexpr typename TArrayView<ElementT, SizeT>::ElementType* TAr
 
 template<typename ElementT, typename SizeT>
 template<typename KeyType>
-KOR_FORCEINLINE constexpr typename TArrayView<ElementT, SizeT>::ElementType* TArrayView<ElementT, SizeT>::FindByKey(const KeyType& key) const noexcept
+KOR_FORCEINLINE constexpr bool TArrayView<ElementT, SizeT>::Contains(const KeyType& key) const noexcept
 {
-	return SFriend::FindByFunc(*this, [&key](const ElementType& element) -> bool { return SMemoryOps::IsEqual(&element, &key); });
-}
-
-template<typename ElementT, typename SizeT>
-KOR_FORCEINLINE constexpr bool TArrayView<ElementT, SizeT>::Contains(const ElementType& val) const noexcept
-{
-	return !!FindByKey(val);
+	return !!Find(key);
 }
 
 template<typename ElementT, typename SizeT>
@@ -198,13 +193,6 @@ template<typename FunctorT>
 KOR_FORCEINLINE constexpr bool TArrayView<ElementT, SizeT>::ContainsByFunc(FunctorT&& func) const
 {
 	return !!FindByFunc(Forward<FunctorT>(func));
-}
-
-template<typename ElementT, typename SizeT>
-template<typename KeyType>
-KOR_FORCEINLINE constexpr bool TArrayView<ElementT, SizeT>::ContainsByKey(const KeyType& key) const noexcept
-{
-	return !!FindByKey(key);
 }
 
 template<typename ElementT, typename SizeT>

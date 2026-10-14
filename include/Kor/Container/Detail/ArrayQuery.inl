@@ -40,12 +40,13 @@ KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::GetLast() co
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::FindIndex(const ElementType& val) const noexcept
+template<typename KeyType>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::FindIndex(const KeyType& key) const noexcept
 {
-	return SFriend::FindIndexByFunc(*this, 
-		[&val](const ElementType& el) noexcept -> bool
+	return SFriend::FindIndexByFunc(*this,
+		[&key](const ElementType& el) noexcept -> bool
 		{
-			return SMemoryOps::IsEqual(&el, &val);
+			return SMemoryOps::IsEqual(&el, &key);
 		}
 	);
 }
@@ -59,9 +60,21 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 
 template<typename ElementT, typename AllocatorFamilyT>
 template<typename KeyType>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::FindIndexByKey(const KeyType& key) const noexcept
+KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorFamilyT>::Find(const KeyType& key) noexcept
 {
-	return SFriend::FindIndexByFunc(*this, 
+	return SFriend::FindByFunc(*this,
+		[&key](const ElementType& el) noexcept -> bool
+		{
+			return SMemoryOps::IsEqual(&el, &key);
+		}
+	);
+}
+
+template<typename ElementT, typename AllocatorFamilyT>
+template<typename KeyType>
+KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::Find(const KeyType& key) const noexcept
+{
+	return SFriend::FindByFunc(*this,
 		[&key](const ElementType& el) noexcept -> bool
 		{
 			return SMemoryOps::IsEqual(&el, &key);
@@ -85,32 +98,9 @@ KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::FindByFunc(F
 
 template<typename ElementT, typename AllocatorFamilyT>
 template<typename KeyType>
-KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorFamilyT>::FindByKey(const KeyType& key) noexcept
+KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::Contains(const KeyType& key) const noexcept
 {
-	return SFriend::FindByFunc(*this, 
-		[&key](const ElementType& el) noexcept -> bool
-		{
-			return SMemoryOps::IsEqual(&el, &key);
-		}
-	);
-}
-
-template<typename ElementT, typename AllocatorFamilyT>
-template<typename KeyType>
-KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::FindByKey(const KeyType& key) const noexcept
-{
-	return SFriend::FindByFunc(*this, 
-		[&key](const ElementType& el) noexcept -> bool
-		{
-			return SMemoryOps::IsEqual(&el, &key);
-		}
-	);
-}
-
-template<typename ElementT, typename AllocatorFamilyT>
-KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::Contains(const ElementT& val) const noexcept
-{
-	return !!FindByKey(val);
+	return !!Find(key);
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -118,11 +108,4 @@ template<typename FunctorT>
 KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::ContainsByFunc(FunctorT&& func) const
 {
 	return !!FindByFunc(Forward<FunctorT>(func));
-}
-
-template<typename ElementT, typename AllocatorFamilyT>
-template<typename KeyType>
-KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::ContainsByKey(const KeyType& key) const noexcept
-{
-	return !!FindByKey(key);
 }

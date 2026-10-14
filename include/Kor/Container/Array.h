@@ -405,20 +405,22 @@ public:
 	// * Never asserts, even on an empty array.
 	// -------------------------------------------------------------------------
 
-	// Matches by operator==.
-	SizeType FindIndex(const ElementType& val) const noexcept;
+	template<typename KeyType>
+	SizeType FindIndex(const KeyType& key) const noexcept;
 
 	// Matches by predicate; not noexcept, since func may throw.
 	template<typename FunctorT>
 	SizeType FindIndexByFunc(FunctorT&& func) const;
 
-	// Matches by key.
-	template<typename KeyType>
-	SizeType FindIndexByKey(const KeyType& key) const noexcept;
-
 	// Find Element
 	// Returns a pointer to the first match, or nullptr. Never asserts.
 	// -------------------------------------------------------------------------
+
+	template<typename KeyType>
+	ElementType* Find(const KeyType& key) noexcept;
+
+	template<typename KeyType>
+	const ElementType* Find(const KeyType& key) const noexcept;
 
 	// Matches by predicate; not noexcept, since func may throw.
 	template<typename FunctorT>
@@ -427,27 +429,16 @@ public:
 	template<typename FunctorT>
 	const ElementType* FindByFunc(FunctorT&& func) const;
 
-	// Matches by key.
-	template<typename KeyType>
-	ElementType* FindByKey(const KeyType& key) noexcept;
-
-	template<typename KeyType>
-	const ElementType* FindByKey(const KeyType& key) const noexcept;
-
 	// Contains
 	// True if any element matches. Never asserts; false on an empty array.
 	// -------------------------------------------------------------------------
 
-	// Matches by operator==.
-	bool Contains(const ElementType& val) const noexcept;
+	template<typename KeyType>
+	bool Contains(const KeyType& key) const noexcept;
 
 	// Matches by predicate; not noexcept, since func may throw.
 	template<typename FunctorT>
 	bool ContainsByFunc(FunctorT&& func) const;
-
-	// Matches by key.
-	template<typename KeyType>
-	bool ContainsByKey(const KeyType& key) const noexcept;
 
 	// Iterators
 	// -------------------------------------------------------------------------
