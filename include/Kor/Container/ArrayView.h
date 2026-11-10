@@ -59,7 +59,7 @@ public:
 	constexpr TArrayView(const ILType& list) noexcept;
 
 	// Makes view to array `data` of specific size
-	explicit constexpr TArrayView(ElementType* data, const SizeType num) noexcept;
+	explicit constexpr TArrayView(ElementType* data, SizeType num) noexcept;
 
 	template<TSize N> explicit TArrayView(ElementType (&data)[N]) noexcept;
 
@@ -129,9 +129,9 @@ public:
 	template<typename KeyType>
 	constexpr SizeType FindIndex(const KeyType& key) const noexcept;
 
-	// Matches by predicate; not noexcept, since func may throw.
-	template<typename FunctorT>
-	constexpr SizeType FindIndexByFunc(FunctorT&& func) const;
+	// Matches by predicate; not noexcept, since pred may throw.
+	template<typename PredT>
+	constexpr SizeType FindIndexBy(PredT&& pred) const;
 
 	// Find Element
 	// Returns a pointer to the first match, or nullptr. Never asserts.
@@ -141,9 +141,9 @@ public:
 	template<typename KeyType>
 	constexpr ElementType* Find(const KeyType& key) const noexcept;
 
-	// Matches by predicate; not noexcept, since func may throw.
-	template<typename FunctorT>
-	constexpr ElementType* FindByFunc(FunctorT&& func) const;
+	// Matches by predicate; not noexcept, since pred may throw.
+	template<typename PredT>
+	constexpr ElementType* FindBy(PredT&& pred) const;
 
 	// Contains
 	// True if any element matches. Never asserts; false on an empty array.
@@ -153,9 +153,9 @@ public:
 	template<typename KeyType>
 	constexpr bool Contains(const KeyType& key) const noexcept;
 
-	// Matches by predicate; not noexcept, since func may throw.
-	template<typename FunctorT>
-	constexpr bool ContainsByFunc(FunctorT&& func) const;
+	// Matches by predicate; not noexcept, since pred may throw.
+	template<typename PredT>
+	constexpr bool ContainsBy(PredT&& pred) const;
 
 	// Iterators
 	// -------------------------------------------------------------------------

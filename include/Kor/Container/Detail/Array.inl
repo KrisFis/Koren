@@ -223,16 +223,16 @@ namespace Detail::Array
 		// Query
 		// -------------------------------------------------------------------------
 
-		template<typename FunctorT>
-		static SizeType FindIndexByFunc(const ArrayType& arr, FunctorT&& func)
-			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
+		template<typename PredT>
+		static SizeType FindIndexBy(const ArrayType& arr, PredT&& pred)
+			KOR_NOEXCEPT_EXPR(pred(DeclVal<const ElementType&>()))
 		{
-			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)");
+			static_assert(TIsInvocable<PredT, const ElementType&>::Value, "PredT format must be bool(const ElementT&)");
 
 			const ElementType* const end = arr._data + arr._num;
 			for (const ElementType* curr = arr._data; curr != end; ++curr)
 			{
-				if (Invoke(func, *curr))
+				if (Invoke(pred, *curr))
 				{
 					return KOR_PTR_TYPED_DIFF(SizeType, curr, arr._data);
 				}
@@ -241,16 +241,16 @@ namespace Detail::Array
 			return KOR_INDEX_NONE;
 		}
 
-		template<typename FunctorT>
-		static const ElementType* FindByFunc(const ArrayType& arr, FunctorT&& func)
-			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
+		template<typename PredT>
+		static const ElementType* FindBy(const ArrayType& arr, PredT&& pred)
+			KOR_NOEXCEPT_EXPR(pred(DeclVal<const ElementType&>()))
 		{
-			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)");
+			static_assert(TIsInvocable<PredT, const ElementType&>::Value, "PredT format must be bool(const ElementT&)");
 
 			const ElementType* const end = arr._data + arr._num;
 			for (const ElementType* curr = arr._data; curr != end; ++curr)
 			{
-				if (Invoke(func, *curr))
+				if (Invoke(pred, *curr))
 				{
 					return curr;
 				}
@@ -259,11 +259,11 @@ namespace Detail::Array
 			return nullptr;
 		}
 
-		template<typename FunctorT>
-		KOR_FORCEINLINE static ElementType* FindByFunc(ArrayType& arr, FunctorT&& func)
-			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
+		template<typename PredT>
+		KOR_FORCEINLINE static ElementType* FindBy(ArrayType& arr, PredT&& pred)
+			KOR_NOEXCEPT_EXPR(pred(DeclVal<const ElementType&>()))
 		{
-			return const_cast<ElementType*>(FindByFunc((const ArrayType&)arr, Forward<FunctorT>(func)));
+			return const_cast<ElementType*>(FindBy((const ArrayType&)arr, Forward<PredT>(pred)));
 		}
 
 		// Mutations
@@ -417,16 +417,16 @@ namespace Detail::Array
 			SMemoryOps::Destruct(arr._data + arr._num, num);
 		}
 
-		// [RemoveByFunc]
-		// Removes every element for which func(*ptr) is true, preserving order via a
+		// [RemoveBy]
+		// Removes every element for which pred(*ptr) is true, preserving order via a
 		// single forward compaction pass. Each surviving element moves at most once;
 		// contiguous survivor runs are batched into one MoveAssign call.
-		// * Func: bool(const ElementType*)
-		template<typename FunctorT>
-		static SizeType RemoveByFunc(ArrayType& arr, FunctorT&& func)
-			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
+		// * Pred: bool(const ElementType*)
+		template<typename PredT>
+		static SizeType RemoveBy(ArrayType& arr, PredT&& pred)
+			KOR_NOEXCEPT_EXPR(pred(DeclVal<const ElementType&>()))
 		{
-			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)");
+			static_assert(TIsInvocable<PredT, const ElementType&>::Value, "PredT format must be bool(const ElementT&)");
 
 			ElementType* const oldEnd = arr._data + arr._num;
 			ElementType* dst = arr._data;
@@ -434,7 +434,7 @@ namespace Detail::Array
 
 			while (src != oldEnd)
 			{
-				if (Invoke(func, *(const ElementType*)src))
+				if (Invoke(pred, *(const ElementType*)src))
 				{
 					++src;
 				}
@@ -444,7 +444,7 @@ namespace Detail::Array
 					do
 					{
 						++src;
-					} while (src != oldEnd && !Invoke(func, *(const ElementType*)src));
+					} while (src != oldEnd && !Invoke(pred, *(const ElementType*)src));
 
 					const SizeType runLen = KOR_PTR_TYPED_DIFF(SizeType, src, runStart);
 					if (dst != runStart)
@@ -465,17 +465,17 @@ namespace Detail::Array
 			return totalRemoved;
 		}
 
-		// [RemoveSwapByFunc]
-		// Removes every element for which func(ptr) is true via swap-from-tail;
+		// [RemoveSwapBy]
+		// Removes every element for which pred(ptr) is true via swap-from-tail;
 		// order not preserved. Reverse scan batches contiguous match-runs into one
 		// RemoveAtSwap call each. Safe because RemoveAtSwap only mutates addresses
 		// >= idx, which the reverse scan has already visited and compared.
-		// * Func: bool(const ElementType*)
-		template<typename FunctorT>
-		static SizeType RemoveSwapByFunc(ArrayType& arr, FunctorT&& func)
-			KOR_NOEXCEPT_EXPR(func(DeclVal<const ElementType&>()))
+		// * Pred: bool(const ElementType*)
+		template<typename PredT>
+		static SizeType RemoveSwapBy(ArrayType& arr, PredT&& pred)
+			KOR_NOEXCEPT_EXPR(pred(DeclVal<const ElementType&>()))
 		{
-			static_assert(TIsInvocable<FunctorT, const ElementType&>::Value, "FunctorT format must be bool(const ElementT&)");
+			static_assert(TIsInvocable<PredT, const ElementType&>::Value, "PredT format must be bool(const ElementT&)");
 
 			SizeType totalRemoved = 0;
 			SizeType num = 0;
@@ -485,7 +485,7 @@ namespace Detail::Array
 			while (curr != begin)
 			{
 				--curr;
-				if (Invoke(func, *curr))
+				if (Invoke(pred, *curr))
 				{
 					++num;
 				}
@@ -844,7 +844,7 @@ template<typename ElementT, typename AllocatorFamilyT>
 template<typename KeyType>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::FindIndex(const KeyType& key) const noexcept
 {
-	return SFriend::FindIndexByFunc(*this,
+	return SFriend::FindIndexBy(*this,
 		[&key](const ElementType& el) noexcept -> bool
 		{
 			return SMemoryOps::IsEqual(&el, &key);
@@ -853,17 +853,17 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-template<typename FunctorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::FindIndexByFunc(FunctorT&& func) const
+template<typename PredT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::FindIndexBy(PredT&& pred) const
 {
-	return SFriend::FindIndexByFunc(*this, Forward<FunctorT>(func));
+	return SFriend::FindIndexBy(*this, Forward<PredT>(pred));
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
 template<typename KeyType>
 KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorFamilyT>::Find(const KeyType& key) noexcept
 {
-	return SFriend::FindByFunc(*this,
+	return SFriend::FindBy(*this,
 		[&key](const ElementType& el) noexcept -> bool
 		{
 			return SMemoryOps::IsEqual(&el, &key);
@@ -875,7 +875,7 @@ template<typename ElementT, typename AllocatorFamilyT>
 template<typename KeyType>
 KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::Find(const KeyType& key) const noexcept
 {
-	return SFriend::FindByFunc(*this,
+	return SFriend::FindBy(*this,
 		[&key](const ElementType& el) noexcept -> bool
 		{
 			return SMemoryOps::IsEqual(&el, &key);
@@ -884,17 +884,17 @@ KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::Find(const K
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-template<typename FunctorT>
-KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorFamilyT>::FindByFunc(FunctorT&& func)
+template<typename PredT>
+KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorFamilyT>::FindBy(PredT&& pred)
 {
-	return SFriend::FindByFunc(*this, Forward<FunctorT>(func));
+	return SFriend::FindBy(*this, Forward<PredT>(pred));
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-template<typename FunctorT>
-KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::FindByFunc(FunctorT&& func) const
+template<typename PredT>
+KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::FindBy(PredT&& pred) const
 {
-	return SFriend::FindByFunc(*this, Forward<FunctorT>(func));
+	return SFriend::FindBy(*this, Forward<PredT>(pred));
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
@@ -905,10 +905,10 @@ KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::Contains(const KeyType&
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-template<typename FunctorT>
-KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::ContainsByFunc(FunctorT&& func) const
+template<typename PredT>
+KOR_FORCEINLINE bool TArray<ElementT, AllocatorFamilyT>::ContainsBy(PredT&& pred) const
 {
-	return !!FindByFunc(Forward<FunctorT>(func));
+	return !!FindBy(Forward<PredT>(pred));
 }
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE void TArray<ElementT, AllocatorFamilyT>::Reserve(SizeType num) noexcept
@@ -1288,7 +1288,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::Remove(const ElementType& val) noexcept
 {
-	return SFriend::RemoveByFunc(*this,
+	return SFriend::RemoveBy(*this,
 		[&val](const ElementType& el) noexcept -> bool
 		{
 			return SMemoryOps::IsEqual(&el, &val);
@@ -1299,7 +1299,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSingle(const ElementType& val) noexcept
 {
-	const SizeType idx = SFriend::FindIndexByFunc(*this,
+	const SizeType idx = SFriend::FindIndexBy(*this,
 		[&val](const ElementType& el) noexcept -> bool
 		{
 			return SMemoryOps::IsEqual(&el, &val);
@@ -1313,17 +1313,17 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-template<typename FunctorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveByFunc(FunctorT&& func)
+template<typename PredT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveBy(PredT&& pred)
 {
-	return SFriend::RemoveByFunc(*this, Forward<FunctorT>(func));
+	return SFriend::RemoveBy(*this, Forward<PredT>(pred));
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-template<typename FunctorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSingleByFunc(FunctorT&& func)
+template<typename PredT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSingleBy(PredT&& pred)
 {
-	const SizeType idx = SFriend::FindIndexByFunc(*this, Forward<FunctorT>(func));
+	const SizeType idx = SFriend::FindIndexBy(*this, Forward<PredT>(pred));
 	if (idx == KOR_INDEX_NONE) return 0;
 
 	SFriend::RemoveAt(*this, idx);
@@ -1333,7 +1333,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSwap(const ElementType& val) noexcept
 {
-	return SFriend::RemoveSwapByFunc(*this,
+	return SFriend::RemoveSwapBy(*this,
 		[&val](const ElementType& el) noexcept -> bool
 		{
 			return SMemoryOps::IsEqual(&el, &val);
@@ -1344,7 +1344,7 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSwapSingle(const ElementType& val) noexcept
 {
-	const SizeType idx = SFriend::FindIndexByFunc(*this,
+	const SizeType idx = SFriend::FindIndexBy(*this,
 		[&val](const ElementType& el) noexcept -> bool
 		{
 			return SMemoryOps::IsEqual(&el, &val);
@@ -1358,17 +1358,17 @@ KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<Ele
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-template<typename FunctorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSwapByFunc(FunctorT&& func)
+template<typename PredT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSwapBy(PredT&& pred)
 {
-	return SFriend::RemoveSwapByFunc(*this, Forward<FunctorT>(func));
+	return SFriend::RemoveSwapBy(*this, Forward<PredT>(pred));
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-template<typename FunctorT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSwapSingleByFunc(FunctorT&& func)
+template<typename PredT>
+KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::SizeType TArray<ElementT, AllocatorFamilyT>::RemoveSwapSingleBy(PredT&& pred)
 {
-	const SizeType idx = SFriend::FindIndexByFunc(*this, Forward<FunctorT>(func));
+	const SizeType idx = SFriend::FindIndexBy(*this, Forward<PredT>(pred));
 	if (idx == KOR_INDEX_NONE) return 0;
 
 	SFriend::RemoveAtSwap(*this, idx);

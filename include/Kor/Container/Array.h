@@ -26,8 +26,6 @@ namespace Detail::Array { template<typename T> struct TFriend; }
 // [ TArray ]
 // A dynamically-sized, heap-allocated array container.
 // * ElementType must be non-void and pure (non-reference, non-cv)
-// * AllocatorFamilyType must expose a signed SizeType
-// * Ownership is exclusive; copying performs a deep copy, moving transfers ownership
 //
 // Example:
 //   TArray<int32> values = { 1, 2, 3 };
@@ -48,7 +46,6 @@ public:
 	using AllocatorFamilyTraits = TAllocatorFamilyTraits<AllocatorFamilyType>;
 
 	using AllocatorType = AllocatorFamilyTraits::template TypedAllocator<ElementType>::Type;
-	using AllocatorTraits = TAllocatorTraits<AllocatorType>;
 
 	using SizeType = typename AllocatorFamilyTraits::SizeType;
 
@@ -321,33 +318,30 @@ public:
 
 	// Remove
 	// Removes elements matching a value or predicate.
-	// * Remove* preserves order; RemoveSwap* uses swap-with-last and does not,
-	//   but is faster for large arrays.
-	// * *Single variants stop after the first match; the base variants remove all.
-	// * *ByFunc variants take a predicate instead of a value and are not
-	//   noexcept, since the functor may throw.
-	// * All variants return the number removed, and are no-ops on an empty
-	//   or non-matching array.
+	// * Remove* preserves order; RemoveSwap* uses swap-with-last and does not, but is faster for large arrays.
+	// ** Single variants stop after the first match; the base variants remove all.
+	// ** By variants take a predicate instead of a value and are not noexcept, since the pred may throw.
+	// * All variants return the number removed, and are no-ops on an empty or non-matching array.
 	// -------------------------------------------------------------------------
 
 	// Requires operator==. Optionally shrinks capacity afterward.
 	SizeType Remove(const ElementType& val) noexcept;
 	SizeType RemoveSingle(const ElementType& val) noexcept;
 
-	template<typename FunctorT>
-	SizeType RemoveByFunc(FunctorT&& func);
+	template<typename PredT>
+	SizeType RemoveBy(PredT&& pred);
 
-	template<typename FunctorT>
-	SizeType RemoveSingleByFunc(FunctorT&& func);
+	template<typename PredT>
+	SizeType RemoveSingleBy(PredT&& pred);
 
 	SizeType RemoveSwap(const ElementType& val) noexcept;
 	SizeType RemoveSwapSingle(const ElementType& val) noexcept;
 
-	template<typename FunctorT>
-	SizeType RemoveSwapByFunc(FunctorT&& func);
+	template<typename PredT>
+	SizeType RemoveSwapBy(PredT&& pred);
 
-	template<typename FunctorT>
-	SizeType RemoveSwapSingleByFunc(FunctorT&& func);
+	template<typename PredT>
+	SizeType RemoveSwapSingleBy(PredT&& pred);
 
 	// Removes `num` elements starting at `idx`, shifting later elements left.
 	// * Requires 0 <= idx, idx + num <= GetNum().
@@ -409,9 +403,9 @@ public:
 	template<typename KeyType>
 	SizeType FindIndex(const KeyType& key) const noexcept;
 
-	// Matches by predicate; not noexcept, since func may throw.
-	template<typename FunctorT>
-	SizeType FindIndexByFunc(FunctorT&& func) const;
+	// Matches by predicate; not noexcept, since pred may throw.
+	template<typename PredT>
+	SizeType FindIndexBy(PredT&& pred) const;
 
 	// Find Element
 	// Returns a pointer to the first match, or nullptr. Never asserts.
@@ -425,12 +419,12 @@ public:
 	template<typename KeyType>
 	const ElementType* Find(const KeyType& key) const noexcept;
 
-	// Matches by predicate; not noexcept, since func may throw.
-	template<typename FunctorT>
-	ElementType* FindByFunc(FunctorT&& func);
+	// Matches by predicate; not noexcept, since pred may throw.
+	template<typename PredT>
+	ElementType* FindBy(PredT&& pred);
 
-	template<typename FunctorT>
-	const ElementType* FindByFunc(FunctorT&& func) const;
+	template<typename PredT>
+	const ElementType* FindBy(PredT&& pred) const;
 
 	// Contains
 	// True if any element matches. Never asserts; false on an empty array.
@@ -440,9 +434,9 @@ public:
 	template<typename KeyType>
 	bool Contains(const KeyType& key) const noexcept;
 
-	// Matches by predicate; not noexcept, since func may throw.
-	template<typename FunctorT>
-	bool ContainsByFunc(FunctorT&& func) const;
+	// Matches by predicate; not noexcept, since pred may throw.
+	template<typename PredT>
+	bool ContainsBy(PredT&& pred) const;
 
 	// Iterators
 	// -------------------------------------------------------------------------
