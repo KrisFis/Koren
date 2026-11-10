@@ -10,7 +10,7 @@ KOR_INLINE bool TStringView<CharT>::Split(const TStringView& delim, TStringView*
 	const SizeType thisLen = _data.GetNum() - 1;
 	const SizeType delimLen = delim._data.GetNum() - 1;
 
-	const SizeType foundIdx = SOps::template Find<Case, Dir>(_data, delim._data, thisLen, delimLen);
+	const SizeType foundIdx = StringOps::template Find<Case, Dir>(_data, delim._data, thisLen, delimLen);
 
 	if (foundIdx == KOR_INDEX_NONE)
 	{
@@ -31,7 +31,7 @@ KOR_INLINE bool TString<CharT>::Split(const TString& delim, TString* outLeft, TS
 	const SizeType thisLen = _data.GetNum() - 1;
 	const SizeType delimLen = delim._data.GetNum() - 1;
 
-	const SizeType foundIdx = SOps::template Find<Case, Dir>(*_data, *delim._data, thisLen, delimLen);
+	const SizeType foundIdx = StringOps::template Find<Case, Dir>(*_data, *delim._data, thisLen, delimLen);
 
 	if (foundIdx == KOR_INDEX_NONE)
 	{
@@ -91,7 +91,7 @@ KOR_INLINE TArray<TStringView<CharT>> TStringView<CharT>::SplitToArray(const TSt
 
 	while (remaining > 0)
 	{
-		const SizeType foundIdx = SOps::template Find<Case, ESearchDir::Forward>(cursor, delim._data, remaining, delimLen);
+		const SizeType foundIdx = StringOps::template Find<Case, ESearchDir::Forward>(cursor, delim._data, remaining, delimLen);
 
 		if (foundIdx == KOR_INDEX_NONE)
 		{
@@ -127,7 +127,7 @@ KOR_INLINE TArray<TString<CharT>> TString<CharT>::SplitToArray(const TString& de
 
 	while (remaining > 0)
 	{
-		const SizeType foundIdx = SOps::template Find<Case, ESearchDir::Forward>(cursor, *delim._data, remaining, delimLen);
+		const SizeType foundIdx = StringOps::template Find<Case, ESearchDir::Forward>(cursor, *delim._data, remaining, delimLen);
 
 		if (foundIdx == KOR_INDEX_NONE)
 		{

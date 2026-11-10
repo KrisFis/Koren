@@ -36,18 +36,18 @@ namespace Detail::Array { template<typename T> struct TFriend; }
 template<typename ElementT, typename AllocatorFamilyT>
 class TArray
 {
+	static_assert(!TIsVoid<ElementT>::Value && TIsClean<ElementT>::Value,
+		"ElementType must be non-void clean type (no qualifiers)"
+	);
+
+	using AllocatorFamilyTraits = TAllocatorFamilyTraits<AllocatorFamilyT>;
+
 public:
-	static_assert(!TIsVoid<ElementT>::Value, "ElementType must be non-void type");
-	static_assert(TIsClean<ElementT>::Value, "ElementType must be a clean type (no qualifiers)");
-
 	using ElementType = ElementT;
-
 	using AllocatorFamilyType = AllocatorFamilyT;
-	using AllocatorFamilyTraits = TAllocatorFamilyTraits<AllocatorFamilyType>;
-
-	using AllocatorType = AllocatorFamilyTraits::template TypedAllocator<ElementType>::Type;
 
 	using SizeType = typename AllocatorFamilyTraits::SizeType;
+	using AllocatorType = AllocatorFamilyTraits::template TypedAllocator<ElementType>::Type;
 
 	using ILType = std::initializer_list<ElementType>;
 

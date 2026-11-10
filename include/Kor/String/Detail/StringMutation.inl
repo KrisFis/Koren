@@ -7,7 +7,7 @@ template<typename CharT>
 KOR_INLINE void TString<CharT>::Add(CharType other) noexcept
 {
 	_data.Pop(); // remove null terminator
-	_data.Append({other, Constant::Null});
+	_data.Append({other, CharConstant::Null});
 }
 
 template<typename CharT>
@@ -27,7 +27,7 @@ KOR_INLINE void TString<CharT>::Append(TString&& other) noexcept
 template<typename CharT>
 KOR_FORCEINLINE void TString<CharT>::Append(const CharType* text) noexcept
 {
-	Append(text, SOps::Length(text));
+	Append(text, StringOps::Length(text));
 }
 
 template<typename CharT>
@@ -35,7 +35,7 @@ KOR_INLINE void TString<CharT>::Append(const CharType* text, SizeType len) noexc
 {
 	_data.Pop(); // remove null terminator
 	_data.Append(text, len);
-	_data.Add(Constant::Null);
+	_data.Add(CharConstant::Null);
 }
 
 template<typename CharT>
@@ -50,32 +50,32 @@ KOR_INLINE void TString<CharT>::RemoveAt(SizeType idx, SizeType count) noexcept
 {
 	KOR_ASSERT(idx >= 0 && idx + count <= _data.GetNum() - 1);
 	_data.RemoveAt(idx, count);
-	_data[_data.GetNum() - 1] = Constant::Null;
+	_data[_data.GetNum() - 1] = CharConstant::Null;
 }
 
 template<typename CharT>
 KOR_FORCEINLINE void TString<CharT>::ToUpper() noexcept
 {
-	return SOps::ToUpper(*_data, _data.GetNum() - 1);
+	return StringOps::ToUpper(*_data, _data.GetNum() - 1);
 }
 
 template<typename CharT>
 KOR_FORCEINLINE void TString<CharT>::ToLower() noexcept
 {
-	return SOps::ToLower(*_data, _data.GetNum() - 1);
+	return StringOps::ToLower(*_data, _data.GetNum() - 1);
 }
 
 template<typename CharT>
 KOR_FORCEINLINE void TString<CharT>::TrimStart() noexcept
 {
-	const int32 count = SOps::template CountWhitespaces<ESearchDir::Forward>(*_data, _data.GetNum() - 1);
+	const int32 count = StringOps::template CountWhitespaces<ESearchDir::Forward>(*_data, _data.GetNum() - 1);
 	return ChopLeft(count);
 }
 
 template<typename CharT>
 KOR_FORCEINLINE void TString<CharT>::TrimEnd() noexcept
 {
-	const int32 count = SOps::template CountWhitespaces<ESearchDir::Backward>(*_data, _data.GetNum() - 1);
+	const int32 count = StringOps::template CountWhitespaces<ESearchDir::Backward>(*_data, _data.GetNum() - 1);
 	return ChopRight(count);
 }
 
@@ -93,7 +93,7 @@ KOR_INLINE void TString<CharT>::ChopRight(SizeType idx) noexcept
 	KOR_ASSERT(idx >= 0 && idx < _data.GetNum() - 1);
 	const SizeType count = _data.GetNum() - 1 - idx;
 	_data.RemoveAt(idx, count);
-	_data[_data.GetNum() - 1] = Constant::Null;
+	_data[_data.GetNum() - 1] = CharConstant::Null;
 }
 
 template<typename CharT>
@@ -110,7 +110,7 @@ KOR_INLINE void TString<CharT>::ChopRange(SizeType firstIdx, SizeType secondIdx)
 {
 	KOR_ASSERT(firstIdx >= 0 && secondIdx >= firstIdx && secondIdx < _data.GetNum() - 1);
 	_data.RemoveAt(firstIdx, secondIdx - firstIdx + 1);
-	_data[_data.GetNum() - 1] = Constant::Null;
+	_data[_data.GetNum() - 1] = CharConstant::Null;
 }
 
 template<typename CharT>
@@ -119,14 +119,14 @@ KOR_INLINE void TString<CharT>::Insert(SizeType idx, const TString& other) noexc
 	KOR_ASSERT(idx >= 0 && idx < _data.GetNum() - 1);
 	// Insert without the other's null terminator
 	_data.Insert(idx, *other._data, other._data.GetNum() - 1);
-	_data[_data.GetNum() - 1] = Constant::Null;
+	_data[_data.GetNum() - 1] = CharConstant::Null;
 }
 
 template<typename CharT>
 template<ESearchCase Case>
 KOR_FORCEINLINE void TString<CharT>::Replace(const TString& from, const TString& to) noexcept
 {
-	SOps::template Replace<Case>(*_data, *from._data, *to._data, _data.GetNum() - 1);
+	StringOps::template Replace<Case>(*_data, *from._data, *to._data, _data.GetNum() - 1);
 }
 
 template<typename CharT>
@@ -140,7 +140,7 @@ template<typename CharT>
 template<ESearchCase Case>
 KOR_FORCEINLINE void TString<CharT>::Replace(CharType from, CharType to) noexcept
 {
-	SOps::template Replace<Case>(*_data, from, to, _data.GetNum() - 1);
+	StringOps::template Replace<Case>(*_data, from, to, _data.GetNum() - 1);
 }
 
 template<typename CharT>

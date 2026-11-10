@@ -14,21 +14,21 @@ KOR_INLINE void TString<CharT>::Fill(SizeType length, CharType val) noexcept
 {
 	_data.ResizeUnitialized(length + 1);
 	SMemoryOps::FillConstruct(*_data, val, length);
-	_data[length] = Constant::Null;
+	_data[length] = CharConstant::Null;
 }
 
 template<typename CharT>
 KOR_INLINE void TString<CharT>::Reset() noexcept
 {
 	_data.Reset();
-	_data.Add(Constant::Null);
+	_data.Add(CharConstant::Null);
 }
 
 template<typename CharT>
 KOR_INLINE void TString<CharT>::Empty() noexcept
 {
 	_data.Empty();
-	_data.Add(Constant::Null);
+	_data.Add(CharConstant::Null);
 }
 
 template<typename CharT>

@@ -144,7 +144,6 @@ struct TCharOps
 
 	using CharType = T;
 	using UCharType = typename TMakeUnsigned<CharType>::Type;
-	using CharConstant = TCharConstant<CharType>;
 
 	// Constants
 	// -------------------------------------------------------------------------

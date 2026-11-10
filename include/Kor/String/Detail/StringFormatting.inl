@@ -45,14 +45,14 @@ KOR_INLINE TString<CharT> TString<CharT>::Format(const FmtT& fmt, const VarTypes
 	TString result;
 	result._data.Resize(InlineBufferSize);
 
-	int32 written = SOps::Format(result._data.GetData(), format, result._data.GetNum(), args...);
+	int32 written = StringOps::Format(result._data.GetData(), format, result._data.GetNum(), args...);
 	if (written < 0) return TString::GetEmpty();
 
 	if (written >= result._data.GetNum())
 	{
 		// Buffer was too small — resize to exact size and reformat
 		result._data.Resize(written + 1);
-		KOR_ASSERT(SOps::Format(result._data.GetData(), format, result._data.GetNum(), args...) == written);
+		KOR_ASSERT(StringOps::Format(result._data.GetData(), format, result._data.GetNum(), args...) == written);
 	}
 	else
 	{
@@ -61,7 +61,7 @@ KOR_INLINE TString<CharT> TString<CharT>::Format(const FmtT& fmt, const VarTypes
 	}
 
 	// MSVC wide does not null terminate on truncation, ensure null terminator explicitly
-	result._data[written] = Constant::Null;
+	result._data[written] = CharConstant::Null;
 	return result;
 }
 

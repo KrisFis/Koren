@@ -114,42 +114,42 @@ KOR_NAMESPACE_BEGIN
 typedef KOR_PLATFORM_STRUCT(Types) SPlatformTypes;
 
 // An 8-bit unsigned integer.
-typedef SPlatformTypes::Int8	int8;
+using int8 = SPlatformTypes::Int8;
 // An 8-bit signed integer.
-typedef SPlatformTypes::Uint8	uint8;
+using uint8 = SPlatformTypes::Uint8;
 
 // A 16-bit unsigned integer.
-typedef SPlatformTypes::Uint16	uint16;
+using uint16 = SPlatformTypes::Uint16;
 // A 16-bit signed integer.
-typedef SPlatformTypes::Int16	int16;
+using int16 = SPlatformTypes::Int16;
 
 // A 32-bit unsigned integer.
-typedef SPlatformTypes::Uint32	uint32;
+using uint32 = SPlatformTypes::Uint32;
 // A 32-bit signed integer.
-typedef SPlatformTypes::Int32	int32;
+using int32 = SPlatformTypes::Int32;
 
 // A 64-bit unsigned integer.
-typedef SPlatformTypes::Uint64	uint64;
+using uint64 = SPlatformTypes::Uint64;
 // A 64-bit signed integer.
-typedef SPlatformTypes::Int64	int64;
+using int64 = SPlatformTypes::Int64;
 
 // Pointer type
-typedef SPlatformTypes::IntPtr intptr;
+using intptr = SPlatformTypes::IntPtr;
 
 // Unsigned pointer type
-typedef SPlatformTypes::UIntPtr uintptr;
+using uintptr = SPlatformTypes::UIntPtr;
 
 // An ANSI character
-typedef SPlatformTypes::Achar	achar;
+using achar = SPlatformTypes::Achar;
 // A wide character. Platform specific width (SEE KOR_WCHAR_BYTES)
-typedef SPlatformTypes::Wchar	wchar;
+using wchar = SPlatformTypes::Wchar;
 
 // An 8-bit character containing a UTF8 (variable-width) code unit.
-typedef SPlatformTypes::Char8	char8;
+using char8 = SPlatformTypes::Char8;
 // A 16-bit character containing a UTF16 (variable-width) code unit.
-typedef SPlatformTypes::Char16	char16;
+using char16 = SPlatformTypes::Char16;
 // A 32-bit character containing a UTF32 (fixed-width) code unit.
-typedef SPlatformTypes::Char32	char32;
+using char32 = SPlatformTypes::Char32;
 
 // Either achar or wchar
 #if KOR_USE_UNICODE

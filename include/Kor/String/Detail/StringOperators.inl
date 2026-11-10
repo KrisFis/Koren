@@ -86,9 +86,9 @@ KOR_INLINE TString<CharT> TString<CharT>::operator+(const TString& other) const 
 
 	TString result(thisLen + otherLen + 1, Init::NoInit);
 
-	SOps::Copy(*result._data, *_data, thisLen);
-	SOps::Copy(*result._data + thisLen, *other._data, otherLen);
-	result._data[thisLen + otherLen] = Constant::Null;
+	StringOps::Copy(*result._data, *_data, thisLen);
+	StringOps::Copy(*result._data + thisLen, *other._data, otherLen);
+	result._data[thisLen + otherLen] = CharConstant::Null;
 
 	return result;
 }
@@ -106,8 +106,8 @@ KOR_INLINE TString<CharT>& TString<CharT>::operator+=(const TString& other) noex
 	const int32 otherLen = other._data.GetNum() - 1;
 
 	_data.SetNumUninitialized(thisLen + otherLen + 1);
-	SOps::Copy(*_data + thisLen, *other._data, otherLen);
-	_data[thisLen + otherLen] = Constant::Null;
+	StringOps::Copy(*_data + thisLen, *other._data, otherLen);
+	_data[thisLen + otherLen] = CharConstant::Null;
 
 	return *this;
 }
@@ -126,11 +126,11 @@ KOR_INLINE TString<CharT> TString<CharT>::operator/(const TString& other) const 
 
 	TString result(thisLen + 1 + otherLen + 1, Init::NoInit);
 
-	SOps::Copy(*result._data, *_data, thisLen);
-	result._data[thisLen] = Constant::Slash;
+	StringOps::Copy(*result._data, *_data, thisLen);
+	result._data[thisLen] = CharConstant::Slash;
 
-	SOps::Copy(* result._data + thisLen + 1, *other._data, otherLen);
-	result._data[thisLen + 1 + otherLen] = Constant::Null;
+	StringOps::Copy(* result._data + thisLen + 1, *other._data, otherLen);
+	result._data[thisLen + 1 + otherLen] = CharConstant::Null;
 
 	return result;
 }
@@ -143,9 +143,9 @@ KOR_INLINE TString<CharT>& TString<CharT>::operator/=(const TString& other) noex
 
 	_data.SetNum(thisLen + 1 + otherLen + 1);
 
-	_data[thisLen] = Constant::Slash;
-	SOps::Copy(*_data + thisLen + 1, *other._data, otherLen);
-	_data[thisLen + 1 + otherLen] = Constant::Null;
+	_data[thisLen] = CharConstant::Slash;
+	StringOps::Copy(*_data + thisLen + 1, *other._data, otherLen);
+	_data[thisLen + 1 + otherLen] = CharConstant::Null;
 
 	return *this;
 }

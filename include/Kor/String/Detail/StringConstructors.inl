@@ -5,7 +5,7 @@
 
 template<typename CharT>
 KOR_FORCEINLINE constexpr TStringView<CharT>::TStringView() noexcept
-	: _data(&Constant::Null)
+	: _data(&CharConstant::Null)
 {}
 
 template<typename CharT>
@@ -15,7 +15,7 @@ KOR_FORCEINLINE constexpr TStringView<CharT>::TStringView(Init::SNoInit) noexcep
 
 template<typename CharT>
 KOR_FORCEINLINE constexpr TString<CharT>::TString() noexcept
-	: _data(&Constant::Null, 1)
+	: _data(&CharConstant::Null, 1)
 {}
 
 template<typename CharT>
@@ -38,11 +38,11 @@ KOR_INLINE TStringView<CharT>::TStringView(const CharType* text) noexcept
 {
 	if (text)
 	{
-		_data = DataType(text, SOps::Length(text) + 1);
+		_data = DataType(text, StringOps::Length(text) + 1);
 	}
 	else
 	{
-		_data = DataType(&Constant::Null, 1);
+		_data = DataType(&CharConstant::Null, 1);
 	}
 }
 
@@ -51,11 +51,11 @@ KOR_INLINE TString<CharT>::TString(const CharType* text) noexcept
 {
 	if (text)
 	{
-		_data = DataType(text, SOps::Length(text) + 1);
+		_data = DataType(text, StringOps::Length(text) + 1);
 	}
 	else
 	{
-		_data = DataType(&Constant::Null, 1);
+		_data = DataType(&CharConstant::Null, 1);
 	}
 }
 
@@ -68,7 +68,7 @@ KOR_INLINE TStringView<CharT>::TStringView(const CharType* text, SizeType length
 	}
 	else
 	{
-		_data = DataType(&Constant::Null, 1);
+		_data = DataType(&CharConstant::Null, 1);
 	}
 }
 
@@ -78,11 +78,11 @@ KOR_INLINE TString<CharT>::TString(const CharType* text, SizeType length) noexce
 	if (text && length > 0)
 	{
 		_data = DataType(text, length + 1);
-		_data[length] = Constant::Null;
+		_data[length] = CharConstant::Null;
 	}
 	else
 	{
-		_data = DataType(&Constant::Null, 1);
+		_data = DataType(&CharConstant::Null, 1);
 	}
 }
 
@@ -104,12 +104,12 @@ KOR_INLINE TString<CharT>::TString(SizeType length, CharType val) noexcept
 	if (length > 0)
 	{
 		_data = DataType(length + 1);
-		SOps::Fill(_data.GetData(), val, length);
-		_data[length] = Constant::Null;
+		StringOps::Fill(_data.GetData(), val, length);
+		_data[length] = CharConstant::Null;
 	}
 	else
 	{
-		_data = DataType(&Constant::Null, 1);
+		_data = DataType(&CharConstant::Null, 1);
 	}
 }
 

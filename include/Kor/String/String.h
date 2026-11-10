@@ -27,12 +27,9 @@ class TStringView
 {
 	static_assert(TIsCharacter<CharT>::Value, "CharType must be character type");
 
-	using Constant = TCharConstant<CharT>;
-	using COps = TCharOps<CharT>;
-	using SOps = TStringOps<CharT>;
-
-	template<typename OtherCharT>
-	friend class TStringView;
+	using CharConstant = TCharConstant<CharT>;
+	using CharOps = TCharOps<CharT>;
+	using StringOps = TStringOps<CharT>;
 
 public:
 	using CharType = CharT;
@@ -206,7 +203,7 @@ public:
 	IteratorType end() const noexcept;
 
 private:
-	DataType _data = {};
+	DataType _data;
 };
 
 // [ TString ]
@@ -224,12 +221,9 @@ class TString
 {
 	static_assert(TIsCharacter<CharT>::Value, "CharType must be character type");
 
-	using Constant = TCharConstant<CharT>;
-	using COps = TCharOps<CharT>;
-	using SOps = TStringOps<CharT>;
-
-	template<typename OtherCharT>
-	friend class TString;
+	using CharConstant = TCharConstant<CharT>;
+	using CharOps = TCharOps<CharT>;
+	using StringOps = TStringOps<CharT>;
 
 public:
 	using CharType = CharT;
@@ -264,7 +258,7 @@ public:
 	template<TSize N> TString(const CharType (&text)[N]) noexcept;
 
 	// String of `length` characters, all set to `val`.
-	explicit TString(SizeType length, CharType val = Constant::Null) noexcept;
+	explicit TString(SizeType length, CharType val = CharConstant::Null) noexcept;
 
 	// Constants
 	// -------------------------------------------------------------------------
@@ -541,7 +535,7 @@ public:
 	TString Copy() const noexcept;
 
 	// Resets the string to `length` characters all set to `val`.
-	void Fill(SizeType length, CharType val = Constant::Null) noexcept;
+	void Fill(SizeType length, CharType val = CharConstant::Null) noexcept;
 
 	// Clears the string and releases memory.
 	void Reset() noexcept;
@@ -570,7 +564,13 @@ public:
 	ConstIteratorType end() const noexcept;
 
 private:
-	DataType _data = {};
+	DataType _data;
+
+	// Friend
+	// -------------------------------------------------------------------------
+
+	template<typename OtherCharT> friend class TString;
+	template<typename OtherCharT> friend class TStringView;
 };
 
 // [ Is TString ]
