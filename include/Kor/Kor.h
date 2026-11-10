@@ -21,6 +21,7 @@
 // Container
 #include "Kor/Container/Array.h"
 #include "Kor/Container/ArrayView.h"
+#include "Kor/Container/BitArray.h"
 #include "Kor/Container/ContainerTraits.h"
 #include "Kor/Container/Queue.h"
 

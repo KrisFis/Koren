@@ -14,6 +14,7 @@ KOR_NAMESPACE_BEGIN
 
 template<typename ElementT, typename SizeT = int32> class TArrayView;
 template<typename ElementT, typename AllocatorFamilyT = CAllocator> class TArray;
+template<typename WordT = uint32, typename AllocatorFamilyT = CAllocator> class TBitArray;
 template<typename ElementT, typename AllocatorT = TQueueAllocator<ElementT>> class TQueue;
 
 KOR_NAMESPACE_END
