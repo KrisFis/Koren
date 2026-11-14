@@ -7,6 +7,7 @@
 
 #include "Kor/Container/ArrayView.h"
 #include "Kor/Container/ContainerTraits.h"
+#include "Kor/Container/Iterator.h"
 
 #include "Kor/Math/MathOps.h"
 
@@ -21,7 +22,7 @@
 KOR_NAMESPACE_BEGIN
 
 // Forward declare for private array friend
-namespace Detail::Array { template<typename T> struct TFriend; }
+namespace Detail::Array { template<typename ArrayT> struct TFriend; }
 
 // [ TArray ]
 // A dynamically-sized, heap-allocated array container.
@@ -51,8 +52,8 @@ public:
 
 	using ILType = std::initializer_list<ElementType>;
 
-	using IteratorType = ElementType*;
-	using ConstIteratorType = const ElementType*;
+	using IteratorType = TIndexedContainerIterator<TArray>;
+	using ConstIteratorType = TIndexedContainerIterator<const TArray>;
 
 	// Constructors
 	// -------------------------------------------------------------------------

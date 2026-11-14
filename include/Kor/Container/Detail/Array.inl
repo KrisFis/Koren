@@ -1451,25 +1451,25 @@ KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::SwapRange(SizeType firstIdx,
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::IteratorType TArray<ElementT, AllocatorFamilyT>::begin() noexcept
 {
-	return _data;
+	return IteratorType(_data);
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::ConstIteratorType TArray<ElementT, AllocatorFamilyT>::begin() const noexcept
 {
-	return _data;
+	return ConstIteratorType(_data);
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::IteratorType TArray<ElementT, AllocatorFamilyT>::end() noexcept
 {
-	return _data + _num;
+	return IteratorType(_data, _num);
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
 KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::ConstIteratorType TArray<ElementT, AllocatorFamilyT>::end() const noexcept
 {
-	return _data + _num;
+	return ConstIteratorType(_data, _num);
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
