@@ -14,14 +14,13 @@ namespace Iterators::Container
 	// ContainerT must:
 	// * Expose types: ElementType and SizeType
 	// * Expose operators: ElementType& operator[](SizeType)
-	// * Expose methods: SizeType GetNum(), bool IsValidIndex(SizeType)
+	// * Expose methods: bool IsValidIndex(SizeType)
 	//
 	// Examples:
 	//
 	// for (auto it = Iterators::Container::MakeIndexed(container); it; ++it) { *it = ...; }
-	// for (auto it = Iterators::Container::MakeIndexedReversed(container); it; ++it) { *it = ...; }
 	//
-	template<typename ContainerT, bool Reversed = false>
+	template<typename ContainerT>
 	class TIndexed
 	{
 		static constexpr bool Const = TIsConst<ContainerT>::Value;
@@ -29,18 +28,18 @@ namespace Iterators::Container
 
 		static_assert(!TIsVoid<typename ContainerTraits::ElementType>::Value, "ContainerT must define valid ElementType");
 		static_assert(!TIsVoid<typename ContainerTraits::SizeType>::Value, "ContainerT must define valid SizeType");
-		// Check GetNum(SizeType)
 		// Check ElementType& operator[](SizeType)
 		// Check IsValidIndex(SizeType)
 
 	public:
+		using ContainerType = typename TRemoveConst<ContainerT>::Type;
 		using ElementType = typename ContainerTraits::ElementType;
 		using SizeType = typename ContainerTraits::SizeType;
 		using AccessType = TChoose<Const, const ElementType, ElementType>;
 
 		KOR_FORCEINLINE explicit TIndexed(ContainerT& container)
 			: _container(container)
-			, _idx(Reversed ? container.GetNum() - 1 : 0)
+			, _idx(0)
 		{}
 
 		KOR_FORCEINLINE explicit TIndexed(ContainerT& container, SizeType startIdx)
@@ -51,14 +50,14 @@ namespace Iterators::Container
 		KOR_NODISCARD KOR_FORCEINLINE bool operator==(const TIndexed& other) const	{ return (&_container == &other._container) && (_idx == other._idx); }
 		KOR_NODISCARD KOR_FORCEINLINE bool operator!=(const TIndexed& other) const { return !operator==(other); }
 
-		KOR_FORCEINLINE TIndexed& operator++() { Increment(); return *this;	}
-		KOR_NODISCARD KOR_FORCEINLINE TIndexed operator++(int) { TIndexed tmp(*this); Increment(); return tmp; }
-		KOR_FORCEINLINE TIndexed& operator+=(SizeType offset) { Increment(offset); return *this; }
+		KOR_FORCEINLINE TIndexed& operator++() { ++_idx; return *this;	}
+		KOR_NODISCARD KOR_FORCEINLINE TIndexed operator++(int) { TIndexed tmp(*this); ++_idx; return tmp; }
+		KOR_FORCEINLINE TIndexed& operator+=(SizeType offset) { _idx += offset; return *this; }
 		KOR_NODISCARD KOR_FORCEINLINE TIndexed operator+(SizeType offset) const { TIndexed tmp(*this); return (tmp += offset); }
 
-		KOR_FORCEINLINE TIndexed& operator--() { Decrement(); return *this; }
-		KOR_NODISCARD KOR_FORCEINLINE TIndexed operator--(int) { TIndexed tmp(*this); Decrement(); return tmp;	}
-		KOR_FORCEINLINE TIndexed& operator-=(SizeType offset) { Decrement(offset); return *this; }
+		KOR_FORCEINLINE TIndexed& operator--() { --_idx; return *this; }
+		KOR_NODISCARD KOR_FORCEINLINE TIndexed operator--(int) { TIndexed tmp(*this); --_idx; return tmp; }
+		KOR_FORCEINLINE TIndexed& operator-=(SizeType offset) { _idx -= offset; return *this; }
 		KOR_NODISCARD KOR_FORCEINLINE TIndexed operator-(SizeType offset) const { TIndexed tmp(*this); return (tmp -= offset); }
 
 		KOR_NODISCARD KOR_FORCEINLINE AccessType& operator*() const { return _container[_idx]; }
@@ -69,22 +68,9 @@ namespace Iterators::Container
 		KOR_NODISCARD KOR_FORCEINLINE SizeType GetIndex() const { return _idx; }
 		KOR_FORCEINLINE void SetIndex(SizeType idx) { _idx = idx; }
 
-		KOR_FORCEINLINE void Reset()
-		{
-			if constexpr (Reversed)
-			{
-				_idx = _container.GetNum() - 1;
-			}
-			else
-			{
-				_idx = 0;
-			}
-		}
+		KOR_FORCEINLINE ContainerT& GetContainer() const { return _container; }
 
 	private:
-		KOR_FORCEINLINE void Increment(SizeType offset = 1) { if constexpr (Reversed) { _idx -= offset; } else { _idx += offset; } }
-		KOR_FORCEINLINE void Decrement(SizeType offset = 1) { if constexpr (Reversed) { _idx += offset; } else { _idx -= offset; } }
-
 		ContainerT& _container;
 		SizeType _idx;
 	};
@@ -96,9 +82,10 @@ namespace Iterators::Container
 	}
 
 	template<typename ContainerT>
-	KOR_NODISCARD KOR_FORCEINLINE static TIndexed<ContainerT> MakeIndexedReversed(ContainerT& container)
+	KOR_NODISCARD KOR_FORCEINLINE static TIndexed<ContainerT> MakeIndexed(ContainerT& container, TSize startIdx)
 	{
-		return TIndexed<ContainerT, true>(container);
+		using ItT = TIndexed<ContainerT>;
+		return TIndexed<ContainerT>(container, (typename ItT::SizeType)startIdx);
 	}
 }
 
