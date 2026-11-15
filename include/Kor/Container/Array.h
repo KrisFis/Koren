@@ -7,7 +7,6 @@
 
 #include "Kor/Container/ArrayView.h"
 #include "Kor/Container/ContainerTraits.h"
-#include "Kor/Container/Iterator.h"
 
 #include "Kor/Math/MathOps.h"
 
@@ -33,6 +32,7 @@ namespace Detail::Array { template<typename ArrayT> struct TFriend; }
 //   values.Add(4);
 //
 // TODO: Support generic containers via constructor/comparison operators
+// NOTE: Might be worth to include "extract_if/drain" pattern
 //
 template<typename ElementT, typename AllocatorFamilyT>
 class TArray
@@ -51,9 +51,6 @@ public:
 	using AllocatorType = AllocatorFamilyTraits::template TypedAllocator<ElementType>::Type;
 
 	using ILType = std::initializer_list<ElementType>;
-
-	using IteratorType = TIndexedContainerIterator<TArray>;
-	using ConstIteratorType = TIndexedContainerIterator<const TArray>;
 
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -442,10 +439,10 @@ public:
 	// Iterators
 	// -------------------------------------------------------------------------
 
-	IteratorType begin() noexcept;
-	ConstIteratorType begin() const noexcept;
-	IteratorType end() noexcept;
-	ConstIteratorType end() const noexcept;
+	ElementType* begin() noexcept;
+	const ElementType* begin() const noexcept;
+	ElementType* end() noexcept;
+	const ElementType* end() const noexcept;
 
 private:
 	// Allocator instance for _data

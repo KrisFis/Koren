@@ -196,13 +196,13 @@ KOR_FORCEINLINE constexpr bool TArrayView<ElementT, SizeT>::ContainsBy(PredT&& p
 }
 
 template<typename ElementT, typename SizeT>
-KOR_FORCEINLINE constexpr typename TArrayView<ElementT, SizeT>::IteratorType TArrayView<ElementT, SizeT>::begin() noexcept
+KOR_FORCEINLINE constexpr ElementT* TArrayView<ElementT, SizeT>::begin() noexcept
 {
 	return _data;
 }
 
 template<typename ElementT, typename SizeT>
-KOR_FORCEINLINE constexpr typename TArrayView<ElementT, SizeT>::IteratorType TArrayView<ElementT, SizeT>::end() noexcept
+KOR_FORCEINLINE constexpr ElementT* TArrayView<ElementT, SizeT>::end() noexcept
 {
 	return _data + _num;
 }

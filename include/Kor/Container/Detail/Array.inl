@@ -1449,27 +1449,27 @@ KOR_INLINE void TArray<ElementT, AllocatorFamilyT>::SwapRange(SizeType firstIdx,
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::IteratorType TArray<ElementT, AllocatorFamilyT>::begin() noexcept
+KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorFamilyT>::begin() noexcept
 {
-	return IteratorType(_data);
+	return _data;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::ConstIteratorType TArray<ElementT, AllocatorFamilyT>::begin() const noexcept
+KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::begin() const noexcept
 {
-	return ConstIteratorType(_data);
+	return _data;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::IteratorType TArray<ElementT, AllocatorFamilyT>::end() noexcept
+KOR_FORCEINLINE ElementT* TArray<ElementT, AllocatorFamilyT>::end() noexcept
 {
-	return IteratorType(_data, _num);
+	return _data + _num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>
-KOR_FORCEINLINE typename TArray<ElementT, AllocatorFamilyT>::ConstIteratorType TArray<ElementT, AllocatorFamilyT>::end() const noexcept
+KOR_FORCEINLINE const ElementT* TArray<ElementT, AllocatorFamilyT>::end() const noexcept
 {
-	return ConstIteratorType(_data, _num);
+	return _data + _num;
 }
 
 template<typename ElementT, typename AllocatorFamilyT>

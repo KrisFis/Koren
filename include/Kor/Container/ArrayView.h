@@ -44,7 +44,6 @@ public:
 	using SizeType = SizeT;
 
 	using ILType = std::initializer_list<typename TRemoveConst<ElementType>::Type>;
-	using IteratorType = ElementType*;
 
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -160,8 +159,8 @@ public:
 	// Iterators
 	// -------------------------------------------------------------------------
 
-	constexpr IteratorType begin() noexcept;
-	constexpr IteratorType end() noexcept;
+	constexpr ElementType* begin() noexcept;
+	constexpr ElementType* end() noexcept;
 
 private:
 	// Non-owned view data
