@@ -64,6 +64,9 @@ private:
 	WordType _mask;
 };
 
+// Make Bit Reference
+// Creates a mutable bit-reference proxy for the bit selected by `mask` in `data`.
+// * Returned proxy can read and modify the masked bit of the referenced word.
 template<typename WordT>
 KOR_NODISCARD KOR_FORCEINLINE static constexpr auto MakeBitReference(WordT& data, WordT mask) noexcept
 	-> TBitReference<WordT>
@@ -71,6 +74,9 @@ KOR_NODISCARD KOR_FORCEINLINE static constexpr auto MakeBitReference(WordT& data
 	return TBitReference<WordT>(data, mask);
 }
 
+// Make Const Bit Reference
+// Creates a read-only bit-reference proxy for the bit selected by `mask` in `data`.
+// * Returned proxy can read the masked bit without modifying the referenced word.
 template<typename WordT>
 KOR_NODISCARD KOR_FORCEINLINE static constexpr auto MakeBitReference(const WordT& data, WordT mask) noexcept
 	-> TConstBitReference<WordT>
