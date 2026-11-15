@@ -239,7 +239,7 @@ private:
 #include "Kor/Container/Detail/BitArray.inl"
 
 // Convenience type for default bit array
-using CBitArray = TBitArray<>;
+using SBitArray = TBitArray<>;
 
 // [ Is TBitArray ]
 // Checks if type is TBitArray type
