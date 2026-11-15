@@ -40,6 +40,9 @@ template<typename T, uint32 Alignment> struct TTypedBytes;
 template<typename AllocatorT, typename ElementT> class TTypedAllocator;
 template<typename ElementT> class TQueueAllocator;
 
+template<typename WordT> class TBitReference;
+template<typename WordT> class TConstBitReference;
+
 template<typename T> class TSharedClass;
 template<typename T> class TSharedPtr;
 template<typename T> class TWeakPtr;

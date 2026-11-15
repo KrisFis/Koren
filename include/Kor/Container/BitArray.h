@@ -11,6 +11,7 @@
 #include "Kor/Memory/Allocator.h"
 #include "Kor/Memory/AllocatorOps.h"
 #include "Kor/Memory/AllocatorTraits.h"
+#include "Kor/Memory/BitReference.h"
 #include "Kor/Memory/MemoryOps.h"
 
 #include "Kor/Utility/Swap.h"
@@ -20,59 +21,15 @@ KOR_NAMESPACE_BEGIN
 // Forward declare for private bit array friend
 namespace Detail::BitArray { template<typename T> struct TFriend; }
 
-template<typename WordT>
-struct TBitReference
-{
-	static_assert(TIsInteger<WordT>::Value && TIsUnsigned<WordT>::Value,
-		"WordT must be an unsigned integer type"
-	);
-
-	using WordType = WordT;
-
-	KOR_FORCEINLINE explicit constexpr TBitReference(WordType& data, WordType mask) noexcept : _data(data), _mask(mask) {}
-
-	KOR_FORCEINLINE constexpr operator bool() const noexcept { return Get(); }
-	KOR_FORCEINLINE constexpr void operator=(bool value) noexcept { return Set(value); }
-	KOR_FORCEINLINE constexpr void operator|=(bool value) const noexcept { if (value) { _data |= _mask; } }
-	KOR_FORCEINLINE constexpr void operator&=(bool value) const noexcept { if (!value) { _data &= ~_mask; } }
-
-	KOR_FORCEINLINE constexpr bool Get() const noexcept { return (_data & _mask) != 0; }
-	KOR_FORCEINLINE constexpr void Set(bool value) noexcept { if (value) { _data |= _mask; } else { _data &= ~_mask; } }
-
-private:
-	WordType& _data;
-	WordType _mask;
-};
-
-template<typename WordT>
-struct TConstBitReference
-{
-	static_assert(TIsInteger<WordT>::Value && TIsUnsigned<WordT>::Value,
-		"WordT must be an unsigned integer type"
-	);
-
-	using WordType = WordT;
-
-	KOR_FORCEINLINE explicit constexpr TConstBitReference(const WordType& data, WordType mask) noexcept : _data(data), _mask(mask) {}
-
-	KOR_FORCEINLINE constexpr operator bool() const noexcept { return Get(); }
-	KOR_FORCEINLINE constexpr bool Get() const noexcept { return (_data & _mask) != 0; }
-
-private:
-	const WordType& _data;
-	WordType _mask;
-};
-
 // [ TBitArray ]
 // A dynamically-sized, heap-allocated packed bit container.
-// * Stores boolean values as bits packed into uint32 blocks
+// * Stores boolean values as bits packed into WordType blocks
 // * WordType must be an unsigned integer type
 //
 // Example:
-//   TBitArray<> flags;
+//   SBitArray flags;
 //   flags.Add(true);
 //   flags.Add(false);
-//   flags.SetBit(1, true);
 //
 template<typename WordT, typename AllocatorFamilyT>
 class TBitArray
