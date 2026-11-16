@@ -54,7 +54,15 @@ namespace Detail
 		// -------------------------------------------------------------------------
 
 		// Creates an empty storage object with a default-constructed allocator.
-		KOR_FORCEINLINE constexpr TArrayStorage() noexcept : Allocator(), Data(nullptr), Num(), ReservedNum(0) {}
+		KOR_FORCEINLINE constexpr TArrayStorage(
+			ElementType* data = nullptr,
+			SizeType num = 0,
+			SizeType reservedNum = 0) noexcept
+			: Allocator()
+			, Data(nullptr)
+			, Num()
+			, ReservedNum(0)
+		{}
 
 		// Creates an empty storage object with a supplied allocator.
 		KOR_FORCEINLINE constexpr TArrayStorage(
@@ -383,7 +391,8 @@ namespace Detail
 		// * index of the first matching element;
 		// * KOR_INDEX_NONE when no element matches.
 		template<typename PredT>
-		SizeType FindIndexBy(PredT&& pred) KOR_NOEXCEPT_EXPR(pred(DeclVal<const ElementType&>()))
+		SizeType FindIndexBy(PredT&& pred) const
+			KOR_NOEXCEPT_EXPR(pred(DeclVal<const ElementType&>()))
 		{
 			static_assert(TIsInvocable<PredT, const ElementType&>::Value, "PredT format must be bool(const ElementT&)");
 
@@ -408,7 +417,8 @@ namespace Detail
 		// * pointer to the first matching element;
 		// * nullptr when no element matches.
 		template<typename PredT>
-		const ElementType* FindBy(PredT&& pred) KOR_NOEXCEPT_EXPR(pred(DeclVal<const ElementType&>()))
+		const ElementType* FindBy(PredT&& pred) const
+			KOR_NOEXCEPT_EXPR(pred(DeclVal<const ElementType&>()))
 		{
 			static_assert(TIsInvocable<PredT, const ElementType&>::Value, "PredT format must be bool(const ElementT&)");
 
@@ -428,9 +438,11 @@ namespace Detail
 		//
 		// The search itself is shared with the const overload.
 		template<typename PredT>
-		KOR_FORCEINLINE ElementType* FindBy(PredT&& pred) KOR_NOEXCEPT_EXPR(pred(DeclVal<const ElementType&>()))
+		KOR_FORCEINLINE ElementType* FindBy(PredT&& pred)
+			KOR_NOEXCEPT_EXPR(pred(DeclVal<const ElementType&>()))
 		{
-			return const_cast<ElementType*>(FindBy(Forward<PredT>(pred)));
+			const TArrayStorage* constThis = this;
+			return const_cast<ElementType*>(constThis->FindBy(Forward<PredT>(pred)));
 		}
 
 		// Mutations

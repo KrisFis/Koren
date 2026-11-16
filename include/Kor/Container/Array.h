@@ -6,7 +6,7 @@
 #include "Kor/Container/Minimal.h"
 
 #include "Kor/Container/ArrayView.h"
-#include "Kor/Container/ContainerTraits.h"
+#include "Kor/Container/Detail/ArrayStorage.h"
 
 #include "Kor/Math/MathOps.h"
 
@@ -19,9 +19,6 @@
 #include "Kor/Utility/Swap.h"
 
 KOR_NAMESPACE_BEGIN
-
-// Forward declare for private array friend
-namespace Detail::Array { template<typename ArrayT> struct TFriend; }
 
 // [ TArray ]
 // A dynamically-sized, heap-allocated array container.
@@ -69,7 +66,7 @@ public:
 
 	// Steals buffer/Num/capacity from `other`.
 	// * `other` is left empty (Data=nullptr, Num=0, Max=0).
-	constexpr TArray(TArray&& other) noexcept;
+	TArray(TArray&& other) noexcept;
 
 	// Deep copy from an initializer list. `{}` is valid and yields an empty array.
 	TArray(const ILType& list) noexcept;
@@ -445,23 +442,7 @@ public:
 	const ElementType* end() const noexcept;
 
 private:
-	// Allocator instance for _data
-	AllocatorType _allocator;
-
-	// Allocated data
-	ElementType* _data;
-
-	// Number of initialized elements
-	SizeType _num;
-
-	// Number of reserved elements (size of _data buffer)
-	SizeType _reservedNum;
-
-	// Friend
-	// -------------------------------------------------------------------------
-
-	using SFriend = Detail::Array::TFriend<TArray>;
-	friend SFriend;
+	Detail::TArrayStorage<ElementType, AllocatorType> _storage;
 };
 
 #include "Kor/Container/Detail/Array.inl"
