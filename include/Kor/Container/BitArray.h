@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Kor/Container/Minimal.h"
-#include "Kor/Container/ContainerTraits.h"
+#include "Kor/Container/Detail/BitArrayStorage.h"
 
 #include "Kor/Math/MathOps.h"
 
@@ -17,9 +17,6 @@
 #include "Kor/Utility/Swap.h"
 
 KOR_NAMESPACE_BEGIN
-
-// Forward declare for private bit array friend
-namespace Detail::BitArray { template<typename T> struct TFriend; }
 
 // [ TBitArray ]
 // A dynamically-sized, heap-allocated packed bit container.
@@ -109,8 +106,14 @@ public:
 	// Number of stored bits.
 	SizeType GetNum() const noexcept;
 
+	// Number of stored words
+	SizeType GetWordNum() const noexcept;
+
 	// Number of bits storable before the next reallocation.
 	SizeType GetReservedNum() const noexcept;
+
+	// Number of words storable before the next reallocation.
+	SizeType GetReservedWordNum() const noexcept;
 
 	// Validation
 	// -------------------------------------------------------------------------
@@ -174,23 +177,7 @@ public:
 	// ConstIteratorType end() const noexcept;
 
 private:
-	// Allocator instance for _data
-	AllocatorType _allocator;
-
-	// Allocated packed words
-	WordType* _data;
-
-	// Number of initialized bits
-	SizeType _num;
-
-	// Number of reserved bits
-	SizeType _reservedNum;
-
-	// Friend
-	// -------------------------------------------------------------------------
-
-	using SFriend = Detail::BitArray::TFriend<TBitArray>;
-	friend SFriend;
+	Detail::TBitArrayStorage<WordType, AllocatorType> _storage;
 };
 
 #include "Kor/Container/Detail/BitArray.inl"
